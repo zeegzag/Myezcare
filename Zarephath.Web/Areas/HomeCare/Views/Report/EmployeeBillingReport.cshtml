@@ -1,0 +1,243 @@
+﻿@{
+	ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.EmployeeBillingReport);
+	Layout = "~/Views/Shared/_Layout.cshtml";
+	ViewBag.SelectedMenuItem = Resource.SMI_EmployeeBillingReport;
+}
+@model SetEmployeeBillingReportListPage
+@Html.Hidden("hdnEmployeeBillingReport", Common.SerializeObject(Model))
+
+<div data-ng-controller="EmployeeBillingReportController">
+	<div class="page-bar">
+		<h3 class="page-title">@Resource.EmployeeBillingReport</h3>
+	</div>
+
+	<div class="row">
+		<div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+			@{ Html.EnableClientValidation(false); }
+			<form id="frmEmpBillingReportlist">
+				<div class="col-lg-2 col-md-3">
+					<label class="control-label">@Resource.EmployeeName</label>
+					@* @Html.TextBoxFor(m => m.SearchEmployeeBillingReportListPage.EmployeeName, new { data_ng_model = "TempSearchEmployeeBillingReportListPage.EmployeeName", @class = "form-control input-sm", placeholder = Resource.EmployeeName, maxlength = 50 })*@
+					@*<select class="form-control input-sm" title="@Resource.SelectEmployee"
+								data-val="true" actions-box="true" multiple="multiple"
+								selectpicker="TempSearchEmployeeBillingReportListPage.EmployeeID" name="SearchEmpCalender.EmployeeID">
+							<option data-ng-repeat="option in EmployeeBillingReportModel.EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+						</select>*@
+					<select class="form-control input-sm" title="@Resource.SelectEmployee"
+							data-ng-model="TempSearchEmployeeBillingReportListPage.EmployeeName" name="SearchEmpCalender.EmployeeID">
+						<option value="">@Resource.SelectEmployee</option>
+						<option data-ng-repeat="option in EmployeeBillingReportModel.EmployeeList" value="{{option.EmployeeName}}">{{option.EmployeeName}}</option>
+					</select>
+				</div>
+				<div class="col-lg-2 col-md-3">
+					<label class="control-label">@Resource.StartDate</label>
+					<div class="input-group date"
+						 datepicker="TempSearchEmployeeBillingReportListPage.StartDate"
+						 ng-dateval="TempSearchEmployeeBillingReportListPage.StartDate">
+						@Html.TextBoxFor(q => q.SearchEmployeeBillingReportListPage.StartDate,
+							 new
+							 {
+								 @class = "form-control input-sm dateInputMask",
+								 placeholder = Resource.StartDate
+							 })
+						@Html.ValidationMessageFor(q => q.SearchEmployeeBillingReportListPage.StartDate)
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3">
+					<label class="control-label">@Resource.EndDate</label>
+					<div class="input-group date"
+						 datepicker="TempSearchEmployeeBillingReportListPage.EndDate"
+						 ng-dateval="TempSearchEmployeeBillingReportListPage.EndDate">
+						@Html.TextBoxFor(q => q.SearchEmployeeBillingReportListPage.EndDate,
+							 new
+							 {
+								 @class = "form-control input-sm dateInputMask",
+								 placeholder = Resource.StartDate
+							 })
+						@Html.ValidationMessageFor(q => q.SearchEmployeeBillingReportListPage.EndDate)
+						<span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+					</div>
+				</div>
+				<div class="col-lg-2 col-md-3">
+					<label class="control-label">&nbsp;</label>
+					<div>
+						<button class="btn btn-sm btn-primary" data-ng-click="SearchEmployeeBillingReport()">
+							<i class="fa fa-search"></i>&nbsp;&nbsp;@Resource.Search
+						</button>
+						<button class="btn btn-sm grey border-grey-cascade" data-ng-click="ResetSearchFilter()">
+							<i class="fa fa-close"></i>&nbsp;&nbsp;@Resource.Reset
+						</button>
+					</div>
+				</div>
+				<div class="visible-md clearfix"></div>
+				<div class="col-lg-2 col-md-3">
+					<label class="control-label">@Resource.PayFrequency</label>
+					@Html.DropDownList("PayFrequency", new SelectList(Enum.GetValues(typeof(PayFrequency))),
+"Select Pay Frequency", new {  @class = "form-control input-sm" })
+				</div>
+				<div class="col-lg-2 col-md-3">
+					<label class="control-label">&nbsp;</label>
+					<div>
+						<button class="btn btn-sm btn-primary" data-ng-click="ExportToCSV($event)">
+							<i class="fa fa-search"></i>&nbsp;&nbsp;@Resource.ExportToCSV
+						</button>
+					</div>
+				</div>
+			</form>
+			@*<div class="btn-group">
+					<button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+						<i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+					</button>
+				</div>*@
+		</div>
+		<div class="col-md-12 col-sm-12 col-xs-12">
+			<div data-ng-show="EmployeeBillingReportList.length > 0">
+				<div class="pull-right top pagination-sm mt-15">
+					<dir-pagination-controls boundary-links="true" on-page-change="EmployeeBillingReportListPager.pageChanged(newPageNumber)" pagination-id="EmployeeBillingReportListPagerID"></dir-pagination-controls>
+				</div>
+			</div>
+		</div>
+		<div class="space20"></div>
+	</div>
+
+	<div>
+		<div class="row">
+			<div class="col-sm-12">
+				<div class="portlet-body compact" style="display: block;">
+					<div class="table-responsive">
+						<table class="table table-pinned table-bordered table-striped table-condensed">
+							<thead class="flip-content">
+								<tr>
+									@*@if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_Delete))
+										{*@
+									@*<th class="width-20px"></th>*@
+									@*}*@
+									<th class="">
+										<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('EmployeeName')">@Resource.EmployeeName</a>
+										<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'EmployeeName'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+									</th>
+									<th class="">
+										<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('AllocatedHour')">Scheduled @Resource.Hours</a>
+										<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'AllocatedHour'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+									</th>
+
+									<th class="">
+										<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('PTOHour')">Working @Resource.Hours</a>
+										<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'PTOHour'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+									</th>
+									<th class="">
+										<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('RegHourInStr')">Regular / @Resource.AllocatedHrs</a>
+										<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'RegHourInStr'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+										<i class="fa fa-question-circle" common-detail-popover data-content="You can set this hours from 'Employee Billing Hours' section of 'Employee Information' tab. By default, we will use 8 hours per Day if not set." popover-closeable="false"></i>
+									</th>
+									<th class="">
+										<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('OvertimeHoursInStr')">Overtime @Resource.Hours</a>
+										<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'OvertimeHoursInStr'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+									</th>
+									<th class="">
+										<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('PTOHour')">PTO @Resource.Hours</a>
+										<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'PTOHour'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+									</th>
+									<th class="">
+										<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('RegularPayHours')">Regular Pay</a>
+										<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'RegularPayHours'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+									</th>
+									<th class="">
+										<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('OvertimePayHours')">Overtime Pay</a>
+										<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'OvertimePayHours'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+									</th>
+									@*<th class="">
+											<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('PTOHour')">Overtime Hours</a>
+											<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'PTOHour'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+										</th>
+										<th class="">
+											<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('WorkingHour')">@Resource.TotalHours</a>
+											<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'WorkingHour'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+										</th>*@
+									@*<th class="">
+											<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('BillableAmount')">@Resource.BillableAmount</a>
+											<span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'BillableAmount'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+										</th>*@
+								</tr>
+							</thead>
+							<tbody>
+								<tr data-ng-class="{'deleted':empbillingreport.IsDeleted}" dir-paginate="empbillingreport in EmployeeBillingReportList | itemsPerPage: EmployeeBillingReportListPager.pageSize" total-items="EmployeeBillingReportListPager.totalRecords" current-page="EmployeeBillingReportListPager.currentPage" pagination-id="EmployeeBillingReportListPagerID">
+									@*@if (Common.HasPermission(Constants.HC_Permission_empbillingreport_Delete))
+										{
+											<td class="text-align-center">
+												<input type="checkbox" class="unicheckbox text-align-center" data-ng-model="empbillingreport.IsChecked" data-ng-change="Selectempbillingreport(empbillingreport)" val="empbillingreport.IsChecked">
+											</td>
+										}*@
+									<td data-ng-bind="empbillingreport.EmployeeName"></td>
+									<td>
+										{{(empbillingreport.AllocatedHour == null || empbillingreport.AllocatedHour =='') ? '0.00' : empbillingreport.AllocatedHourInStr }}
+									</td>
+									<td>
+										{{(empbillingreport.WorkingHour == null || empbillingreport.WorkingHour =='') ? '0.00' : empbillingreport.WorkingHourInStr }}
+									</td>
+									<td>
+										{{(empbillingreport.RegHourInStr == null || empbillingreport.RegHourInStr =='') ? '0.00' : empbillingreport.RegHourInStr }}
+									</td>
+									<td>
+										{{(empbillingreport.OvertimeHoursInStr == null || empbillingreport.OvertimeHoursInStr =='') ? '0.00' : empbillingreport.OvertimeHoursInStr }}
+									</td>
+									<td>
+										{{(empbillingreport.PTOHour == null || empbillingreport.PTOHour =='') ? '0.00' : empbillingreport.PTOHourInStr }}
+									</td>
+									<td>
+										{{(empbillingreport.RegularPayHours == null || empbillingreport.RegularPayHours =='') ? '0.00' : empbillingreport.RegularPayHours }}
+									</td>
+									<td>
+										{{(empbillingreport.OvertimePayHours == null || empbillingreport.OvertimePayHours =='') ? '0.00' : empbillingreport.OvertimePayHours }}
+									</td>
+
+
+
+
+									@*<td>
+											{{(empbillingreport.OTHourInStr == null || empbillingreport.OTHourInStr =='') ? '0.00' : empbillingreport.OTHourInStr }}
+										</td>
+										<td>
+											{{(empbillingreport.RegHourInStr == null || empbillingreport.RegHourInStr =='') ? '0.00' : empbillingreport.RegHourInStr }}
+										</td>*@
+									@*<td data-ng-bind="empbillingreport.BillableAmount"></td>*@
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</div>
+			</div>
+		</div>
+		<br />
+		<div class="row">
+			<div class="col-sm-12" data-ng-if="EmployeeBillingReportList.length > 0">
+				<div class="col-sm-3 pull-left no-padding">
+					@Resource.Showing <span data-ng-bind="(EmployeeBillingReportListPager.pageSize * EmployeeBillingReportListPager.currentPage) - EmployeeBillingReportListPager.pageSize  + 1"></span>
+					&nbsp;@Resource.To <span data-ng-bind="(EmployeeBillingReportListPager.pageSize == EmployeeBillingReportListPager.currentPageSize) ? (EmployeeBillingReportListPager.pageSize * EmployeeBillingReportListPager.currentPage) :(EmployeeBillingReportListPager.pageSize * EmployeeBillingReportListPager.currentPage) - EmployeeBillingReportListPager.pageSize  + EmployeeBillingReportListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeBillingReportListPager.totalRecords"></span>&nbsp;@Resource.Records
+				</div>
+				<div class="pull-right top pagination-sm">
+					<dir-pagination-controls boundary-links="true" on-page-change="EmployeeBillingReportListPager.pageChanged(newPageNumber)" pagination-id="EmployeeBillingReportListPagerID"></dir-pagination-controls>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-sm-12">
+			<div data-ng-if="EmployeeBillingReportList.length == 0">
+				<div class="row">
+					<div class="col-lg-12">
+						<div class="alert alert-danger">
+							@Html.Raw(Resource.NoRecordsFound)
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+@section Scripts{
+	@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/employeebillingreport")
+}

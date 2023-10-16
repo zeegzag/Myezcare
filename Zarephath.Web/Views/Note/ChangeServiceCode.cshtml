@@ -1,0 +1,109 @@
+﻿@{
+    ViewBag.Title = Resource.ChangeServiceCode;
+    ViewBag.SelectedMenuItem = Resource.SMI_ChangeServiceCode;
+}
+@model ChangeServiceCodeModel
+
+<div id="wizard-container" data-ng-controller="ChangeServiceCodeController">
+    <div class="page-bar">
+        <h2 class="page-title">@Resource.ChangeServiceCode
+        </h2>
+    </div>
+
+    @Html.Hidden("hdnChangeServiceCodeModel", Common.SerializeObject(Model))
+
+    <div data-ng-if="!IsFinalPage">
+        <div class="mt-element-step">
+            <div class="row step-thin">
+
+                <a class="col-md-4 bg-grey-steel mt-step-col" data-ng-class="{'active':step.step == currentStep,'done':step.isDone,'disabled-anchor':step.step>currentStep && SelectedNotes.length==0}" data-ng-repeat="step in steps" data-ng-click="gotoStep(step.step)">
+                    <div class="mt-step-number bg-white font-grey">{{step.step}}</div>
+                    <div class="mt-step-title uppercase font-grey-cascade">{{step.name}}</div>
+                    <div class="mt-step-content font-grey-cascade">{{step.desc}}</div>
+                </a>
+            </div>
+        </div>
+
+
+        <div id="wizard-content-container" class="row">
+            <div class="col-md-12 padding-left-right-30 margin-bottom-minus-33">
+                <div class="pull-right">
+                    <button data-ng-hide="currentStep <= 1 && currentStep != 3" class="btn btn-default" name="previous" type="button" data-ng-click="gotoStep(currentStep - 1)"><i class="fa fa-arrow-left"></i>&nbsp;Previous step</button>
+                    <button data-ng-hide="currentStep >= steps.length || SelectedNotes.length==0" class="btn btn-primary" name="next" type="button" data-ng-click="gotoStep(currentStep + 1)">Next step <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+            <div class="padding-left-right-30">
+                <div id="groupnote-step1" data-ng-if="currentStep==1">
+                    @Html.Partial("Partial/_CSCStep1", Model)
+                </div>
+                <div id="groupnote-step2" data-ng-if="currentStep==2">
+                    @Html.Partial("Partial/_CSCStep2", Model)
+                </div>
+            </div>
+
+            <div class="col-md-12 padding-left-right-30">
+                <div class="pull-right">
+                    <button data-ng-hide="currentStep <= 1 && currentStep != 3" class="btn btn-default" name="previous" type="button" data-ng-click="gotoStep(currentStep - 1)"><i class="fa fa-arrow-left"></i>&nbsp;Previous step</button>
+                    <button data-ng-hide="currentStep >= steps.length || SelectedNotes.length==0" class="btn btn-primary" name="next" type="button" data-ng-click="gotoStep(currentStep + 1)">Next step <i class="fa fa-arrow-right"></i></button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <div data-ng-if="IsFinalPage">
+        @Html.Partial("Partial/_CSCStep3")
+    </div>
+
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/note/changeservicecode")
+}
+
+<script type="text/javascript">
+    
+
+    var SearchNotes = "@Resource.SearchNotes";
+    var EnterNewServiceCodeDetail = "@Resource.EnterNewServiceCodeDetail";
+    var Complete = "@Resource.Complete";
+
+
+    var DistanceInMilesUnit = "@Convert.ToInt32(EnumUnitType.DistanceInMiles)";
+    var StopUnit = "@Convert.ToInt32(EnumUnitType.Stop)";
+    var TimeUnit = "@Convert.ToInt32(EnumUnitType.Time)";
+    var OtherServiceCode = "@Convert.ToInt32(EnumServiceCodeType.Other)";
+    var OtherPOS = "@Convert.ToInt32(EnumPlaceOfServices.Confirmed)";
+    var Name = "@Resource.Name";
+    var AHCCCSID = "@Resource.AHCCCSID";
+    var CISNumber = "@Resource.CISNumber";
+    var Phone = "@Resource.Phone";
+    var Address = "@Resource.Address";
+    var CommunityMentalHealthCenter = "@Resource.lblCommunityMentalHealthCenter";
+    var MaxUnit = "@Resource.MaxUnit";
+    var DailyUnitLimit = "@Resource.DailyUnitLimit";
+    var Billable = "@Resource.Billable";
+    var GroupOption = "@Resource.GroupOption";
+    
+    
+    
+    var FirstStep = "@Resource.FirstStep";
+    var SecondStep = "@Resource.SecondStep";
+    var ThirdStep = "@Resource.ThirdStep";
+    var FacilityForOtherServiceCode = "@Constants.FacilityForOtherServiceCode";
+
+    var ServiceDate = "@Resource.ServiceDate";
+    var ServiceCodeType = "@Resource.ServiceCodeType";
+    var ServiceCode = "@Resource.ServiceCode";
+    var POS = "@Resource.POS";
+    var FieldsRequired = '@Html.Raw(Resource.FieldsRequired)';
+    var Required = "@Resource.Required";
+    var ValidateServiceCodeInStep2 = '@Html.Raw(Resource.ValidateServiceCodeInStep2)';
+    var NeedUpdateFromStep2 = '@Html.Raw(Resource.NeedUpdateFromStep2)';
+
+    var DailyLimitExceedMsg = '@Resource.DailyLimitExceedMsg';
+    var CanNotSave = '@Resource.CanNotSave';
+    var GroupCodelAlert = '@Html.Raw(Resource.GroupCodelAlert)';
+
+</script>

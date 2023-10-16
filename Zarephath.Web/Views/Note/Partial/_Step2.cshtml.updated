@@ -1,0 +1,504 @@
+﻿@model GroupNoteModel
+<div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 no-padding margin-top-minus-10">
+    <h3 class="inline col-md-6 padding-left-0">@Resource.EnterNoteDetail</h3>
+</div>
+<hr class="clearfix" />
+
+<div class="col-lg-8 col-md-8 col-sm-8 col-xs-12 ">
+
+    <div class="row">
+
+        <div class="clearfix">
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.ServiceDate</label>
+                <div class="input-group date" datepicker="GroupNoteModel.Note.ServiceDate" ng-dateval="GroupNoteModel.Note.ServiceDate">
+                    <input class="form-control input-sm dateInputMask"
+                           id="ServiceDate" maxlength="10"
+                           name="Note.ServiceDate"
+                           data-val="true" 
+                           data-val-required="@Resource.ServiceDateRequired"
+                           type="text" placeholder="@Resource.ServiceDate">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+                @Html.ValidationMessageFor(m => m.Note.ServiceDate)
+            </div>
+
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.ServiceCodeType</label>
+                <div>
+                    <select class="form-control input-sm"
+                        data-ng-init="GroupNoteModel.Note.ServiceCodeType=(GroupNoteModel.Note.ServiceCodeType==null || GroupNoteModel.Note.ServiceCodeType==0 || GroupNoteModel.Note.ServiceCodeType=='') ?'':GroupNoteModel.Note.ServiceCodeType.toString()"
+                        data-ng-model="GroupNoteModel.Note.ServiceCodeType"
+                        id="ServiceCodeType"
+                        name="Note.ServiceCodeType"
+                        data-val="true"
+                        data-val-required="@Resource.ServiceCodeTypeRequired" 
+                        convert-to-number="">
+                        <option value="">@Resource.Select</option>
+                        <option data-ng-repeat="option in GroupNoteModel.ServiceCodeTypes" value="{{option.ServiceCodeTypeID}}">{{option.ServiceCodeTypeName}}</option>
+                    </select>
+                </div>
+                @Html.ValidationMessageFor(m => m.Note.ServiceCodeType)
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.BillingProvider</label>
+                <div>
+
+                    @Html.DropDownListFor(p => p.Note.BillingProviderID, Model.Facilities.ToSelectList(Model.Note.BillingProviderID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                          new
+                                              {
+                                                  convert_to_number = "",
+                                                  data_ng_model = "GroupNoteModel.Note.BillingProviderID",
+                                                  data_ng_init = "GroupNoteModel.Note.BillingProviderID=(GroupNoteModel.Note.BillingProviderID==null || GroupNoteModel.Note.BillingProviderID==0 || GroupNoteModel.Note.BillingProviderID=='') ?'':GroupNoteModel.Note.BillingProviderID.toString()",
+                                                  data_ng_value = "GroupNoteModel.Note.BillingProviderID",
+                                                  data_ng_options = "col.Value as col.Name for col in GroupNoteModel.Facilities track by col.Value",
+                                                  @class = "form-control input-sm"
+                                              })
+
+                </div>
+                @Html.ValidationMessageFor(m => m.Note.BillingProviderID)
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.RenderingProvider</label>
+                <div>
+                    @Html.DropDownListFor(p => p.Note.RenderingProviderID, Model.Facilities.ToSelectList(Model.Note.RenderingProviderID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                          new
+                                              {
+                                                  convert_to_number = "",
+                                                  data_ng_model = "GroupNoteModel.Note.RenderingProviderID",
+                                                  data_ng_init = "GroupNoteModel.Note.RenderingProviderID=(GroupNoteModel.Note.RenderingProviderID==null || GroupNoteModel.Note.RenderingProviderID==0 || GroupNoteModel.Note.RenderingProviderID=='') ?'':GroupNoteModel.Note.RenderingProviderID.toString()",
+                                                  data_ng_value = "GroupNoteModel.Note.RenderingProviderID",
+                                                  data_ng_options = "col.Value as col.Name for col in GroupNoteModel.Facilities track by col.Value",
+                                                  @class = "form-control input-sm"
+                                              })
+
+                </div>
+                @Html.ValidationMessageFor(m => m.Note.RenderingProviderID)
+            </div>
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+            <label class="control-label">@Resource.ZSPService</label>
+            <div>
+
+                @Html.DropDownListFor(p => p.Note.ZarephathService, Model.Facilities.ToSelectList(Model.Note.ZarephathService ?? "", "Value", "Value", @Resource.Select, ""),
+                                      new
+                                          {
+                                              //convert_to_number = "",
+                                              data_ng_model = "GroupNoteModel.Note.ZarephathService",
+                                              data_ng_init = "GroupNoteModel.Note.ZarephathService=(GroupNoteModel.Note.ZarephathService==null || GroupNoteModel.Note.ZarephathService==0 || GroupNoteModel.Note.ZarephathService=='') ?'':GroupNoteModel.Note.ZarephathService.toString()",
+                                              data_ng_value = "GroupNoteModel.Note.ZarephathService",
+                                              data_ng_options = "option.Value as option.Value for option in GroupNoteModel.Services track by option.Value",
+                                              @class = "form-control input-sm"
+                                          })
+            </div>
+            @Html.ValidationMessageFor(m => m.Note.ZarephathService)
+        </div>
+
+
+        <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="GroupNoteModel.Note.ServiceCodeType > 0 && GroupNoteModel.Note.ServiceCodeType!= OtherServiceCode">
+            <label class="control-label">@Resource.ServiceCode</label>
+
+            @Html.TextBoxFor(x => x.Note.ServiceCodeID,
+                             new
+                                 {
+                                     ng_model = "GroupNoteModel.Note.ServiceCodeID",
+                                     @class = "form-control hideErrorContent",
+                                  })
+            <div>
+                <input type="text"
+                       token-input
+                       ng-val="GroupNoteModel.Note.ServiceCodeID"
+                       textfield='ServiceCode'
+                       valuefield='ServiceCodeID'
+                       searchurl="{{GetStep2ServiceCodesURL}}"
+                       placeholder="@Resource.EnterServiceCode"
+                       tokenlimit='1'
+                       onresultsformatter='GroupNoteModel.GN_ServiceCodeResultsFormatter'
+                       onaddedcallback='GroupNoteModel.GN_AddedServiceCode'
+                       ondeletecallback='GroupNoteModel.GN_RemoveServiceCode'
+                       ontokenformatter="GroupNoteModel.GN_ServiceCodeTokenFormatter"
+                       additional-filter-value="GroupNoteModel.GN_AdditionFilterForServiceCode"                                           
+                       additional-filter-text="searchParam"
+                       autoSelectFirstResult="true"
+                       minChars="0"
+                       tokeninputobj="GroupNoteModel.GN_ServiceCodeTokenObj"
+                       id="GroupNoteServiceCodeIDToken"
+                       customclass="form-control input-sm"
+                    />
+            </div>
+            @Html.ValidationMessageFor(x => x.Note.ServiceCodeID, "", new { data_ng_attr_valmsg_for = "{{ 'GroupNoteModel.ServiceCodeID' }}" })
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="GroupNoteModel.Note.ServiceCodeType!=OtherServiceCode">@*data-ng-show="referralNote.Note.ServiceCodeID > 0"*@
+            <label class="control-label">@Resource.POS{{GroupNoteModel.Note.PosID}}</label>
+            <div>
+                @Html.DropDownListFor(p => p.Note.PosID, Model.POSList.ToSelectList(Model.Note.PosID.ToString() ?? "", "PosName", "PosID", @Resource.Select, ""),
+                                      new
+                                          {
+                                              convert_to_number = "",
+                                              data_ng_model = "GroupNoteModel.Note.PosID",
+                                              data_ng_init = "GroupNoteModel.Note.PosID=(GroupNoteModel.Note.PosID==null || GroupNoteModel.Note.PosID==0 || GroupNoteModel.Note.PosID=='') ?'':GroupNoteModel.Note.PosID.toString()",
+                                              @class = "form-control input-sm",
+                                              data_error_Count = "GroupNoteModel.ErrorCount",
+                                              data_ng_attr_id = "{{ 'GroupNoteModel_PosID' + GroupNoteModel.ReferralID }}",
+                                              data_ng_attr_name = "{{ 'GroupNoteModel.PosID' + GroupNoteModel.ReferralID }}"
+                                          })
+            </div>
+            @Html.ValidationMessageFor(m => m.Note.PosID, "", new { data_ng_attr_valmsg_for = "{{ 'GroupNoteModel.PosID' + GroupNoteModel.ReferralID }}" })
+        </div>
+
+        <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="GroupNoteModel.Note.ServiceCodeType!=OtherServiceCode">
+            <label class="control-label">@Resource.POSDetails</label>
+            <div>
+                @Html.TextBoxFor(x => x.Note.POSDetail,
+                                 new
+                                     {
+                                         ng_model = "GroupNoteModel.Note.POSDetail",
+                                         @class = "form-control input-sm",
+                                         data_ng_disabled = "GroupNoteModel.Note.PosID!=OtherPOS",
+                                         data_ng_attr_id = "{{ 'GroupNoteModel_POSDetail' + GroupNoteModel.ReferralID }}",
+                                         data_ng_attr_name = "{{ 'GroupNoteModel.POSDetail' + GroupNoteModel.ReferralID }}"
+                                     })
+            </div>
+            @Html.ValidationMessageFor(m => m.Note.POSDetail, "", new { data_ng_attr_valmsg_for = "{{ 'GroupNoteModel.POSDetail' + GroupNoteModel.ReferralID }}" })
+        </div>
+
+
+
+
+        <div data-ng-show="GroupNoteModel.Note.ServiceCodeType!=OtherServiceCode">
+            <div class="form-group col-lg-3 clearfix">
+                <button class="form-control btn btn-sm red" data-ng-click="GroupNoteModel.ValidateServiceCode()">@Resource.ValidateServiceCode</button>
+            </div>
+            <div class="form-group col-lg-9">
+                <i data-ng-show="GroupNoteModel.ValidateServiceCodePassed==2"><span class="font-red font-weight-600">@Resource.Failed:&nbsp;</span><small class="" data-ng-bind-html="GroupNoteModel.ValidateServiceCodeMsg"></small></i>
+                <span data-ng-show="GroupNoteModel.ValidateServiceCodePassed==1" class="badge badge-success">@Resource.Passed</span>
+            </div>
+        </div>
+
+
+
+        <div class="clearfix" data-ng-if="GroupNoteModel.ValidateServiceCodePassed==1 && GroupNoteModel.Note.ServiceCodeType!=OtherServiceCode">
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.StartTime</label>
+                @Html.TextBoxFor(x => x.Note.StrStartTime,
+                                                                     new
+                                                                         {
+                                                                             ng_model = "GroupNoteModel.Note.StrStartTime",
+                                                                             @class = "form-control input-sm",
+                                                                             placeholder = @Resource.StartTime,
+                                                                             data_ng_attr_id = "{{ 'GroupNoteModel_strStartTime' + GroupNoteModel.ReferralID }}",
+                                                                             data_ng_attr_name = "{{ 'GroupNoteModel_strStartTime' + GroupNoteModel.ReferralID }}",
+                                                                             time_input_mask = "",
+                                                                         })
+                @Html.ValidationMessageFor(m => m.Note.StrStartTime, "", new { data_ng_attr_valmsg_for = "{{ 'GroupNoteModel_strStartTime' + GroupNoteModel.ReferralID }}" })
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.EndTime</label>
+                @Html.TextBoxFor(x => x.Note.StrEndTime,
+                                                                     new
+                                                                         {
+                                                                             ng_model = "GroupNoteModel.Note.StrEndTime",
+                                                                             @class = "form-control input-sm",
+                                                                             placeholder = @Resource.EndTime,
+                                                                             compare_with = "{{ '#GroupNoteModel_strStartTime' + GroupNoteModel.ReferralID }}",
+                                                                             validation_timecompare = "",
+                                                                             data_ng_attr_id = "{{ 'GroupNoteModel_NotestrEndTime' + GroupNoteModel.ReferralID }}",
+                                                                             data_ng_attr_name = "{{ 'GroupNoteModel_NotestrEndTime' + GroupNoteModel.ReferralID }}",
+                                                                             time_input_mask = ""
+                                                                         })
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="GroupNoteModel.Note.ShowMile">
+                <label class="control-label">@Resource.StartMile</label>
+                <div>
+                    @Html.TextBoxFor(x => x.Note.StartMile,
+                                                                         new
+                                                                             {
+                                                                                 ng_model = "GroupNoteModel.Note.StartMile",
+                                                                                 @class = "form-control input-sm",
+                                                                                 placeholder = @Resource.StartMile,
+                                                                                 dir_valid_decimal = "",
+                                                                                 data_ng_attr_id = "{{ 'GroupNoteModel_StartMile' + GroupNoteModel.ReferralID }}",
+                                                                                 data_ng_attr_name = "{{ 'GroupNoteModel.StartMile' + GroupNoteModel.ReferralID }}"
+                                                                             })
+                </div>
+                @Html.ValidationMessageFor(m => m.Note.StartMile, "", new { data_ng_attr_valmsg_for = "{{ 'GroupNoteModel.StartMile' + GroupNoteModel.ReferralID }}" })
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="GroupNoteModel.Note.ShowMile">
+                <label class="control-label">@Resource.EndMile</label>
+                <div>
+                    @Html.TextBoxFor(x => x.Note.EndMile,
+                                                                         new
+                                                                             {
+                                                                                 ng_model = "GroupNoteModel.Note.EndMile",
+                                                                                 min = "{{GroupNoteModel.Note.StartMile}}",
+                                                                                 @class = "form-control input-sm",
+                                                                                 placeholder = @Resource.EndMile,
+                                                                                 dir_valid_decimal = "",
+                                                                                 data_ng_attr_id = "{{ 'GroupNoteModel_EndMile' + GroupNoteModel.ReferralID }}",
+                                                                                 data_ng_attr_name = "{{ 'GroupNoteModel.EndMile' + GroupNoteModel.ReferralID }}"
+                                                                             })
+                </div>
+                @Html.ValidationMessageFor(m => m.Note.EndMile, "", new { data_ng_attr_valmsg_for = "{{ 'GroupNoteModel.EndMile' + GroupNoteModel.ReferralID }}" })
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+    <hr class="clear">
+    <div class="row">
+        <div class="" data-ng-if="GroupNoteModel.Note.ServiceCodeType==OtherServiceCode">
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.SpokeTo</label>
+                <div>
+                    <input type="text" class="form-control input-sm" name="GroupNoteModel.Note.SpokeTo" data-ng-model="GroupNoteModel.Note.SpokeTo">
+                </div>
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.Relation</label>
+                <div>
+
+                    <select class="form-control input-sm"
+                        data-ng-init="GroupNoteModel.Note.Relation=(GroupNoteModel.Note.Relation==null || GroupNoteModel.Note.Relation==0 || GroupNoteModel.Note.Relation=='') ?'':GroupNoteModel.Note.Relation.toString()"
+                        data-ng-model="GroupNoteModel.Note.Relation"
+                        id="Relation"
+                        name="GroupNoteModel.Note.Relation">
+                        <option value="">@Resource.Select</option>
+                        <option data-ng-repeat="option in GroupNoteModel.Relations" value="{{option.Value}}">{{option.Value}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.KindOfNote</label>
+                <div>
+                    <select class="form-control input-sm"
+                        data-ng-init="GroupNoteModel.Note.OtherNoteType=(GroupNoteModel.Note.OtherNoteType==null || GroupNoteModel.Note.OtherNoteType==0 || GroupNoteModel.Note.OtherNoteType=='') ?'':GroupNoteModel.Note.OtherNoteType.toString()"
+                        data-ng-model="GroupNoteModel.Note.OtherNoteType"
+                        id="OtherNoteType"
+                        name="GroupNoteModel.Note.OtherNoteType">
+                        <option value="">@Resource.Select</option>
+                        <option data-ng-repeat="option in GroupNoteModel.KindOfNotes" value="{{option.Value}}">{{option.Value}}</option>
+                    </select>
+                </div>
+            </div>
+
+
+
+            <div class="clearfix">
+                <div class="form-group col-md-6 col-sm-6 col-sm-6 margin-top-20">
+                    <div>
+                        <div class="pull-left">
+                            <input data-ng-model="GroupNoteModel.Note.IsIssue" type="checkbox" id="IsIssue" name="GroupNoteModel.IsIssue" class="unicheckbox " val="GroupNoteModel.Note.IsIssue">
+                        </div>
+                        <label class="col-md-11" for="GroupNoteModelIsIssue">@Resource.OpenAsAnIssue</label>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="GroupNoteModel.Note.IsIssue">
+                    <label class="control-label" data-ng-class="{'required':GroupNoteModel.Note.IsIssue}">@Resource.Assignee</label>
+                    <div>
+                        @Html.DropDownListFor(p => p.Note.IssueAssignID, Model.Employees.ToSelectList(Model.Note.IssueAssignID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                                              new
+                                                                                  {
+                                                                                      convert_to_number = "",
+                                                                                      data_ng_model = "GroupNoteModel.Note.IssueAssignID",
+                                                                                      data_ng_init = "GroupNoteModel.Note.IssueAssignID=(GroupNoteModel.Note.IssueAssignID==null || GroupNoteModel.Note.IssueAssignID==0 || GroupNoteModel.Note.IssueAssignID=='') ?'':GroupNoteModel.Note.IssueAssignID.toString()",
+                                                                                      data_ng_value = "GroupNoteModel.Note.IssueAssignID",
+                                                                                      data_ng_options = "col.Value as col.Name for col in GroupNoteModel.Employees track by col.Value",
+                                                                                      @class = "form-control input-sm",
+                                                                                      data_ng_attr_id = "{{ 'GroupNoteModel_IssueAssignID' + GroupNoteModel.ReferralID }}",
+                                                                                      data_ng_attr_name = "{{ 'GroupNoteModel.IssueAssignID' + GroupNoteModel.ReferralID }}"
+                                                                                  })
+                    </div>
+                    @Html.ValidationMessageFor(m => m.Note.IssueAssignID, "", new { data_ng_attr_valmsg_for = "{{ 'GroupNoteModel.IssueAssignID' + GroupNoteModel.ReferralID }}" })
+                </div>
+            </div>
+
+
+        </div>
+        <div class="margin-top-30 inline-block">
+            <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                <label class="control-label">@Resource.NoteData</label>
+                <div>
+                    @Html.TextAreaFor(x => x.Note.NoteDetails,
+                                      new
+                                          {
+                                              ng_model = "GroupNoteModel.Note.NoteDetails",
+                                              @class = "form-control hideErrorContent replaceErrorSource"
+                                          })
+                    @Html.ValidationMessageFor(m => m.Note.NoteDetails)
+                    <div class="replaceErrorDest summerNoteEditor">
+                        <summernote data-ng-model="GroupNoteModel.Note.NoteDetails"
+                            height="150"></summernote>
+                    </div>
+                </div>
+
+            </div>
+
+
+
+            <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                <button class="btn btn-sm green-seagreen yellow-casablanca-stripe" data-ng-click="AddTempNote(GroupNoteModel.Note)">@Resource.AddService</button>
+                <button class="btn btn-sm grey-silver red-stripe cancel" data-ng-click="ClearTempNote()">@Resource.ClearDetails</button>
+                <button class="cancel ClearDetails" data-ng-click="ClearTempNote(true)" style="display: none;"></button>
+            </div>
+
+            <div class="clearfix padding-top-40">
+                <h3 class=" form-group col-lg-12 col-md-12 col-sm-12">@Resource.NoteDetails</h3>
+                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                    <div class="clearfix tbl_reflog tbl_ReqServiceMsg" tabindex="4000">
+                        <label class="control-label required"><strong>@Resource.ServiceDetails</strong></label>
+                        <span class="font-red padding-left-5">@Resource.Atleast1ServiceRequried  {{AddNotePageModel.Note.DummyNoteID}}</span>
+                        <hr />
+                        <div class="portlet-body compact padding-30 text-align-center border-grey-steel bg-grey-steel bg-font-grey-steel tbl_ReqServiceMsg" data-ng-if="GroupNoteModel.TempNoteList.length<=0">
+                            <b>@Resource.Atleast1ServiceRequried</b>
+                        </div>
+
+                        <div class="portlet-body compact" data-ng-if="GroupNoteModel.TempNoteList.length>0">
+                            <div class="dataTables_wrapper">
+                                <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                    <tbody data-ng-repeat="tempNote in GroupNoteModel.TempNoteList track by $index | orderBy:''">
+                                        <tr data-ng-class="{'deleted':tempNote.IsDeleted,'edited':((tempNote.NoteID === 0 || tempNote.NoteID === undefined) && tempNote.DummyNoteID === GroupNoteModel.Note.DummyNoteID) || (tempNote.NoteID > 0 && tempNote.NoteID === GroupNoteModel.Note.NoteID)}">
+                                            <td class="border-blue">
+                                                <div>@*tempNote.NoteID==AddNotePageModel.Note.NoteID || *@  {{tempNote.DummyNoteID}}
+                                                                        <div class="BatchSummaryDiv padding-top-4px">
+                                                                            <div class="td-batch-summary">@Resource.ServiceDate:</div>
+                                                                            <div class="BatchSummaryDesc">
+                                                                                <span class="text-decoration-underline">{{tempNote.ServiceDate | dateformat}}</span>
+                                                                            </div>
+                                                                            <div data-ng-if="tempNote.ServiceCodeType!=OtherServiceCode">
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.ServiceTime:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.StrStartTime}}</span><span class="padding-left-right-5 text-decoration-none">@Resource.To </span><span class="text-decoration-underline">{{tempNote.StrEndTime}}</span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Minutes:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.SelectedServiceCodeForPayor.MinutesDiff?tempNote.SelectedServiceCodeForPayor.MinutesDiff:'@Resource.NA'}} </span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Miles:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.SelectedServiceCodeForPayor.MileDiff?tempNote.SelectedServiceCodeForPayor.MileDiff:'@Resource.NA'}} </span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Units:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline font-purple-seance bold">{{tempNote.SelectedServiceCodeForPayor.CalculatedUnit}} </span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div data-ng-if="tempNote.ServiceCodeType==OtherServiceCode">
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.SpokeTo:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.SpokeTo?tempNote.SpokeTo:'@Resource.NA'}}</span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Relation:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.Relation?tempNote.Relation:'@Resource.NA'}} </span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Kind:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.OtherNoteType?tempNote.OtherNoteType:'@Resource.NA'}} </span>
+                                                                                </div>
+
+                                                                                @*<div class="td-batch-summary padding-left-30">@Resource.IM:</div>
+                                                                            <div class="BatchSummaryDesc">
+                                                                                <span class="text-decoration-underline">{{tempNote.IsIssue}} </span>
+                                                                            </div>*@
+                                                                            </div>
+
+
+
+                                                                            <div class="td-batch-summary pull-right padding-right-5">
+                                                                                <div class="btn-group">
+                                                                                    <a class="btn-xs dropdown-toggle no-padding" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                                                        <i class="">@Resource.Actions</i>
+                                                                                    </a>
+                                                                                    <ul class="dropdown-menu pull-right">
+                                                                                        <li>
+                                                                                            <a data-ng-click="EditTempNote(tempNote)">@Resource.Edit</a>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <a data-ng-if="tempNote.NoteID>0 && tempNote.IsDeleted" data-ng-click="DisableTempNote(tempNote,$index,'Enable')">@Resource.Enable</a>
+                                                                                            <a data-ng-if="tempNote.NoteID>0 && !tempNote.IsDeleted" data-ng-click="DisableTempNote(tempNote,$index,'Disable')">@Resource.Disable</a>
+                                                                                            <a data-ng-if="tempNote.NoteID<=0 || tempNote.NoteID == undefined" data-ng-click="DisableTempNote(tempNote,$index)">@Resource.Remove</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+                                                    <div class="BatchSummaryDiv padding-top-4px" data-ng-if="tempNote.ServiceCodeType!=OtherServiceCode">
+                                                        <div class="td-batch-summary">@Resource.Code:</div>
+                                                        <div class="BatchSummaryDesc font-purple-seance">
+                                                            <span class="text-decoration-underline bold">{{tempNote.ServiceCode}}</span>-&nbsp;<span class="text-decoration-italic">{{tempNote.Description}}</span>
+                                                        </div>
+                                                        <div class="td-batch-summary padding-left-30">@Resource.POS: </div>
+                                                        <div class="BatchSummaryDesc">
+                                                            {{tempNote.PosID}}:&nbsp;{{tempNote.POSDetail}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="BatchSummaryDiv padding-top-4px padding-bottom-10">
+                                                        <div class="td-batch-summary">@Resource.NoteDetails: </div>
+                                                        <div class="BatchSummaryDesc">
+                                                            <span data-ng-bind-html="tempNote.NoteDetails"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+
+                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                    <label class="control-label">@Resource.Assessment</label>
+                    <div>
+
+                        <summernote data-ng-model="GroupNoteModel.Note.Assessment" height="150"></summernote>
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                    <label class="control-label">@Resource.ActionPlan</label>
+                    <div>
+
+                        <summernote data-ng-model="GroupNoteModel.Note.ActionPlan" height="150"></summernote>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                <div class="no-left-padding">
+                    <input type="checkbox" id="MarkAsComplete" data-ng-model="GroupNoteModel.Note.MarkAsComplete" class="unicheckbox" val="GroupNoteModel.Note.MarkAsComplete">
+                    <label for="MarkAsComplete"><strong class="SignAndComplete">@Resource.SignAndComplete</strong></label>
+                </div>
+            </div>
+            <div class="form-group col-lg-6 col-md-6 col-sm-6 pull-left" data-ng-if="GroupNoteModel.Note.MarkAsComplete">
+                <div class="col-md-12">
+                    <b>@SessionHelper.FirstName @SessionHelper.LastName</b>
+                    <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{'@(ConfigSettings.AmazonS3Url + ConfigSettings.ZarephathBucket)/'+GroupNoteModel.Note.Signature}}" />
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

@@ -1,0 +1,827 @@
+﻿@*@{
+        ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.EmployeeVisitNoteList);
+        Layout = "~/Views/Shared/_Layout.cshtml";
+        ViewBag.SelectedMenuItem = Resource.SMI_EmployeeVisitNoteList;
+    }*@
+
+
+@model SetEmployeeVisitListPage
+
+<style>
+    .switch {
+        position: relative;
+        display: inline-block;
+        width: 90px;
+        height: 34px;
+    }
+
+    $scope.Cance
+
+    .switch input {
+        display: none;
+    }
+
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #10c920;
+        /*background-color: #ca2222;*/
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+    input:checked + .slider {
+        background-color: #2ab934;
+    }
+
+    input:focus + .slider {
+        box-shadow: 0 0 1px #2196F3;
+    }
+
+    input:checked + .slider:before {
+        -webkit-transform: translateX(55px);
+        -ms-transform: translateX(55px);
+        transform: translateX(55px);
+    }
+
+    /*------ ADDED CSS ---------*/
+    .on {
+        display: none;
+    }
+
+    .on, .off {
+        color: white;
+        position: absolute;
+        transform: translate(-50%,-50%);
+        top: 50%;
+        left: 50%;
+        font-size: 10px;
+        font-family: Verdana, sans-serif;
+    }
+
+    input:checked + .slider .on {
+        display: block;
+    }
+
+    input:checked + .slider .off {
+        display: none;
+    }
+
+    /*--------- END --------*/
+
+    /* Rounded sliders */
+    .slider.round {
+        border-radius: 34px;
+    }
+
+        .slider.round:before {
+            border-radius: 50%;
+        }
+
+    #ShowVisitNoteFormsModal .custom-table {
+        max-height: calc(100vh - 380px);
+        overflow: auto;
+        min-height: 120px;
+    }
+</style>
+
+<div class="modal fade" id="visitNoteListModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="VisitTaskModelClosed()" aria-label="Close" data-target="#visitNoteListModal"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <a class="text-decoration-none sbold uppercase ng-binding">{{EmployeeName}}</a>
+                    @*<label class="switch"><input type="checkbox" id="togBtn" data-ng-click="Change(id)" data-ng-model="id">
+                        <div class="slider round"style="height: 30px;">
+
+                            <span class="off">Simple</span><span class="on">Detail</span>END</div></label>*@
+                    @*<span>
+                            <div class="custom_switch">
+                                <input type="radio" id="radiocurrent" name="ratecurrent" data-ng-model="EmployeeModel.Employee.IsActive"
+                                       ng-value="true" />
+                                <label for="radiocurrent">Simple</label>
+                                <input type="radio" id="radiocurrentDaily" name="ratecurrent" data-ng-model="EmployeeModel.Employee.IsActive"
+                                       ng-value="true" />
+                                <label for="radiocurrentDaily">Detail</label>
+                                <span class="custom_switchwrapper"></span>
+                            </div>
+                        </span>*@
+                    <small class="pull-right padding-right-10">
+                        <b>Selected Patient :</b>
+                        <span class="label label-mini label-success label-inverse margin-right-05 ng-binding">
+                            <b class="ng-binding">{{PatientName}} &nbsp;</b>
+                        </span>
+                    </small>
+                </h4>
+                @*<h4 class="modal-title">@Resource.EmployeeVisitNoteList</h4>*@
+            </div>
+            <div class="modal-body">
+                <div class="tabbable tabbable-custom boxless">
+                    @*<div class="pull-right">
+                            <button class="btn btn-xs btn-info" data-ng-click="GenerateBillingNote(EmployeeVisit)">
+                                @Resource.GenerateBillingNotes
+                            </button>
+                        </div>*@
+                    <ul class="nav nav-tabs" id="reportTabs">
+                        <li class="active"><a data-toggle="tab" href="#notes">@Resource.Tasks</a></li>
+                        <li><a data-toggle="tab" href="#conclusion">@Resource.Conclusion</a></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <div id="notes" class="tab-pane fade in active">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="inline-block pull-right" data-ng-show="EmployeeVisitNoteList.length > 0">
+                                        <div class="pull-right margin-left-5">
+                                            <dir-pagination-controls boundary-links="true" max-size="EmployeeVisitNoteListPager.maxSize" on-page-change="EmployeeVisitNoteListPager.pageChanged(newPageNumber)" pagination-id="EmployeeVisitNoteListPager_ID"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div>
+                                        <b class="color-grey">@Resource.TaskList</b>
+                                    </div>
+                                    <hr />
+                                    @*@if (Common.HasPermission(Constants.Permission_DxCode_AddUpdate))
+                                        {*@
+                                    @*<div class="btn-group" data-ng-show="EmployeeVisitNoteList.length > 0">
+                                            <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                                                <input id="SelectAllVisitNote" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllVisitNoteCheckbox" data-ng-change="SelectAllVisitNote()" val="SelectAllCheckbox">
+                                                <label for="SelectAllVisitNote"></label>
+                                            </span>
+                                        </div>*@
+                                    @*}*@
+                                    <div class="btn-group">
+                                        <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="RefreshVisitNote()">
+                                            <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                                        </button>
+                                    </div>
+                                    @*<div class="btn-group">
+                                            @Html.DropDownListFor(m => m.SearchEmployeeVisitNoteListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchEmployeeVisitNoteListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                          new
+                                                                          {
+                                                                              id = "IsDeleted",
+                                                                              data_ng_model = "TempSearchEmployeeVisitNoteListPage.IsDeleted",
+                                                                              data_ng_init = "TempSearchEmployeeVisitNoteListPage.IsDeleted = TempSearchEmployeeVisitNoteListPage.IsDeleted==null?'-1':TempSearchEmployeeVisitNoteListPage.IsDeleted.toString()",
+                                                                              @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                              data_ng_change = "SearchEmployeeVisitNote()"
+                                                                          })
+                                        </div>*@
+                                    @*@if (Common.HasPermission(Constants.Permission_DxCode_AddUpdate))
+                                        {*@
+                                    <div class="btn-group" data-ng-if="SelectedEmployeeVisitNoteIds.length > 0">
+                                        <button type="button" data-ng-click="DeleteEmployeeVisitNote()" class="btn blue btn-sm grey border-grey-cascade">
+                                            <i class="fa fa-random margin-right-10"></i>{{TempSearchEmployeeVisitNoteListPage.IsDeleted==0 ?'DeleteSeleted' :(TempSearchEmployeeVisitNoteListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                                        </button>
+                                    </div>
+
+                                    <div class="btn-group pull-right">
+                                        <a class="letter-space btn btn-sm green-jungle" data-ng-click="AddVisitNote()"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Task</a>
+                                    </div>
+                                    @*}*@
+                                </div>
+                                <div class="space20"></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact" style="display: block;">
+                                        <form id="frmEmployeeVisitTaskList ">
+                                            <div class="table-responsive tabbable-custom">
+
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            @*@if (Common.HasPermission(Constants.Permission_DxCode_AddUpdate))
+                                                                {*@
+                                                            <th class="width-20px"></th>
+                                                            @*}*@
+                                                            <th class="col-sm-7">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitNoteListPager.sortColumn('VisitTaskDetail')">@Resource.Task</a>
+                                                                <span class="sortorder" data-ng-show="EmployeeVisitNoteListPager.sortIndex === 'VisitTaskDetail'" data-ng-class="{reverse:EmployeeVisitNoteListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-sm-4 hidden">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitNoteListPager.sortColumn('Description')">@Resource.Description</a>
+                                                                <span class="sortorder" data-ng-show="EmployeeVisitNoteListPager.sortIndex === 'Description'" data-ng-class="{reverse:EmployeeVisitNoteListPager.reverse}"></span>
+                                                            </th>
+                                                            <th>
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitNoteListPager.sortColumn('ServiceTime')">@Resource.ServiceTime</a>
+                                                                <span class="sortorder" data-ng-show="EmployeeVisitNoteListPager.sortIndex === 'ServiceTime'" data-ng-class="{reverse:EmployeeVisitNoteListPager.reverse}"></span>
+                                                            </th>
+                                                            <th>@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr class="compact-search-tr">
+                                                            <td>
+                                                                <div class="btn-group" data-ng-show="EmployeeVisitNoteList.length > 0">
+                                                                    <input id="SelectAllVisitNote" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllVisitNoteCheckbox" data-ng-change="SelectAllVisitNote()" val="SelectAllCheckbox">
+                                                                    <label for="SelectAllVisitNote"></label>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                @Html.TextBoxFor(m => m.SearchEmployeeVisitNoteListPage.VisitTaskDetail, new { data_ng_model = "TempSearchEmployeeVisitNoteListPage.VisitTaskDetail", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 100 })
+                                                            </td>
+                                                            <td class="hidden">
+                                                                @Html.TextBoxFor(m => m.SearchEmployeeVisitNoteListPage.Description, new { data_ng_model = "TempSearchEmployeeVisitNoteListPage.Description", @class = "form-control input-sm", placeholder = Resource.Description, maxlength = 100 })
+                                                            </td>
+                                                            <td></td>
+                                                            <td class="text-align-center">
+                                                                <button type="submit" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchEmployeeVisitNote()">
+                                                                    <i class="glyphicon glyphicon-search"></i>
+                                                                </button>
+                                                                @*<input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchEmployeeVisitNote()" />*@
+                                                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetVisitNoteSearchFilter()" title="@Resource.Reset">
+                                                                    <i class="fa fa-retweet"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr data-ng-class="{'deleted':EmployeeVisitNote.IsDeleted}" dir-paginate="EmployeeVisitNote in EmployeeVisitNoteList | itemsPerPage: EmployeeVisitNoteListPager.pageSize" total-items="EmployeeVisitNoteListPager.totalRecords" current-page="EmployeeVisitNoteListPager.currentPage" pagination-id="EmployeeVisitNoteListPager_ID">
+                                                            @*@if (Common.HasPermission(Constants.Permission_DxCode_AddUpdate))
+                                                                {*@
+                                                            <td>
+                                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitNote.IsChecked" data-ng-change="SelectEmployeeVisitNote(EmployeeVisitNote)" val="EmployeeVisitNote.IsChecked">
+                                                            </td>
+                                                            @*}*@
+                                                            <td data-ng-bind="EmployeeVisitNote.VisitTaskDetail"></td>
+                                                            <td class="hidden" data-ng-bind="EmployeeVisitNote.Description"></td>
+                                                            <td>{{EmployeeVisitNote.ServiceTime | timeinhrs}}&nbsp;hrs</td>
+                                                            @*<td data-ng-bind="EmployeeVisitNote.ServiceTime + '&nbsp;hrs'"></td>*@
+                                                            <td>
+                                                                @*@if (Common.HasPermission(Constants.Permission_DxCode_AddUpdate))
+                                                                    {*@
+                                                                <a href="javascript:void(0);" data-ng-click="AddVisitNote(EmployeeVisitNote)" class="btn btn-xs btn-primary">@Resource.Edit</a>
+                                                                <a href="javascript:void(0);" data-ng-show="EmployeeVisitNote.IsDeleted" data-ng-click="DeleteEmployeeVisitNote(EmployeeVisitNote.EmployeeVisitNoteID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                <a href="javascript:void(0);" data-ng-show="!EmployeeVisitNote.IsDeleted" data-ng-click="DeleteEmployeeVisitNote(EmployeeVisitNote.EmployeeVisitNoteID,'@Resource.Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                                                @*}*@
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12" data-ng-if="EmployeeVisitNoteList.length > 0">
+                                    <div class="pull-left no-padding">
+                                        @Resource.Showing <span data-ng-bind="(EmployeeVisitNoteListPager.pageSize * EmployeeVisitNoteListPager.currentPage) - EmployeeVisitNoteListPager.pageSize  + 1"></span>
+                                        &nbsp;@Resource.To <span data-ng-bind="(EmployeeVisitNoteListPager.pageSize == EmployeeVisitNoteListPager.currentPageSize) ? (EmployeeVisitNoteListPager.pageSize * EmployeeVisitNoteListPager.currentPage) :(EmployeeVisitNoteListPager.pageSize * EmployeeVisitNoteListPager.currentPage) - EmployeeVisitNoteListPager.pageSize  + EmployeeVisitNoteListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeVisitNoteListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                    </div>
+                                    <div class="pull-right top pagination-sm">
+                                        <dir-pagination-controls boundary-links="true" max-size="EmployeeVisitNoteListPager.maxSize" on-page-change="EmployeeVisitNoteListPager.pageChanged(newPageNumber)" pagination-id="EmployeeVisitNoteListPager_ID"></dir-pagination-controls>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div data-ng-if="EmployeeVisitNoteList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="conclusion" class="tab-pane fade">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div>
+                                        <b class="color-grey">@Resource.ConclusionList</b>
+                                        <span class="badge badge-green pull-right" data-ng-if="SurveyCompleted">@Resource.SurveyCompleted</span>
+                                        <span class="badge badge-danger pull-right" data-ng-if="!SurveyCompleted">@Resource.SurveyNotCompleted</span>
+                                    </div>
+                                    <hr />
+                                    <div class="btn-group pull-right">
+                                        <a class="letter-space btn btn-sm green-jungle" data-ng-click="AddVisitConclusion()"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Conclusion</a>
+                                    </div>
+                                </div>
+                                <div class="space20"></div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact" style="display: block;">
+                                        <form id="frmEmployeeVisitConclusionList ">
+                                            <div class="table-responsive tabbable-custom">
+
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th class="col-sm-11">
+                                                                @Resource.Conclusion
+                                                            </th>
+                                                            <th class="col-sm-4">
+                                                                @*@Resource.Description*@
+                                                            </th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr data-ng-repeat="EmployeeVisitConclusion in EmployeeVisitConclusionList">
+                                                            <td data-ng-bind="EmployeeVisitConclusion.VisitTaskDetail"></td>
+                                                            <td>
+                                                                @*<input type="checkbox" id="{{'#ReferralRadio-'+item.EmployeeVisitNoteID }}"
+                                                                    class="uniformControls"
+                                                                    data-uniform-value="EmployeeVisitConclusion.Desc"
+                                                                    data-ng-model="EmployeeVisitConclusion.Desc"
+                                                                    data-ng-change="ChangeAnswer(EmployeeVisitConclusion)" />*@
+                                                                <i class="glyphicon glyphicon-ok text-success" data-ng-if="EmployeeVisitConclusion.Description==='YES'"></i>
+                                                                <i class="glyphicon glyphicon-remove text-danger" data-ng-if="EmployeeVisitConclusion.Description==='NO'"></i>
+                                                                <span data-ng-if="EmployeeVisitConclusion.Description==null">@Resource.NA</span>
+                                                            </td>
+                                                            <td>
+                                                                <a href="javascript:void(0);" data-ng-click="AddVisitConclusion(EmployeeVisitConclusion)" class="btn btn-xs btn-primary">@Resource.Edit</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div data-ng-if="EmployeeVisitConclusionList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+<div class="modal fade" id="AddVisitNoteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0%;">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>*@
+                <button type="button" class="close" aria-label="Close" data-ng-click="VisitTaskModelClosed()"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <a class="text-decoration-none sbold uppercase ng-binding">
+                        <span data-ng-if="!VisitNote.EmployeeVisitNoteID">
+                            @Resource.AddTask
+                        </span>
+                        <span data-ng-if="VisitNote.EmployeeVisitNoteID>0">@Resource.UpdateTask</span>
+                    </a>
+                    <div class="switchWrap">
+                        <span class="off">Simple</span>
+                        <label class="switch">
+                            <input type="checkbox" id="togBtn" data-ng-click="Change(id)" data-ng-model="id">
+                            <div class="slider round switch-button"></div>
+                        </label>
+                        <span class="on">Detail</span>
+                    </div>
+
+                    @*<select ng-model="myVar">
+                            <option value="Simple">Simple
+                            <option value="Detail">Detail
+
+                        </select>*@
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div ng-switch="id">
+                    <form id="addVisitNotefrm" ng-switch-when="true">
+                        <div class="form-group">
+                            <label class="control-label">@Resource.Task</label>
+
+                            <select class="form-control input-sm" data-ng-model="VisitNote.ReferralTaskMappingID" data-ng-options="v.ReferralTaskMappingID as v.VisitTaskDetail for v in MappedTaskList"
+                                    data-val="true" data-val-required="@Resource.TaskRequired" id="VisitNote_ReferralTaskMappingID" name="VisitNote.ReferralTaskMappingID">
+                                <option value="">@Resource.Select</option>
+                            </select>
+                            <span class="field-validation-error" data-valmsg-for="VisitNote.ReferralTaskMappingID" data-valmsg-replace="true"></span>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">@Resource.ServiceTime</label>
+                            <div class="margin-top-5"></div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="control-label"><b>@Resource.Hours</b></label>
+                                    <select class="form-control input-sm" data-ng-model="VisitNote.Hours" data-ng-options="v.Value as v.Name for v in HourList"
+                                            data-val="true" data-val-required="@Resource.HoursRequired" id="VisitNote_Hours" name="VisitNote.Hours">
+                                        <option value="">@Resource.Hours</option>
+                                    </select>
+                                    <span class="field-validation-error" data-valmsg-for="VisitNote.Hours" data-valmsg-replace="true"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="control-label"><b>@Resource.Minutes</b></label>
+                                    <select class="form-control input-sm" data-ng-model="VisitNote.Minutes" data-ng-options="v.Value as v.Name for v in MinuteList"
+                                            data-val="true" data-val-required="@Resource.MinutesRequired" id="VisitNote_Minutes" name="VisitMinutes.Minutes">
+                                        <option value="">@Resource.Minutes</option>
+                                    </select>
+                                    <span class="field-validation-error" data-valmsg-for="VisitNote.Minutes" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="btn-group">
+                            <a class="letter-space btn btn-sm green-jungle" data-ng-click="SaveVisitNote()">@Resource.Save</a>
+                        </div>
+                    </form>
+                    <form id="addVisitNotefrm_Detail" ng-switch-when="false">
+                        <table class="table table-bordered table-striped table-condensed flip-content">
+                            <thead>
+                                <tr>
+                                    <th>id</th>
+                                    <th>VisitTaskDetail</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr ng-repeat=" item in MappedTaskList">
+                                    <td>
+                                        <div class="checker">
+                                            <span>
+                                                <input type="checkbox" class="unicheckbox text-align-center ng-pristine ng-untouched ng-valid ng-isolate-scope"
+                                                       data-ng-model="item.IsChecked"
+                                                       data-ng-change="SelectVisitTask(item)"
+                                                       val="item.IsChecked">
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td>{{item.VisitTaskDetail}}</td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                        <button class="letter-space btn btn-sm green-jungle" ng-click="SaveVisitNote11()">Save</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ShowVisitNoteFormsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0%;">
+    <div class="modal-dialog margin-top-65" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" aria-label="Close" data-ng-click="HideVisitNoteForms()"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <a class="text-decoration-none sbold uppercase ng-binding">
+                        <span>
+                            @Resource.VisitTaskForms
+                        </span>
+                    </a>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div>
+                    <div class="panel panel-default p-15 bg-light-grey">
+                        <label class="control-label mr-10">@Resource.Task</label>
+                        <span class="border-bottom p-15 pb-0 border-grey">{{VisitNoteForms.VisitTaskDetail}}</span>
+                    </div>
+                    <div class="custom-table">
+                        <table class="table table-responsive margin-top-0 mb-0">
+                            <thead>
+                                <tr>
+                                    <th class="width-10px"><strong>@Resource.FormName</strong></th>
+                                    <th class="width-10px"><strong>@Resource.FormLongName</strong></th>
+                                    <th><strong>@Resource.IsRequired</strong></th>
+                                    <th><strong>@Resource.Action</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="form in VisitNoteForms.TaskFormList">
+                                    <td><div class="text-ellipsis width-150px" title="{{form.Name}}">{{form.Name}}</div></td>
+                                    <td><div class="text-ellipsis width-150px" title="{{form.FormLongName}}">{{form.FormLongName}}</div></td>
+                                    <td>{{form.IsRequired?'@Resource.Yes':'@Resource.No'}}</td>
+                                    <td>
+                                        <button type="button" data-ng-if="form.ReferralTaskFormMappingID == 0" data-ng-click="ShowVisitNoteForm(form, 'new')" class="btn btn-xs btn-success margin-right-05"><i class="fa fa-plus"></i></button>
+                                        <button type="button" data-ng-if="form.ReferralTaskFormMappingID > 0" data-ng-click="ShowVisitNoteForm(form, 'view')" class="btn btn-xs btn-warning margin-right-05"><i class="fa fa-eye"></i></button>
+                                        <button type="button" data-ng-if="form.ReferralTaskFormMappingID > 0" data-ng-click="ShowVisitNoteForm(form, 'edit')" class="btn btn-xs btn-primary margin-right-05"><i class="fa fa-edit"></i></button>
+                                        <button type="button" data-ng-if="form.ReferralTaskFormMappingID > 0" data-ng-click="DeleteVisitNoteForm(form)" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ShowVisitNoteFormModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0%;">
+    <div class="modal-dialog modal-full mt-20 mb-20" role="document">
+        <div class="modal-content" style="height: calc(100vh - 40px);">
+            <div class="modal-header">
+                <button type="button" class="close" aria-label="Close" data-ng-click="HideVisitNoteForm()"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <a class="text-decoration-none sbold uppercase ng-binding">
+                        <span>
+                            {{VisitNoteForms.Form.Name}}
+                        </span>
+                    </a>
+                </h4>
+            </div>
+            <div class="modal-body" style="height: calc(100% - 39px);">
+                <div class="width-100 height-100 margin-top-minus-15px">
+                    <iframe data-ng-if="VisitNoteForms.Form.URL" class="width-100 height-100 border border-grey" data-ng-src="{{VisitNoteForms.Form.URL}}"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="AddVisitConclusionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0%">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>*@
+                <button type="button" class="close" aria-label="Close" data-ng-click="ConclusionModelClosed()"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <a class="text-decoration-none sbold uppercase ng-binding">
+                        <span data-ng-if="!VisitConclusion.EmployeeVisitNoteID">@Resource.AddConclusion</span>
+                        <span data-ng-if="VisitConclusion.EmployeeVisitNoteID>0">@Resource.UpdateConclusion</span>
+                    </a>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form id="addVisitConclusionfrm">
+                    <div class="form-group">
+                        <label class="control-label">@Resource.Conclusion</label>
+                        <select class="form-control input-sm" data-ng-model="VisitConclusion.ReferralTaskMappingID" data-ng-options="v.ReferralTaskMappingID as v.VisitTaskDetail for v in MappedConclusionList"
+                                data-val="true" data-val-required="@Resource.ConclusionRequired" name="VisitConclusion.ReferralTaskMappingID" id="VisitConclusion_ReferralTaskMappingID">
+                            <option value="">@Resource.Select</option>
+                        </select>
+                        <span class="field-validation-error" data-valmsg-for="VisitConclusion.ReferralTaskMappingID" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class=" form-group">
+                        <label class="control-label">@Resource.Answer</label>
+                        <input type="radio" data-ng-model="VisitConclusion.Description " name="VisitConclusion.Description " value="YES" /> Yes &nbsp; &nbsp;
+                        <input type="radio" data-ng-model="VisitConclusion.Description " name="VisitConclusion.Description " value="NO" /> No <br /><br />
+                        <div data-ng-if="VisitConclusion.Description =='YES'"><span>Notes</span><textarea rows="2" data-ng-model="VisitConclusion.AlertComment" maxlength="50" style="margin: 0px;width: 263px;height: 73px"></textarea></div>
+
+                        <span class="field-validation-error" data-valmsg-for="VisitConclusion.Answer" data-valmsg-replace="true"></span>
+                    </div>
+                    @*<div class=" form-group" >
+                            <label class="control-label">@Resource.Answer</label>
+                            <input type="radio"  data-ng-model="VisitConclusion.Answer" name="VisitConclusion.Answer"  value="Yes" /> Yes &nbsp; &nbsp;
+                            <input type="radio"  data-ng-model="VisitConclusion.Answer" name="VisitConclusion.Answer"  value="No" /> No <br /><br />
+                             <div data-ng-if="VisitConclusion.Answer=='Yes'"><span>Notes</span><textarea rows="2" data-ng-model="VisitConclusion.AlertComment" maxlength="50" style="margin: 0px;width: 263px;height: 73px" ></textarea></div>
+
+                            <span class="field-validation-error" data-valmsg-for="VisitConclusion.Answer" data-valmsg-replace="true"></span>
+                        </div>*@
+                    <div class="btn-group">
+                        <a class="letter-space btn btn-sm green-jungle" data-ng-click="SaveVisitConclusion()">@Resource.Save</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="ByPassRejectReasonModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">@Resource.RejectReason</h4>
+            </div>
+            <div class="modal-body">
+                <form id="addRejectReasonfrm">
+                    <div class="form-group">
+                        <label class="control-label">@Resource.Reason</label>
+                        <textarea class="form-control input-sm" data-ng-model="BypassDetail.RejectReason" data-val="true"
+                                  data-val-required="@Resource.ReasonRequired" id="BypassDetail_RejectReason" name="BypassDetail.RejectReason"></textarea>
+                        <span class="field-validation-error" data-valmsg-for="BypassDetail.RejectReason" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="btn-group">
+                        <a class="letter-space btn btn-sm green-jungle" data-ng-click="ActionTaken(BypassDetail,false)">@Resource.Save</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ReferralEmployeeVisitmodel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">Set Payor</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <label class="control-label">@Resource.Payor</label>
+                            <select class="form-control input-sm"
+                                    id="drpReferralPayorList">
+                                <option value="">@Resource.Select</option>
+                                <option data-ng-repeat="option in ReferralPayorList" value="{{option.PayorID}}">{{option.PayorName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="btn-group pull-right">
+                            <a class="letter-space btn btn-sm green-jungle" data-ng-click="saveSelectedReferralPayorId()">@Resource.Save</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="ReferralEmployeeVisitTaskmodel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">Task Must be Create</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-group">
+                            <b>Task Must be Create!</b>
+                            <br />
+                            <br />
+                            <span style="white-space: pre-line;">{{NotcreatedTaksList}}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var DeleteVisitNoteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.EmployeeVisitNote)';
+    var EnableDisableVisitNoteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.EmployeeVisitNote)';
+    function ClockInOutinitMap(ClockInClockOutMap, ClickMode) {
+        var Hostname = window.location.origin;
+        var map_center = new google.maps.LatLng(35.171483796298794, -5.248213875000038);
+
+        geocoder = new google.maps.Geocoder();
+        if (ClockInClockOutMap.ClockOutTimeLongitude && ClockInClockOutMap.ClockOutTimeLongitude != "0")
+            map_center = new google.maps.LatLng(parseFloat(ClockInClockOutMap.ClockOutTimeLatitude), parseFloat(ClockInClockOutMap.ClockOutTimeLongitude));
+
+        else if (ClockInClockOutMap.ClockInTimeLongitude && ClockInClockOutMap.ClockInTimeLongitude != "0")
+            map_center = new google.maps.LatLng(parseFloat(ClockInClockOutMap.ClockInTimeLatitude), parseFloat(ClockInClockOutMap.ClockInTimeLongitude));
+
+       else if (ClockInClockOutMap.SignedLongitude && ClockInClockOutMap.SignedLongitude != "0")
+            map_center = new google.maps.LatLng(parseFloat(ClockInClockOutMap.SignedLatitude), parseFloat(ClockInClockOutMap.SignedLongitude));
+        else if (ClockInClockOutMap.PatientLatitude && ClockInClockOutMap.PatientLatitude != "0")
+            map_center = new google.maps.LatLng(parseFloat(ClockInClockOutMap.PatientLatitude), parseFloat(ClockInClockOutMap.PatientLongitude));
+
+        var mapOptions = {
+            zoom: 16,
+            draggableCursor: 'default',
+            center: map_center,
+            mapTypeId: google.maps.MapTypeId.roadmap
+        };
+
+        map = new google.maps.Map(document.getElementById("ClockInOutmap"), mapOptions);
+
+        infowindow = new google.maps.InfoWindow();
+
+
+
+        var txt_lat = ClockInClockOutMap.ClockInTimeLatitude;
+        var txt_long = ClockInClockOutMap.ClockInTimeLongitude;
+
+        if (txt_lat && txt_lat != "0" && txt_long && txt_long!="0" ) {
+            lat = parseFloat(txt_lat);
+            lng = parseFloat(txt_long);
+            map_center = new google.maps.LatLng(lat, lng);
+            marker = new google.maps.Marker({
+                position: map_center,
+                map: map,
+                draggable: false,
+                icon: {
+                    url: Hostname + '/Assets/images/red-map-pin.png'
+
+                }
+            });
+
+        }
+        txt_lat = ClockInClockOutMap.ClockOutTimeLatitude;
+        txt_long = ClockInClockOutMap.ClockOutTimeLongitude;
+        if (txt_lat && txt_lat != "0" && txt_long && txt_long != "0") {
+            lat = parseFloat(txt_lat);
+            lng = parseFloat(txt_long);
+            map_center = new google.maps.LatLng(lat, lng);
+            marker = new google.maps.Marker({
+               position: map_center,
+                map: map,
+                draggable: false,
+                icon: {
+                    url: Hostname + '/Assets/images/green-map-pin.png'
+                }
+            });
+
+        }
+        txt_lat = ClockInClockOutMap.SignedLatitude;
+        txt_long = ClockInClockOutMap.SignedLongitude;
+        if (txt_lat && txt_lat != "0" && txt_long && txt_long != "0") {
+            lat = parseFloat(txt_lat);
+            lng = parseFloat(txt_long);
+            map_center = new google.maps.LatLng(lat, lng);
+            marker = new google.maps.Marker({
+                position: map_center,
+                map: map,
+                draggable: false,
+                icon: {
+                    url: Hostname + '/Assets/images/yellow-map-pin.png'
+                }
+            });
+
+        }
+        txt_lat = ClockInClockOutMap.PatientLatitude;
+        txt_long = ClockInClockOutMap.PatientLongitude;
+        if (txt_lat && txt_lat != "0" && txt_long && txt_long != "0") {
+            lat = parseFloat(txt_lat);
+            lng = parseFloat(txt_long);
+            map_center = new google.maps.LatLng(lat, lng);
+            marker = new google.maps.Marker({
+                position: map_center,
+                map: map,
+                draggable: false,
+                icon: {
+                    url: Hostname + '/Assets/images/blue-map-pin.png'
+                }
+            });
+
+        }
+    }
+</script>
+
+<div class="modal fade" id="ByPassActionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>*@
+                <button type="button" class="close" aria-label="Close" data-ng-click="ByPassActionModelClosed()"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    ByPass Reason
+                    <span class="badge badge-warning pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Pending)">@Resource.Pending</span>
+                    <span class="badge badge-green pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Approved)">@Resource.Approved</span>
+                    <span class="badge badge-danger pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Rejected)">@Resource.Rejected</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <div 
+                    <textarea rows="3" class="form-control input-sm" data-ng-model="BypassDetail.ByPassReasonsClockIn" maxlength="1000"
+                              placeholder="ByPass Reason" data-val="true"></textarea>
+                </div>
+                <div class="col-sm-12" data-ng-if="BypassDetail.IsByPassClockIn">
+                    <strong>@Resource.BypassReasonForClockIn </strong>{{BypassDetail.ByPassReasonClockIn}}
+                    <hr data-ng-if="BypassDetail.IsByPassClockIn && BypassDetail.IsByPassClockOut" />
+                </div>
+                <div class="col-sm-12" data-ng-if="BypassDetail.IsByPassClockOut">
+                    <strong>@Resource.BypassReasonForClockOut </strong>{{BypassDetail.ByPassReasonClockOut}}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="col-lg-5 pull-right">
+                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="ActionTaken(BypassDetail,true)">@Resource.Approve</button>
+                    <button type="button" class="btn btn-sm red" data-ng-click="SaveByPassReasonNote1(BypassDetail,true)">@Resource.Reject</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

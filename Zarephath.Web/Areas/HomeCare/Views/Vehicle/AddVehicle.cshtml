@@ -1,0 +1,173 @@
+﻿@model SetVehicleModel
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.VehicleModel.VehicleID > 0 ? Resource.EditVehicle : Resource.AddVehicle));
+    bool boolIsPartialView = ViewBag.IsPartialView != null;
+    string isPartialView = boolIsPartialView ? "1" : "0";
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_VehicleAdd;
+    bool isEditMode = Model.VehicleModel.VehicleID > 0;
+    
+}
+
+@Html.Hidden("hdnVehicleModel", Common.SerializeObject(Model))
+@Html.Hidden("IsPartialView", isPartialView)
+<div data-ng-controller="AddVehicleController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditVehicle : @Resource.AddVehicle)
+            <small>@Resource.EnterVehicleInformation</small>
+            <input type="submit" data-ng-click="SaveVehicleDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.VehicleModel.VehicleID > 0 ? Resource.Update : Resource.Save)" />
+            @if (boolIsPartialView)
+            {
+                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+            }
+            else
+            {
+                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+            }
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <form id="frmaddVehicle" class="form-horizontal">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.VehicleDetails
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.BrandName
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.VehicleModel.BrandName, new { data_ng_model = "VehicleModel.BrandName", @class = "form-control input-sm", placeholder = Resource.BrandName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.BrandName)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.Model
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.VehicleModel.Model, new { data_ng_model = "VehicleModel.Model", @class = "form-control input-sm", placeholder = Resource.Model, maxlength = 50 })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.Model)
+                                        </div>
+                                    </div>
+
+                                    @*<div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label">
+                                            @Resource.VehicleType
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.VehicleModel.VehicleType, new { data_ng_model = "VehicleModel.VehicleType", @class = "form-control input-sm", placeholder = Resource.VehicleType, maxlength = 30 })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.VehicleType)
+                                        </div>
+                                    </div>*@
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.VehicleType
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.DropDownListFor(p => p.VehicleModel.VehicleType, Model.VehicleTypeListModel.ToSelectList("", "VehicleTypes", "VehicleTypeID", @Resource.Select, ""),
+                                            new
+                                            {
+                                                data_ng_model = "VehicleModel.VehicleType",
+                                                data_ng_init = "VehicleModel.VehicleType=VehicleModel.VehicleType==null?'':VehicleModel.VehicleType.toString()",
+                                                @class = "form-control input-sm requiredStrip"
+                                            })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.ContactID)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.TransportService
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.DropDownListFor(p => p.VehicleModel.ContactID, Model.TransportContactNameListModel.ToSelectList("", "TransportName", "TransportID", @Resource.Select, ""),
+                                            new
+                                            {
+                                                data_ng_model = "VehicleModel.ContactID",
+                                                data_ng_init = "VehicleModel.ContactID=VehicleModel.ContactID==null?'':VehicleModel.ContactID.toString()",
+                                                @class = "form-control input-sm requiredStrip"
+                                            })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.ContactID)
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.VIN_Number
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.VehicleModel.VIN_Number, new { data_ng_model = "VehicleModel.VIN_Number", @class = "form-control input-sm", placeholder = Resource.VIN_Number, maxlength = 25 })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.VIN_Number)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label">
+                                            @Resource.Color
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.VehicleModel.Color, new { data_ng_model = "VehicleModel.Color", @class = "form-control input-sm", placeholder = Resource.Color, maxlength = 25 })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.Color)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label">
+                                            @Resource.SeatingCapacity
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.VehicleModel.SeatingCapacity, new { data_ng_model = "VehicleModel.SeatingCapacity", @class = "form-control input-sm", placeholder = Resource.SeatingCapacity, maxlength = 10 })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.SeatingCapacity)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.Attendent
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.VehicleModel.Attendent, new { data_ng_model = "VehicleModel.Attendent", @class = "form-control input-sm", placeholder = Resource.Attendent, maxlength = 50 })
+                                            @Html.ValidationMessageFor(m => m.VehicleModel.Attendent)
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space15"></div>
+                        <div class="col-md-12 form-group text-center">
+                            <input type="submit" data-ng-click="SaveVehicleDetails()" class="btn btn-sm green-jungle" value="@(Model != null && Model.VehicleModel.VehicleID > 0 ? Resource.Update : Resource.Save)" />
+                            @if (boolIsPartialView)
+                            {
+                                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint" value="@Resource.Cancel" />
+                            }
+                            else
+                            {
+                                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint" value="@Resource.Cancel" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/vehicle/addvehicle")
+}

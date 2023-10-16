@@ -1,0 +1,153 @@
+﻿@model HC_AddEmployeeModel
+<div class="">
+    <div class="row">
+        <div class="form-group col-lg-10 col-md-10 col-sm-10">
+            <span class="label-italic">
+                <b class="font-red-thunderbird">@Resource.NoteLabel</b>
+                <span>@Html.Raw(Resource.DocuementNoteForEmployee)</span>
+            </span>
+        </div>
+        @if (Common.HasPermission(Constants.Permission_ReferralDocuments_AddUpdate))
+        {
+            <div class="col-lg-2 col-md-2 col-sm-2 pull-right">
+                <div class="fileUpload btn btn-xs btn-primary pull-right margin-right-0">
+                    <span><i class="icon-plus"></i>&nbsp; @Resource.UploadDocuments</span>
+                    <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                           fileupload
+                           file-uploadurl="{{UploadFile}}"
+                           beforesend="BeforeSend"
+                           aftersend="AfterSend"
+                           progress="Progress"
+                           data-primary-id="EmployeeID"
+                           filelist="UploadingFileList"
+                           multiple="" />
+                </div>
+            </div>
+        }
+    </div>
+    <div class="row-fluid no-padding col-lg-12" data-ng-show="UploadingFileList.length > 0 || EmployeeDocumentList.length > 0">
+        @*<form action="#" class="horizontal-form">*@
+        <div class="row-fluid">
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                <div class="portlet box red">
+                    <div class="portlet-title">
+                        <div class="caption">
+                            <i class="icon-briefcase"></i>&nbsp;@Resource.Documents
+                        </div>
+                    </div>
+                    <div class="portlet-body compact table-responsive">
+                        <div class="dataTables_wrapper">
+                            <table class="table table-bordered table-striped table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th style="width: 10px;">
+                                            @Resource.Hash
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDocumentPager.sortColumn('FileName')">@Resource.DocName</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDocumentPager.sortIndex === 'FileName'" data-ng-class="{reverse:EmployeeDocumentPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDocumentPager.sortColumn('KindOfDocument')">@Resource.Kind</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDocumentPager.sortIndex === 'KindOfDocument'" data-ng-class="{reverse:EmployeeDocumentPager.reverse}"></span>
+                                        </th>
+                                        <th class="col-lg-2">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDocumentPager.sortColumn('DocumentTypeName')">@Resource.Type</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDocumentPager.sortIndex === 'DocumentTypeName'" data-ng-class="{reverse:EmployeeDocumentPager.reverse}"></span>
+                                        </th>
+                                        <th class="col-lg-2">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDocumentPager.sortColumn('Name')">@Resource.AddedBy</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDocumentPager.sortIndex === 'Name'" data-ng-class="{reverse:EmployeeDocumentPager.reverse}"></span>
+                                        </th>
+                                        <th class="col-lg-1">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDocumentPager.sortColumn('CreatedDate')">@Resource.DateReceived</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDocumentPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:EmployeeDocumentPager.reverse}"></span>
+                                        </th>
+                                        <th class="col-lg-1">@Resource.Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="filedata in UploadingFileList" id="pbar">
+                                        <td></td>
+                                        <td>
+                                            <div class="" data-ng-bind="filedata.name" title="{{filedata.name}}">
+                                            </div>
+                                        </td>
+
+                                        <td colspan="2">
+                                            <div>
+                                                <div class="active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                                    <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }">
+                                                        <span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <a href="javascript:void(0);" data-ng-if="filedata.IsError" data-ng-click="DeleteUploadedFile(filedata)" tooltip title="Delete Document"><i class="fa fa-remove"></i></a>
+                                        </td>
+                                    </tr>
+                                    <tr dir-paginate="EmployeeDocument in EmployeeDocumentList | itemsPerPage: EmployeeDocumentPager.pageSize" total-items="EmployeeDocumentPager.totalRecords" current-page="EmployeeDocumentPager.currentPage" pagination-id="EmployeeDocumentPagerID">
+                                        <td data-ng-bind="$index + 1"></td>
+                                        <td>
+                                            <div class="">
+                                                <a href="{{EmployeeDocument.FilePath}}" target="_blank">{{EmployeeDocument.FileName}}</a>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span data-ng-class="{'badge badge-info': EmployeeDocument.KindOfDocument=='Internal','badge badge-danger': EmployeeDocument.KindOfDocument=='External'}" title="{{EmployeeDocument.KindOfDocument==External?'External Document':'Internal Document'}}">
+                                                {{EmployeeDocument.KindOfDocument==Internal?Internal:External}}{{EmployeeDocument.KindOfDocument}}
+                                            </span>
+                                        </td>
+                                        <td>{{EmployeeDocument.DocumentTypeName==null?'@Resource.NA':EmployeeDocument.DocumentTypeName}}</td>
+                                        <td data-ng-bind="EmployeeDocument.Name"></td>
+                                        <td data-ng-bind="EmployeeDocument.CreatedDate | orgdate"></td>
+                                        <td>
+                                            @if (Common.HasPermission(Constants.Permission_ReferralDocuments_AddUpdate))
+                                            {
+                                                <a href="#EditDocument" data-ng-click="EditDocument(EmployeeDocument)" tooltip title="Edit Document" data-toggle="modal"><i class="fa fa-edit"></i></a>
+                                                <a href="javascript:void(0);" data-ng-click="DeleteDocument(EmployeeDocument)" tooltip title="Delete Document"><i class="fa fa-remove"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-md-5 col-sm-5" data-ng-if="EmployeeDocumentPager.totalRecords > EmployeeDocumentPager.pageSize">
+                                    @Resource.Showing <span data-ng-bind="(EmployeeDocumentPager.pageSize * EmployeeDocumentPager.currentPage) - EmployeeDocumentPager.pageSize  + 1"></span>
+                                    &nbsp;@Resource.To <span data-ng-bind="(EmployeeDocumentPager.pageSize == EmployeeDocumentPager.currentPageSize) ? (EmployeeDocumentPager.pageSize * EmployeeDocumentPager.currentPage) :(EmployeeDocumentPager.pageSize * EmployeeDocumentPager.currentPage) - EmployeeDocumentPager.pageSize  + EmployeeDocumentPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeDocumentPager.totalRecords"></span>&nbsp;@Resource.Records
+                                </div>
+                                <div class="col-md-7 col-sm-7">
+                                    <div class="pull-right top pagination-sm">
+                                        <dir-pagination-controls boundary-links="true" on-page-change="EmployeeDocumentPager.pageChanged(newPageNumber,true)" pagination-id="EmployeeDocumentPagerID"></dir-pagination-controls>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*</form>*@
+
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="UploadingFileList.length == 0 && EmployeeDocumentList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+

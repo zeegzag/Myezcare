@@ -1,0 +1,350 @@
+﻿@{
+
+    bool isEditMode = !string.IsNullOrEmpty(Model.Referral.EncryptedReferralID) && Model.Referral.ReferralID > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, isEditMode ? Resource.EditPatient : Resource.AddPatient);
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ReferralAdd;
+    const int legalGuardianContactTypeID = (int)@Common.ContactTypes.LegalGuardian;
+    const int primaryContactTypeID = (int)@Common.ContactTypes.PrimaryPlacement;
+}
+<link href="~/Assets/css/sitecss/bootstrap.css" rel="stylesheet" />
+@section styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/schedule/scheduleassignmentinhome")
+    <style>
+        .postzipcode {
+            top: 19px !important;
+        }
+    </style>
+}
+@model HC_AddReferralModel
+
+<div data-ng-controller="ParentReferralController">
+    @Html.Hidden("hdnAddReferralModel", Common.SerializeObject(Model))
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? @Resource.EditPatient : @Resource.AddPatient)
+
+          
+        </h3>
+    </div>
+
+    <div class="asideBar-content patient-asidebar-content">
+
+        <div class="tabbable tabbable-custom boxless " style="margin-bottom: 0">
+            <ul class="nav nav-tabs" id="loanDetailTopTabs">
+
+
+                @if (Model.DefaultTab == Constants.HashUrl_ReferralAccessDenied)
+                {
+
+                    <li>
+                        <a id="@Constants.HashUrl_ReferralAccessDenied" data-target="#tab_AccessDenied" data-toggle="tab">@Resource.AccessDeniedLable</a>
+                    </li>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientDetails_ViewOnly))
+                {
+                    <li class="asideBarWidth @(Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientDetails_ViewOnly) ? "active" : "disabled")">
+                        <span style="display: none;">{{TotalReferralErrorCount=  ReferralErrorCount.ClientTab.length + ReferralErrorCount.ContactTab.length + ReferralErrorCount.ComplianceTab.length + ReferralErrorCount.ReferralHistoryTab.length}}</span>
+
+                        <a id="@Constants.HashUrl_ReferralDetails" data-target="#tab_Referral" data-toggle="@(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientDetails_ViewOnly) ? "tab" : "")">Facility Details<span class="badge badge-important" data-ng-hide="TotalReferralErrorCount <= 0">{{TotalReferralErrorCount}}</span></a>
+                    </li>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Documents_View))
+                {
+                    <li class="asideBarWidth @(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_Documents_View) ? "" : "disabled")">
+                        <a id="@Constants.HashUrl_ReferralDocument" data-target="#tab_Documents" data-toggle="@(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_Documents_View) ? "tab" : "")">@Resource.Documents</a>
+                    </li>
+                }
+
+                @*@if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_View))
+                {
+                    <li class="asideBarWidth @(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_View) ? "" : "disabled")">
+                        <a id="@Constants.HashUrl_Billings" data-target="#tab_Billings" data-toggle="@(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_View) ? "tab" : "")">@Resource.BillingPriorAuthorization</a>
+                    </li>
+                }*@
+
+                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_View))
+                {
+                    <li class="asideBarWidth @(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_View) ? "" : "disabled")">
+                        <a id="@Constants.HashUrl_CarePlan" data-target="#tab_CarePlan" data-toggle="@(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_View) ? "tab" : "")">@Resource.Task</a>
+                    </li>
+                }
+
+                @*@if (Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientCalendar))
+                {
+                    <li class="asideBarWidth @(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientCalendar) ? "" : "disabled")">
+                        <a id="@Constants.HashUrl_ReferralPatientCalender" data-target="#tab_PatientCalender" data-toggle="@(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientCalendar) ? "tab" : "")">@Resource.Calendar</a>
+                    </li>
+                }*@
+
+                @*@if (Common.HasPermission(Constants.HC_Permission_PatientIntake_BlockEmployees_View))
+                {
+                    <li class="asideBarWidth @(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_BlockEmployees_View) ? "" : "disabled")">
+                        <a id="@Constants.HashUrl_ReferralBlockEmployee" data-target="#tab_BlockedEmployee" data-toggle="@(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_BlockEmployees_View) ? "tab" : "")">@Resource.BlockEmployees</a>
+                    </li>
+                }*@
+
+                @*@if (Common.HasPermission(Constants.HC_Permission_PatientIntake_IM_View))
+                {
+                    <li class="asideBarWidth @(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_IM_View) ? "" : "disabled")">
+                        <a id="@Constants.HashUrl_ReferralInternalMessage" data-target="#tab_Notes" data-toggle="@(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_IM_View) ? "tab" : "")">@Resource.InternalMessaging</a>
+                    </li>
+                }*@
+
+              
+
+                @*@if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Notes_View))
+                {
+                    <li class="asideBarWidth @(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_Notes_View) ? "" : "disabled")">
+                        <a id="@Constants.HashUrl_ReferralNote" data-target="#tab_PatientNotes" data-toggle="@(isEditMode && Common.HasPermission(Constants.HC_Permission_PatientIntake_Notes_View) ? "tab" : "")">@Resource.Notes</a>
+                    </li>
+                }*@
+
+            </ul>
+            <div class="tab-content">
+
+                <div class="tab-pane" id="tab_AccessDenied">
+                    <span>@Resource.AccessDeniedClientMsg</span>
+                </div>
+
+
+                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientDetails_ViewOnly))
+                {
+                    <div class="tab-pane active" id="tab_Referral" data-ng-controller="AddReferralController">
+                        @Html.Partial("Partial/_ReferralDetails")
+                    </div>
+                }
+                @if (isEditMode)
+                {
+                    var chkModel = new SetReferralCheckListModel();
+                    chkModel.AgencyList = Model.AgencyList;
+                    chkModel.AgencyLocationList = Model.AgencyLocationList;
+                    chkModel.CaseManagerList = Model.CaseManagerList;
+
+
+                    if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Documents_View))
+                    {
+                        ViewBag.DocumentFrom = "PATIENT";
+                        <div class="tab-pane" id="tab_Documents" data-ng-controller="ReferralDocumentController">
+                            @Html.Partial("Partial/ReferralDocuments/_tabReferralDocuments1")
+                        </div>
+                    }
+
+                    @*if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_View))
+                    {
+                        <div class="tab-pane" id="tab_Billings">
+                            @Html.Partial("Partial/_BillingDetails", Model)
+                        </div>
+                    }*@
+
+                    if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_View))
+                    {
+                        <div class="tab-pane" id="tab_CarePlan">
+                            @Html.Partial("Partial/_CarePlan", Model)
+                        </div>
+                    }
+
+                    @*if (Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientCalendar))
+                    {
+                        <div id="tab_PatientCalender" class="tab-pane fade">
+                            @Html.Action("PartialReferralCalender", "Referral", new { id = Model.Referral.ReferralID })
+                        </div>
+                    }*@
+                    @*if (Model.Referral.ReferralID > 0)
+                    {
+                        RefBlockEmpPageModel model = new RefBlockEmpPageModel();
+                        model.EmployeeList = Model.EmployeeList;
+                        model.SearchRefBlockEmpListModel.EncryptedReferralID = Model.Referral.EncryptedReferralID;
+
+                        if (Common.HasPermission(Constants.HC_Permission_PatientIntake_BlockEmployees_View))
+                        {
+                            <div class="tab-pane" id="tab_BlockedEmployee" data-ng-controller="ReferralBlockEmployeeController">
+                                @Html.Partial("Partial/ReferralDetails/_tabBlockEmployee", model)
+                            </div>
+                        }
+
+                    }*@
+
+
+                    @*if (Common.HasPermission(Constants.HC_Permission_PatientIntake_IM_View))
+                    {
+                        <div class="tab-pane" id="tab_Notes" data-ng-controller="ReferralInternalMessageController">
+                            @Html.Partial("Partial/_ReferralInternamMessage", Model)
+                        </div>
+                    }*@
+                   
+                    @*if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Notes_View))
+                    {
+
+                        ViewBag.NoteFrom = "PATIENT";
+                        <div class="tab-pane" id="tab_PatientNotes" data-ng-controller="ReferralNoteController">
+                            @Html.Partial("Partial/ReferralDetails/_ReferralNote")
+                        </div>
+                    }*@
+                   
+
+                }
+
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    @*<script src="https://maps.google.com/maps/api/js?sensor=false&key=AIzaSyA_Pc8Ldr4NbtKti-rQsf5g0PVa4K9VsMs" type="text/javascript"></script>*@
+    @*@Scripts.Render("~/viewjs/siteApp/homecare/referral/addreferral")*@
+    @Scripts.Render("~/viewjs/siteApp/staffing/facility/addreferral")
+ 
+    @*<script src="https://cdnjs.cloudflare.com/ajax/libs/signature_pad/1.5.3/signature_pad.min.js"></script>*@
+   @* @Scripts.Render("~/viewjs/siteApp/homecare/referral/careplan")*@
+    @Scripts.Render("~/viewjs/siteApp/staffing/facility/careplan")
+ 
+
+   
+    <script src="~/Assets/js/viewjs/siteApp/Areas/HomeCare/Shared/_VisitReasonActionModal.js"></script>
+
+    <script type="text/javascript">
+        var Account = "@Resource.Account";
+        var Medicaid = "@Resource.Medicaid";
+        var EncryptedReferralID = "@Model.Referral.EncryptedReferralID";
+        var EncryptedIDForZero = "@Zarephath.Core.Infrastructure.Crypto.Encrypt(Convert.ToString(0))";
+        var LoggedInUserId = parseInt('@SessionHelper.LoggedInID');
+        var DeleteNoteMessage = '@Resource.DeleteNoteMessage';
+        var ResolveNoteConfirmMessage = '@Resource.ResolveNoteConfirmMessage';
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Contact)';
+        var InvalidImageUploadMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.InvalidFileUploadMessage))';
+        var MaximumUploadImageSizeMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage))';
+        var DeleteDocumentMessage = '@string.Format(@Resource.DeleteDocumentMessage, @Resource.Document)';
+        var DeletePayorConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Payor)';
+        var defaultStateCode = '@Constants.DefaultStateCode';
+        var loggedInUserName = '@SessionHelper.LastName' + ', ' + '@SessionHelper.FirstName';
+        var LegalGuardianContactTypeID = '@legalGuardianContactTypeID';
+        var LegalGuardian = '@Constants.LegalGuardianType';
+        var InternalShort = '@Constants.InternalShort';
+        var Internal = '@Constants.Internal';
+        var ExternalShort = '@Constants.ExternalShort';
+        var External = '@Constants.External';
+        var PrimaryPlacementContactTypeID = '@primaryContactTypeID';
+        var Add = '@Constants.AddAction';
+        var AddLegalGuardianMessage = '@Resource.AddLegalGuardianMessage';
+        var MissingPrimaryContactOrLegalGuardian = '@Resource.MissingPrimaryContactOrLegalGuardian';
+        var ReferralCannotBeCreated = '@Resource.ReferralCannotBeCreated';
+        var ZarePhathServicePlanRequired = '@Resource.ZarePhathServicePlanRequired';
+        var LegalGuardianExists = '@Resource.LegalGuardianExists';
+        var AddLegalGuardian = '@Resource.AddLegalGuardian';
+        var CancelStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Cancelled)';
+        var ContactRequired = '@Resource.ContactRequired';
+        var DeleteConfirmationMessageForSchedule = '@string.Format(@Resource.DeleteConfirmationMessage, "Schedule Master")';
+        var DraftIncomplete = '@Html.Raw(Resource.DraftIncomplete)';
+        var FieldsIncomplete = '@Html.Raw(Resource.FieldsIncomplete)';
+        var DateFormat = '@ConfigSettings.ClientSideDateFormat';
+        var DXCode = '@Resource.DXCode';
+        var Description = '@Resource.Description';
+        var NA = '@Resource.NA';
+        var Phone = '@Resource.Phone';
+        var Address = '@Resource.Address';
+        var CanNotUpdateLegalGuardianInformation = GetHtmlString('@Resource.CanNotUpdateLegalGuardianInformation');
+        var CaontactTypeAlreadyExist = GetHtmlString('@Resource.CaontactTypeAlreadyExist');
+        var ActiveStatus = '@((int)ReferralStatus.ReferralStatuses.Active)';
+        var Inactive = '@((int)ReferralStatus.ReferralStatuses.Inactive)';
+        var ReferralAccepted = '@((int)ReferralStatus.ReferralStatuses.ReferralAccepted)';
+        var SendNotificationToCM = GetHtmlString('@Resource.SendNotificationToCM');
+        var SendNotificationToCMReferralAccepted = GetHtmlString('@Resource.SendNotificationToCMReferralAccepted');
+        var ActiveStatusNotAllowedForSaveAsDraft = GetHtmlString('@Resource.ActiveStatusNotAllowedForSaveAsDraft');
+        var FirstName = '@Resource.FirstName';
+        var LastName = '@Resource.LastName';
+        var AHCCCSID = '@Resource.AHCCCSID';
+        var CISNumberLabel = '@Resource.CISNumberLabel';
+        var CISNumberShort = '@Resource.CISLabel';
+        var DOB = '@Resource.DOB';
+        var Assignee = '@Resource.Assignee';
+        var PayorEffectiveDate = '@Resource.PayorEffectiveDate';
+        var Status = '@Resource.Status';
+        var Gender = '@Resource.Gender';
+        var Email = '@Resource.Email';
+        var Invalid = '@Resource.Invalid';
+        var Missing = '@Resource.Missing';
+        var StartDate = '@Resource.StartDate';
+        var EndDate = '@Resource.EndDate';
+        var DeleteDxCodeConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.DXCode)';
+        var DxcodeEnabledSuccessMessage = '@Resource.DxCodeEnableSuccessfully';
+        var DxcodeDisabledSuccessMessage = '@Resource.DxCodeDisabledSuccessfully';
+        var Cancel = '@Resource.Cancel';
+        var Delete = '@Resource.Delete';
+        var CanNotSave = '@Resource.CanNotSave';
+        var DXCodeWithoutDot = '@Resource.DXCodeWithoutDot';
+        var DXCodeWithPrecedenceExists = '@Resource.DXCodeWithPrecedenceExists';
+        var Precedence = '@Resource.Precedence';
+        var ParentName = '@Resource.ParentName';
+        var ReferralSiblingMappingExists = '@Resource.ReferralSiblingMappingExists';
+        var DeleteReferralSiblingConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.ReferralSiblingMappings)';
+        var Confirm = '@Resource.PleaseConfirm';
+        var YesContinue = '@Resource.YesContinue';
+        var NoContinue = '@Resource.NoContinue';
+        var InactiveAllBXContract = GetHtmlString('@Resource.InactiveAllBXContract');
+        var TerminatePopUpMessage = '@Resource.TerminatePopUpMessage';
+
+        var RefStatus_ConnectingFamilies = '@((int)ReferralStatus.ReferralStatuses.ConnectingFamilies)';
+        var MustSetLegalGuardian = '@Html.Raw(Resource.MustSetLegalGuardian)';
+        var EnableDisableMonthlySummaryConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.MonthlySummary)';
+
+        var checklistTypePatient = '@Common.ChecklistType.PatientIntake.GetHashCode()';
+        var checklistTypeMonthlyVisit = '@Common.ChecklistType.MonthlyVisit.GetHashCode()';
+        var checklistTypeAnnualVisit = '@Common.ChecklistType.AnnualVisit.GetHashCode()';
+        var checklistVisitTypeMonthlyVisit = '@Common.ChecklistVisitType.MonthlyVisit.GetHashCode()';
+        var checklistVisitTypeAnnualVisit = '@Common.ChecklistVisitType.AnnualVisit.GetHashCode()';
+        var DeleteOutComeConfirmationMessage = '@Resource.DeleteOutComeConfirmationMessage';
+        var DeleteAnsellCaseyConfirmationMessage = '@Resource.DeleteAnsellCaseyConfirmationMessage';
+        var RegxClientAhcccsId = '@Constants.RegxClientAhcccsId';
+
+
+        var EnableDisablePayorMappingConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.ReferralPayorMapping)';
+        var Resource_Conclusion = '@Resource.Conclusion';
+        var DeleteRHConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.ReferralHistory)';
+        var DeleteBEConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.BlockEmployee)';
+        var DeleteTaskConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Task)';
+        var DeleteConclusionConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Conclusion)';
+        var AddressMissingMessage = '@Resource.AddressMissingMessage';
+        var GeoCodeError = '@Resource.GeoCodeError';
+        var RefFutureSchDeleteConfirmation = '@Resource.RefFutureSchDeleteConfirmation';
+        var RefFutureSchDeleteConfirmationMaster = '@Resource.RefFutureSchDeleteConfirmationMaster';
+        var Reply = '@Resource.Reply';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.EmployeeVisit)';
+        var EnableDisableConfirmationReferralAuthorizationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.AuthorizationCode)';
+        var EnableDisableConfirmationReferralPAServiceCodeMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.ServiceCode)';
+
+        var PrimaryDXCodeValidation = '@Resource.PrimaryDXCodeValidation';
+        var TimeSlotForceUpdateConfirmation = '@Resource.ReferralTimeSlotForceUpdateConfirmation';
+        var AddCaseLoadConfirmation = '@Resource.AddCaseLoadConfirmation';
+        var RemoveCaseLoadConfirmation = '@Resource.RemoveCaseLoadConfirmation';
+        var SelectAllChecklistItems = '@Resource.SelectAllChecklistItems';
+        var ReferralFormPageId = '@Resource.ReferralFormPageId';
+        var ReferralDocumentPageId = '@Resource.ReferralDocumentPageId';
+        var InvalidDocumentUploadMessage = '@Resource.InvalidDocumentUploadMessage';
+        var ScheduleDetailsMissing = '@Resource.ScheduleDetailsMissing';
+        var EmployeeNotAssigned = '@Resource.EmployeeNotAssigned';
+        var checklistEmailTemplateId = '@(EnumEmailType.HomeCare_MonthlyChecklist_Notification_SMS.GetHashCode())';
+        var checklistNotificationId = '@(Mobile_Notification.NotificationTypes.ChecklistNotification.GetHashCode())';
+        var isCaseManagement = '@(SessionHelper.IsCaseManagement ? "1" : "0")';
+        var isDayCare = '@(SessionHelper.IsDayCare ? "1" : "0")';
+        var SelectBeneficiaryType = '@Resource.SelectBeneficiaryType';
+        var SelectBeneficiaryNumber = '@Resource.SelectBeneficiaryNumber';
+        var BeneficiaryTypeExists = '@Resource.BeneficiaryTypeExists';
+        var DeleteBeneficiaryTypeMessage = '@Resource.DeleteBeneficiaryTypeMessage';
+        var DeletePhysicianMessage = '@Resource.DeletePhysicianMessage';
+        var DeleteMultipleConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Multiple)';
+
+        var NotEditableComplianceIDs = [@Constants.PatientAuthorizationsComplianceID, @Constants.VisitsComplianceID];
+
+        var HashUrl_BillingSettings_AuthScheduleLink_Future = '@Constants.HashUrl_BillingSettings_AuthScheduleLink_Future';
+        var HashUrl_BillingSettings_AuthScheduleLink_Past = '@Constants.HashUrl_BillingSettings_AuthScheduleLink_Past';
+    </script>
+
+
+}

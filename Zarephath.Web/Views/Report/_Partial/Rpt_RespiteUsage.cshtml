@@ -1,0 +1,124 @@
+﻿@using System.Globalization
+@model ReportModel
+@Html.Hidden("hdnSetRespiteUsageModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptRespiteUsageController">
+
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon  ribbon-color-default uppercase">@Resource.RespiteUsageReport</div>
+        <p class="ribbon-content">
+            @Resource.RespiteUsageDetail
+        </p>
+        <hr />
+        <div>
+            <a class="btn btn-sm blue-soft pull-right" href="#model__SearchRptRespiteUsage" data-toggle="modal">@Resource.GenerateReport</a>
+        </div>
+        <br />
+    </div>
+
+    <div class="modal fade" id="model__SearchRptRespiteUsage" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.RespiteUsageReport, Resource.SearchParameter)</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmSearchRptClientStatus">
+                                <div class="col-md-12 no-padding">
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Region</label>
+                                        @Html.DropDownListFor(m => m.SearchRespiteUsageModel.RegionID, Model.Region.ToSelectList(Convert.ToString(Model.SearchRespiteUsageModel.RegionID), "RegionName", "RegionID", Resource.SelectRegion, ""), new
+                                                                  {
+                                                                      id = "RegionID",
+                                                                      data_ng_model = "SearchRespiteUsageModel.RegionID",
+                                                                      data_ng_init = "SearchRespiteUsageModel.RegionID=SearchRespiteUsageModel.RegionID==''?null:SearchRespiteUsageModel.RegionID",
+                                                                      @class = "form-control input-sm",
+                                                                      convert_to_number = ""
+
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Status</label>
+                                        @Html.DropDownListFor(p => p.SearchRespiteUsageModel.ReferralStatusID, Model.ReferralStatuses.ToSelectList(Model.SearchRespiteUsageModel.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", Resource.SelectStatus, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "ReferralStatusID",
+                                                                      data_ng_model = "SearchRespiteUsageModel.ReferralStatusID",
+                                                                      data_ng_init = "SearchRespiteUsageModel.ReferralStatusID=SearchRespiteUsageModel.ReferralStatusID==''?null:SearchRespiteUsageModel.ReferralStatusID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Agency</label>
+                                        @Html.DropDownListFor(p => p.SearchRespiteUsageModel.AgencyID, Model.Agencies.ToSelectList(Model.SearchRespiteUsageModel.AgencyID.ToString() ?? "", "NickName", "AgencyID", Resource.SelectAgency, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "AgencyID",
+                                                                      data_ng_model = "SearchRespiteUsageModel.AgencyID",
+                                                                      data_ng_init = "SearchRespiteUsageModel.AgencyID=SearchReportModel.AgencyID==''?null:SearchRespiteUsageModel.AgencyID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.EnableDisableClient</label>
+                                        @Html.DropDownListFor(m => m.SearchRespiteUsageModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchRespiteUsageModel.IsDeleted), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      id = "IsDeleted",
+                                                                      data_ng_model = "SearchRespiteUsageModel.IsDeleted",
+                                                                      data_ng_init = "SearchRespiteUsageModel.IsDeleted = SearchRespiteUsageModel.IsDeleted==null?'-1':SearchRespiteUsageModel.IsDeleted.toString()",
+                                                                      @class = "form-control input-sm"
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                        <label class="control-label">@Resource.FiscalYear</label>
+                                        <select id="FiscalYear" class="form-control input-sm">
+                                            @{
+                                                int year = DateTime.Now.Month > 9 ? DateTime.Now.Year + 1 : DateTime.Now.Year;
+                                            }
+                                            @for (int i = year; i > 2010; i--)
+                                            {
+                                                <option value="@i">@string.Format("{0}  {1} - {2}  {3} ", @Resource.Oct, @i - 1, @Resource.Sep, @i) </option>
+                                            }
+                                        </select>
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="RespiteUsageAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                             <span class="padding-left-5"><img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" data-ng-click="ResetSearchFilter()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm blue"  id="btnRespiteUsageDownload" data-loading-text="@Resource.DownloadingInProgress"  data-ng-click="DownloadRespiteUsageReport('#btnRespiteUsageDownload')">@Resource.Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,167 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Clockinout);
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmployeeAttendanceClockinout;
+    DDMasterModel model = ViewBag.DDMasterModel != null ? (DDMasterModel)ViewBag.DDMasterModel : new DDMasterModel();
+}
+@model SaveClockInOutModel
+@section Styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/schedule/scheduleassignmentinhome")
+}
+
+@Html.Hidden("hdnClockInOutModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="clockinoutController">
+    <div class="container">
+        <div class="row" style="display: flex; justify-content: space-around;">
+            <div class="col-lg-5 col-xs-12" style="padding: 0px; background-color: #fff; box-shadow: 0 .5rem 1rem #c7bebe !important;">
+                <div class="card text-center">
+                    <div class="card-header">
+                        @Resource.Clockinout
+                    </div>
+                    <div class="card-body">                     
+                        <h5 class="card-title">
+                            &nbsp;@*Special title treatment*@
+                            <span data-ng-show="SetClockInOutModel.EmployeeAttendanceMaster == null || SetClockInOutModel.EmployeeAttendanceMaster.Id == undefined"></span>
+                            <span data-ng-show="AttendanceDetailType == 1"></span>
+
+                        </h5>
+                        <div class="row" style="display: flex;justify-content: space-around;">
+                            <div class="col-lg-5 col-xs-12 small-select padding-right-0">
+                                <div class="fields">
+                                    <label class="control-label">@Resource.Facility</label>
+                                    @Html.DropDownListFor(p => p.EmployeeAttendanceMaster.FacilityID, Model.FacilityListModel.ToSelectList("", "FacilityName", "FacilityID"),
+                                              new
+                                              {
+                                                  data_ng_model = "SetClockInOutModel.EmployeeAttendanceMaster.FacilityID",
+                                                  //data_ng_init = "SetClockInOutModel.EmployeeAttendanceMaster.FacilityID=SetClockInOutModel.EmployeeAttendanceMaster.FacilityID==null?'':SetClockInOutModel.EmployeeAttendanceMaster.FacilityID",
+                                                  data_ng_init = "SetClockInOutModel.EmployeeAttendanceMaster.FacilityID",
+                                                  data_ng_disabled = "AttendanceDetailType  != 0",
+                                                  @class = "form-control input-sm",
+                                                  ng_change = "FacilityChange(this)"
+                                              })
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <p class="card-text">
+                            &nbsp;@*With supporting text below as a natural lead-in to additional content.*@
+                            <span data-ng-show="SetClockInOutModel.EmployeeAttendanceMaster == null || SetClockInOutModel.EmployeeAttendanceMaster.Id == undefined ">@Resource.ClockIn</span>
+                            <span data-ng-show="AttendanceDetailType  == 1 || AttendanceDetailType  == 4 " >@Resource.Break or @Resource.ClockOut </span>
+                            <span data-ng-show="AttendanceDetailType  == 3 ">@Resource.ResumeFromBreak</span>
+                            <span data-ng-show="AttendanceDetailType  == 2 ">@Resource.ClockOut @Resource.Completed</span>
+                            @*<span data-ng-show="AttendanceDetailType==0&&Expiry"> Expired and @Resource.ClockIn{{AttendanceDetailType}}</span>*@
+
+                        </p>
+                        <div class="row" style="display: flex;justify-content: space-around;">
+                            <div class="col-lg-6 col-sm-12">
+
+                                <button id="btnClockIn" data-ng-show="AttendanceDetailType == 0 || AttendanceDetailType==2" type="button" class="btn btn-primary btn-indigo px-4 waves-effect waves-light"
+                                        style="height: 23vh; width: 90%; box-shadow: 0 .5rem 1rem #337ab7 !important; background-color: #169f14;" autocomplete="autocomplete_off_hack_xfr4!k"
+                                        data-ng-click="SaveAttendance(1)" disabled>
+                                    <i data-ng-show="!AjaxStart" class="fa fa-sign-in" aria-hidden="true" style="font-size: 20vh; margin-top: 6vh;"></i>
+                                    <div class="top pagination-sm" style="font-size: 2.5vh;" data-ng-show="AjaxStart">
+                                        Loading, Please wait...
+                                        <br>
+                                        <img src="/Assets/images/lazyload.gif">
+                                    </div>
+                                </button>
+                                <button data-ng-show="AttendanceDetailType  == 3" type="button" class="btn btn-primary btn-indigo px-4 waves-effect waves-light btn-sm"
+                                        style="height: 23vh; width: 90%; box-shadow: 0 .5rem 1rem #337ab7 !important; " autocomplete="autocomplete_off_hack_xfr4!k"
+                                        data-ng-click="SaveAttendance(4);FacilityChange(this);">
+                                    <i data-ng-show="!AjaxStart" class="fa fa-7x fa-play" aria-hidden="true" style="font-size: 20vh;margin-top: 6vh;"></i>
+                                    <div class="top pagination-sm" style="font-size: 2.5vh;" data-ng-show="AjaxStart">
+                                        Loading, Please wait...
+                                        <br>
+                                        <img src="/Assets/images/lazyload.gif">
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="row" data-ng-show="AttendanceDetailType  == 1 || AttendanceDetailType  == 4">
+                            <div class="col-lg-6 col-sm-12">
+                                <button type="button" class="btn btn-primary green-jungle px-4 waves-effect waves-light"
+                                        style="height: 23vh; width: 90%; box-shadow: 0 .5rem 1rem #26C281 !important; background-color: #e1e122 " autocomplete="autocomplete_off_hack_xfr4!k"
+                                        data-ng-click="SaveAttendance(3)">
+                                    <i data-ng-show="!AjaxStart" class="fa fa-pause" aria-hidden="true" style="font-size: 20vh; margin-top: 6vh;"></i>
+                                    <div class="top pagination-sm" style="font-size: 2.5vh;" data-ng-show="AjaxStart">
+                                        Loading, Please wait...
+                                        <br>
+                                        <img src="/Assets/images/lazyload.gif">
+                                    </div>
+                                </button>
+                            </div>
+                            <div class="col-lg-6 col-sm-12">
+                                <button type="button" class="btn red-mint btn-danger px-4 waves-effect waves-light"
+                                        style="height: 23vh; width: 90%; box-shadow: 0 .5rem 1rem #ed6b75 !important; " autocomplete="autocomplete_off_hack_xfr4!k"
+                                        data-ng-click="SaveAttendance(2)">
+                                    <i data-ng-show="!AjaxStart" class="fa fa-sign-out" aria-hidden="true" style="font-size: 20vh; margin-top: 6vh;"></i>
+                                    <div class="top pagination-sm" style="font-size: 2.5vh;" data-ng-show="AjaxStart">
+                                        Loading, Please wait...
+                                        <br>
+                                        <img src="/Assets/images/lazyload.gif">
+                                    </div>
+                                </button>
+                            </div>
+                        </div>
+
+                        <br />
+                        <div class="row" style="display: flex;justify-content: space-around;">
+                            <div class="col-lg-10 col-xs-12">
+                                <div class="field">
+                                    <label class="control-label">       @Resource.Note</label>
+                                    <div class="field-box">
+                                        @Html.TextAreaFor(m => m.EmployeeAttendanceMaster.Note,
+                                       new
+                                       {
+                                           data_ng_model = "SetClockInOutModel.EmployeeAttendanceMaster.Note",
+                                           @class = "form-control input-sm",
+                                           placeholder = Resource.Note,
+                                           maxlength = 512,
+                                           data_ng_disabled = "AttendanceDetailType  == 2",
+                                       })
+                                        @Html.ValidationMessageFor(m => m.EmployeeAttendanceMaster.Note)
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <br />
+                    <div class="card-footer text-muted">
+                        <table class=" table table-bordered table-striped table-condensed flip-content table-checkable">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th style="text-align:center;"><span>Activity</span></th>
+                                    <th style="text-align:center;"><span>Time</span></th>
+                                    <th style="text-align:center;"><span>Note</span></th>
+                                </tr>
+                            </thead>
+                            <tr data-ng-repeat="detail in SetClockInOutModel.EmployeeAttendanceDetail" ng-value="{{$index}}">
+                                <td>
+                                    <span>{{$index+1}}</span>
+                                </td>
+                                <td>
+                                    <span>{{AttendanceDetailName(detail.Type)}}</span>
+                                </td>
+                                <td>
+                                    <span>{{GetDate(detail.CreatedDate) |date:'@Resource._DateFormat hh:mm a' }}</span>
+                                </td>
+                                <td>
+                                    <span>{{detail.Note}}</span>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/transportservice/addtransportmapping");
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/Attendance/clockinout.js")
+}

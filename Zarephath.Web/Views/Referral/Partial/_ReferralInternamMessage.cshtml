@@ -1,0 +1,200 @@
+﻿@using Zarephath.Core.Models
+@model AddReferralModel
+
+@Html.Hidden("hdnSetReferralInternalMessageModel", Common.SerializeObject(Model))
+@{
+    Model.SetReferralInternalMessagePageLoad.AssigneeList = new List<NameValueData>
+        {
+            new NameValueData { Name = Constants.AssignedMe, Value = (long) Common.AssignedMeEnum.AssignedMe},
+            new NameValueData { Name = Common.AssignedMeEnum.All.ToString(), Value = (long)Common.AssignedMeEnum.All},
+        };
+}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-md-12 margin-bottom-10">
+
+            @if (Common.HasPermission(Constants.Permission_ReferralInternalMessaging_AddUpdate))
+            {
+                <div class="col-sm-2 pull-right">
+                    <a href="#AddReferralInternalMessageModal" data-toggle="modal" class="btn btn-xs green-jungle pull-right">
+                        <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddNewMessage
+                    </a>
+                </div>
+            }
+            <div class="col-sm-2 pull-right">
+                <div class="mt-checkbox-inline">
+                    <label class="mt-checkbox mt-checkbox-outline">
+                        <input data-ng-model="SearchReferralInternalMessage.Assignee"
+                            class="uniformControls" data-uniform-value="SearchReferralInternalMessage.Assignee"
+                            data-ng-true-value="1" data-ng-false-value="-1" data-ng-change="SetReferralInternamMessageDetail(true)"
+                            type="checkbox">Assigned to me only<span></span>
+                    </label>
+
+                </div>
+            </div>
+
+        </div>
+
+
+        <div class="portlet-body compact" style="display: block;">
+            <div>
+                <table class="table table-bordered table-striped table-condensed flip-content">
+                    <thead class="">
+                        <tr>
+                            <th class="col-lg-6">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralInternalMessageListPager.sortColumn('Note')">@Resource.Message</a>
+                                <span class="sortorder" data-ng-show="ReferralInternalMessageListPager.sortIndex === 'Note'" data-ng-class="{reverse:ReferralInternalMessageListPager.reverse}"></span>
+                            </th>
+                            <th class="">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralInternalMessageListPager.sortColumn('Assignee')">@Resource.Assignee</a>
+                                <span class="sortorder" data-ng-show="ReferralInternalMessageListPager.sortIndex === 'Assignee'" data-ng-class="{reverse:ReferralInternalMessageListPager.reverse}"></span>
+                            </th>
+                            <th class="">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralInternalMessageListPager.sortColumn('Status')">@Resource.Status</a>
+                                <span class="sortorder" data-ng-show="ReferralInternalMessageListPager.sortIndex === 'Status'" data-ng-class="{reverse:ReferralInternalMessageListPager.reverse}"></span>
+                            </th>
+                            <th class="">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralInternalMessageListPager.sortColumn('CreatedBy')">@Resource.AddedBy</a>
+                                <span class="sortorder" data-ng-show="ReferralInternalMessageListPager.sortIndex === 'CreatedBy'" data-ng-class="{reverse:ReferralInternalMessageListPager.reverse}"></span>
+                            </th>
+                            <th class="width-100px">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralInternalMessageListPager.sortColumn('CreatedDate')">@Resource.AddedDate</a>
+                                <span class="sortorder" data-ng-show="ReferralInternalMessageListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:ReferralInternalMessageListPager.reverse}"></span>
+                            </th>
+                            <th class="width-155px">@Resource.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr dir-paginate="item in ReferralInternalMessageList | itemsPerPage: ReferralInternalMessageListPager.pageSize" total-items="ReferralInternalMessageListPager.totalRecords" current-page="ReferralInternalMessageListPager.currentPage" pagination-id="ReferralInternalMessageListPagerID">
+                            @*<tr data-ng-repeat="item in ReferralInternalMessageList">*@
+                            <td class="col-sm-5">
+                                <span data-ng-bind-html="item.Note"
+                                    @* class="dirPopover" data-popover-content="{{item.Note}}"
+                            data-popover-trigger="click"
+                            data-popover-placement="right"*@
+                                    ></span>
+                                @*<a href="#"  data-ng-bind="item.Notes">Show More</a>*@
+                            </td>
+                            <td data-ng-bind="item.AssigneeName" class="width15"></td>
+                            <td>
+                                <span data-ng-if="item.IsResolved" class="badge badge-success">@Resource.Resolved</span>
+                                <span data-ng-if="!item.IsResolved" class="badge badge-danger">@Resource.Open</span>
+                            </td>
+                            <td>{{item.CreatedByName}}</td>
+                            <td>{{item.CreatedDate | date:'@Resource._DateFormat'}}</td>
+                            <td>
+                                <div class="text-right">
+                                    <span data-ng-if="!item.IsResolved && item.CanResolve">
+                                        <a class="btn btn-xs yellow" data-ng-click="ResolveNote(item)" href="javascript:void(0);">@Resource.Resolve</a>
+                                    </span>
+                                    @if (Common.HasPermission(Constants.Permission_ReferralInternalMessaging_AddUpdate))
+                                    {
+                                        <span data-ng-if="item.CreatedBy==LoggedInUserId">
+                                            <a href="#AddReferralInternalMessageModal" data-ng-click="EditNote(item)" data-toggle="modal" class="btn btn-xs blue">@Resource.Edit
+                                            </a>
+                                            <a class="btn btn-xs red" href="javascript:void(0);" data-ng-click="DeleteNote(item)">@Resource.Delete </a>
+                                        </span>
+                                    }
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+    <div class="col-sm-12">
+        <div data-ng-if="ReferralInternalMessageList.length == 0">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger">
+                        @Html.Raw(Resource.NoRecordsFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-12" data-ng-if="ReferralInternalMessageList.length > 0">
+        <div class="pull-left col-sm-3 no-padding">
+            @Resource.Showing <span data-ng-bind="(ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) -ReferralInternalMessageListPager.pageSize  + 1"></span>
+            &nbsp;@Resource.To <span data-ng-bind="(ReferralInternalMessageListPager.pageSize == ReferralInternalMessageListPager.currentPageSize) ? (ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) :(ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) - ReferralInternalMessageListPager.pageSize  + ReferralInternalMessageListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralInternalMessageListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+        </div>
+        <div class="pull-right top">
+            <dir-pagination-controls boundary-links="true" on-page-change="ReferralInternalMessageListPager.pageChanged(newPageNumber)" pagination-id="ReferralInternalMessageListPagerID"></dir-pagination-controls>
+            @*<pagination boundary-links="true" max-size="ReferralInternalMessageListPager.maxShowNumbersSize" items-per-page="ReferralInternalMessageListPager.pageSize" total-items="ReferralInternalMessageListPager.totalRecords" ng-model="ReferralInternalMessageListPager.currentPage" ng-change="ReferralInternalMessageListPager.pageChanged(ReferralInternalMessageListPager.currentPage)"></pagination>*@
+        </div>
+    </div>
+    <div class="modal fade" id="AddReferralInternalMessageModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span data-ng-show="!IsEditNote">@Resource.AddNewMessage</span><span data-ng-show="IsEditNote">Edit Message</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmNewReferralInternalMessage">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-3">
+                                            <label class="control-label required">@Resource.Assignee</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            @* @Html.DropDownListFor(m => m.SetReferralInternalMessagePageLoad.ReferralInternalMessage.Assignee, Model.EmployeeList.ToSelectList(Model.SetReferralInternalMessagePageLoad.ReferralInternalMessage.Assignee.ToString() ?? "", "EmployeeName", "EmployeeID", "Select Assignee", ""),
+                                                    new
+                                                        {
+                                                            convert_to_number = "",
+                                                            data_ng_model = "ReferralInternalMessage.Assignee",
+                                                            data_ng_init = "ReferralInternalMessage.Assignee=ReferralInternalMessage.Assignee==''?null:ReferralInternalMessage.Assignee",
+                                                            @class = "form-control input-sm",
+                                                            data_ng_class = "{'valid': !(ReferralInternalMessage.Assignee == null  || ReferralInternalMessage.Assignee == '' )}",
+                                                            id = "AssignEmployee",
+                                                        })*@
+                                            <select class="form-control input-sm"
+                                                    data-ng-init="ReferralInternalMessage.Assignee=ReferralInternalMessage.Assignee==''?null:ReferralInternalMessage.Assignee"
+                                                    data-ng-model="ReferralInternalMessage.Assignee"
+                                                    data-val="true" data-val-required="@Resource.AssigneeRequired"
+                                                    id="AssignEmployee"
+                                                    name="ReferralInternalMessage.Assignee"
+                                                    convert-to-number="" data-ng-class="{'valid': !(ReferralInternalMessage.Assignee == null  || ReferralInternalMessage.Assignee == '' )}">
+                                                <option value="">@Resource.SelectAssignee</option>
+                                                <option data-ng-repeat="option in EmployeeList | filter:AssigneeFilter(ReferralInternalMessage.Assignee)" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                                            </select>
+                                            @Html.ValidationMessageFor(m => m.SetReferralInternalMessagePageLoad.ReferralInternalMessage.Assignee)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-3">
+                                            <label class="control-label required">@Resource.Message</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            @Html.TextAreaFor(m => m.SetReferralInternalMessagePageLoad.ReferralInternalMessage.Note, new { data_ng_model = "ReferralInternalMessage.Note", @class = "form-control", rows = 3, maxlength = "500" })
+                                            @Html.ValidationMessageFor(m => m.SetReferralInternalMessagePageLoad.ReferralInternalMessage.Note)
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-sm-11">
+                            <div class="form-group col-sm-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Cancel</button>@*data-ng-click="ResetReferralInternamMessage()"*@
+                                <button type="submit" data-ng-click="SaveReferralInternalMessage()" class="btn green-jungle">@Resource.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

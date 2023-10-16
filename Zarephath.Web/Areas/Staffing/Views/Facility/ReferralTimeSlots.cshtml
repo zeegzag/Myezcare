@@ -1,0 +1,241 @@
+﻿@{
+    ViewBag.Title = Resource.PatientSchedule;
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_PatientTimeSlots;
+}
+@model HC_RTSModel
+
+@Html.Hidden("hdnRTSModel", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="AddReferralTimeSlotsController">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            @{ Html.EnableClientValidation(false); }
+            <form id="frmAddReferral01">
+
+                <div class="row">
+                    <div class="form-group col-lg-8 col-md-8 col-sm-8 form-inline">
+
+                        @if (!Model.IsPartial)
+                        {
+                            <button type="button" id="prev" class="btn grey border-grey-cascade btn-sm" title="Previous" data-ng-click="prevOption()">
+                                <i class="fa fa-backward"></i>
+                            </button>
+                        }
+
+                        <select class="form-control input-sm"
+                                data-ng-init="TempSearchRTSMaster.ReferralID=TempSearchRTSMaster.ReferralID==''?null:TempSearchRTSMaster.ReferralID.toString()"
+                                data-ng-model="TempSearchRTSMaster.ReferralID"
+                                name="RTSModelReferral"
+                                data-ng-change="SearchRTSMasterList()" disabled="@(Model.IsPartial == true && Model.SearchRTSMaster.ReferralID > 0)">
+                            <option value="">@Resource.SelectPatient</option>
+                            <option data-ng-repeat="option in RTSModel.ReferralList" value="{{option.Value}}">{{option.Name.replace(',','')}}</option>
+                        </select>
+
+                        @if (!Model.IsPartial)
+                        {
+                            <button type="button" id="next" class="btn grey border-grey-cascade btn-sm" title="Next" data-ng-click="nextOption()">
+                                <i class="fa fa-forward"></i>
+                            </button>
+                        }
+
+
+
+                        <button type="button" class="btn grey border-grey-cascade btn-sm margin-right-05 margin-left-20"
+                                data-ng-click="RefreshRTSMaster()" title="@Resource.Refresh">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                        </button>
+
+                        @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_PatientSchedule_Add)))
+                        {
+                            <button type="button" class="btn btn-sm green-jungle"
+                                    data-ng-show="TempSearchRTSMaster.ReferralID>0" data-ng-click="OpenRTSMasterModal($event)"
+                                    title="@Resource.AddReferralSchedule">
+                                <i class="fa fa-plus" aria-hidden="true">&nbsp;&nbsp;</i>@Resource.AddReferralSchedule
+                            </button>
+                        }
+
+                    </div>
+                    @*<div class="form-group col-lg-4 col-md-4 col-sm-4 form-inline">
+
+                            <span class="badge badge-primary">@Resource.AuthorizedHours</span>
+                            <span class="badge badge-secondary">@Resource.TotalHours</span>
+                            <span class="badge badge-warning">@Resource.UsedHours </span>
+                            <span class="badge badge-info">@Resource.RemainingHrs</span>
+                        </div>*@
+                </div>
+
+                <div class="row">
+
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4 form-inline">
+                        <select class="form-control input-sm"
+                                data-ng-init="null"
+                                data-ng-model="selectedPatientStatusFilter"
+                                name="PatientStatusFilter"
+                                @*data-ng-change="FilterPatientStatus()" disabled="@(Model.IsPartial == true && Model.SearchRTSMaster.ReferralID > 0)">*@
+                                data-ng-change="FilterPatientStatus()" >
+                            <option value="">@Resource.SelectPatientFilter</option>
+                            <option data-ng-repeat="option in patientStatusFilter" value="{{option}}">{{option}}</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+
+                        <div class="inline-block pull-right" data-ng-show="RTSMasterList.length > 0">
+                            <div class="pull-right margin-left-5">
+                                <dir-pagination-controls boundary-links="true" max-size="RTSMasterListPager.maxSize" on-page-change="RTSMasterListPager.pageChanged(newPageNumber)" pagination-id="RTSMasterListPager"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space20"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            <div class="table-responsive">
+
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSMasterListPager.sortColumn('Name')">@Resource.Name</a>
+                                                <span class="sortorder" data-ng-show="RTSMasterListPager.sortIndex === 'Name'" data-ng-class="{reverse:RTSMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSMasterListPager.sortColumn('StartDate')">@Resource.StartDate</a>
+                                                <span class="sortorder" data-ng-show="RTSMasterListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:RTSMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSMasterListPager.sortColumn('EndDate')">@Resource.EndDate</a>
+                                                <span class="sortorder" data-ng-show="RTSMasterListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:RTSMasterListPager.reverse}"></span>
+                                            </th>
+                                            @*@if (!SessionHelper.IsCaseManagement)
+                                                {
+                                                    <th>
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSMasterListPager.sortColumn('TotalRTSDetailCount')">@Resource.SlotsHash</a>
+                                                        <span class="sortorder" data-ng-show="RTSMasterListPager.sortIndex === 'TotalRTSDetailCount'" data-ng-class="{reverse:RTSMasterListPager.reverse}"></span>
+                                                    </th>
+                                                }*@
+                                            <th>CareType</th>
+                                            <th>Information</th>
+                                            <th class="width-200px col-sm-3">@Resource.Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr data-ng-class="{'deleted':item.IsDeleted,'activeBgColor':item.ActiveStat, 'table-row-selected':SearchRTSDetail.ReferralTimeSlotMasterID==item.ReferralTimeSlotMasterID}"
+                                            dir-paginate="item in RTSMasterList | itemsPerPage: RTSMasterListPager.pageSize" total-items="RTSMasterListPager.totalRecords" current-page="RTSMasterListPager.currentPage" pagination-id="RTSMasterListPager">
+                                            {{item | json}}
+                                            <td>{{item.Name != null ? item.Name : '@Resource.NA'}}</td>
+                                            <td>{{item.StartDate | dateformat}}</td>
+                                            <td>{{(item.EndDate!=null) ? (item.EndDate | dateformat) : '@Resource.NA'}}</td>
+                                            @*@if (!SessionHelper.IsCaseManagement)
+                                                {
+                                                    <td>{{item.TotalRTSDetailCount}}</td>
+                                                }*@
+                                            <td>{{item.CareType}}</td>
+                                            <td>
+                                                <span class="badge badge-green" ng-if="item.ActiveStat">@Resource.Active</span>
+                                               @* <span class="badge badge-danger" ng-if="item.EndDate">@Resource.Expired</span>*@
+                                                @*<span class="badge badge-danger" ng-if="item.EndDate ==null">@Resource.BadgeError</span>*@
+                                                @*<span class="badge badge-primary" ng-if="item.EndDate !=null">{{item.AllowedTime}}</span>
+                                                    <span class="badge badge-secondary" ng-if="item.EndDate !=null">{{item.ScheduledHours}}</span>
+                                                    <span class="badge badge-warning" ng-if="item.EndDate !=null">{{item.UsedHours }}</span>
+                                                    <span class="badge badge-info" ng-if="item.EndDate !=null">{{item.PendingHours}}</span>*@
+                                            </td>
+                                            <td>
+                                                @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_PatientSchedule_Add)))
+                                                {
+                                                    <a href="javascript:void(0);" data-ng-disabled="item.IsDeleted" data-ng-click="item.IsDeleted ? false : OpenRTSMasterModal($event,item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                    <a href="javascript:void(0);" data-ng-disabled="item.IsDeleted" data-ng-click="item.IsDeleted ? false : OpenRTSDeleteModal($event,item)" class="btn btn-xs red margin-right-05"><i class="fa fa-trash"></i> </a>
+                                                    <a href="javascript:void(0);" data-ng-disabled="item.IsDeleted" class="btn btn-xs green-jungle" data-ng-click="item.IsDeleted ? false : OpenEmpRefSchModal($event,item)">@Resource.ScheduleNow </a>
+                                                }
+                                                @*<a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteRTSMaster($event,item.ReferralTimeSlotMasterID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>*@
+                                                @*<a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteRTSMaster($event,item.ReferralTimeSlotMasterID,'@Resource.Delete')" class="btn btn-xs red">@Resource.Delete</a>*@
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12" data-ng-if="RTSMasterList.length > 0">
+                        <div class="col-sm-6 pull-left no-padding margin-top-5">
+                            @Resource.Showing <span data-ng-bind="(RTSMasterListPager.pageSize * RTSMasterListPager.currentPage) - RTSMasterListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(RTSMasterListPager.pageSize == RTSMasterListPager.currentPageSize) ? (RTSMasterListPager.pageSize * RTSMasterListPager.currentPage) :(RTSMasterListPager.pageSize * RTSMasterListPager.currentPage) - RTSMasterListPager.pageSize  + RTSMasterListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="RTSMasterListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                        </div>
+                        <div class="pull-right top pagination-sm">
+                            <dir-pagination-controls boundary-links="true" max-size="RTSMasterListPager.maxSize" on-page-change="RTSMasterListPager.pageChanged(newPageNumber)" pagination-id="RTSMasterListPager"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="RTSMasterList.length == 0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            @if (SessionHelper.IsHomeCare)
+            {
+                @Html.Partial("/Areas/HomeCare/Views/Schedule/Partial/01/_EmpRefSchDetailPopover.cshtml")
+            }
+            @if (SessionHelper.IsDayCare)
+            {
+                @Html.Partial("/Areas/HomeCare/Views/Schedule/Partial/DayCare/_EmpRefSchDetailPopover.cshtml", new HC_DayCare_ScheduleAssignmentModel())
+            }
+
+
+            @Html.Partial("Partial/_AddRTSMaster", Model)
+            @Html.Partial("Partial/_AddRTSByPriorAuth", Model)
+        </div>
+    </div>
+</div>
+
+<script id="schemployeedetail-popover" type="text/ng-template">
+    @Html.Partial("/Areas/HomeCare/Views/Schedule/Partial/PrivateDuty/_EmployeeDetailPopover.cshtml")
+</script>
+@section Scripts{
+
+    @if (!Model.IsPartial)
+    {
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/referral/referraltimeslots")
+        if (SessionHelper.IsHomeCare)
+        {
+            @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/emprefschoptions")
+        }
+        if (SessionHelper.IsDayCare)
+        {
+            @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/daycare/emprefschoptions")
+        }
+
+        <script type="text/javascript">
+            var RefFutureSchDeleteConfirmation = '@Resource.RefFutureSchDeleteConfirmation';
+            var RefFutureSchDeleteConfirmationMaster = '@Resource.RefFutureSchDeleteConfirmationMaster';
+            var TimeSlotForceUpdateConfirmation = '@Resource.ReferralTimeSlotForceUpdateConfirmation';
+            var isCaseManagement = '@(SessionHelper.IsCaseManagement ? "1" : "0")';
+            var PatientForceSchedulesConfirmation  = '@Resource.PatientForceSchedulesConfirmation';
+        </script>
+    }
+
+}
+
+
+

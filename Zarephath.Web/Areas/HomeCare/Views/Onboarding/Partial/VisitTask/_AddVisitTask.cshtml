@@ -1,0 +1,446 @@
+﻿@{
+    var IsEdit = Model != null && Model.VisitTask.VisitTaskID > 0;
+}
+
+@model AddVisitTaskModel
+
+<div data-ng-controller="AddVisitTaskController" id="addvisittaskmodel" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseAddVTModal()">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    @(IsEdit ? Resource.EditVisitTask : Resource.AddVisitTask)
+                    <small>@Resource.EnterVisitTaskInformation</small>
+                </h4>
+            </div>
+            <div class="modal-body">
+                @if (Model != null)
+                {
+                    @Html.Hidden("hdnVisitTaskModel", Common.SerializeObject(Model))
+                    <div>
+                        <form class="form-horizontal" id="frmVisitTask">
+                            @*<div class="page-bar">
+                                <h3 class="page-title">
+                                    @(IsEdit ? Resource.EditVisitTask : Resource.AddVisitTask)
+                                    <small>@Resource.EnterVisitTaskInformation</small>
+                                </h3>
+                            </div>*@
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group row">
+                                        <div class="col-sm-12">
+                                            <div class="col-sm-push-2 col-sm-8 no-padding">
+                                                <div class="col-sm-12">
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label required">
+                                                            @Resource.TaskType
+                                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.TaskTypeHelptext"
+                                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            @Html.DropDownListFor(p => p.VisitTask.VisitTaskType, Model.VisitTaskTypes.ToSelectList(Model.VisitTask.VisitTaskType ?? "", "Name", "Value", @Resource.SelectTaskType, ""),
+                                                                                      new
+                                                                                      {
+                                                                                          data_ng_model = "VisitTask.VisitTaskType",
+                                                                                          data_ng_init = "VisitTask.VisitTaskType=VisitTask.VisitTaskType==''?null:VisitTask.VisitTaskType",
+                                                                                          @class = "form-control input-sm",
+                                                                                          data_ng_change="GetVisitTaskCategory()"
+                                                                                      })
+                                                            @Html.ValidationMessageFor(q => q.VisitTask.VisitTaskType)
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group" data-ng-if="VisitTask.VisitTaskType=='@VisitTask.TaskType.Task.ToString()'">
+                                                        <label class="col-md-3 control-label required">
+                                                            @Resource.VisitType
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            @Html.DropDownListFor(m => m.VisitTask.VisitType,Model.VisitTypeList.ToSelectList(Convert.ToString(Model.VisitTask.VisitType), "Name", "Value",Resource.Select,""), new
+                                                            {
+                                                                id = "VisitType",
+                                                                data_ng_model = "VisitTask.VisitType",
+                                                                data_ng_init = "VisitTask.VisitType=VisitTask.VisitType==''?null:VisitTask.VisitType",
+                                                                @class = "form-control input-sm",
+                                                                data_ng_change="OnVisitTypeChange()",
+                                                                convert_to_number = ""
+                                                            })
+                                                            @Html.ValidationMessageFor(q => q.VisitTask.VisitType)
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group" data-ng-if="VisitTask.VisitTaskType=='@VisitTask.TaskType.Task.ToString()'">
+                                                        <label class="col-md-3 control-label required">
+                                                            @Resource.CareType
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            @Html.DropDownListFor(m => m.VisitTask.CareType, new List<SelectListItem>() { new SelectListItem() { Value = "", Text = "Select" } },
+                                                            new
+                                                            {
+                                                                @class = "form-control input-sm",
+                                                                data_ng_model = "VisitTask.CareType",
+                                                                data_ng_init = "VisitTask.CareType=VisitTask.CareType==''?null:VisitTask.CareType",
+                                                                data_ng_options = "dd.Value as dd.Name for dd in CareTypeList"
+                                                            })
+                                                            @Html.ValidationMessageFor(q => q.VisitTask.CareType)
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group" data-ng-if="VisitTask.VisitTaskType=='@VisitTask.TaskType.Task.ToString()'">
+                                                        <label class="col-md-3 control-label">
+                                                            @Resource.ServiceCode
+                                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.VisitTaskServiceCodeHelptext"
+                                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            <div class="replaceErrorDest">
+                                                                <input type="text"
+                                                                       token-input
+                                                                       ng-val="VisitTask.ServiceCodeID"
+                                                                       textfield='ServiceCode'
+                                                                       valuefield='ServiceCodeID'
+                                                                       searchurl="{{GetServiceCodeListURL}}"
+                                                                       placeholder="@Resource.EnterServiceCode"
+                                                                       tokenlimit='1'
+                                                                       onresultsformatter='ServiceCodeResultsFormatter'
+                                                                       ontokenformatter="ServiceCodeTokenFormatter"
+                                                                       id="SearchContactToken"
+                                                                       customclass="form-control input-sm" />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label">
+                                                            @Resource.Category
+                                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.VisitTaskCategoryHelptext"
+                                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            <select class="form-control input-sm" data-ng-model="VisitTask.VisitTaskCategoryID" data-ng-change="GetVisitTaskSubCategory()"
+                                                                    data-ng-options="item.VisitTaskCategoryID as item.VisitTaskCategoryName for item in VisitTaskCategories">
+                                                                <option value="">@Resource.SelectCategory</option>
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="pull-left">
+                                                            <button type="button" class="btn btn-sm green-jungle" data-ng-click="OpenCategoryModal($event,1)" title="@Resource.AddCategory">
+                                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label">
+                                                            @Resource.SubCategory
+                                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.VisitTaskSubCategoryHelptext"
+                                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            <select class="form-control input-sm" data-ng-model="VisitTask.VisitTaskSubCategoryID"
+                                                                    data-ng-options="item.VisitTaskCategoryID as item.VisitTaskCategoryName for item in VisitTaskSubCategories">
+                                                                <option value="">@Resource.SelectSubCategory</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="pull-left">
+                                                            <button type="button" class="btn btn-sm green-jungle" data-ng-click="OpenCategoryModal($event,2)" title="@Resource.AddSubCategory">
+                                                                <i class="fa fa-plus" aria-hidden="true"></i>
+                                                            </button>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label required">
+                                                            @Resource.TaskDetail
+                                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.TaskDetailHelptext"
+                                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            @Html.TextBoxFor(q => q.VisitTask.VisitTaskDetail, new
+                                                       {
+                                                           @class = "form-control input-sm",
+                                                           data_ng_model = "VisitTask.VisitTaskDetail",
+                                                           placeholder = Resource.EnterTaskDetail,
+                                                           maxlength = 1000
+                                                       })
+                                                            @Html.ValidationMessageFor(q => q.VisitTask.VisitTaskDetail)
+
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label">
+                                                            @Resource.IsRequired
+                                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.IsRequiredHelptext"
+                                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            @Html.DropDownListFor(m => m.VisitTask.IsRequired, Common.SetYesNoListForBoolean().ToSelectList(Convert.ToString(Model.VisitTask.IsRequired), "Name", "Value"), new
+                                                       {
+                                                           id = "IsRequired",
+                                                           data_ng_model = "VisitTask.IsRequired",
+                                                           data_ng_init = "VisitTask.IsRequired=VisitTask.IsRequired==''?null:VisitTask.IsRequired",
+                                                           @class = "form-control input-sm",
+                                                           convert_to_boolean = "",
+                                                           //disabled="disabled"
+                                                       })
+                                                            @Html.ValidationMessageFor(q => q.VisitTask.IsRequired)
+                                                        </div>
+                                                    </div>
+
+                                                    <div data-ng-show="VisitTask.VisitTaskType=='@VisitTask.TaskType.Task.ToString()'">
+                                                        <div class="form-group">
+                                                            <label class="col-md-3 control-label">
+                                                                @Resource.MinimumTimeRequired
+                                                                <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.MinimumTimeRequiredHelptext"
+                                                                   data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                            </label>
+                                                            <div class="col-md-7 col-sm-12">
+                                                                <div class="col-md-6 no-padding">
+                                                                    @Html.TextBoxFor(q => q.VisitTask.MinimumTimeRequired,
+                                                            new
+                                                            {
+                                                                @class = "form-control input-sm",
+                                                                data_ng_model = "VisitTask.MinimumTimeRequired",
+                                                                placeholder = @Resource.MinimumTimeRequired,
+                                                                maxlength = 5
+                                                            })
+                                                                    @Html.ValidationMessageFor(q => q.VisitTask.MinimumTimeRequired)
+                                                                </div>
+                                                                <div class="col-md-6 no-padding">
+                                                                    <input type="text" disabled="disabled" class="form-control input-sm" value="@Resource.Minutes" />
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group" data-ng-if="VisitTask.VisitTaskType=='@VisitTask.TaskType.Conclusion.ToString()'">
+                                                        <label class="col-md-3 control-label">
+                                                            @Resource.SendAlert
+                                                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.SendAlertHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            @Html.DropDownListFor(m => m.VisitTask.SendAlert, Common.SetYesNoListForBoolean().ToSelectList(Convert.ToString(Model.VisitTask.SendAlert), "Name", "Value"), new
+                                                       {
+                                                           id = "SendAlert",
+                                                           data_ng_model = "VisitTask.SendAlert",
+                                                           data_ng_init = "VisitTask.SendAlert=VisitTask.SendAlert==''?null:VisitTask.SendAlert",
+                                                           @class = "form-control input-sm",
+                                                           convert_to_boolean = ""
+                                                       })
+                                                            @Html.ValidationMessageFor(q => q.VisitTask.SendAlert)
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label">
+                                                            @Resource.DefaultFrequency
+                                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.DefaultFrequencyHelptext"
+                                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            <select class="form-control input-sm" data-ng-model="VisitTask.Frequency"
+                                                                    data-ng-options="item.Value as item.Name for item in TaskFrequencyCodeList">
+                                                                <option value="">@Resource.SelectFrequency</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+
+
+                                                    <div class="form-group">
+                                                        <label class="col-md-3 control-label">
+                                                            @Resource.IsDefault
+                                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.IsDefaultHelptext"
+                                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                        </label>
+                                                        <div class="col-md-7 col-sm-12">
+                                                            @Html.DropDownListFor(m => m.VisitTask.IsDefault, Common.SetYesNoListForBoolean().ToSelectList(Convert.ToString(Model.VisitTask.IsDefault), "Name", "Value"), new
+                                                       {
+                                                           id = "IsDefault",
+                                                           data_ng_model = "VisitTask.IsDefault",
+                                                           data_ng_init = "VisitTask.IsDefault=VisitTask.IsDefault==''?null:VisitTask.IsDefault",
+                                                           @class = "form-control input-sm",
+                                                           convert_to_boolean = ""
+                                                       })
+                                                            @Html.ValidationMessageFor(q => q.VisitTask.IsDefault)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    @*<div class="col-md-12 form-group no-margin no-padding">
+                                        <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(IsEdit ? Resource.Update : Resource.Save)" />
+                                        <a href="@Constants.VisitTaskListURL" class="wzd-cancel">
+                                            <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                                        </a>
+                                    </div>*@
+
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="form-group row" data-ng-if="VisitTask.VisitTaskType=='@VisitTask.TaskType.Task.ToString()'">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="fscontainer">
+                                    <div class="legend">
+                                        Form Mapping
+                                    </div>
+
+                                    <a href="#model_AddContact" data-ng-click="OpenAddFormModal(VisitTask)" class="btn btn-xs blue pull-right margin-top-minus-15px" data-toggle="modal">
+                                        <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddForm
+                                    </a>
+
+                                    <div class="form-group row">
+                                        <div class="col-lg-12 col-md-12 col-sm-12">
+                                            <p class="label-italic">
+                                                <b class="font-red-thunderbird">@Resource.NoteLabel</b>
+                                                <span>@Html.Raw(Resource.TaskFormMappingNote)</span>
+                                            </p>
+                                        </div>
+                                    </div>
+
+
+                                    <div data-ng-if="MappedFormList.length > 0">
+
+                                        <div class="row padding-left-right-10">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="portlet-body compact">
+                                                    <div class="dataTables_wrapper">
+                                                        <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th><strong>@Resource.FormNumber</strong></th>
+                                                                    <th><strong>@Resource.FormName</strong></th>
+                                                                    <th><strong>@Resource.IsRequired</strong></th>
+                                                                    <th><strong>@Resource.Action</strong></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr data-ng-repeat="form in MappedFormList">
+                                                                    <td>{{form.Name}}</td>
+                                                                    <td><a data-ng-click="OpenNewHtmlForm(form)">{{form.FormLongName}}</a></td>
+                                                                    <td>
+                                                                        <input type="checkbox" class="uniformControls ng-pristine ng-valid ng-isolate-scope ng-touched" data-uniform-value="form.IsRequired" data-ng-model="form.IsRequired" data-ng-change="OnFormChecked(form)">
+                                                                    </td>
+                                                                    <td><a href="javascript:void(0);" data-ng-click="DeleteMappedForm(form.TaskFormMappingID,'@Resource.Delete')" class="btn btn-xs red">@Resource.Delete</a></td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div data-ng-if="ReferralModel.ContactInformationList.length == 0">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="alert alert-danger">
+                                                                @Html.Raw(Resource.NoRecordsFound)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="mapFormModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+                            <div class="modal-dialog" role="document">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                                        <h4 class="caption margin-bottom-0 margin-top-5">
+                                            <a class="text-decoration-none sbold uppercase ng-binding">
+                                                Map Form With Task
+                                            </a>
+                                        </h4>
+                                    </div>
+                                    <div class="modal-body">
+                                        <div class="table-responsive tabbable-custom form-table-overflow">
+
+                                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                                <thead class="flip-content">
+                                                    <tr>
+                                                        <th class="width-20px"></th>
+                                                        <th class="width-min-107px">
+                                                            @Resource.FormNumber
+                                                        </th>
+                                                        <th>
+                                                            @Resource.FormName
+                                                        </th>
+                                                        @*<th class="">@Resource.Action</th>*@
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="compact-search-tr">
+                                                        <td></td>
+                                                        <td colspan="2">
+                                                            <input class="form-control input-sm" placeholder="Search by Form Number, Name or Tags" data-ng-model="frmSearch" />
+                                                        </td>
+                                                        @*<td></td>*@
+                                                    </tr>
+                                                    <tr data-ng-repeat="form in OrganizationFormList | filter: frmSearch">
+                                                        <td>
+                                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="form.IsChecked" data-ng-change="SelectForm(form)" val="form.IsChecked">
+                                                        </td>
+                                                        <td>{{ form.Name }}</td>
+                                                        <td>
+                                                            <a data-ng-click="OpenNewHtmlForm(form)">{{ form.FormLongName }}</a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                        </div>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <a class="letter-space btn btn-sm green-jungle pull-right" data-ng-click="MapSelectedForms()">Map</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        @Html.Partial("Partial/VisitTask/Partial/_AddVisitTaskCategory", Model)
+                    </div>
+                }
+            </div>
+
+
+            <div class="modal-footer">
+                <div class="col-md-12">
+                    @*<button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseAddVTModal()">@Resource.Cancel</button>*@
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-show="VisitTask.VisitTaskID === 0" data-ng-click="Save()">@Resource.Save</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-show="VisitTask.VisitTaskID !== 0" data-ng-click="Save()">@Resource.Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript">
+    var MaxUnit = "@Resource.MaxUnit";
+    var DailyUnitLimit = "@Resource.DailyUnitLimit";
+    var Billable = "@Resource.Billable";
+    var GroupOption = "@Resource.GroupOption";
+    var Title = "@Resource.Alert";
+    var SaveConfirmationMessage = "@Resource.SaveTaskConfirmationMessage";
+    var DeleteConfirmationMessage = "@Resource.DeleteMappedFormMessage";
+</script>
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/visittask/addvisittask")

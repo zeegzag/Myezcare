@@ -1,0 +1,191 @@
+﻿@{
+    CacheHelper _cacheHelper = new CacheHelper();
+    CacheHelper_MyezCare ch_MyezcareOrg = new CacheHelper_MyezCare();
+    ReleaseNote releaseNote = ch_MyezcareOrg.GetCachedData<ReleaseNote>(CacheHelperName.ReleaseNote);
+    var rnID = releaseNote == null ? -1 : releaseNote.ReleaseNoteID;
+
+    MyEzcareOrganization myezCareOrg = ch_MyezcareOrg.GetCachedData<MyEzcareOrganization>();
+    //var isHomeCare = myezCareOrg == null || myezCareOrg.OrganizationType.ToLower() == MyEzcareOrganization.AgencyType.HomeCare.ToString().ToLower();
+    if (myezCareOrg == null || myezCareOrg.OrganizationType.ToLower() == MyEzcareOrganization.AgencyType.HomeCare.ToString().ToLower())
+    {
+        SessionHelper.IsHomeCare = true;
+        SessionHelper.IsDayCare = false;
+        SessionHelper.IsPrivateDutyCare = false;
+        SessionHelper.IsRAL = false;
+    }
+    else if (myezCareOrg.OrganizationType.ToLower() == MyEzcareOrganization.AgencyType.DayCare.ToString().ToLower())
+    {
+        SessionHelper.IsHomeCare = false;
+        SessionHelper.IsDayCare = true;
+        SessionHelper.IsPrivateDutyCare = false;
+        SessionHelper.IsRAL = false;
+    }
+    else if (myezCareOrg.OrganizationType.ToLower() == MyEzcareOrganization.AgencyType.PrivateDutyCare.ToString().ToLower())
+    {
+        SessionHelper.IsHomeCare = false;
+        SessionHelper.IsDayCare = false;
+        SessionHelper.IsPrivateDutyCare = true;
+        SessionHelper.IsRAL = false;
+    }
+    else if (myezCareOrg.OrganizationType.ToLower() == MyEzcareOrganization.AgencyType.RAL.ToString().ToLower())
+    {
+        SessionHelper.IsHomeCare = false;
+        SessionHelper.IsDayCare = false;
+        SessionHelper.IsPrivateDutyCare = false;
+        SessionHelper.IsRAL = true;
+    }
+
+    //String CurrentDate = Common.GetOrgCurrentDateTime().ToString("MM/dd/yyyy");
+    //String ReleaseNote_StartDate = Common.ConvertDateToOrgTimeZone(releaseNote.StartDate).ToString("MM/dd/yyyy");
+    //String ReleaseNote_EndDate = Common.ConvertDateToOrgTimeZone(releaseNote.StartDate).ToString("MM/dd/yyyy");
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel='shortcut icon' href='@_cacheHelper.FavIcon' class="favicon-logo" type='image/x-icon' />
+    @*<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />*@
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,300i,400,400i,500,500i,600,600i,700,800,900&display=swap" rel="stylesheet">
+    @if (SessionHelper.OrgCssPath == "~/sitelayoutSevaArpan/css")
+    {
+
+        @Styles.Render("~/sitelayoutSevaArpan/css")
+    }
+    else
+    {
+        @Styles.Render("~/sitelayout/css")
+    }
+    @*@Styles.Render("~/sitelayout/css")*@
+    @RenderSection("styles", required: false)
+    <script src="https://maps.google.com/maps/api/js?sensor=false&key=AIzaSyDrrmfitW8YmTnDz1KQklmB-qR_nUY_6JA&libraries=places" type="text/javascript"></script>
+
+      
+    <script type="text/javascript">
+         @{
+             var pageSize = _cacheHelper.PageSize > 0 ? _cacheHelper.PageSize : ConfigSettings.PageSize;
+             var siteBaseUrl = _cacheHelper.SiteBaseURL;
+        }
+
+
+        window.DeleteConfirmationMessage = '@Resource.DeleteConfirmationMessage';
+        window.PageSize = '@pageSize';//   '@pageSize';
+        window.Alert = '@Resource.Alert';
+        window.SelectedMenuItem = '@ViewBag.SelectedMenuItem';
+        window.ErrorCode_Warning = '@Constants.ErrorCode_Warning';
+
+        window.FileSize = '@ConfigSettings.FileSize';
+
+        //#region Used this Variable in Resource JS
+        window.Yes = '@Resource.Yes';
+        window.No = '@Resource.No';
+        window.Okay = '@Resource.Okay';
+        window.Save = '@Resource.Save';
+        window.Cancel = '@Resource.Cancel';
+        window.YesContinue = '@Resource.YesContinue';
+        window.UpdateRecords = '@Resource.UpdateRecords';
+        window.HardDelete = '@Resource.Delete';
+        window.SoftDelete = '@Resource.SoftDelete';
+        window.Disable = '@Resource.Disable';
+        window.Enable = '@Resource.Enable';
+        window.TypeInASearchTerm = '@Resource.TypeInASearchTerm';
+        window.ZarephathBucket = '@ConfigSettings.ZarephathBucket';
+        window.LiveSiteURL = '@siteBaseUrl';
+        window.OrgID = '@myezCareOrg.OrganizationID';
+        window.RN_CookieName = '@String.Format("ReleaseNote{0}{1}", rnID, _cacheHelper.Domain)';
+		window.LUserId = '@SessionHelper.LoggedInID';
+        window.BetaTagComment = '@Resource.BetaTagComment';
+        window.CalWeekStartDay = @Common.GetCalWeekStartDay();
+        window.Domain = '@SessionHelper.DomainName';
+        //#endregion
+    </script>
+
+    @RenderSection("scriptsHeads", required: false)
+
+</head>
+
+<body class="page-header-fixed page-sidebar-closed page-sidebar-closed-hide-logo page-content-white" cz-shortcut-listen="true" data-ng-app="myApp" data-ng-controller="ParentController">
+
+    <span data-us-spinner="{radius:30, width:8, length: 16,scale:0.5}" style="z-index: 9999999"></span>
+    <div class="ng-cloak">
+
+        <!-- BEGIN HEADER & CONTENT DIVIDER -->
+        <div class="clearfix"></div>
+        <!-- END HEADER & CONTENT DIVIDER -->
+        <!-- BEGIN CONTAINER -->
+        <div class="page-container" style="margin-top: 0px !important">
+            <!-- BEGIN CONTENT -->
+            <div class="page-content-wrapper">
+                <!-- BEGIN CONTENT BODY -->
+                <div class="page-content hideContent">
+                    @RenderBody()
+                </div>
+                <!-- END CONTENT BODY -->
+            </div>
+            <!-- END CONTENT -->
+            <!-- BEGIN QUICK SIDEBAR -->
+            <a href="javascript:;" class="page-quick-sidebar-toggler">
+                <i class="icon-login"></i>
+            </a>
+
+            <!-- END QUICK SIDEBAR -->
+        </div>
+        <!-- END CONTAINER -->
+        @*@Html.Partial("_Footer")*@
+    </div>
+
+
+
+
+
+    @if (releaseNote != null && releaseNote.ReleaseNoteID > 0)
+    {
+        <div data-ng-controller="LayoutDetailController">
+            <div class="box_popup releaseNote display-none" data-ng-show="ShowReleaseNote">
+                <div class="box_img">
+                    <i class="fa fa-bell" aria-hidden="true"></i>
+                </div>
+                <div class="box_con">
+                    <h4 id="release_title ">@releaseNote.Title </h4>
+                    <p id="release_description">
+                        @{
+                            string url = @Constants.ReleaseNoteUrl + releaseNote.EncryptedReleaseNoteID;
+                            string desc = Html.Raw(releaseNote.DescriptionWithoutHtml).ToString();
+
+
+                        }
+                        @if (desc.Length > 100)
+                        {
+                            // truncate string
+                            string stringCut = desc.Substring(0, 100);
+                            int endPoint = stringCut.LastIndexOf(" ");
+                            //if the string doesn't contain any space then it will cut without word basis.
+                            desc = endPoint > 0 ? stringCut.Substring(0, endPoint) : stringCut;
+                            desc = desc + "... <a href=" + url + " target='_blank'>Read More</a>";
+                        }
+                        @Html.Raw(desc)
+                    </p>
+                    <div class="cls_icn">
+                        <a href="javascript:void(0)" data-ng-click="CloseReleaseNote()">@Resource.Close</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="modal fade" id="GeneralEmployee" tabindex="-1" role="dialog">
+        @Html.Partial("/Areas/HomeCare/Views/GeneralMaster/Partial/_AddGeneralMasterModel.cshtml")
+    </div>
+</body>
+
+
+@Scripts.Render("~/assets/sitelayout/js")
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/generalmaster/_addgeneralmastermodel")
+@RenderSection("scripts", required: false)
+<script type="text/javascript">
+    $(document).ready(function () {
+        $(".page-content").addClass("margin-left-0-important");
+    })
+</script>
+
+</html>

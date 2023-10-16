@@ -1,0 +1,125 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.SecurityQuestion);
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+@model SecurityQuestionModel
+
+@Html.Hidden("hdnSecurityQuestionModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="SetSecurityQuestionController">
+    <section class="loginWrapper">
+        <div class="cstmContainer">
+            <div class="rightWrapper">
+                <form role="form" id="frmSecurityQuestion">
+                    <h3 class="form-title font-green">@Resource.SecurityQuestion</h3>
+                    <p></p>
+                    <div class="form-group">
+                        @Html.TextBoxFor(q => q.SecurityQuestionDetailModel.UserName, new { data_ng_model = "SecurityQuestionModel.SecurityQuestionDetailModel.UserName", @class = "form-control", maxlength = 50, data_ng_disabled = "true" })
+                        @Html.ValidationMessageFor(q => q.SecurityQuestionDetailModel.UserName)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.DropDownListFor(p => p.SecurityQuestionDetailModel.SecurityQuestionID, Model.SecurityQuestionList.ToSelectList(Model.SecurityQuestionDetailModel.SecurityQuestionID.ToString() ?? "", "Question", "SecurityQuestionID", @Resource.SelectSecurityQuestion, ""),
+                                                                              new
+                                                                                  {
+                                                                                      data_ng_model = "SecurityQuestionModel.SecurityQuestionDetailModel.SecurityQuestionID",
+                                                                                      data_ng_init = "SecurityQuestionModel.SecurityQuestionDetailModel.SecurityQuestionID=SecurityQuestionModel.SecurityQuestionDetailModel.SecurityQuestionID==''?null:SecurityQuestionModel.SecurityQuestionDetailModel.SecurityQuestionID.toString()",
+                                                                                      @class = "form-control",
+                                                                                      data_ng_setname = "SecurityQuestionModel.SecurityQuestionDetailModel.Question"
+                                                                                  })
+                        @Html.ValidationMessageFor(q => q.SecurityQuestionDetailModel.SecurityQuestionID)
+                    </div>
+
+                    <div class="form-group">
+                        @Html.TextBoxFor(q => q.SecurityQuestionDetailModel.SecurityAnswer, new { data_ng_model = "SecurityQuestionModel.SecurityQuestionDetailModel.SecurityAnswer", @class = "form-control", maxlength = 100, placeholder = @Resource.EnterSecurityAnswer })
+                        @Html.ValidationMessageFor(q => q.SecurityQuestionDetailModel.SecurityAnswer)
+                    </div>
+
+                    @if (SessionHelper.EmployeeSignatureID == 0 && 1 == 2)
+                    {
+                        <div class="form-group">
+                            <label class="control-label required">Signature</label>
+                            @Html.TextBoxFor(q => q.SecurityQuestionDetailModel.TempSignaturePath,
+                                new
+                                {
+                                    data_ng_model = "SecurityQuestionModel.SecurityQuestionDetailModel.TempSignaturePath",
+                                    @class = "form-control hideErrorContent replaceErrorSource"
+                                })
+
+                            @Html.ValidationMessageFor(m => m.SecurityQuestionDetailModel.TempSignaturePath)
+                            <div class="replaceErrorDest">
+                                <div class="btn-group btn-block text-center ">
+                                    <div data-ng-if="!IsFileUploading" class="fileUpload btn btn-xs btn-primary margin-right-0">
+                                        <span><i class="icon-plus"></i>&nbsp; @Resource.UploadSignature</span>
+                                        <div>
+
+                                            <div class="">
+                                                <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                       amazonfileupload
+                                                       file-uploadurl="{{UploadFile}}"
+                                                       beforesend="BeforeSend"
+                                                       aftersend="AfterSend"
+                                                       progress="Progress"
+                                                       filelist="UploadingFileList"
+                                                       onchange="loadFile(event)"
+                                                       data-ng-aws-settings-model="SecurityQuestionModel.AmazonSettingModel" />
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="font-sm col-md-12 no-padding margin-top-10">
+                                    <b class="font-red-thunderbird">@Resource.NoteLabel</b><i>@Html.Raw(Resource.SignatureImageNote)</i>
+                                </div>
+                                <div class="margin-top-20">
+                                    <script>
+                                        var loadFile = function (event) {
+                                            var output = document.getElementById('img1');
+                                            output.src = URL.createObjectURL(event.target.files[0]);
+                                        };
+                                    </script>
+
+                                    <img class="img-responsive signature-image" id="imgDisplay" data-ng-if="!IsFileUploading && SecurityQuestionModel.SecurityQuestionDetailModel.TempSignaturePath" data-ng-src="{{SecurityQuestionModel.AmazonSettingModel.URL+'/'+SecurityQuestionModel.SecurityQuestionDetailModel.TempSignaturePath}}" />
+                                    <img class="img-responsive signature-image" id="img1" src="" data-ng-show="IsFileUploading" />
+                                    <img class="img-responsive signature-image" id="SignatureDefaultImage" src="/Assets/images/signature.jpg" data-ng-show="!IsFileUploading && !SecurityQuestionModel.SecurityQuestionDetailModel.TempSignaturePath" />
+
+                                    <div class="col-sm-12 no-padding" data-ng-repeat="filedata in UploadingFileList">
+                                        <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                    <hr />
+                    <div class="form-group">
+                        <button type="submit" data-ng-click="Save()" data-ng-disabled="IsFileUploading" class="btn btn-success uppercase pull-right">@Resource.Save</button>
+                    </div>
+
+                </form>
+            </div>
+            <div class="leftWrapper">
+                <div class="logoContainer">
+                    <img src="../assets/images/myezcaresimpleyetpowerful_Logo.png" alt="Logo">
+                </div>
+                <div class="announcementContent">
+                    <h2>Hint <span class="icon"><img src="../assets/images/promotion.svg" alt="icon"></span></h2>
+                    <p>Security question can help in case of forgetting the password and needs to be changed . Keep your security question hard for anyone else to guess.</p>
+                    <p>- Security Question : Select the security question , this will asked when self service reset password is requiredd</p>
+                    <p>- Security Answer: Secret Answer to the question for the selected security question.</p>
+                    <p>- Confirm Answer: Confirm the Answer entered for security answer</p>
+                </div>
+            </div>
+           
+        </div>
+    </section>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/signature")
+    @Scripts.Render("~/assets/js/viewjs/loginapp/security/securityquestion")
+    <script type="text/javascript">
+        var InvalidImageUploadMessage = '@Resource.InvalidImageUploadMessage';
+        var MaximumUploadImageSizeMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage2MB))';
+    </script>
+}

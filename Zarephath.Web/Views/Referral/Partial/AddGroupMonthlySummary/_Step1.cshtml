@@ -1,0 +1,177 @@
+﻿@model GroupMonthlySummaryModel
+<div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 no-padding margin-top-minus-10">
+    <h3 class="inline col-md-4 padding-left-0">@Resource.SearchClients</h3>
+    <h3 class="inline text-decoration-none pull-right">No of selected clients: {{SelectedClients.length}}</h3>
+</div>
+<hr class="clearfix" />
+<div class="row">
+
+    <div id="filter-panel" class="filter-panel col-md-12 clearfix no-padding">
+        <form>
+            <div class="form-group col-lg-2 col-md-2 col-sm-3">
+                <label class="control-label">@Resource.Payor</label>
+                @Html.DropDownListFor(p => p.SearchClientForMonthlySummary.PayorID, Model.Payors.ToSelectList(Model.SearchClientForMonthlySummary.PayorID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                      new
+                                          {
+                                              convert_to_number = "",
+                                              id = "PayorID",
+                                              data_ng_model = "SearchClientModel.PayorID",
+                                              data_ng_init = "SearchClientModel.PayorID=SearchClientModel.PayorID==''?null:SearchClientModel.PayorID",
+                                              @class = "form-control input-sm"
+                                          })
+            </div>
+            <div class="form-group col-lg-2 col-md-2 col-sm-3">
+                <label class="control-label">@Resource.Facility</label>
+                @Html.DropDownListFor(p => p.SearchClientForMonthlySummary.FacilityID, Model.AllFacilities.ToSelectList(Model.SearchClientForMonthlySummary.FacilityID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                      new
+                                          {
+                                              convert_to_number = "",
+                                              id = "FacilityID",
+                                              data_ng_model = "SearchClientModel.FacilityID",
+                                              data_ng_init = "SearchClientModel.FacilityID=SearchClientModel.FacilityID==''?null:SearchClientModel.FacilityID",
+                                              @class = "form-control input-sm"
+                                          })
+            </div>
+            <div class="form-group col-lg-2 col-md-2 col-sm-3">
+                <label class="control-label">@Resource.StartDate</label>
+                <div class="input-group date no-focus" datepicker="SearchClientModel.StartDate" ng-dateval="SearchClientModel.StartDate">
+                    @Html.TextBoxFor(m => m.SearchClientForMonthlySummary.StartDate, new
+                        {
+                            @class = "no-focus form-control input-sm dateInputMask",
+                            placeholder = @Resource.StartDate
+                        })
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+            <div class="form-group col-lg-2 col-md-2 col-sm-3">
+                <label class="control-label">@Resource.EndDate</label>
+                <div class="input-group date no-focus" datepicker="SearchClientModel.EndDate" ng-dateval="SearchClientModel.EndDate">
+                    @Html.TextBoxFor(m => m.SearchClientForMonthlySummary.EndDate, new
+                        {
+                            @class = "no-focus form-control input-sm dateInputMask",
+                            placeholder = @Resource.EndDate
+                        })
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+            <div class="form-group col-lg-2 col-md-2 col-sm-3">
+                <label class="control-label">@Resource.Name</label>
+                <div class="">
+                    @Html.TextBoxFor(q => q.SearchClientForMonthlySummary.ClientName, new
+                        {
+                            @class = "form-control input-sm",
+                            data_ng_model = "SearchClientModel.ClientName",
+                            placeholder = @Resource.Name,
+                            maxlength = 50
+                        })
+                </div>
+            </div>
+            <div class="form-group col-lg-1 col-md-1 col-sm-2">
+                <label class="control-label">@Resource.PageSize</label>
+                <div class="">
+                    @Html.TextBoxFor(q => q.SearchClientForMonthlySummary.PageSize, new
+                        {
+                            @class = "form-control input-sm",
+                            data_ng_model = "SearchClientModel.PageSize",
+                            placeholder = @Resource.PageSize,
+                            maxlength = 4
+                        })
+                </div>
+            </div>
+            <div class="form-group col-lg-1 col-md-1 col-sm-2">
+                <label class="control-label"></label>
+                <div class="">
+                    <button class="btn btn-sm blue" data-ng-click="SearchClientForNote()">@Resource.Search</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="row" data-ng-show="currentStep == 1">
+    <div class="row padding-left-right-10">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="portlet-body compact">
+
+                <div class="text-align-center margin-top-15">
+                    <div class="top pagination-sm" data-ng-show="GetGroupNoteListAjaxCall">
+                        @Resource.Loading
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+
+                <div class=" dataTables_wrapper" data-ng-if="Clients.length > 0 || SelectedClients.length > 0">
+                    <table class="table table-advance table-bordered table-striped table-condensed">
+                        <thead>
+                            <tr>
+                                <th class="width-20px">
+                                    <input id="SelectAllClients" type="checkbox" class="unicheckbox" data-ng-change="SelectAll(SelectAllCheckbox)" data-ng-model="SelectAllCheckbox" val="SelectAllCheckbox">
+                                </th>
+                                <th>
+                                    <strong>@Resource.Name</strong>
+                                </th>
+                                <th>
+                                    <strong>@Resource.AHCCCS</strong>
+                                </th>
+                                <th>
+                                    <strong>@Resource.CISLabel</strong>
+                                </th>
+                                <th>
+                                    <strong>@Resource.Phone</strong>
+                                </th>
+                                <th>
+                                    <strong>@Resource.Address</strong>
+                                </th>
+                                <th>
+                                    <strong>@Resource.PayorName</strong>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="client in SelectedClients" style="background-color: #e9edef">
+                                <td>
+                                    <input type="checkbox" class="unicheckbox text-align-center" data-ng-change="SelectClient(client)" data-ng-model="client.IsChecked" val="client.IsChecked" />
+                                </td>
+                                <td>
+                                    <a class="" data-ng-href="/referral/addreferral/{{client.EncryptedReferralID}}" target="_blank">{{client.Name}}</a>
+                                </td>
+                                <td>{{client.AHCCCSID}}</td>
+                                <td>{{client.CISNumber}}</td>
+                                <td>{{client.Phone1 ? client.Phone1 : '@Resource.NA'}}</td>
+                                <td>{{client.Address ? client.Address : '@Resource.NA'}}</td>
+                                <td>{{client.PayorName ? client.PayorName : '@Resource.NA'}}</td>
+                            </tr>
+                            <tr data-ng-repeat="client in Clients | filter:CheckIsChecked(client)">
+                                <td>
+                                    <input type="checkbox" class="unicheckbox text-align-center" data-ng-change="SelectClient(client)" data-ng-model="client.IsChecked" val="client.IsChecked" />
+                                </td>
+                                <td>
+                                    <a class="" data-ng-href="/referral/addreferral/{{client.EncryptedReferralID}}" target="_blank">{{client.Name}}</a>
+                                </td>
+                                <td>{{client.AHCCCSID}}</td>
+                                <td>{{client.CISNumber}}</td>
+                                <td>{{client.Phone1 ? client.Phone1 : '@Resource.NA'}}</td>
+                                <td>{{client.Address ? client.Address : '@Resource.NA'}}</td>
+                                <td>{{client.PayorName ? client.PayorName : '@Resource.NA'}}</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="Clients.length == 0 && SelectedClients.length==0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

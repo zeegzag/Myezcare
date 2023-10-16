@@ -1,0 +1,28 @@
+﻿CREATE TABLE [dbo].[JO_ScheduleMasters] (
+    [JO_ScheduleID]                       BIGINT        IDENTITY (1, 1) NOT NULL,
+    [ScheduleID]                          BIGINT        NOT NULL,
+    [ReferralID]                          BIGINT        NULL,
+    [FacilityID]                          BIGINT        NULL,
+    [StartDate]                           DATE          NULL,
+    [EndDate]                             DATE          NULL,
+    [PickUpLocation]                      BIGINT        NULL,
+    [DropOffLocation]                     BIGINT        NULL,
+    [ScheduleStatusID]                    BIGINT        NOT NULL,
+    [Comments]                            VARCHAR (500) NULL,
+    [IsAssignedToTransportationGroupDown] BIT           NULL,
+    [IsAssignedToTransportationGroupUp]   BIT           NULL,
+    [CreatedBy]                           BIGINT        NULL,
+    [CreatedDate]                         DATETIME      NULL,
+    [UpdatedBy]                           BIGINT        NULL,
+    [UpdatedDate]                         DATETIME      NULL,
+    [SystemID]                            VARCHAR (100) NULL,
+    [IsDeleted]                           BIT           NULL,
+    [WhoCancelled]                        VARCHAR (50)  NULL,
+    [WhenCancelled]                       DATE          NULL,
+    [CancelReason]                        VARCHAR (MAX) NULL,
+    [IsReschedule]                        BIT           NULL,
+    [Action]                              CHAR (1)      NOT NULL,
+    [ActionDate]                          DATETIME      NOT NULL,
+    CONSTRAINT [PK_JO_ScheduleMasters] PRIMARY KEY CLUSTERED ([JO_ScheduleID] ASC)
+);
+

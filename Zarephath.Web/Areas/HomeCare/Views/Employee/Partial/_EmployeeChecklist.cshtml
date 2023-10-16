@@ -1,0 +1,976 @@
+﻿@model HC_AddEmployeeModel
+@Html.Hidden("hdnEmpChecklistModel", Common.SerializeObject(Model.EmployeeChecklistModel))
+<form class="form-horizontal" id="frmEmployeeChecklist">  
+    <div class="checklistContent">
+        <div class="row">
+            <div class="col-sm-12">
+                <h5><strong>@Resource.ChecklistTitle</strong></h5>
+                <hr />
+            </div>
+
+            <div class="col-sm-12 margin-bottom-30 clearfix">
+                <div class="row margin-bottom-10">
+                    <div class="col-sm-3">
+                        <label>@Resource.Name</label>
+                        <div class="">
+                            @Html.TextBox("EmployeeChecklistModelEmployeeName", Model.Employee.EmployeeName, new { @class = "form-control input-sm", disabled = "disabled", data_ng_model = "EmployeeModel.Employee.EmployeeName", placeholder = @Resource.Name, maxlength = 200 })
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>@Resource.Email</label>
+                        <div class="">
+                            @Html.TextBox("EmployeeChecklistModelEmail", Model.Employee.Email, new { @class = "form-control input-sm", disabled = "disabled", data_ng_model = "EmployeeModel.Employee.Email", placeholder = @Resource.Email, maxlength = 256 })
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>@Resource.Date</label>
+                        <div class="">
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="EmployeeChecklistModel.SubmittedDate" ng-dateval="EmployeeChecklistModel.SubmittedDate">
+                                @Html.TextBoxFor(m => m.EmployeeChecklistModel.SubmittedDate, new
+                        {
+                            @class = "form-control input-sm dateInputMask",
+                            maxlength = "50",
+                            placeholder = Resource.DateFormat,
+                            disabled = "disabled"
+                        })
+                                @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.SubmittedDate)
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>@Resource.Address</label>
+                        <div class="">
+                            @Html.TextBox("EmployeeChecklistModelAddress", Model.Employee.Address, new { @class = "form-control input-sm", disabled = "disabled", data_ng_model = "EmployeeModel.Employee.Address", placeholder = @Resource.Address, maxlength = 200 })
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label>@Resource.Cell</label>
+                        <div class="">
+                            @Html.TextBox("EmployeeChecklistModelMobileNumber", Model.Employee.MobileNumber, new { @class = "form-control input-sm", disabled = "disabled", data_ng_model = "EmployeeModel.Employee.MobileNumber", placeholder = @Resource.Cell, maxlength = 50 })
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <label>@Resource.HomePhone</label>
+                        <div class="">
+                            @Html.TextBox("EmployeeChecklistModelHomePhone", Model.Employee.PhoneHome, new { @class = "form-control input-sm", disabled = "disabled", data_ng_model = "EmployeeModel.Employee.PhoneHome", placeholder = @Resource.HomePhone, maxlength = 50 })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 clearfix">
+                <div class="table-responsive">
+                    <table class="table table-bordered employee-checklist">
+                        <thead>
+                            <tr class="bg-grey-salsa">
+                                <td>@Resource.IdentificationRequirements</td>
+                                <td>@Resource.ExpirationDate</td>
+                                <td>@Resource.CompletionDate</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_DriverLicense" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.DriverLicense"
+                                               data-ng-model="EmployeeChecklistModel.DriverLicense"
+                                               data-ng-change="CheckboxChange('Identification', 'DriverLicense')"
+                                               data-ng-checked="EmployeeChecklistModel.DriverLicense"
+                                               data-ng-true-value="1" />
+                                        @Resource.DriverLicense
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_StateID" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.StateID"
+                                               data-ng-model="EmployeeChecklistModel.StateID"
+                                               data-ng-change="CheckboxChange('Identification', 'StateID')"
+                                               data-ng-checked="EmployeeChecklistModel.StateID"
+                                               data-ng-true-value="1" />
+                                        @Resource.StateID
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_AlienCard" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.AlienCard"
+                                               data-ng-model="EmployeeChecklistModel.AlienCard"
+                                               data-ng-change="CheckboxChange('Identification', 'AlienCard')"
+                                               data-ng-checked="EmployeeChecklistModel.AlienCard"
+                                               data-ng-true-value="1" />
+                                        @Resource.AlienCard
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_Passport" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.Passport"
+                                               data-ng-model="EmployeeChecklistModel.Passport"
+                                               data-ng-change="CheckboxChange('Identification', 'Passport')"
+                                               data-ng-checked="EmployeeChecklistModel.Passport"
+                                               data-ng-true-value="1" />
+                                        @Resource.Passport
+                                    </label>
+                                    <label><small>@Resource.IdentificationDesc</small></label>
+                                </td>
+                                <td>
+                                    <div id="date-IDate" class="input-group date date-picker pull-right"
+                                         datepicker="RTSMaster.IdentificationDate" ng-dateval="EmployeeChecklistModel.IdentificationDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.IdentificationDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.IdentificationDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div id="date-ICDate" class="input-group date date-picker pull-right"
+                                         datepicker="RTSMaster.IdentificationCompletionDate" ng-dateval="EmployeeChecklistModel.IdentificationCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.IdentificationCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.IdentificationCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_SSCardCopy" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.SSCardCopy"
+                                               data-ng-model="EmployeeChecklistModel.SSCardCopy"
+                                               data-ng-checked="EmployeeChecklistModel.SSCardCopy"
+                                               data-ng-true-value="1" />
+                                        @Resource.SSCardCopy
+                                    </label>
+                                </td>
+                                <td>
+                                    <div id="date-SSCDate" class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.SSCardDate" ng-dateval="EmployeeChecklistModel.SSCardDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.SSCardDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.SSCardDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div id="date-SSCCDate" class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.SSCardCompletionDate" ng-dateval="EmployeeChecklistModel.SSCardCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.SSCardCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.SSCardCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="bg-grey-salsa">
+                                    @Resource.CompetencyRequirements
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_RN" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.RN"
+                                               data-ng-model="EmployeeChecklistModel.RN"
+                                               data-ng-change="CheckboxChange('Competency', 'RN')"
+                                               data-ng-checked="EmployeeChecklistModel.RN"
+                                               data-ng-true-value="1" />
+                                        @Resource.RN
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_LPN" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.LPN"
+                                               data-ng-model="EmployeeChecklistModel.LPN"
+                                               data-ng-change="CheckboxChange('Competency', 'LPN')"
+                                               data-ng-checked="EmployeeChecklistModel.LPN"
+                                               data-ng-true-value="1" />
+                                        @Resource.LPN
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_LSW" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.LSW"
+                                               data-ng-model="EmployeeChecklistModel.LSW"
+                                               data-ng-checked="EmployeeChecklistModel.LSW"
+                                               data-ng-change="CheckboxChange('Competency', 'LSW')"
+                                               data-ng-true-value="1" />
+                                        @Resource.LSW
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_CNA" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.CNA"
+                                               data-ng-model="EmployeeChecklistModel.CNA"
+                                               data-ng-change="CheckboxChange('Competency', 'CNA')"
+                                               data-ng-checked="EmployeeChecklistModel.CNA"
+                                               data-ng-true-value="1" />
+                                        @Resource.CNA
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_Other" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.Other"
+                                               data-ng-model="EmployeeChecklistModel.Other"
+                                               data-ng-change="CheckboxChange('Competency', 'Other')"
+                                               data-ng-checked="EmployeeChecklistModel.Other"
+                                               data-ng-true-value="1" />
+                                        @Resource.Other
+                                    </label>
+                                    <span class="" data-ng-show="EmployeeChecklistModel.Other == 1">
+                                        <input type="text" maxlength="100" id="EmployeeChecklistModel_OtherText" name="EmployeeChecklistModel_OtherText" data-ng-value="EmployeeChecklistModel.OtherText" />
+                                    </span>
+                                </td>
+                                <td>
+                                    <div id="date-CDate" class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.CompetencyDate" ng-dateval="EmployeeChecklistModel.CompetencyDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.CompetencyDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.CompetencyDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div id="date-CCDate"  class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.CompetencyCompletionDate" ng-dateval="EmployeeChecklistModel.CompetencyCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.CompetencyCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.CompetencyCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_EducationContinuingCertificate" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.EducationContinuingCertificate"
+                                               data-ng-model="EmployeeChecklistModel.EducationContinuingCertificate"
+                                               data-ng-checked="EmployeeChecklistModel.EducationContinuingCertificate"
+                                               data-ng-true-value="1" />
+                                        @Resource.EducationContinuingCertificate
+                                    </label>
+                                </td>
+                                <td>
+                                    <div id="date-ECCDate" class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.EducationContinuingCertificateDate" ng-dateval="EmployeeChecklistModel.EducationContinuingCertificateDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.EducationContinuingCertificateDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.EducationContinuingCertificateDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div id="date-ECCCompletionDate" class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.EducationContinuingCertificateCompletionDate" ng-dateval="EmployeeChecklistModel.EducationContinuingCertificateCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.EducationContinuingCertificateCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.EducationContinuingCertificateCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_CurrentResume" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.CurrentResume"
+                                               data-ng-model="EmployeeChecklistModel.CurrentResume"
+                                               data-ng-checked="EmployeeChecklistModel.CurrentResume"
+                                               data-ng-true-value="1" />
+                                        @Resource.CurrentResume
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.CurrentResumeDate" ng-dateval="EmployeeChecklistModel.CurrentResumeDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.CurrentResumeDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.CurrentResumeDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.CurrentResumeCompletionDate" ng-dateval="EmployeeChecklistModel.CurrentResumeCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.CurrentResumeCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.CurrentResumeCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="bg-grey-salsa">
+                                    @Resource.SafetyClearance
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_FirstAid" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.FirstAid"
+                                               data-ng-model="EmployeeChecklistModel.FirstAid"
+                                               data-ng-checked="EmployeeChecklistModel.FirstAid"
+                                               data-ng-true-value="1" />
+                                        @Resource.FirstAid
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.FirstAidDate" ng-dateval="EmployeeChecklistModel.FirstAidDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.FirstAidDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.FirstAidDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.FirstAidCompletionDate" ng-dateval="EmployeeChecklistModel.FirstAidCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.FirstAidCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.FirstAidCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_CPR" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.CPR"
+                                               data-ng-model="EmployeeChecklistModel.CPR"
+                                               data-ng-checked="EmployeeChecklistModel.CPR"
+                                               data-ng-true-value="1" />
+                                        @Resource.CPR
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.CPRDate" ng-dateval="EmployeeChecklistModel.CPRDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.CPRDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.CPRDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.CPRCompletionDate" ng-dateval="EmployeeChecklistModel.CPRCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.CPRCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.CPRCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_BloodBornePathogens" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.BloodBornePathogens"
+                                               data-ng-model="EmployeeChecklistModel.BloodBornePathogens"
+                                               data-ng-checked="EmployeeChecklistModel.BloodBornePathogens"
+                                               data-ng-true-value="1" />
+                                        @Resource.BloodBornePathogens
+                                    </label>
+                                    <label><small>@Resource.UniversalPrecaution</small></label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.BloodBornePathogensDate" ng-dateval="EmployeeChecklistModel.BloodBornePathogensDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.BloodBornePathogensDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.BloodBornePathogensDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.BloodBornePathogensCompletionDate" ng-dateval="EmployeeChecklistModel.BloodBornePathogensCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.BloodBornePathogensCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.BloodBornePathogensCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_DriverAbstract" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.DriverAbstract"
+                                               data-ng-model="EmployeeChecklistModel.DriverAbstract"
+                                               data-ng-checked="EmployeeChecklistModel.DriverAbstract"
+                                               data-ng-true-value="1" />
+                                        @Resource.DriverAbstract
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.DriverAbstractDate" ng-dateval="EmployeeChecklistModel.DriverAbstractDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.DriverAbstractDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.DriverAbstractDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.DriverAbstractCompletionDate" ng-dateval="EmployeeChecklistModel.DriverAbstractCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.DriverAbstractCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.DriverAbstractCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="bg-grey-salsa">
+                                    @Resource.HealthClearance
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_TBClearance" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.TBClearance"
+                                               data-ng-model="EmployeeChecklistModel.TBClearance"
+                                               data-ng-checked="EmployeeChecklistModel.TBClearance"
+                                               data-ng-true-value="1" />
+                                        @Resource.TBClearance
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.TBClearanceDate" ng-dateval="EmployeeChecklistModel.TBClearanceDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.TBClearanceDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.TBClearanceDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.TBClearanceCompletionDate" ng-dateval="EmployeeChecklistModel.TBClearanceCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.TBClearanceCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.TBClearanceCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_HepatitisBVaccine" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.HepatitisBVaccine"
+                                               data-ng-model="EmployeeChecklistModel.HepatitisBVaccine"
+                                               data-ng-checked="EmployeeChecklistModel.HepatitisBVaccine"
+                                               data-ng-true-value="1" />
+                                        @Resource.HepatitisBVaccine
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.HepatitisBVaccineDate" ng-dateval="EmployeeChecklistModel.HepatitisBVaccineDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.HepatitisBVaccineDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.HepatitisBVaccineDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.HepatitisBVaccineCompletionDate" ng-dateval="EmployeeChecklistModel.HepatitisBVaccineCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.HepatitisBVaccineCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.HepatitisBVaccineCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="bg-grey-salsa">
+                                    @Resource.SecurityClearance
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_ProtectiveServicesClearance" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.ProtectiveServicesClearance"
+                                               data-ng-model="EmployeeChecklistModel.ProtectiveServicesClearance"
+                                               data-ng-checked="EmployeeChecklistModel.ProtectiveServicesClearance"
+                                               data-ng-true-value="1" />
+                                        @Resource.ProtectiveServicesClearance
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.InitialDate" ng-dateval="EmployeeChecklistModel.InitialDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.InitialDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.InitialDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.InitialCompletionDate" ng-dateval="EmployeeChecklistModel.InitialCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.InitialCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.InitialCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_FingerPrinting" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.FingerPrinting"
+                                               data-ng-model="EmployeeChecklistModel.FingerPrinting"
+                                               data-ng-checked="EmployeeChecklistModel.FingerPrinting"
+                                               data-ng-true-value="1" />
+                                        @Resource.FingerPrinting
+                                    </label>
+                                    <label>
+                                        <small>@Resource.FingerPrintingDesc</small>
+                                        <label class="margin-left-20">@Resource.YearOne</label>
+                                        <input class="form-control input-sm finger-print-input" id="EmployeeChecklistModel_YearOne" name="EmployeeChecklistModel.YearOne"
+                                               data-ng-model="EmployeeChecklistModel.YearOne" maxlength="4" data-val="true" />
+                                        <span class="field-validation-valid" data-valmsg-for="EmployeeChecklistModel.YearOne" data-valmsg-replace="true"></span>
+                                        <label class="margin-left-10">@Resource.YearTwo</label>
+                                        <input class="form-control input-sm finger-print-input" id="EmployeeChecklistModel_YearTwo" name="EmployeeChecklistModel.YearTwo"
+                                               data-ng-model="EmployeeChecklistModel.YearTwo" maxlength="4" data-val="true" />
+                                        <span class="field-validation-valid" data-valmsg-for="EmployeeChecklistModel.YearTwo" data-valmsg-replace="true"></span>
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.FingerPrintingDate" ng-dateval="EmployeeChecklistModel.FingerPrintingDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.FingerPrintingDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.FingerPrintingDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.FingerPrintingCompletionDate" ng-dateval="EmployeeChecklistModel.FingerPrintingCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.FingerPrintingCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.FingerPrintingCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_NameCheck" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.NameCheck"
+                                               data-ng-model="EmployeeChecklistModel.NameCheck"
+                                               data-ng-checked="EmployeeChecklistModel.NameCheck"
+                                               data-ng-true-value="1" />
+                                        @Resource.NameCheck
+                                    </label>
+                                    <label><small>@Resource.NameCheckDesc</small></label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.NameCheckDate" ng-dateval="EmployeeChecklistModel.NameCheckDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.NameCheckDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.NameCheckDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.NameCheckCompletionDate" ng-dateval="EmployeeChecklistModel.NameCheckCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.NameCheckCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.NameCheckCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="3" class="bg-grey-salsa">
+                                    @Resource.AdministrativeRequirements
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_CarInsurance" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.CarInsurance"
+                                               data-ng-model="EmployeeChecklistModel.CarInsurance"
+                                               data-ng-checked="EmployeeChecklistModel.CarInsurance"
+                                               data-ng-true-value="1" />
+                                        @Resource.CarInsurance
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.CarInsuranceDate" ng-dateval="EmployeeChecklistModel.CarInsuranceDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.CarInsuranceDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.CarInsuranceDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.CarInsuranceCompletionDate" ng-dateval="EmployeeChecklistModel.CarInsuranceCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.CarInsuranceCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.CarInsuranceCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_LiabilityInsurance" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.LiabilityInsurance"
+                                               data-ng-model="EmployeeChecklistModel.LiabilityInsurance"
+                                               data-ng-checked="EmployeeChecklistModel.LiabilityInsurance"
+                                               data-ng-true-value="1" />
+                                        @Resource.LiabilityInsurance
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.LiabilityInsuranceDate" ng-dateval="EmployeeChecklistModel.LiabilityInsuranceDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.LiabilityInsuranceDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.LiabilityInsuranceDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.LiabilityInsuranceCompletionDate" ng-dateval="EmployeeChecklistModel.LiabilityInsuranceCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.LiabilityInsuranceCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.LiabilityInsuranceCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_EmployeeW4Form" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.EmployeeW4Form"
+                                               data-ng-model="EmployeeChecklistModel.EmployeeW4Form"
+                                               data-ng-change="CheckboxChange('EmployeeForm', 'EmployeeW4Form')"
+                                               data-ng-checked="EmployeeChecklistModel.EmployeeW4Form"
+                                               data-ng-true-value="1" />
+                                        @Resource.EmployeeW4Form
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_ISCW9Form" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.ISCW9Form"
+                                               data-ng-model="EmployeeChecklistModel.ISCW9Form"
+                                               data-ng-change="CheckboxChange('EmployeeForm', 'ISCW9Form')"
+                                               data-ng-checked="EmployeeChecklistModel.ISCW9Form"
+                                               data-ng-true-value="1" />
+                                        @Resource.ISCW9Form
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.EmployeeFormDate" ng-dateval="EmployeeChecklistModel.EmployeeFormDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.EmployeeFormDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.EmployeeFormDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.EmployeeFormCompletionDate" ng-dateval="EmployeeChecklistModel.EmployeeFormCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.EmployeeFormCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.EmployeeFormCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_ISCGELicense" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.ISCGELicense"
+                                               data-ng-model="EmployeeChecklistModel.ISCGELicense"
+                                               data-ng-checked="EmployeeChecklistModel.ISCGELicense"
+                                               data-ng-true-value="1" />
+                                        @Resource.ISCGELicense
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.ISCGELicenseDate" ng-dateval="EmployeeChecklistModel.ISCGELicenseDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.ISCGELicenseDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.ISCGELicenseDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.ISCGELicenseCompletionDate" ng-dateval="EmployeeChecklistModel.ISCGELicenseCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.ISCGELicenseCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.ISCGELicenseCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_DOHLicense" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.DOHLicense"
+                                               data-ng-model="EmployeeChecklistModel.DOHLicense"
+                                               data-ng-checked="EmployeeChecklistModel.DOHLicense"
+                                               data-ng-true-value="1" />
+                                        @Resource.DOHLicense
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.DOHLicenseDate" ng-dateval="EmployeeChecklistModel.DOHLicenseDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.DOHLicenseDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.DOHLicenseDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.DOHLicenseCompletionDate" ng-dateval="EmployeeChecklistModel.DOHLicenseCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.DOHLicenseCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.DOHLicenseCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_IndependentAgreement" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.IndependentAgreement"
+                                               data-ng-model="EmployeeChecklistModel.IndependentAgreement"
+                                               data-ng-change="CheckboxChange('Agreement', 'IndependentAgreement')"
+                                               data-ng-checked="EmployeeChecklistModel.IndependentAgreement"
+                                               data-ng-true-value="1" />
+                                        @Resource.IndependentAgreement
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="EmployeeChecklistModel_EmployeeAgreement" class="uniformControls" type="checkbox"
+                                               data-uniform-value="EmployeeChecklistModel.EmployeeAgreement"
+                                               data-ng-model="EmployeeChecklistModel.EmployeeAgreement"
+                                               data-ng-change="CheckboxChange('Agreement', 'EmployeeAgreement')"
+                                               data-ng-checked="EmployeeChecklistModel.EmployeeAgreement"
+                                               data-ng-true-value="1" />
+                                        @Resource.EmployeeAgreement
+                                    </label>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.AgreementDate" ng-dateval="EmployeeChecklistModel.AgreementDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.AgreementDate, new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    maxlength = "50",
+                                    placeholder = Resource.DateFormat
+                                })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.AgreementDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeChecklistModel.AgreementCompletionDate" ng-dateval="EmployeeChecklistModel.AgreementCompletionDate">
+                                        @Html.TextBoxFor(m => m.EmployeeChecklistModel.AgreementCompletionDate, new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        maxlength = "50",
+                                        placeholder = Resource.DateFormat
+                                    })
+                                        @Html.ValidationMessageFor(m => m.EmployeeChecklistModel.AgreementCompletionDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @if (Common.HasPermission(Constants.HC_Permission_Employee_Checklist_Add))
+            {
+                <div class="col-sm-12 clearfix">
+                    <input type="button" data-ng-click="SaveEmployeeChecklist()" class="btn btn-sm green-jungle pull-right" value="@Resource.SaveChecklist" />
+                </div>
+            }
+        </div>
+    </div>
+	<div ng-init="callBack()"></div>
+</form>

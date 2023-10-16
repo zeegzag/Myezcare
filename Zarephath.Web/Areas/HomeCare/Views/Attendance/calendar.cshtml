@@ -1,0 +1,120 @@
+﻿﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, @Resource.Calendar);
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmployeeAttendanceCalender;
+    DDMasterModel model = ViewBag.DDMasterModel != null ? (DDMasterModel)ViewBag.DDMasterModel : new DDMasterModel();
+
+}
+@model HC_EmpCalenderModel
+@section Styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/schedule/scheduleassignmentinhome")
+}
+
+@Html.Hidden("hdnEmployeeModel", Common.SerializeObject(Model))
+@Html.Hidden("hdnEmployeeID", SessionHelper.LoggedInID)
+@if (Common.HasPermission(Constants.HC_Permission_All_Employee_Attendance_Calender))
+{
+    @Html.Hidden("hdnPermissionAllEmployee", "1")
+}
+else
+{
+    @Html.Hidden("hdnPermissionAllEmployee", "0")
+}
+<div data-ng-controller="clockinoutController">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <form id="frmEmpCalender">
+                <div class="formInnerMain">
+                    <div class="form-group col-lg-3 col-md-4 col-sm-6">
+                        <div class="employeeSelect">
+                            <select class="form-control input-sm" single="single" title="@Resource.SelectEmployee"
+                                    data-val="true"
+                                    selectpicker="SearchEmpCalender.EmployeeID" name="SearchEmpCalender.EmployeeID"
+                                    disabled="@(Model.IsPartial==true)">
+                                <option data-ng-repeat="option in EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                            </select>
+                        </div>
+                    </div><!--Form group End-->
+                    <!--<div class="form-group col-lg-2 col-md-3 col-sm-6">
+                        @{ Html.EnableClientValidation(false); }
+                        <div class="input-group date" datepicker="SearchEmpCalender.StartDate" data-ng-dateval="SearchEmpCalender.StartDate">
+                            @Html.TextBoxFor(q => q.SearchEmpCalender.StartDate,
+                            new
+                            {
+                                @class = "form-control input-sm dateInputMask",
+                                placeholder = Resource.StartDate,
+                            })
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>-->
+                    <!--Form group End-->
+
+                    <div class="form-group col-lg-2 col-md-3 col-sm-6">
+                        <button type="button" class="btn btn-sm btn-primary"
+                                data-ng-click="SeachAndGenerateCalenders()" title="@Resource.Search">
+                            @Resource.Search
+                        </button>
+                        @*<button type="button" class="btn btn-default border-grey-cascade margin-left-10 btn-sm" data-ng-click="CalenderRefresh()"  title="@Resource.Refresh">
+                                @Resource.Refresh
+                            </button>*@
+                    </div><!--Form group End-->
+                </div>
+
+                <div class="calenderBottomBtn">
+
+                    <button type="button" class="btn btn-primary btn-sm padding-left-right-10" ng-click="printToCart('CalenderPrint')" title="Print PDF">
+                        Print PDF
+                    </button>
+                </div>
+
+                @*<div ng-click="printToCart('CalenderPrint')">
+                        <i class="font-red-soft fa fa-file-pdf-o" style="font-size: 25px;padding-left: 315px"></i>
+                    </div>*@
+            </form><!--End Form Here-->
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="calander-main" data-ng-repeat="calenderItem in CalendarList" id="CalenderPrint">
+                        <div data-ng-scalender="calenderItem" class="has-toolbar customCalender"
+                             data-ng-editable="false"
+                             data-ng-draggable="false"
+                             data-ng-droppable="false"
+                             data-ng-defaultview="'month'"
+                             data-ng-weekstartday="@Common.GetCalWeekStartDay()"
+                             data-ng-aspectratio="2.65"
+                             data-ng-startdate="SearchEmpCalender.StartDate"
+                             data-ng-get-event-list="GetScheduleList"
+                             data-ng-resourcelist="GetResourcesList"
+                             data-ng-on-event-render="EventRender"
+                             data-ng-on-resource-render="ResourceRender"
+                             @*
+                                 data-ng-on-event-order="EventOrder"
+                                 data-ng-on-day-render="DayRender"
+                                 ng-after-all-event-render="AllEventRender"
+                                 data-ng-startdate="SelectedWeekObj.StartDate"
+                                 data-ng-hiddendays="SelectedWeekObj.WeekDaysToHide"*@>
+                        </div>
+                    </div>
+                </div>
+            </div><!--Row End-->
+        </div>
+    </div><!--Row End-->
+
+</div>
+<script id="empReource" type="text/ng-template">
+    <span>
+        <span class="text-decoration-none font-size-12" data-ng-bind="DataModel.resourceObj.EmployeeName"></span>
+        <span style="padding: 10px;float: left;" data-ng-style="{'background-color':DataModel.resourceObj.eventColor}"></span>
+    </span>
+</script>
+<script id="calendereventmarker" type="text/ng-template">
+    @Html.Partial("Partial/_CalenderEventMarker")
+</script>
+
+<script id="eventdetailpopover" type="text/ng-template">
+    @Html.Partial("Partial/_EventDetailPopover")
+</script>
+@section Scripts{
+    @*@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/Attendance/calendar.js")*@
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/Attendance/calendar")
+}

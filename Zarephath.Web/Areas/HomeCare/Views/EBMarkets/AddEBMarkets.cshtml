@@ -1,0 +1,97 @@
+﻿@{
+    bool isEditMode = Model != null && Convert.ToInt32 (Model.EBMarkets.EBMarketID )  > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (isEditMode ? Resource.EditMarket : @Resource.AddMarket));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_MarketAdd;
+}
+
+@model  EBMarketsModel
+ 
+
+@Html.Hidden("hdnEBMarketsModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="AddEBMarketsController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditMarket : @Resource.AddMarket)
+            <small>@Resource.EnterMarketInformation</small>
+            <input type="submit" data-ng-click="SaveCategory()" class="btn btn-sm green-jungle pull-right" value="@(isEditMode ? Resource.Update : Resource.Save)" />
+            <a href="@Constants.HC_EBMarketsListURL"></a>
+
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form class="form-horizontal" id="frmAddMarket">
+
+                <div class="form-group row">
+                    <div class="col-sm-12">
+
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.MarketInformation
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Name</label>
+                                        <div class="col-md-7">
+
+                                       
+                                            @Html.TextBoxFor(q => q.EBMarkets.Name, new { @class = "form-control input-sm", data_ng_model = "EBMarketsModel.EBMarkets.Name", placeholder = @Resource.Name, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.EBMarkets.Name)
+                                        </div>
+                                    </div>
+
+                                   
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 no-padding" style="display:none">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.MarketID</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBMarkets.EBMarketID, new { @class = "form-control input-sm", data_ng_model = "EBMarketsModel.EBMarkets.MarketID", placeholder =@Resource.EBMarketID , maxlength = 50 })
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display:none">
+                                        <label class="col-md-5 control-label">@Resource.EBCategoryID</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBMarkets.ID, new { @class = "form-control input-sm", data_ng_model = "EBMarketsModel.EBMarkets.ID", placeholder = @Resource.EBCategoryID, maxlength = 10 })
+                                             
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="col-md-12 form-group no-margin no-padding">
+
+                    <input type="submit" data-ng-click="SaveMarkets()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Convert.ToInt32( Model.EBMarkets.ID ) > 0 ? Resource.Update : Resource.Save)" />
+
+                    <a href="@Constants.HC_EBMarketsListURL">
+                        <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/Markets/addMarket")
+ 
+
+       
+}

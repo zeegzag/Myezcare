@@ -1,0 +1,100 @@
+﻿@model SetRolePermissionModel
+@{
+    /**/
+
+    ViewBag.Title = "Organisation Permission";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = "Organisation Permission";
+}
+@Html.Hidden("hdnRolePermissionModel", Common.SerializeObject(Model))
+
+@section styles{
+    <style type="text/css">
+        #3016_anchor > i.jstree-checkbox {
+            display: none !important;
+        }
+    </style>
+}
+
+<div data-ng-controller="RolePermissionController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            Organization Permission<small>&nbsp;&nbsp;Search and set Organization Permission</small>
+            <a href="javascript:void(0);" style="margin-right:10px" data-ng-click="SavePermissions()" class="btn btn-sm blue pull-right letter-space"><i class="fa fa-copy">&nbsp;&nbsp;</i>@Resource.Save</a>&nbsp;&nbsp;
+        </h3>
+    </div>
+    <div class="row">
+        <form id="frmrolepermission">
+            <div class=" col-lg-8 col-md-8 col-sm-12 no-padding margin-top-5">
+                <div class="col-md-3">
+                    <label class="control-label"></label>
+                </div>
+                <div class="permissionList">
+                    <div class="row-fluid">
+                        <div class="caption">
+                            <i class=" icon-layers font-green"></i>
+                            <span class="caption-subject font-green bold uppercase font-size-17">System - Organisation</span>
+                            <div class="space10"></div>
+                            <div class="col-sm-8 no-padding">
+                                <label class="control-label">@Resource.Organization</label>
+                                <div class="form-group">
+                                    <select name="mySelect" id="mySelect" class="form-control"
+                                            data-ng-options="obj.OrganizationID as obj.CompanyName for obj in OrganizationList"
+                                            data-ng-model="SearchRolePermission.OrganizationID"
+                                            data-ng-init="SearchRolePermission.OrganizationID = SearchRolePermission.OrganizationID==''? null: SearchRolePermission.OrganizationID"
+                                            data-ng-change="GetRolePermission(SearchRolePermission)"
+                                            data-ng-setname="SearchRolePermission.CompanyName">
+                                        <option value="">Select Organizations</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-6">
+                    <div class="space20"></div>
+                    <div class="portlet-body compact">
+                        <div class="dataTables_wrapper external-events-group table-responsive">
+                        </div>
+                    </div>
+                    <div class="">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <div>
+                                    <i class="glyphicon glyphicon-tree-conifer"></i>&nbsp;@Resource.WebPermissions
+                                </div>
+                            </div>
+                            <div class="panel-body">
+                                <div id="jstreeid" data-ng-click="SetPermission()" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="PermissionList" tree="treeInstance" tree-events="ready:ExpandTreeView;changed:SaveRoleWisePermission;hover_node:ShowDescription;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    @*PermissionList{{PermissionList}}*@
+                </div>
+                <div class="col-lg-6">
+                    <div class="space20"></div>
+                    <div class="portlet-body compact">
+                        <div class="dataTables_wrapper external-events-group table-responsive">
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <i class="glyphicon glyphicon-tree-conifer"></i>&nbsp; @Resource.MobilePermissions
+                        </div>
+                        <div class="panel-body">
+                            <div id="jstreeidMobile" data-ng-click="SetPermission()" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="MobilePermissionList" tree="treeInstanceMobile" tree-events="ready:ExpandTreeView;changed:MobileSaveRoleWisePermission;hover_node:ShowDescription;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/Assets/js/viewjs/siteApp/Permissions/rolepermission.js")
+}

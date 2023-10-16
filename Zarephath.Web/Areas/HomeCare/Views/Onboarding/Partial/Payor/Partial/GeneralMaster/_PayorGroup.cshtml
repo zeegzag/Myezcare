@@ -1,0 +1,344 @@
+﻿@model DDMasterModel
+
+@Html.Hidden("hdnPayorGroupModel", Common.SerializeObject(Model))
+
+<div id="AddPayerGroupControllerModel" class="modal fade" role="dialog" data-ng-controller="AddPayorGroupController">
+    <div class="modal-dialog modal-md">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="ClosePayerGroupModal()">&times;</button>
+                <h3 class="page-title">
+                    @Resource.PayerGroup
+                </h3>
+            </div>
+            <div class="modal-body">
+                <div class="col-lg-12 col-md-12 col-sm-12 no-padding">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <div class="fscontainer">
+                                        @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_AddUpdate))
+                                        {
+                                            <form id="frmDDMaster">
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div class="col-lg-4 col-md-4 col-sm-4">
+                                                            <label class="control-label required">@Resource.ItemType</label>
+                                                            @Html.DropDownListFor(p => p.DDMaster.ItemType, Model.TypeList.ToSelectList("", "Name", "DDMasterTypeID", @Resource.Select, ""),
+                                                       new
+                                                       {
+                                                           data_ng_model = "DDMasterModel.DDMaster.ItemType",
+                                                           data_ng_init = "DDMasterModel.DDMaster.ItemType=DDMasterModel.DDMaster.ItemType==''?null:DDMasterModel.DDMaster.ItemType",
+                                                           @class = "form-control input-sm",
+                                                           data_ng_disabled= "DDMasterModel.DDMaster.ItemType",
+                                                           convert_to_number = ""
+                                                       })
+                                                            @Html.ValidationMessageFor(q => q.DDMaster.ItemType)
+                                                        </div>
+
+                                                        <div class="col-lg-4 col-md-4 col-sm-4">
+                                                            <label class="control-label required">@Resource.Title</label>
+                                                            @Html.TextBoxFor(p => p.DDMaster.Title,
+                                                       new
+                                                       {
+                                                           data_ng_model = "DDMasterModel.DDMaster.Title",
+                                                           @class = "form-control input-sm",
+                                                           @placeholder = Resource.Title,
+                                                           @maxlength = 100
+                                                       })
+                                                            @Html.ValidationMessageFor(q => q.DDMaster.Title)
+                                                        </div>
+                                                        <div class="col-lg-4 col-md-4 col-sm-4" data-ng-if="DDMasterModel.DDMaster.IsDisplayValue">
+
+                                                            <div data-ng-show="DDMasterModel.DDMaster.ItemType!= @((int)Enum_DDMasterType.Document_Section)">
+                                                                <label class="control-label required">@Resource.Value</label>
+                                                                @Html.TextBoxFor(p => p.DDMaster.Value,
+                                                               new
+                                                               {
+                                                                   data_ng_model = "DDMasterModel.DDMaster.Value",
+                                                                   @class = "form-control input-sm",
+                                                                   @placeholder = Resource.Value,
+                                                                   @maxlength = 100
+                                                               })
+                                                                @Html.ValidationMessageFor(q => q.DDMaster.Value)
+                                                            </div>
+
+                                                            <div data-ng-show="DDMasterModel.DDMaster.ItemType== @((int)Enum_DDMasterType.Document_Section)">
+                                                                <label class="control-label required">@Resource.Value</label>
+                                                                @Html.TextBoxFor(p => p.DDMaster.Value,
+                                                               new
+                                                               {
+                                                                   data_ng_model = "DDMasterModel.DDMaster.Value",
+                                                                   @class = "form-control input-sm color-picker minicolors-input",
+                                                                   @placeholder = Resource.ColorScheme,
+                                                                   @maxlength = 100
+                                                               })
+                                                                @Html.ValidationMessageFor(q => q.DDMaster.Value)
+                                                            </div>
+                                                        </div>
+
+
+
+
+
+                                                        <div data-ng-show="DDMasterModel.DDMaster.ItemType>0 && ParentChildList.length>0">
+                                                            <div class="form-group col-lg-2 col-md-2 col-sm-12" data-ng-show="ShowParentChildList">
+                                                                <label class="control-label">Mapping Item</label>
+                                                                <select class="form-control input-sm"
+                                                                        data-ng-init="DDMasterModel.DDMaster.SelectedParentChild=DDMasterModel.DDMaster.SelectedParentChild==''?null:DDMasterModel.DDMaster.SelectedParentChild.toString()"
+                                                                        data-ng-model="DDMasterModel.DDMaster.SelectedParentChild"
+                                                                        data-val="false"
+                                                                        id="SelectedParentChild" convert-to-number="">
+                                                                    <option data-ng-repeat="option in ParentChildList" value="{{option.DDMasterTypeID}}">{{option.Name}}</option>
+                                                                </select>
+                                                            </div>
+
+                                                            <div class="form-group col-lg-2 col-md-2 col-sm-12">
+                                                                <label class="control-label">{{DDMasterModel.DDMaster.SelectedParentChildText}}</label>
+                                                                <div data-ng-show="IsMultiSelect">
+                                                                    <select class="form-control input-sm"
+                                                                            multiple="multiple" title="@Resource.Select"
+                                                                            data-val="false" selectpicker="DDMasterModel.DDMaster.SelectedParentChildValueItems" name="DDMasterIDChild">
+                                                                        <option data-ng-repeat="option in ParentChildValueList" value="{{option.DDMasterID}}">{{option.Title}}</option>
+                                                                    </select>
+                                                                </div>
+                                                                <div data-ng-show="!IsMultiSelect">
+                                                                    <select class="form-control input-sm"
+                                                                            data-ng-init="DDMasterModel.DDMaster.SelectedParentChildValueItem=DDMasterModel.DDMaster.SelectedParentChildValueItem==''?null:DDMasterModel.DDMaster.SelectedParentChildValueItem.toString()"
+                                                                            data-ng-model="DDMasterModel.DDMaster.SelectedParentChildValueItem"
+                                                                            data-val="false"
+                                                                            id="SelectedParentChildValueItem"
+                                                                            convert-to-number="">
+                                                                        <option value="">@Resource.Select</option>
+                                                                        <option data-ng-repeat="option in ParentChildValueList" value="{{option.DDMasterID}}">{{option.Title}}</option>
+                                                                    </select>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div data-ng-class="DDMasterModel.DDMaster.IsDisplayValue ? 'form-group col-lg-4 col-md-4 col-sm-12' : 'form-group col-lg-4 col-md-4 col-sm-12'">
+                                                            <label class="control-label"></label>
+                                                            <div>
+                                                                <button type="submit" data-ng-click="SaveDDMaster()" class="btn btn-sm green-jungle">@Resource.Save</button>
+                                                                <a href="javascript:void(0);" data-ng-click="WZCancel()" class="btn btn-sm red-mint">@Resource.Reset</a>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="space1"></div>
+                                                        <hr />
+                                                        <div class="space1"></div>
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        }
+
+                                        @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_List))
+                                        {
+                                            <div>
+                                                <div class="row">
+                                                    <div class="col-md-12 col-sm-12 col-xs-12">
+
+                                                        <div class="btn-group">
+                                                            <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                                                                <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                                                            </button>
+                                                        </div>
+
+                                                        <div class="btn-group">
+                                                            @Html.DropDownListFor(m => m.SearchDDMasterListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchDDMasterListPage.IsDeleted), "Name", "Value", "", ""),
+                                                               new
+                                                               {
+                                                                   id = "IsDeleted",
+                                                                   data_ng_model = "TempSearchDDMasterListPage.IsDeleted",
+                                                                   data_ng_init = "TempSearchDDMasterListPage.IsDeleted = TempSearchDDMasterListPage.IsDeleted==null?'-1':TempSearchDDMasterListPage.IsDeleted.toString()",
+                                                                   @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                   data_ng_change = "SearchDDMaster()"
+                                                               })
+                                                        </div>
+
+                                                        @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_Delete))
+                                                        {
+                                                            <div class="btn-group" data-ng-if="SelectedDDMasterIds.length > 0">
+                                                                <button type="button" data-ng-click="DeleteDDMaster()" class="btn blue btn-sm grey border-grey-cascade">
+                                                                    <i class="fa fa-random margin-right-10"></i>
+                                                                    {{TempSearchDDMasterListPage.IsDeleted==0?'@Constants.DisableSelected' :(TempSearchDDMasterListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                                                                </button>
+                                                            </div>
+                                                        }
+                                                        <div class="inline-block pull-right" data-ng-show="DDMasterList.length > 0">
+                                                            <div class="inline-block pull-right" data-ng-show="DDMasterList.length > 0">
+                                                                <div class="pull-right margin-left-5">
+                                                                    <dir-pagination-controls boundary-links="true" max-size="DDMasterListPager.maxSize" on-page-change="DDMasterListPager.pageChanged(newPageNumber)" pagination-id="DDMasterListPagerID"></dir-pagination-controls>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="space20"></div>
+                                                </div>
+
+                                                <div>
+                                                    <div class="row">
+                                                        <div class="col-sm-15">
+                                                            <div class="portlet-body" style="display: block;">
+                                                                <form id="FrmDDMasterList">
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                        <div class="portlet-body compact">
+                                                                            <div class="dataTables_wrapper">
+                                                                                <table class="table table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                                                    <thead class="flip-content">
+                                                                                        <tr>
+                                                                                            @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_Delete))
+                                                                                            {
+                                                                                                <th class="width-20px"></th>
+                                                                                            }
+                                                                                            <th>
+                                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="DDMasterListPager.sortColumn('ItemType')">@Resource.ItemType</a>
+                                                                                                <span class="sortorder" data-ng-show="DDMasterListPager.sortIndex === 'ItemType'" data-ng-class="{reverse:DDMasterListPager.reverse}"></span>
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="DDMasterListPager.sortColumn('Title')">@Resource.Title</a>
+                                                                                                <span class="sortorder" data-ng-show="DDMasterListPager.sortIndex === 'Title'" data-ng-class="{reverse:DDMasterListPager.reverse}"></span>
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="DDMasterListPager.sortColumn('Value')">@Resource.Value</a>
+                                                                                                <span class="sortorder" data-ng-show="DDMasterListPager.sortIndex === 'Value'" data-ng-class="{reverse:DDMasterListPager.reverse}"></span>
+                                                                                            </th>
+                                                                                            <th class="width-120px">@Resource.Action</th>
+                                                                                        </tr>
+                                                                                    </thead>
+
+                                                                                    <tbody>
+                                                                                        <tr class="compact-search-tr">
+                                                                                            @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_Delete))
+                                                                                            {
+                                                                                                <td>
+                                                                                                    <div class="btn-group" data-ng-show="DDMasterList.length > 0">
+                                                                                                        <input id="SelectAllDDMaster" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                                                                        <label for="SelectAllDDMaster"></label>
+                                                                                                    </div>
+                                                                                                </td>
+                                                                                            }
+                                                                                            <td>
+                                                                                                @Html.DropDownListFor(p => p.SearchDDMasterListPage.ItemType, Model.TypeList.ToSelectList("", "Name", "DDMasterTypeID", @Resource.Select, ""),
+                                                 new
+                                                 {
+                                                     data_ng_model = "TempSearchDDMasterListPage.ItemType",
+                                                     data_ng_init = "TempSearchDDMasterListPage.ItemType=TempSearchDDMasterListPage.ItemType==''?null:TempSearchDDMasterListPage.ItemType.toString()",
+                                                     @class = "form-control input-sm",
+                                                     data_ng_disabled = "DDMasterModel.DDMaster.ItemType",
+                                                 })
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                @Html.TextBoxFor(m => m.SearchDDMasterListPage.Title, new { data_ng_model = "TempSearchDDMasterListPage.Title", @class = "form-control input-sm", placeholder = Resource.Title, maxlength = 50 })
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                @Html.TextBoxFor(m => m.SearchDDMasterListPage.Value, new { data_ng_model = "TempSearchDDMasterListPage.Value", @class = "form-control input-sm", placeholder = Resource.Value, maxlength = 50 })
+                                                                                            </td>
+                                                                                            <td class="text-align-center">
+                                                                                                <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchDDMaster()" />
+                                                                                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                        <tr data-ng-class="{'deleted':ddMaster.IsDeleted}" dir-paginate="ddMaster in DDMasterList | itemsPerPage: DDMasterListPager.pageSize" total-items="DDMasterListPager.totalRecords" current-page="DDMasterListPager.currentPage" pagination-id="DDMasterListPagerID">
+                                                                                            @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_Delete))
+                                                                                            {
+                                                                                                <td>
+                                                                                                    <input type="checkbox" class="unicheckbox" data-ng-model="ddMaster.IsChecked" data-ng-change="SelectDDMaster(ddMaster)" val="ddMaster.IsChecked">
+                                                                                                </td>}
+                                                                                            <td>
+                                                                                                {{ddMaster.ItemType}}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                {{ddMaster.Title}}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <div data-ng-show="ddMaster.DDMasterTypeID != @((int)Enum_DDMasterType.Document_Section)">
+                                                                                                    {{ddMaster.Value}}
+                                                                                                </div>
+                                                                                                <div data-ng-show="ddMaster.DDMasterTypeID == @((int)Enum_DDMasterType.Document_Section)">
+
+                                                                                                    <div data-ng-style="{'background-color': ddMaster.Value,'height': '18px','width': '20px'}" class="pull-left"></div>
+                                                                                                    <span class="pull-left padding-left-5">{{ddMaster.Value}}</span>
+
+                                                                                                </div>
+
+                                                                                            </td>
+                                                                                            <td class="text-align-center">
+                                                                                                @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_AddUpdate))
+                                                                                                {
+                                                                                                    <a href="javascript:void(0);" data-ng-click="EditDDMaster(ddMaster)" class="btn btn-xs blue">@Resource.Edit </a>
+                                                                                                }
+                                                                                                @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_Delete))
+                                                                                                {
+                                                                                                    <a href="javascript:void(0);" data-ng-show="ddMaster.IsDeleted" data-ng-click="DeleteDDMaster(ddMaster.DDMasterID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                                                    <a href="javascript:void(0);" data-ng-show="!ddMaster.IsDeleted" data-ng-click="DeleteDDMaster(ddMaster.DDMasterID,'Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                                                                                }
+
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    </tbody>
+
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="row">
+                                                        <div class="col-sm-12" data-ng-if="DDMasterList.length > 0">
+                                                            <div class="pull-left col-sm-6 no-padding">
+                                                                @Resource.Showing <span data-ng-bind="(DDMasterListPager.pageSize * DDMasterListPager.currentPage) - DDMasterListPager.pageSize  + 1"></span>
+                                                                &nbsp;@Resource.To <span data-ng-bind="(DDMasterListPager.pageSize == DDMasterListPager.currentPageSize) ? (DDMasterListPager.pageSize * DDMasterListPager.currentPage) :(DDMasterListPager.pageSize * DDMasterListPager.currentPage) - DDMasterListPager.pageSize  + DDMasterListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="DDMasterListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                                            </div>
+                                                            <div class="pull-right top pagination-sm">
+                                                                <dir-pagination-controls boundary-links="true" max-size="DDMasterListPager.maxSize" on-page-change="DDMasterListPager.pageChanged(newPageNumber)" pagination-id="DDMasterListPagerID"></dir-pagination-controls>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                    <div class="row">
+                                                        <div class="col-sm-12">
+                                                            <div data-ng-if="DDMasterList.length == 0">
+                                                                <div class="row">
+                                                                    <div class="col-lg-12">
+                                                                        <div class="alert alert-danger">
+                                                                            @Html.Raw(Resource.NoRecordsFound)
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        }
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br class="clear-both" />
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/generalmaster/partial/payorgroup")
+<script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.GeneralMaster)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.GeneralMaster)';
+</script>

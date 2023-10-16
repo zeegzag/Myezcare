@@ -1,0 +1,181 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.TimeSheet);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_PatientTimeSheet;
+}
+
+@model SetPatientTimeSheetPage
+@Html.Hidden("hdnSetPatientTimeSheetListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="PatientTimeSheetController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.PatientTimeSheet
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="inline-block pull-right" data-ng-show="PatientTimeSheetList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="PatientTimeSheetListPager.maxSize" on-page-change="PatientTimeSheetListPager.pageChanged(newPageNumber)" pagination-id="PatientTimeSheetListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmPatientTimeSheetList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content empvisitlist_tbl">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientTimeSheetListPager.sortColumn('Name')">@Resource.EmployeeName</a>
+                                            <span class="sortorder" data-ng-show="PatientTimeSheetListPager.sortIndex === 'Name'" data-ng-class="{reverse:PatientTimeSheetListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientTimeSheetListPager.sortColumn('StartDate')">@Resource.ScheduleStartDate</a>
+                                            <span class="sortorder" data-ng-show="PatientTimeSheetListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:PatientTimeSheetListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientTimeSheetListPager.sortColumn('EndDate')">@Resource.ScheduleEndDate</a>
+                                            <span class="sortorder" data-ng-show="PatientTimeSheetListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:PatientTimeSheetListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientTimeSheetListPager.sortColumn('ClockInTime')">@Resource.ClockInTime</a>
+                                            <span class="sortorder" data-ng-show="PatientTimeSheetListPager.sortIndex === 'ClockInTime'" data-ng-class="{reverse:PatientTimeSheetListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientTimeSheetListPager.sortColumn('ClockOutTime')">@Resource.ClockOutTime</a>
+                                            <span class="sortorder" data-ng-show="PatientTimeSheetListPager.sortIndex === 'ClockOutTime'" data-ng-class="{reverse:PatientTimeSheetListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-115px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        <td>
+                                            <select class="form-control input-sm" title="@Resource.SelectEmployee"
+                                                    data-val="true" actions-box="true" multiple="multiple" 
+                                                    selectpicker="TempSearchPatientTimeSheetListPage.EmployeeIDs" name="SearchEmpCalender.EmployeeID">
+                                                <option data-ng-repeat="option in PatientTimeSheetModel.EmployeeList"
+                                                        value="{{option.EmployeeID}}">
+                                                    {{option.EmployeeName}}
+                                                </option>
+                                            </select>
+                                        </td>
+                                        <td class="col-md-2">
+                                            <div class="input-group date date-picker pull-right"
+                                                 datepicker="TempSearchPatientTimeSheetListPage.StartDate" 
+                                                 ng-dateval="TempSearchPatientTimeSheetListPage.StartDate" 
+                                                 >
+                                                @Html.TextBoxFor(m => m.SearchPatientTimeSheetListPage.StartDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask",
+                                                   maxlength = "50",
+                                                   placeholder = Resource.DateFormat
+                                               })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </td>
+                                        <td class="col-md-2">
+                                            <div class="input-group date date-picker pull-right"
+                                                 datepicker="TempSearchPatientTimeSheetListPage.EndDate" 
+                                                 ng-dateval="TempSearchPatientTimeSheetListPage.EndDate" 
+                                                 >
+                                                @Html.TextBoxFor(m => m.SearchPatientTimeSheetListPage.EndDate, new
+                                           {
+                                               @class = "form-control input-sm dateInputMask",
+                                               maxlength = "50",
+                                               placeholder = Resource.DateFormat
+                                           })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchPatientTimeSheetListPage.StrStartTime,
+                                             new
+                                             {
+                                                 ng_model = "TempSearchPatientTimeSheetListPage.StrStartTime",
+                                                 @class = "form-control input-sm time",
+                                                 placeholder = @Resource.StartTime,
+                                             })
+                                            @Html.ValidationMessageFor(m => m.SearchPatientTimeSheetListPage.StrStartTime)
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchPatientTimeSheetListPage.StrEndTime,
+                                             new
+                                             {
+                                                 ng_model = "TempSearchPatientTimeSheetListPage.StrEndTime",
+                                                 @class = "form-control input-sm time",
+                                                 placeholder = @Resource.EndTime,
+                                             })
+                                            @Html.ValidationMessageFor(m => m.SearchPatientTimeSheetListPage.StrEndTime)
+                                        </td>
+                                        <td class="text-align-center">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchEmployeeVisit()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in PatientTimeSheetList | itemsPerPage: PatientTimeSheetListPager.pageSize" total-items="PatientTimeSheetListPager.totalRecords" current-page="PatientTimeSheetListPager.currentPage" pagination-id="PatientTimeSheetListPager_ID">
+                                        <td>{{item.Name}}</td>
+                                        <td>{{item.StartDate | orgdatetime }}</td>
+                                        <td>{{item.EndDate | orgdatetime }}</td>
+                                        <td>{{item.ClockInTime | timeformat12hrs }}</td>
+                                        <td>{{item.ClockOutTime | timeformat12hrs }}</td>
+                                        <td>
+                                            <a href="@Constants.HC_GeneratePatientTimeSheetPdfURL{{item.EncryptedEmployeeVisitID}}" target="_blank" title="@Resource.PrintPCATimeSheet" class="btn btn-xs yellow-mint" ><i class="fa fa-print"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="PatientTimeSheetList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(PatientTimeSheetListPager.pageSize * PatientTimeSheetListPager.currentPage) - PatientTimeSheetListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(PatientTimeSheetListPager.pageSize == PatientTimeSheetListPager.currentPageSize) ? (PatientTimeSheetListPager.pageSize * PatientTimeSheetListPager.currentPage) :(PatientTimeSheetListPager.pageSize * PatientTimeSheetListPager.currentPage) - PatientTimeSheetListPager.pageSize  + PatientTimeSheetListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PatientTimeSheetListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="PatientTimeSheetListPager.maxSize" on-page-change="PatientTimeSheetListPager.pageChanged(newPageNumber)" pagination-id="PatientTimeSheetListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="PatientTimeSheetList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/patienttimesheet/patienttimesheet")
+<script type="text/javascript">
+    var StrtEndTimeRequired = '@Resource.StrtEndTimeRequired';
+    var GenerateBillingNote = '@Resource.GenerateBillingNotes';
+    var ConfirmationForBillingNote = '@Resource.ConfirmationForBillingNote';
+</script>
+}

@@ -1,0 +1,96 @@
+﻿@model HC_AddReferralModel
+@{bool isEditMode = Model != null && Model.Referral.ReferralID > 0;
+    bool isOrgHasAggregator = Common.IsOrgHasAggregator();}
+
+<div class="col-lg-12 col-md-12 col-sm-12 no-padding employeeTabsecond">
+    <div>
+        <div class="row">
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label class="control-label required">Facility Name</label>
+
+                <input type="text" id="txtFacilityName" maxlength="50" class="form-control input-sm required validateElement" ng-model="ReferralModel.Referral.FirstName" placeholder="Facility Name" data-val="true" data-val-required="Facility Name is required" data-error-count="ReferralErrorCount.ClientTab" />
+            </div>
+
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label class="control-label required">
+                    @Resource.Account #
+                    <i class="fa fa-question-circle font-size-15" data-ng-tooltip="Agency's Unique Identification Number"
+                       data-ng-custom-class="tooltip-extra-z-index"></i>
+                </label>
+                <input class="form-control input-sm validateElement"
+                       data-ng-model="ReferralModel.Referral.AHCCCSID"
+                       data-val="true"
+                       data-val-required="@Resource.AccountRequired"
+                       placeholder="@Resource.AccountNumber"
+                       id="AHCCCS_ID"
+                       maxlength=10
+                       data-html="true"
+                       data-error-count="ReferralErrorCount.ClientTab"
+                       name="Referral.AHCCCSID" />
+            </div>
+
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label class="control-label required">@Resource.Status</label>
+                @Html.DropDownListFor(p => p.Referral.ReferralStatusID, Model.ReferralStatusList.ToSelectList(Model.Referral.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", @Resource.SelectStatus, ""),
+                                      new
+                                      {
+                                          data_ng_model = "ReferralModel.Referral.ReferralStatusID",
+                                          data_ng_init = "ReferralModel.Referral.ReferralStatusID==null?'':ReferralModel.Referral.ReferralStatusID.toString()",
+                                          @class = "form-control input-sm validateElement requiredStrip",
+                                          data_error_Count = "ReferralErrorCount.ClientTab",
+                                          convert_to_number = ""
+                                      })
+
+                @Html.ValidationMessageFor(q => q.Referral.ReferralStatusID)
+            </div>
+
+        </div>
+
+        <div class="clearleft"></div>
+        <div class="row"></div>
+
+        <div class="row">
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label class="control-label required">@Resource.Assignee</label>
+                <select class="form-control input-sm validateElement requiredStrip"
+                        data-error-Count="ReferralErrorCount.ClientTab"
+                        data-ng-init="ReferralModel.Referral.Assignee=ReferralModel.Referral.Assignee==''?null:ReferralModel.Referral.Assignee.toString()"
+                        data-ng-model="ReferralModel.Referral.Assignee"
+                        data-val="true" data-val-required="@Resource.AssigneeRequired"
+                        id="Assignee"
+                        name="ReferralModel.Referral.Assignee"
+                        convert-to-number="">
+                    <option value="">@Resource.SelectAssignee</option>
+                    <option data-ng-repeat="option in ReferralModel.EmployeeList | filter:AssigneeFilter(ReferralModel.Referral.Assignee)" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                </select>
+                @Html.ValidationMessageFor(q => q.Referral.Assignee)
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label class="control-label required">@Resource.Position</label>
+                <div class="requiredStrip" ng-dropdown-multiselect="" options="CareTypeList" selected-model="SelectedCareType" checkboxes="true" title="@Resource.Position" extra-settings="CareTypeSettings"></div>
+            </div>
+
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label class="control-label">EIN #</label>
+                <input type="text" class="form-control input-sm" ng-model="ReferralModel.Referral.SocialSecurityNumber" placeholder="EIN Number" id="txtEIN" />
+            </div>
+
+        </div>
+    </div>
+
+
+
+    <div class="e" id="tab_ContactInformation">
+        @Html.Partial("Partial/ReferralDetails/_tabContact")
+    </div>
+</div>
+
+
+<script type="text/javascript">
+    var ssnformat = "@Resource.ssnformat";
+    var MaximumUploadImageSizeMessage2MB = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage2MB))';
+</script>
+
+
+
+

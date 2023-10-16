@@ -1,0 +1,82 @@
+﻿<div class="col-sm-12 no-padding" data-ng-if="!IsLoadingDetails && DetailModel">
+    <h4 class="caption">
+        <a class="text-decoration-none sbold uppercase" data-ng-href="/referral/addreferral/{{DetailModel.ReferralDetail.EncryptedReferralID}}" data-ng-bind="DetailModel.ReferralDetail.ReferralName" target="_blank">
+        </a>
+        <small><span class="label label-mini label-inverse margin-right-05 ng-binding">CSI#: {{DetailModel.ReferralDetail.CISNumber}}</span>
+            <span class="label label-mini label-success ng-binding">AHCCCS ID: {{DetailModel.ReferralDetail.AHCCCSID}}</span><span class="margin-left-5 badge badge-danger" data-ng-if="DetailModel.ReferralDetail.NeedPrivateRoom">P</span></small>
+    </h4>
+    <div class="col-sm-12 margin-bottom-5 no-padding">
+        <strong>@Resource.PrimaryContact :</strong>
+        <span class="margin-top-5 about-text">{{DetailModel.ReferralDetail.PrimaryContactName?DetailModel.ReferralDetail.PrimaryContactName:'@Resource.NA'}}</span>
+    </div>
+    <div class="col-sm-6 margin-bottom-5 no-padding">
+        <strong><i class="fa fa-phone" aria-hidden="true"></i> :</strong>
+        <span class="margin-top-5 about-text">{{DetailModel.ReferralDetail.Phone1|phoneformat}}</span><span class="margin-top-5 about-text" ng-if="DetailModel.ReferralDetail.Phone2">, {{DetailModel.ReferralDetail.Phone2|phoneformat}}</span>
+    </div>
+    <div class="col-sm-6 margin-bottom-5 no-padding">
+        <strong><i class="fa fa-envelope" aria-hidden="true"></i> :</strong>
+        <span class="margin-top-5 about-text">{{DetailModel.ReferralDetail.Email?DetailModel.ReferralDetail.Email:'@Resource.NA'}}</span>
+    </div>
+    <div class="col-md-6 margin-bottom-5 no-padding">
+        <strong>@Resource.LastAtt :</strong>
+        <span class="margin-top-2 about-text">{{DetailModel.ReferralDetail.LastAttendedDate ? (DetailModel.ReferralDetail.LastAttendedDate|dateformat|date:'@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}</span>
+    </div>
+    <div class="col-md-6 margin-bottom-5 no-padding">
+        <strong>@Resource.FrequencyCode :</strong> <span class="margin-top-2 about-text">{{DetailModel.ReferralDetail.FrequencyCode ?DetailModel.ReferralDetail.FrequencyCode : '@Resource.NA'}}</span>
+    </div>
+    <div class="col-md-4 margin-bottom-5 no-padding" data-ng-if="DetailModel.ReferralDetail.RespiteService">
+        <strong>@Resource.Respite :</strong>
+        <span class="margin-top-2 about-text">{{ DetailModel.ReferralDetail.ZSPRespiteExpirationDate ? (DetailModel.ReferralDetail.ZSPRespiteExpirationDate|dateformat|date:'@ConfigSettings.ClientSideDateFormat') : '@Resource.NA' }}
+        </span>
+    </div>
+    <div class="col-md-4 margin-bottom-5 no-padding" data-ng-if="DetailModel.ReferralDetail.LifeSkillsService">
+        <strong>@Resource.LifeSkillsShort :</strong>
+        <span class="margin-top-2 about-text">{{ DetailModel.ReferralDetail.ZSPLifeSkillsExpirationDate ? (DetailModel.ReferralDetail.ZSPLifeSkillsExpirationDate|dateformat|date:'@ConfigSettings.ClientSideDateFormat') : '@Resource.NA' }}
+        </span>
+    </div>
+    <div class="col-md-4 margin-bottom-5 no-padding" data-ng-if="DetailModel.ReferralDetail.CounselingService">
+        <strong>@Resource.Counseling :</strong>
+        <span class="margin-top-2 about-text">{{ DetailModel.ReferralDetail.ZSPCounsellingExpirationDate ? (DetailModel.ReferralDetail.ZSPCounsellingExpirationDate|dateformat|date:'@ConfigSettings.ClientSideDateFormat') : '@Resource.NA' }}
+        </span>
+    </div>
+    @*<div class="col-md-12 margin-bottom-5 no-padding">
+        <strong>@Resource.NeedPrivateRoom : </strong><span class="margin-top-5">{{DetailModel.ReferralDetail.NeedPrivateRoom?'@Resource.Yes':'@Resource.No'}}</span>
+    </div>*@
+    <div class="col-md-12 margin-bottom-5 no-padding">
+        <strong>@Resource.PlacementRequirement :</strong>
+        <p class="margin-top-2 about-text">{{DetailModel.ReferralDetail.PlacementRequirement?DetailModel.ReferralDetail.PlacementRequirement:'@Resource.NA'}}</p>
+    </div> 
+</div>
+<div class="col-sm-12 no-padding" data-ng-if="!IsLoadingDetails && DetailModel">
+    <strong>@Resource.RecentSchedules :</strong><span data-ng-if="DetailModel.ScheduleList.length==0">@Resource.NA</span>
+    <div class="dataTables_wrapper margin-top-5 " data-ng-if="DetailModel.ScheduleList.length>0">
+        <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+            <thead>
+                <tr>
+                    <th class="col-sm-2"><strong>@Resource.StarDate</strong></th>
+                    <th><strong>@Resource.EndDate</strong></th>
+                    <th><strong>@Resource.Facility</strong></th>
+                    <th><strong>@Resource.Status</strong></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-if="DetailModel.ScheduleList.length > 0" data-ng-repeat="schedule in DetailModel.ScheduleList">
+                    <td>{{ schedule.StartDate ? (schedule.StartDate|dateformat|date:'@ConfigSettings.ClientSideDateFormat') : '@Resource.NA' }}</td>
+                    <td>{{ schedule.EndDate ? (schedule.EndDate|dateformat|date:'@ConfigSettings.ClientSideDateFormat') : '@Resource.NA' }}</td>
+                    <td>{{schedule.FacilityName}}</td>
+                    <td>{{schedule.ScheduleStatusName}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+    </div>
+</div>
+<div class="col-sm-12 no-padding" data-ng-if="IsLoadingDetails">
+    <h4 class="text-center">loading...</h4>
+</div>
+
+
+
+
+
+

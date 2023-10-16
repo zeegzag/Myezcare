@@ -1,0 +1,108 @@
+﻿@model Zarephath.Core.Models.ViewModel.HC_AddEmployeeModel
+
+@{
+    ViewBag.Title = "_EmployeeNote.cshtml";
+}
+@Html.Hidden("hdnEmployeeModel", Common.SerializeObject(Model))
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-md-12 margin-bottom-10">
+
+            @*@if (Common.HasPermission(Constants.Hc_Empl))
+                {*@
+            <div class="col-sm-2 pull-right">
+                <a href="#AddEmployeeNoteModal" data-toggle="modal" class="btn btn-xs green-jungle pull-right" data-ng-click="OnAddEmployeeClick()">
+                    <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddNote
+                </a>
+            </div>
+            @*}*@
+        </div>
+        <div class="portlet-body compact" style="display: block;">
+            <div>
+                <table class="table table-bordered table-striped table-condensed flip-content">
+                    <thead class="">
+                        <tr>
+                            <th class="col-lg-6">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="">@Resource.Note</a>
+                                @*<span class="sortorder" data-ng-show="EmployeeInternalMessageListPager.sortIndex === 'Note'" data-ng-class="{reverse:EmployeeInternalMessageListPager.reverse}"></span>*@
+                            </th>
+                            <th class="">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="">@Resource.AddedBy</a>
+                                @*<span class="sortorder" data-ng-show="EmployeeInternalMessageListPager.sortIndex === 'CreatedBy'" data-ng-class="{reverse:EmployeeInternalMessageListPager.reverse}"></span>*@
+                            </th>
+                            <th class="width-100px">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="">@Resource.AddedDate</a>
+                                @*<span class="sortorder" data-ng-show="EmployeeInternalMessageListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:EmployeeInternalMessageListPager.reverse}"></span>*@
+                            </th>
+                            <th class="width-155px">@Resource.Action</th>
+                            @*<th class="width-155px">@Resource.Action</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="item in EmployeeNoteList">
+                            <td>{{item.Note}}</td>
+                            <td>{{item.CreatedBy}}</td>
+                            <td>{{item.CreatedDate|orgdate}}</td>
+                            <td>
+                                @*ToDo: Add Permission Check here*@
+                                <span>
+                                    <a href="#AddEmployeeNoteModal" data-ng-click="EditEmployeeNote(item)" data-toggle="modal" class="btn btn-xs blue">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a class="btn btn-xs red" href="javascript:void(0);" data-ng-click="DeleteEmployeeNote(item)"><i class="fa fa-trash"></i></a>
+                                </span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="AddEmployeeNoteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span data-ng-show="!IsEdit">@Resource.AddNote</span><span data-ng-show="IsEdit">Edit Note</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmNewEmployeeNote">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-3">
+                                            <label class="control-label required">@Resource.Note</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <textarea rows="5" class="form-control input-sm" data-ng-model="EmployeeNoteDetail" maxlength="1000"
+                                                      placeholder="@Resource.Note" data-val="true"
+                                                      data-val-required="@Resource.ReasonRequired"
+                                                      name="Notes" id="Notes"></textarea>
+                                            <span class="field-validation-valid" data-valmsg-for="Notes" data-valmsg-replace="true"></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-sm-11">
+                            <div class="form-group col-sm-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Cancel</button>@*data-ng-click="ResetEmployeeInternamMessage()"*@
+                                <button type="submit" data-ng-click="SaveEmployeeNote()" class="btn green-jungle">@Resource.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

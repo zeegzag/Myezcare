@@ -1,0 +1,267 @@
+﻿@{
+    ViewBag.Title = "Manage Claims";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = "ManageClaims";
+}
+@model AddManageClaimModel
+@Html.Hidden("hdnSetManageClaimListPage", Common.SerializeObject(Model))
+
+@section styles{
+    @Styles.Render("~/assets/css/sitecss/cms1500")
+}
+<div data-ng-controller="ManageClaimsListController">
+    <div>
+        <div class="page-bar">
+            <h3 class="page-title">
+                Manage Claims
+            </h3>
+            <div class="btn-group pull-right btn-group-xs btn-group-devided">
+            </div>
+        </div>
+
+        <div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <canvas id="myChart" class="chart chart-bar"
+                            chart-series="series" width="600" height="200"></canvas>
+                </div>
+                @*<div class="col-sm-6">
+                    <canvas id="myChart2" class="chart chart-bar"
+                            chart-series="series" width="600" height="350"></canvas>
+                </div>*@
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="portlet-body compact" style="display: block;">
+                        <div class="table-responsive">
+                            <form id="frmCaseManagerList">
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+                                            <td></td>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ClaimsListPager.sortColumn('BatchID')">Batch ID</a>
+                                                <span class="sortorder" data-ng-show="ClaimsListPager.sortIndex === 'BatchID'" data-ng-class="{reverse:ClaimsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ClaimsListPager.sortColumn('PatientName')">Patient Name</a>
+                                                <span class="sortorder" data-ng-show="ClaimsListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:ClaimsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ClaimsListPager.sortColumn('Payor')">Payor</a>
+                                                <span class="sortorder" data-ng-show="ClaimsListPager.sortIndex === 'Payor'" data-ng-class="{reverse:ClaimsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ClaimsListPager.sortColumn('INS_Number')">Insured ID</a>
+                                                <span class="sortorder" data-ng-show="ClaimsListPager.sortIndex === 'INS_Number'" data-ng-class="{reverse:ClaimsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ClaimsListPager.sortColumn('FDOS')">FDOS</a>
+                                                <span class="sortorder" data-ng-show="ClaimsListPager.sortIndex === 'FDOS'" data-ng-class="{reverse:ClaimsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ClaimsListPager.sortColumn('Total_Charge')">Charges</a>
+                                                <span class="sortorder" data-ng-show="ClaimsListPager.sortIndex === 'Total_Charge'" data-ng-class="{reverse:ClaimsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ClaimsListPager.sortColumn('Status')">Status</a>
+                                                <span class="sortorder" data-ng-show="ClaimsListPager.sortIndex === 'Status'" data-ng-class="{reverse:ClaimsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width120">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td></td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.ListManageClaimsModel.BatchID, new { data_ng_model = "SearchClaimListPage.BatchID", @class = "form-control input-sm", placeholder = Resource.BatchID, maxlength = 100 })
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(p => p.ListManageClaimsModel.ReferralID, Model.PatientList.ToSelectList(Model.ListManageClaimsModel.ReferralID.ToString() ?? "", "ReferralName", "ReferralID", Resource.SelectPatient, ""),
+                                                                      new
+                                                                          {
+                                                                              data_ng_model = "SearchClaimListPage.ReferralID",
+                                                                              data_ng_init = "SearchClaimListPage.ReferralID=SearchClaimListPage.ReferralID==''?null:SearchClaimListPage.ReferralID",
+                                                                              @class = "form-control input-sm",
+                                                                              data_val = false,
+                                                                              convert_to_number = ""
+                                                                          })
+                                            </td>
+                                            <td>
+                                                @Html.DropDownListFor(p => p.ListManageClaimsModel.PayorID, Model.PayorList.ToSelectList(Model.ListManageClaimsModel.PayorID.ToString() ?? "", "PayorName", "PayorID", Resource.SelectPayor, ""),
+                                                                      new
+                                                                          {
+                                                                              data_ng_model = "SearchClaimListPage.PayorID",
+                                                                              data_ng_init = "SearchClaimListPage.PayorID=SearchClaimListPage.PayorID==''?null:SearchClaimListPage.PayorID",
+                                                                              @class = "form-control input-sm",
+                                                                              data_val = false,
+                                                                              convert_to_number = ""
+                                                                          })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.ListManageClaimsModel.INS_Number, new { data_ng_model = "SearchClaimListPage.INS_Number", @class = "form-control input-sm", placeholder = Resource.InsuredSNumber, maxlength = 100 })
+                                            </td>
+                                            <td>
+                                                <table>
+                                                    <tr>
+                                                        <td class="width-130px">
+                                                            <div class="input-group date" datepicker="SearchClaimListPage.StartDate"
+                                                                 data-ng-dateval="SearchClaimListPage.StartDate">
+                                                                @Html.TextBoxFor(q => q.ListManageClaimsModel.StartDate,
+                                                                    new
+                                                                    {
+                                                                        @class = "form-control input-sm dateInputMask",
+                                                                        placeholder = Resource.StartDate,
+                                                                    })
+                                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="input-group date" datepicker="SearchClaimListPage.EndDate"
+                                                                 data-ng-dateval="SearchClaimListPage.EndDate">
+                                                                @Html.TextBoxFor(q => q.ListManageClaimsModel.EndDate,
+                                                                    new
+                                                                    {
+                                                                        @class = "form-control input-sm dateInputMask",
+                                                                        placeholder = Resource.EndDate,
+                                                                    })
+                                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchUpload835Files()" />
+                                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+                                    <tbody dir-paginate="item in ClaimsList | itemsPerPage: ClaimsListPager.pageSize" total-items="ClaimsListPager.totalRecords" current-page="ClaimsListPager.currentPage" pagination-id="ClaimsListPagerID">
+                                        <tr id="openPatientClaims{{$index}}">
+                                            <td>
+                                                @*<span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle"
+                                                      data-ng-click="GetPatientClaims(item,'#openPatientClaims'+$index)"
+                                                      data-ng-attr-id="{{'ClaimDetails-'+item.BatchID}}"
+                                                      data-toggle="collapse"
+                                                      data-ng-attr-data-target="{{'#ClaimDetails-'+item.BatchID }}"></span>*@
+                                            </td>
+                                            <td>{{item.BatchID}}</td>
+                                            <td>
+                                                <span data-ng-if="item.Status != 'A'" class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle pull-left" data-ng-click="GetClaimErrorDetails(item)"
+                                                      data-toggle="collapse" data-ng-attr-data-target="{{'#ClaimErrorDetails-'+item.BatchUploadedClaimID}}"></span>
+                                                <span class="pull-left">{{item.PatientName}}</span>
+                                            </td>
+                                            <td>{{item.Payer}}</td>
+                                            <td>{{item.INS_Number}}</td>
+                                            <td>{{item.FDOS|dateformat | orgdate }}</td>
+                                            @*<td>{{item.Charges | orgcurrency}}</td>*@
+                                        <td>{{item.Charges | orgcurrency}}</td>
+                                            <td><span class="badge badge-pill badge-success" data-ng-if="item.Status == 'A'">Acknowledged</span><span class="badge badge-pill badge-danger" data-ng-if="item.Status == 'R'">Rejected</span></td>
+                                            <td><a href="javascript:void(0);" data-ng-click="ShowCMS1500File(item)" class="btn btn-xs blue">@Resource.CMS1500</a></td>
+                                        </tr>
+                                        <tr data-ng-attr-id="{{'ClaimDetails-'+item.BatchID }}" class="collapse collapseDestination">
+                                            <td colspan="9">
+                                                <div class="padding-left-right-10">
+                                                    <div class="row">
+                                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                                            <div class="portlet-body compact" style="display: block;">
+                                                                <div class="table-responsive ">
+                                                                    <table class="table table-bordered table-condensed flip-content">
+                                                                        <thead class="flip-content">
+                                                                            <tr>
+                                                                                <th>test</th>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                                <th></th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>test</td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                                <td></td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                                @*<ul data-ng-if="ClaimErrorDetails[item.BatchUploadedClaimID].length > 0" style="color:red;">
+                                                                        <li data-ng-repeat="error in ClaimErrorDetails[item.BatchUploadedClaimID]">{{error.Message}}</li>
+                                                                    </ul>*@
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12" data-ng-if="ClaimsList.length > 0">
+                    <div class="col-sm-3 pull-left no-padding">
+                        @Resource.Showing <span data-ng-bind="(ClaimsListPager.pageSize * ClaimsListPager.currentPage) - ClaimsListPager.pageSize  + 1"></span>
+                        &nbsp;@Resource.To <span data-ng-bind="(ClaimsListPager.pageSize == ClaimsListPager.currentPageSize) ? (ClaimsListPager.pageSize * ClaimsListPager.currentPage) :(ClaimsListPager.pageSize * ClaimsListPager.currentPage) - ClaimsListPager.pageSize  + ClaimsListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ClaimsListPager.totalRecords"></span>&nbsp;@Resource.Records
+                    </div>
+                    <div class="pull-right top pagination-sm">
+                        <dir-pagination-controls boundary-links="true" max-size="ClaimsListPager.maxSize" on-page-change="ClaimsListPager.pageChanged(newPageNumber)" pagination-id="ClaimsListPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div data-ng-if="ClaimsList.length == 0  ">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="model__ValidateAndGenerateEdi837" tabindex="-1" role="dialog" aria-hidden="true" style="z-index:999999999;">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                @Html.Partial("Partial/_ValidateAndGenerateEdi837")
+            </div>
+        </div>
+    </div>
+
+    @Html.Partial("Partial/_GenerateCMS1500")
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/chart")
+    <script src="~/Assets/js/viewjs/siteApp/Areas/HomeCare/batch/manageclaimlist.js"></script>
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.EdiFileLog)';
+        var ValidateAndGenerateEDI837 = '@Resource.ValidateAndGenerateEDI837Title';
+        var ValidateBatches = '@Resource.ValidateBatches';
+        var ValidateWaitText = '@Resource.ValidateWaitText';
+    </script>
+}

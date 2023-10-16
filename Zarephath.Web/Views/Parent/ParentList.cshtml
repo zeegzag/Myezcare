@@ -1,0 +1,256 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.ParentList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ParentList;
+}
+
+@model SetParentListPage
+@Html.Hidden("hdnSetParentListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="ParentListController">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.ParentList &nbsp;<small>@Resource.ParentInformation</small>
+            <a href="@Constants.AddParentURL" class="btn btn-sm letter-space green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Parent</a>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate))
+            {
+                <div class="btn-group" data-ng-show="ParentList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllParent" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllParent"></label>
+                    </span>
+                </div>
+            }
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchParentListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchParentListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempSearchParentListPage.IsDeleted",
+                                                                          data_ng_init = "TempSearchParentListPage.IsDeleted = TempSearchParentListPage.IsDeleted==null?'-1':TempSearchParentListPage.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchParent()"
+                                                                      })
+            </div>
+            @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate))
+            {
+                <div class="btn-group" data-ng-if="SelectedParentIds.length > 0">
+                    <button type="button" data-ng-click="DeleteParent()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchParentListPage.IsDeleted==0?'@Constants.DisableSelected' :(TempSearchParentListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}</button>
+                </div>
+            }
+            <div class="inline-block pull-right" data-ng-show="ParentList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="ParentListPager.maxSize" on-page-change="ParentListPager.pageChanged(newPageNumber)" pagination-id="ParentListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive">
+                        <form id="frmParentList">
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate))
+                                        {
+                                            <th class="width-20px"></th>
+                                        }
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('Name')">@Resource.Name</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'Name'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('Email')">@Resource.Email</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'Email'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('Address')">@Resource.Address</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'Address'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>
+
+
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('City')">@Resource.City</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'City'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>
+
+
+                                        @*<th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('State')">@Resource.State</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'State'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>*@
+
+
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('ZipCode')">@Resource.ZipCode</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'ZipCode'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>
+
+
+
+
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('Phone1')">@Resource.Phone</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'Phone1'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>
+
+
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('ContactType')">@Resource.ContactType</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'ContactType'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>
+
+
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ParentListPager.sortColumn('ReferralCount')">@Resource.ReferralCount</a>
+                                            <span class="sortorder" data-ng-show="ParentListPager.sortIndex === 'ReferralCount'" data-ng-class="{reverse:ParentListPager.reverse}"></span>
+                                        </th>
+
+
+                                        <th class="width-120px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate))
+                                        {
+                                            <td></td>
+                                        }
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchParentListPage.Name, new { data_ng_model = "TempSearchParentListPage.Name", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                        </td>
+
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchParentListPage.Email, new {data_ng_model = "TempSearchParentListPage.Email", @class = "form-control input-sm", placeholder = Resource.Email, maxlength = 50})
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchParentListPage.Address, new {data_ng_model = "TempSearchParentListPage.Address", @class = "form-control input-sm", placeholder = Resource.Address, maxlength = 50})
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchParentListPage.City, new {data_ng_model = "TempSearchParentListPage.City", @class = "form-control input-sm", placeholder = Resource.City, maxlength = 50})
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchParentListPage.ZipCode, new {data_ng_model = "TempSearchParentListPage.ZipCode", @class = "form-control input-sm", placeholder = Resource.ZipCode, maxlength = 20})
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchParentListPage.Phone1, new { data_ng_model = "TempSearchParentListPage.Phone1", @class = "form-control input-sm", placeholder = Resource.Phone, maxlength = 20 })
+                                        </td>
+                                        <td>
+                                            <div class="input-group input-group-sm ">
+                                                @Html.DropDownListFor(p => p.SearchParentListPage.ContactTypeID, Model.ContactTypeList.ToSelectList(Model.SearchParentListPage.ContactTypeID.ToString() ?? "", "ContactTypeName", "ContactTypeID", Resource.All, ""),
+                                                                  new
+                                                                  {
+                                                                       convert_to_number = "",  
+                                                                      data_ng_model = "TempSearchParentListPage.ContactTypeID",
+                                                                      data_ng_init = "TempSearchParentListPage.ContactTypeID=TempSearchParentListPage.ContactTypeID==''?null:TempSearchParentListPage.ContactTypeID",
+                                                                      @class = "form-control  input-sm",
+                                                                      data_val = false
+
+                                                                  })
+                                            </div>
+                                        </td>
+
+                                        
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchParent()"/>
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+
+
+                                    <tr data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in ParentList | itemsPerPage: ParentListPager.pageSize" total-items="ParentListPager.totalRecords" current-page="ParentListPager.currentPage" pagination-id="ParentListPagerID">
+                                        @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate))
+                                        {
+                                            <td>
+
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="Parent.IsChecked" data-ng-change="SelectParent(item)" val="item.IsChecked">
+                                            </td>
+                                        }
+                                        <td>{{item.Name}}</td>
+                                        <td>{{item.Email}}</td>
+                                        <td>{{item.Address}}</td>
+                                        <td>{{item.City}}</td>
+                                        @*<td >{{item.State}}</td>*@
+                                        <td>{{item.ZipCode}}</td>
+                                        <td data-phone-format="item.Phone1" data-ng-bind="item.Phone1"></td>
+
+                                        <td>{{item.ContactTypeName}}</td>
+
+                                        <td class="text-align-center">
+                                            <a class="text-decoration-none" target="_blank" title="@Resource.GotoReferralList" data-ng-click="GotoReferralList(item.Name)">{{item.ReferralCount != null ? item.ReferralCount : '@Resource.NA'}}</a>
+                                        </td>
+                                        <td>
+                                            @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate))
+                                            {
+                                                <a href="{{ AddParentURL +item.EncryptedContactID}}" class="btn btn-xs blue">@Resource.Edit </a>
+                                                <a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteParent(item.ContactID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteParent(item.ContactID,'Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                            }
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="ParentList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(ParentListPager.pageSize * ParentListPager.currentPage) - ParentListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(ParentListPager.pageSize == ParentListPager.currentPageSize) ? (ParentListPager.pageSize * ParentListPager.currentPage) :(ParentListPager.pageSize * ParentListPager.currentPage) - ParentListPager.pageSize  + ParentListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ParentListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="ParentListPager.maxSize" on-page-change="ParentListPager.pageChanged(newPageNumber)" pagination-id="ParentListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ParentList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/parent/parentlist")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Parent)';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.Parent)';
+        var CaseManagerReferralExistMessage = '@Resource.CaseManagerReferralExistMessage';
+    </script>
+}

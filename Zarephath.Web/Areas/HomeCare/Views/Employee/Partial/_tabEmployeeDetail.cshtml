@@ -1,0 +1,386 @@
+﻿@*@model HC_AddEmployeeModel
+    @{
+        string clientSideDateFormat = ConfigSettings.ClientSideDateTimeFormat;
+        const int legalGuardianContactTypeID = (int)@Common.ContactTypes.LegalGuardian;
+        int primaryContactTypeID = (int)@Common.ContactTypes.EmployeePrimaryPlacement;
+        string isEditMode = !string.IsNullOrEmpty(Model.Employee.EmployeeID.ToString()) && Model.Employee.EmployeeID > 0 ? "1" : "0";
+        bool isEditMode = Model != null && Model.Employee.EmployeeID > 0;
+
+    }*@
+@{
+    /**/
+
+    bool isEditMode = Model != null && Model.Employee.EmployeeID > 0;
+}
+
+@model HC_AddEmployeeModel
+<div class="employee-billing-hours employeeDetailBox">
+    <div class="form-group row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="row">
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="field">
+                        <label class="control-label required">@Resource.Username</label>
+                        <div class="field-box">
+                            @Html.TextBoxFor(q => q.Employee.UserName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.UserName", placeholder = @Resource.Username, maxlength = 50 })
+                            @Html.ValidationMessageFor(q => q.Employee.UserName)
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="field">
+                        <label class="control-label">
+                            @Resource.SSN
+                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.SocialSecurityNumber"
+                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        <div class="field-box" style="display:flex">
+
+
+                            @{
+
+                                var canSeeLastFourDigit = Common.HasPermission(Constants.HC_Can_See_Last_Four_Digit);
+                                var canSeeSSN = Common.HasPermission(Constants.HC_Can_See_SSN);
+
+                                var canSeeRole = Common.HasPermission(Constants.HC_Can_See_Role);
+                                var canUpdateRole = Common.HasPermission(Constants.HC_Can_Update_Role);
+                                @Html.Hidden("hdCanSeeLastFourDigit", canSeeLastFourDigit);
+                                @Html.Hidden("hdCanSeeSSN", canSeeSSN);
+
+                                if (isEditMode)
+
+                                {
+
+                                    if (canSeeLastFourDigit || canSeeSSN)
+                                    {
+                                        if (!string.IsNullOrEmpty(Model.Employee.SocialSecurityNumber))
+                                        {
+                                            const int NO_OF_DIGIT = 4;
+                                            var pos = Model.Employee.SocialSecurityNumber.Length - NO_OF_DIGIT;
+                                            var maskedSSN = Resource.maskedSSNFormat + (pos >= 0 ? Model.Employee.SocialSecurityNumber.Substring(pos, NO_OF_DIGIT) : Model.Employee.SocialSecurityNumber);
+
+                                            <input type="text" class="form-control input-sm " disabled placeholder=@Resource.SSNplaceholder data_ng_show="!canSeeSSN && !canSeeLastFourDigit" />
+                                            <input type="text" class="form-control input-sm " disabled placeholder=@Resource.SSNplaceholder value="@maskedSSN" data_ng_show="canSeeLastFourDigit" />
+                                            @Html.TextBoxFor(q => q.Employee.SocialSecurityNumber, new { @class = "form-control input-sm" + Resource.ssnformat, data_ng_show = "canSeeSSN", data_ng_model = "EmployeeModel.Employee.SocialSecurityNumber", maxlength = Resource.SSNmaxlength, placeholder = @Resource.SSNplaceholder })
+                                            <a ng-click="showSSN()"><i class="fa fa-eye icon" data-ng-class="isEyeOpen ? 'eyeOpen' : ''" style="padding: 8px;background: #96a4b3;color: white;min-width: 50px;text-align: center;"></i></a>
+                                        }
+                                        else
+                                        {
+                                            @Html.TextBoxFor(q => q.Employee.SocialSecurityNumber, new { @class = "form-control input-sm" + Resource.ssnformat, data_ng_model = "EmployeeModel.Employee.SocialSecurityNumber", maxlength = Resource.SSNmaxlength, placeholder = @Resource.SSNplaceholder })
+                                        }
+
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="form-control input-sm" disabled placeholder=@Resource.SSNplaceholder />
+                                    }
+
+                                }
+                                else
+                                {
+                                    @Html.TextBoxFor(q => q.Employee.SocialSecurityNumber, new { @class = "form-control input-sm " + Resource.ssnformat, data_ng_model = "EmployeeModel.Employee.SocialSecurityNumber", maxlength = Resource.SSNmaxlength, placeholder = @Resource.SSNplaceholder })
+                                }
+                            }
+
+                            @Html.ValidationMessageFor(q => q.Employee.SocialSecurityNumber)
+                        </div>
+                    </div>
+
+                </div>
+                @*<div class="col-md-6 col-sm-6"></div>*@
+                @if (isEditMode)
+                {
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <div class="field">
+                            <label class="control-label" data-ng-class="{'required' :!EmployeeModel.IsEditMode}">@Resource.Password</label>
+                            <div class="field-box">
+                                @if (!isEditMode)
+                                {
+
+                                }
+                                else if (isEditMode)
+                                {
+                                    @Html.PasswordFor(q => q.Employee.NewPassword, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.NewPassword", maxlength = 20, placeholder = @Resource.Password })
+                                    @Html.ValidationMessageFor(q => q.Employee.NewPassword)
+                                }
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-sm-6 col-xs-12">
+                        <div class="field">
+                            <label class="control-label" data-ng-class="{'required' :!EmployeeModel.IsEditMode}">@Resource.ConfirmPassword</label>
+                            <div class="field-box">
+                                @if (isEditMode)
+                                {
+                                    @Html.PasswordFor(q => q.Employee.TempConfirmPassword, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.TempConfirmPassword", maxlength = 20, placeholder = @Resource.ConfirmPassword })
+                                    @Html.ValidationMessageFor(q => q.Employee.TempConfirmPassword)
+
+                                }
+                                else
+                                {
+
+                                }
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="field">
+                            <label class="control-label"></label>
+                            <div class="field-box">
+                                <a data-ng-click="ResendRegistrationMail()">@Resource.ResendRegistrationEmail</a>
+                                @if (Model.Organization.TwilioFromNo != null)
+                                {
+                                    <span class="padding-left-right-5" data-ng-if="AllowSendSMS">|</span>
+                                    <a data-ng-click="ResendRegistrationSMS()" data-ng-if="AllowSendSMS">@Resource.ResendRegistrationSMS</a>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                }
+
+                <div class="col-md-6 col-sm-6">
+                    <div class="field">
+                        <label class="control-label required">@Resource.Role </label>
+
+                        <div class="field-box">
+                            <div>
+                                @{
+                                    if (isEditMode)
+                                    {
+
+                                        if (canSeeRole || canUpdateRole)
+                                        {
+
+                                            @Html.DropDownListFor(p => p.Employee.RoleID, Model.RoleList.ToSelectList(Model.Employee.RoleID.ToString() ?? "", "RoleName", "RoleID", @Resource.SelectRole, ""),
+                                                                   new
+                                                                   {
+                                                                       data_ng_model = "EmployeeModel.Employee.RoleID",
+                                                                       data_ng_init = "EmployeeModel.Employee.RoleID=EmployeeModel.Employee.RoleID==''?null:EmployeeModel.Employee.RoleID.toString()",
+                                                                       @class = "form-control input-sm requiredStrip",
+                                                                       data_ng_setname = "EmployeeModel.Employee.RoleName",
+                                                                       data_ng_disabled = (canUpdateRole? "false" : "true")
+                                                                   })
+                                        }
+                                        else
+                                        {
+                                            <input type="text" class="form-control input-sm" disabled placeholder=@Resource.Role />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        @Html.DropDownListFor(p => p.Employee.RoleID, Model.RoleList.ToSelectList(Model.Employee.RoleID.ToString() ?? "", "RoleName", "RoleID", @Resource.SelectRole, ""),
+                                                          new
+                                                          {
+                                                              data_ng_model = "EmployeeModel.Employee.RoleID",
+                                                              data_ng_init = "EmployeeModel.Employee.RoleID=EmployeeModel.Employee.RoleID==''?null:EmployeeModel.Employee.RoleID.toString()",
+                                                              @class = "form-control input-sm requiredStrip",
+                                                              data_ng_setname = "EmployeeModel.Employee.RoleName"
+                                                          })
+                                    }
+                                }
+                                @Html.ValidationMessageFor(q => q.Employee.RoleID)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="field">
+                        <label class="control-label" ng-class="{'required':EmployeeModel.Employee.RoleID==18}">
+                            @Resource.MobileNumberIVRID
+                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.MobileNumberOrIVRIDHelptext"
+                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        <div class="field-box">
+                            @Html.TextBoxFor(q => q.Employee.MobileNumber, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.MobileNumber", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                            @Html.ValidationMessageFor(q => q.Employee.MobileNumber)
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="field">
+                        <label class="control-label" ng-class="{'required':EmployeeModel.Employee.RoleID==18}">
+                            @Resource.FourDigitIVRPin
+                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.IVRPinHelptext"
+                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        <div class="field-box">
+                            @Html.TextBoxFor(q => q.Employee.IVRPin, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.IVRPin", maxlength = 4, dir_valid_number = "", placeholder = Resource.FourDigitIVRPin })
+                            @Html.ValidationMessageFor(q => q.Employee.IVRPin)
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="field">
+                        <label class="control-label">
+                            @Resource.HHA_NPI_ID
+                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.NPINumberHelptext"
+                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        <div class="field-box">
+                            @Html.TextBoxFor(q => q.Employee.HHA_NPI_ID, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.HHA_NPI_ID", maxlength = 50, placeholder = @Resource.HHA_NPI_ID })
+                            @Html.ValidationMessageFor(q => q.Employee.HHA_NPI_ID)
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="field">
+                        <label class="control-label">@Resource.Skills</label>
+                        <div class="field-box">
+                            <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                    selectpicker="EmployeeSkillList" name="EmployeeSkillList"
+                                    title="Select Skills">
+                                <option ng-repeat="item in SkillList" value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-sm-6 col-xs-12">
+                    <div class="field">
+                        <label class="control-label required">@Resource.CareType</label>
+                        <div class="field-box ">
+                            <div class="requiredStrip" ng-dropdown-multiselect="" options="CareTypeList" selected-model="SelectedCareType" checkboxes="true" title="@Resource.SelectCareType" extra-settings="CareTypeSettings"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-sm-6 col-xs-6">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12 preferences-fields">
+                            <div class="field">
+                                <label class="control-label">@Resource.Preferences</label>
+                                <div class="field-box">
+                                    <input type="text"
+                                           token-input
+                                           ng-val="PreferenceName"
+                                           textfield='PreferenceName'
+                                           valuefield='PreferenceName'
+                                           searchurl="{{SearhSkillURL}}"
+                                           placeholder="@Resource.EnterPreference"
+                                           tokenlimit='1'
+                                           onresultsformatter='PreferenceResultsFormatter'
+                                           ontokenformatter="PreferenceTokenFormatter"
+                                           onaddedcallback='AddedPreference'
+                                           autoSelectFirstResult="true"
+                                           minChars="1"
+                                           tokeninputobj="PreferenceTokenObj"
+                                           id="ProductTagTkn"
+                                           customclass="form-control input-sm" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-sm-6 col-xs-12 default-badge-hide">
+                    <div class="field" data-ng-show="ListPreference.length>0">
+                        <div class="control-label">&nbsp;</div>
+                        <div class="field-box">
+                            <div class="badge_main">
+                                <span data-ng-repeat="item in ListPreference">
+                                    <span class="badge-default badge-success ">
+                                        {{item.PreferenceName}}
+                                        <a href="javascript:void(0)" data-ng-click="DeletePreference(item,$index)" class="fa fa-times" aria-hidden="true"></a>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                {
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="field">
+                            <label class="control-label">Signature</label>
+                            <div class="field-box">
+                                <div class="">
+                                    <div class="btn-group btn-block text-center">
+                                        <div data-ng-if="!IsFileUploading" class="fileUpload btn btn-xs btn-primary margin-right-0">
+                                            <span><i class="icon-plus"></i>&nbsp; @Resource.UploadSignature</span>
+                                            <div>
+                                                <div class="">
+                                                    <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                           @*amazonfileupload=""*@
+                                                           fileupload
+                                                           file-uploadurl="{{UploadFile}}"
+                                                           beforesend="BeforeSend"
+                                                           aftersend="AfterSend"
+                                                           progress="Progress"
+                                                           filelist="UploadingFileList"
+                                                           onchange="loadFile(event)"
+                                                           limitmultifileuploads="1"
+                                                           @*data-ng-aws-settings-model="EmployeeModel.AmazonSettingModel"*@ />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="font-sm col-md-12 no-padding margin-top-10">
+                                        <b class="font-red-thunderbird">@Resource.NoteLabel</b><i>@Html.Raw(Resource.SignatureImageNote)</i>
+                                    </div>
+                                    <div class="col-md-12 no-padding margin-top-20">
+                                        <script>
+                                            var loadFile = function (event) {
+                                                var output = document.getElementById('img1');
+                                                output.src = URL.createObjectURL(event.target.files[0]);
+                                            };
+                                        </script>
+                                        <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-show="!IsFileUploading && EmployeeModel.Employee.TempSignaturePath" data-ng-src="{{EmployeeModel.Employee.TempSignaturePath}}" />
+                                        @*data-ng-src="{{EmployeeModel.AmazonSettingModel.URL+'/'+EmployeeModel.Employee.TempSignaturePath}}"*@
+                                        <img class="img-responsive signature-image" id="img1" src="" data-ng-show="IsFileUploading" />
+                                        <img class="img-responsive signature-image" id="defaultSignature" src="/Assets/images/signature.jpg" data-ng-show="!IsFileUploading && !EmployeeModel.Employee.TempSignaturePath" />
+                                        <div class="col-sm-12 no-padding" data-ng-repeat="filedata in UploadingFileList">
+                                            <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    if (Model.Employee.EmployeeSignatureID > 0)
+                    {
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="field">
+                                <label class="control-label">Signature</label>
+                                <div class="field-box">
+                                    <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{EmployeeModel.AmazonSettingModel.URL+'/'+EmployeeModel.Employee.TempSignaturePath}}" />
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                <div class="col-md-6 col-sm-6 col-xs-12 profileImage">
+                    <div class="field" data-ng-if="EmployeeModel.Employee.ProfileImagePath != null && EmployeeModel.Employee.ProfileImagePath != ''">
+                        <label class="control-label">@Resource.ProfileImage</label>
+                        <div class="field-box">
+                            <img class="img-responsive EmpProfile-image" id="imgDisplay" data-ng-src="{{EmployeeModel.Employee.ProfileImagePath}}" />
+                        </div>
+                    </div>
+                </div>
+
+            </div> <!---End row here -->
+        </div>
+        <div class="col-md-12 form-group no-margin no-padding buttons-footer active">
+            <a class="" id="addEmployee_ContactDetail" href="#tab_ContactDetail" data-toggle="tab">
+                <input class="btn btn-sm green-jungle" type="button" data-ng-click="Next1()" value="Next" style="width:70px" />
+            </a>
+            <a id="addEmployee_EmployeeDetail" href="#tab_EmployeeInformation" data-toggle="tab">
+                <input class="btn btn-sm blue margin-right-10 pull-right " type="button" data-ng-click="Prev()" value="Previous" />
+            </a>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    var ssnformat = "@Resource.ssnformat";
+
+</script>

@@ -1,0 +1,298 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, @Resource.GroupSMS);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_GroupSMS;
+}
+
+@model HC_SendBulkSmsModel
+
+
+@Html.Hidden("hdnSendBulkSmsModel", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="SendBulkSmsController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.GroupSMS
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabbable tabbable-custom boxless">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#sendbulksms">@Resource.GroupSMS</a></li>
+                    <li>
+                        <a href="#empSentSms" id="tabsentsms" data-toggle="tab">@Resource.SentSMS</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="sendbulksms" class="tab-pane fade  in active">
+
+                        <div class="compact col-lg-5">
+                            <div class="font-size-18 padding-bottom-15px required">
+                                <strong>@Resource.Step1 :</strong> @Resource.SelectEmployeeToSendSMS
+                            </div>
+                            <div class="table-responsive" style="display: block; height: 500px; overflow-y: auto;">
+                                <form id="frmemployeelist">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead class="flip-content">
+                                            <tr>
+
+                                                <th class="width-20px"></th>
+                                                <th class="">
+
+                                                    <strong>@Resource.Employee</strong>
+
+                                                </th>
+                                                <th class="">
+                                                    <strong>@Resource.MobileNumber</strong>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="compact-search-tr">
+
+                                                <td class="text-align-center">
+                                                    <div class="btn-group" data-ng-show="EmployeeList.length > 0">
+                                                        <input id="SelectAllEmployee" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                        <label for="SelectAllEmployee"></label>
+                                                    </div>
+                                                </td>
+
+                                                <td class="col-sm-8">
+                                                    @Html.TextBoxFor(m => m.SearchSBSEmployeeModel.EmployeeName, new { data_ng_model = "SearchSBSEmployeeModel.EmployeeName", @class = "form-control input-sm", placeholder = Resource.Employee, maxlength = 50 })
+                                                </td>
+
+                                                <td class="col-sm-4">
+                                                    <div class="col-sm-8 no-padding">
+                                                        @Html.TextBoxFor(m => m.SearchSBSEmployeeModel.MobileNumber, new { data_ng_model = "SearchSBSEmployeeModel.MobileNumber", @class = "form-control input-sm", placeholder = Resource.MobileNumber, maxlength = 10 })
+                                                    </div>
+                                                    <div class="col-sm-1">
+                                                        <button type="submit" data-ng-click="GetEmployeeList()" class="pull-left btn btn-sm"><i class="fa fa-search"></i></button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr data-ng-repeat="item in EmployeeList">
+
+                                                <td class="text-align-center">
+                                                    <input type="checkbox"
+                                                           data-ng-if="item.MobileNumber"
+                                                           class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectEmployee(item)" val="item.IsChecked">
+                                                </td>
+
+                                                <td data-ng-bind="item.EmployeeName">
+                                                    @*<a href="@Constants.EmployeeName{{item.EncryptedEmployeeID}}" target="_blank">{{item.EmployeeName}}
+                                                        </a>*@</td>
+                                                <td data-ng-bind="item.MobileNumber"></td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+
+                                <div data-ng-if="EmployeeList.length==0">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger">
+                                                @Html.Raw(Resource.NoRecordsFound)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="compact col-lg-7">
+                            <div class="col-lg-12 font-size-18 padding-bottom-15px required">
+                                <strong>@Resource.Step2:</strong> @Resource.EnterSMSText
+                            </div>
+                            <div class="col-lg-11">
+                                <textarea class="form-control input-sm" rows="13" placeholder="@Resource.EnterSMSTextHere"
+                                          data-ng-model="SendSMSModel.Message"></textarea>
+                            </div>
+
+
+
+                            <div class="col-lg-12 font-size-18 padding-top-40 padding-bottom-15px">
+                                <strong>@Resource.Step3:</strong> @Resource.ClickOnSendSMSButton
+                            </div>
+                            <div class="col-lg-12">
+                                <button class="btn btn-lg blue" data-ng-click="SendBulkSMS()">@Resource.SendSMS</button>
+                            </div>
+                        </div>
+                        @* @Html.Action("PartialEmployeeTimeSlots", "Employee", new { id = Model.Employee.EmployeeID })*@
+                    </div>
+                    <div id="empSentSms" class="tab-pane fade">
+                        <div class="inline-block pull-right" data-ng-show="SentSmsList.length > 0">
+                            <div class="pull-right margin-left-5">
+                                <dir-pagination-controls boundary-links="true" max-size="SentSmsListPager.maxSize" on-page-change="SentSmsListPager.pageChanged(newPageNumber)" pagination-id="SentSmsListPager"></dir-pagination-controls>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <div class="compact" style="display: block;">
+                                    <div class="table-responsive">
+
+                                        <div class="font-size-18 padding-bottom-15px">
+                                            <strong>@Resource.MessageHistory</strong>
+                                        </div>
+                                        <form id="frmViewSendSms">
+                                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                                <thead class="flip-content">
+                                                    <tr>
+
+                                                        <th class="">
+                                                            @Resource.Employees
+
+                                                        </th>
+
+                                                        <th class="col-lg-5">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentSmsListPager.sortColumn('Message')">@Resource.Message</a>
+                                                            <span class="sortorder" data-ng-show="SentSmsListPager.sortIndex === 'Message'" data-ng-class="{reverse:SentSmsListPager.reverse}"></span>
+                                                        </th>
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentSmsListPager.sortColumn('NotificationSid')">@Resource.NotificationSid</a>
+                                                            <span class="sortorder" data-ng-show="SentSmsListPager.sortIndex === 'NotificationSid'" data-ng-class="{reverse:SentSmsListPager.reverse}"></span>
+                                                        </th>
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentSmsListPager.sortColumn('SentBy')">@Resource.SentBy</a>
+                                                            <span class="sortorder" data-ng-show="SentSmsListPager.sortIndex === 'SentBy'" data-ng-class="{reverse:SentSmsListPager.reverse}"></span>
+                                                        </th>
+
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentSmsListPager.sortColumn('SentDate')">@Resource.SentDate</a>
+                                                            <span class="sortorder" data-ng-show="SentSmsListPager.sortIndex === 'SentDate'" data-ng-class="{reverse:SentSmsListPager.reverse}"></span>
+                                                        </th>
+
+
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    <tr data-ng-class="{'deleted':employee.IsDeleted}" dir-paginate="item in SentSmsList | itemsPerPage: SentSmsListPager.pageSize" total-items="SentSmsListPager.totalRecords" current-page="SentSmsListPager.currentPage" pagination-id="SentSmsListPager">
+
+                                                        <td>
+                                                            <a class="" data-ng-click="GetEmployeesForSentSMS(item.GroupMessageLogID)">
+                                                                    <strong>@Resource.ViewEmployees</strong>
+                                                                </a>
+                                                            @*@Resource.ViewEmployees*@
+                                                        </td>
+                                                        <td>{{item.Message}}</td>
+                                                        <td>{{item.NotificationSID}}</td>
+                                                        <td>{{item.SentBy}}</td>
+                                                        <td>{{item.SentDate | dateformat | orgdate }}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </form>
+                                    </div>
+                                </div>
+
+
+                                <div data-ng-if="SentSmsList.length==0">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger">
+                                                @Html.Raw(Resource.NoRecordsFound)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12" data-ng-if="SentSmsList.length > 0">
+                                <div class="col-sm-3 pull-left no-padding">
+                                    @Resource.Showing <span data-ng-bind="(SentSmsListPager.pageSize * SentSmsListPager.currentPage) - SentSmsListPager.pageSize  + 1"></span>
+                                    &nbsp;@Resource.To <span data-ng-bind="(SentSmsListPager.pageSize == SentSmsListPager.currentPageSize) ? (SentSmsListPager.pageSize * SentSmsListPager.currentPage) :(SentSmsListPager.pageSize * SentSmsListPager.currentPage) - SentSmsListPager.pageSize  + SentSmsListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="SentSmsListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                                </div>
+                                <div class="pull-right top pagination-sm">
+                                    <dir-pagination-controls boundary-links="true" max-size="SentSmsListPager.maxSize" on-page-change="SentSmsListPager.pageChanged(newPageNumber)" pagination-id="SentSmsListPager"></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <div>
+        <div class="modal fade" id="empSentSmsModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true" style="display: none; margin-top: 0px;">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="H1" data-ng-hide="ETSMaster.EmployeeTimeSlotMasterID>0">@Resource.Employees</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="">
+                            <div class="btn-group margin-left-20PR">
+                                <div class="top pagination-sm" data-ng-show="ModalAjaxStart">
+                                    @Resource.Loading
+                                    <img src="~/Assets/images/lazyload.gif" />
+                                </div>
+                            </div>
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+
+                                        <th class="">
+
+                                            <strong>@Resource.Employee</strong>
+
+                                        </th>
+                                        <th class="">
+                                            <strong>@Resource.MobileNumber</strong>
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="item in EmployeesListForSentSMS">
+
+                                        <td>
+                                            <a href="@Constants.HC_AddEmployee{{item.EncryptedEmployeeID}}" target="_blank">
+                                                {{item.EmployeeName}}
+                                            </a>
+                                        </td>
+                                        <td data-ng-bind="item.MobileNumber  | phoneformat"></td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@Resource.Okay</button>
+                        @*<button type="button" class="btn green-jungle" data-ng-click="SaveETSMaster()">@Resource.Save</button>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/sendbulksms")
+    <script type="text/javascript">
+        var ConfirmSendSMS = '@Resource.ConfirmSendSMS';
+    </script>
+}

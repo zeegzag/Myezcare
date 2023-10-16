@@ -1,0 +1,468 @@
+﻿@model HC_AddReferralModel
+@Html.Hidden("hdnSetBillingSettingModel", Common.SerializeObject(Model))
+@{ 
+
+                    //var formAuthID = String.Format("FormAuth{0}", Model.ReferralBillingAuthorization.TempType);
+}
+
+
+
+<div>
+    @*Page Search Section Start *@
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group col-lg-2 col-md-2 col-sm-12">
+                <label class="control-label">Records</label>
+                @Html.DropDownListFor(m => m.SearchReferralBillingAuthorization.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchReferralBillingAuthorization.IsDeleted), "Name", "Value", "", ""),
+                new
+                {
+                    id = "IsDeleted",
+                    data_ng_model = "TempSearchPriorAuthorization.IsDeleted",
+                    data_ng_init = "TempSearchPriorAuthorization.IsDeleted = TempSearchPriorAuthorization.IsDeleted==null?'-1':TempSearchPriorAuthorization.IsDeleted.toString()",
+                    @class = "form-control input-sm",
+                    data_ng_change = "SearchPriorAuthorizationClick()"
+                })
+            </div>
+            <div class="form-group col-lg-2 col-md-2 col-sm-12">
+                <label class="control-label">@Resource.Payor</label>
+
+                <select class="form-control input-sm"
+                    data-ng-init="TempSearchPriorAuthorization.PayorID=TempSearchPriorAuthorization.PayorID==''?null:TempSearchPriorAuthorization.PayorID.toString()"
+                    data-ng-model="TempSearchPriorAuthorization.PayorID"
+                    data-val="false"
+                    id="SearchPayorID-@Model.ReferralBillingAuthorization.TempType"
+                    convert-to-number="">
+                    <option value="">@Resource.Select</option>
+                    <option data-ng-repeat="option in PatientPayorList" value="{{option.Value}}">{{option.Name}}</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-2 col-md-2 col-sm-12">
+                <label class="control-label">@Resource.AuthorizationCode</label>
+                @Html.TextBoxFor(m => m.SearchReferralBillingAuthorization.AuthorizationCode, new
+            {
+                data_ng_model = "TempSearchPriorAuthorization.AuthorizationCode",
+                @class = "form-control input-sm",
+                placeholder = Resource.AuthorizationCode,
+                maxlength = 50,
+                id = String.Format("SrchAuthrizationCode{0}", Model.ReferralBillingAuthorization.TempType)
+            })
+            </div>
+
+            <div class="form-group col-lg-2 col-md-2 col-sm-12 display-none">
+                <label class="control-label">@Resource.StarDate</label>
+                <div class="input-group date"
+                    datepicker="TempSearchPriorAuthorization.StartDate"
+                    data-ng-dateval="TempSearchPriorAuthorization.StartDate">
+                    @Html.TextBoxFor(q => q.SearchReferralBillingAuthorization.StartDate,
+                    new
+                    {
+                        @class = "form-control input-sm dateInputMask",
+                        placeholder = Resource.StartDate,
+                        id = String.Format("SrchStartDate{0}", Model.ReferralBillingAuthorization.TempType)
+                    })
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+
+
+            <div class="form-group col-lg-2 col-md-2 col-sm-12  display-none">
+                <label class="control-label">@Resource.EndDate</label>
+                <div class="input-group date"
+                    datepicker="TempSearchPriorAuthorization.EndDate"
+                    data-ng-dateval="TempSearchPriorAuthorization.EndDate">
+                    @Html.TextBoxFor(q => q.SearchReferralBillingAuthorization.EndDate,
+                    new
+                    {
+                        @class = "form-control input-sm dateInputMask",
+                        placeholder = Resource.EndDate,
+                        id = String.Format("SrchEndDate{0}", Model.ReferralBillingAuthorization.TempType)
+                    })
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+
+
+
+            <div class="form-group col-lg-4 col-md-4 col-sm-12 margin-top-18">
+                <button type="submit" class="btn btn-sm grey border-grey-cascade" data-ng-tooltip="@Resource.Search" data-ng-click="SearchPriorAuthorizationClick()">
+                    <i class="fa fa-search">&nbsp;&nbsp;</i>@Resource.Search
+                </button>
+                <a href="javascript:void(0);" data-ng-click="ResetPriorAuthorizationSearchFilter()" data-ng-tooltip="@Resource.Reset" class="btn btn-sm grey border-grey-cascade margin-left-05"><i class="fa fa-refresh">&nbsp;&nbsp;</i>@Resource.Reset</a>
+            </div>
+
+
+
+
+        </div>
+        @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PR_Add))
+        {
+
+            <div class="col-lg-12">
+                <div class="form-group col-lg-3 col-md-3 col-sm-12 pull-right">
+                    <a class="btn btn-sm btn-primary pull-right" data-ng-click="OpenPriorAuthorizationModal()">
+                        <i class="fa fa-plus">&nbsp;&nbsp;</i>Add New Prior Authorization Code
+                    </a>
+                </div>
+            </div>
+        }
+        <div class="clearleft"></div>
+    </div>
+
+
+    @*Page List Section Start *@
+    <div>
+
+        <div class="col-lg-6 col-md-6 col-xs-12 col-sm-12" dir-paginate="item in PriorAuthorizationList | itemsPerPage: PriorAuthorizationPager.pageSize" total-items="PriorAuthorizationPager.totalRecords" current-page="PriorAuthorizationPager.currentPage" pagination-id="PriorAuthorizationPagerID">
+
+            <div class="panel panel-default compact" style="height: 260px; overflow-x: hidden;">
+                <!-- Default panel contents -->
+                <div class="panel-heading padding-15" data-ng-class="{'deleted':item.IsDeleted}">
+                    <div class="panel-title">
+                        <span class="caption-subject font-dark bold uppercase">{{item.AuthorizationCode}}</span>
+                        <div class="pull-right margin-top-N9">
+                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PR_Add))
+                            {
+                                <a href="javascript:void(0)" data-ng-tooltip="@Resource.Edit" class="btn btn-circle btn-icon-only btn-default" data-ng-click="OpenPriorAuthorizationModal(item)"><i class="fa fa-edit"></i></a>
+                            }
+                            
+                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PR_Delete))
+                            {
+                                <a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeletePriorAuthorization(item.ReferralBillingAuthorizationID,'@Resource.Enable')"
+                               class="btn btn-circle btn-icon-only btn-default" data-ng-tooltip="@Resource.Enable"><i class="fa fa-check"></i></a>
+
+                                <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeletePriorAuthorization(item.ReferralBillingAuthorizationID,'@Resource.Disable')"
+                               class="btn btn-circle btn-icon-only btn-default" data-ng-tooltip="@Resource.Disable"><i class="fa fa-remove"></i></a>
+                            }
+                        </div>
+
+
+                    </div>
+
+
+
+                </div>
+                <div class="panel-body row">
+                    <div class="col-lg-8" style="border-right: 1px #cacaca solid;">
+                        <div>
+                            @*<span>@Resource.Payor:&nbsp; </span>*@
+                            <strong>{{item.PayorName ? item.PayorName:'@Resource.NA'}}</strong>
+                        </div>
+                        <div>
+                            <span>Authorization #:&nbsp; </span>
+                            <br />
+                            <span>{{item.AuthorizationCode ? item.AuthorizationCode:'@Resource.NA'}}</span>
+                        </div>
+                        <div>
+                            <span>@Resource.StarDate:&nbsp; </span>
+                            <span>{{item.StartDate ? (item.StartDate | date:'@Resource._DateFormat') : '@Resource.NA'}}</span>
+                        </div>
+                        <div>
+                            <span>@Resource.EndDate:&nbsp; </span>
+                            <span>{{item.EndDate ? (item.EndDate | date:'@Resource._DateFormat') : '@Resource.NA' }}</span>
+                        </div>
+                    </div>
+                    <div class="col-lg-4 text-align-center ">
+                        @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PR_Add))
+                        {
+                            <a class="" href="javascript:void(0)" data-ng-click="OpenPAServiceCodeModal(item)">Map New Service Code
+                            </a>
+                        }
+                    </div>
+                </div>
+                <!-- Table -->
+                <table class="table table-advance table-bordered table-hover table-condensed">
+                    <thead>
+                        <tr>
+                            <th><span data-ng-class="{'small-loader':item.IsLoading}">#</span></th>
+                            <th>@Resource.ServiceCode</th>
+                            <th>@Resource.DailyUnitLimit </th>
+                            <th>@Resource.UnitLimit</th>
+                            <th class="width-50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="subItem in item.PAServiceCodeList" data-ng-if="item.PAServiceCodeList.length>0" data-ng-class="{'deleted':subItem.IsDeleted}">
+                            <td>{{$index + 1}}</td>
+                            <td>{{subItem.ServiceCode}}</td>
+                            <td>
+                                <span data-ng-if="subItem.DailyUnitLimit==0">@Resource.NoLimit</span>
+
+                                <span data-ng-if="subItem.UnitType== '@((int)EnumUnitType.Time)'  && subItem.DailyUnitLimit>0 ">{{subItem.DailyUnitLimit+' UN= '+ (subItem.DailyUnitLimit*subItem.PerUnitQuantity)+' Min(s)'}}
+                                </span>
+                                <span data-ng-if="subItem.UnitType== '@((int)EnumUnitType.Visit)' && subItem.DailyUnitLimit>0 ">{{subItem.DailyUnitLimit+' UN= '+ (subItem.DailyUnitLimit)+' Visit'}}
+                                </span>
+                            </td>
+                            <td>
+                                <span data-ng-if="subItem.MaxUnitLimit==0">@Resource.NoLimit</span>
+
+                                <span data-ng-if="subItem.UnitType== '@((int)EnumUnitType.Time)'   && subItem.MaxUnitLimit>0 ">{{subItem.MaxUnitLimit+' UN= '+ (subItem.MaxUnitLimit*subItem.PerUnitQuantity)+' Min(s)'}}
+                                </span>
+                                <span data-ng-if="subItem.UnitType== '@((int)EnumUnitType.Visit)'  && subItem.MaxUnitLimit>0 ">{{subItem.MaxUnitLimit+' UN= '+ (subItem.MaxUnitLimit)+' Visit'}}
+                                </span>
+
+                            </td>
+                            <td>
+
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PR_Add))
+                                {
+                                    <a href="javascript:void(0);" data-ng-click="OpenPAServiceCodeModal(item,subItem)"><i class="fa fa-pencil font-black" data-ng-tooltip="Edit Service Code Details"></i></a>
+                                }
+
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PR_Delete))
+                                {
+                                    <a href="javascript:void(0);" data-ng-show="subItem.IsDeleted" data-ng-click="DeletePAServiceCode(subItem.ReferralBillingAuthorizationServiceCodeID,'@Resource.Enable')"
+                                   data-ng-tooltip="Enable Service Code Details"><i class="fa fa-check font-green-soft padding-left-5"></i></a>
+
+                                    <a href="javascript:void(0);" data-ng-show="!subItem.IsDeleted" data-ng-click="DeletePAServiceCode(subItem.ReferralBillingAuthorizationServiceCodeID,'@Resource.Disable')"
+                                   data-ng-tooltip="Disable Service Code Details"><i class="fa fa-trash font-red padding-left-5"></i></a>
+                                }
+                            </td>
+                        </tr>
+                        <tr data-ng-if="item.PAServiceCodeList.length==0">
+                            <td colspan="5" class="background-color-danger">
+                                <div class="text-align-center">
+                                    @Resource.NoRecordsFoundMsgOnly
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+        <div class="alert alert-danger col-lg-12 " data-ng-if="PriorAuthorizationList.length==0">
+            <div class="text-align-center">
+                @Resource.NoRecordsFoundMsgOnly
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@*Add Prior Authorization Modal*@
+<div class="modal fade modal-scroll addPAForm" id="model_AddPriorAuthorization" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" aria-label="Close" data-ng-click="ClosePriorAuthorizationModal()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title text-center"><strong>Add Prior Authorization</strong></h4>
+            </div>
+
+            <div class="modal-body">
+                <form id="frmAddPriorAuthorization">
+                    <div class="">
+                        <div class="">
+                            <div class="form-group col-lg-6">
+                                <label class="control-label required">@Resource.Payor</label>
+                                <select class="form-control input-sm"
+                                        data-ng-init="AddPriorAuthorizationModel.PayorID=AddPriorAuthorizationModel.PayorID==''?null:AddPriorAuthorizationModel.PayorID.toString()"
+                                        data-ng-model="AddPriorAuthorizationModel.PayorID"
+                                        data-val="true"
+                                        data-val-required="@Resource.PayorRequired"
+                                        id="Payor-@Model.ReferralBillingAuthorization.TempType"
+                                        convert-to-number="">
+                                    <option value="">@Resource.Select</option>
+                                    <option data-ng-repeat="option in PatientPayorList" value="{{option.Value}}">{{option.Name}}</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-lg-6">
+                                <label class="control-label required">@Resource.AuthrizationCode</label>
+                                @Html.TextBoxFor(q => q.ReferralBillingAuthorization.AuthorizationCode, new
+                                {
+                                    @class = "form-control input-sm",
+                                    data_ng_model = "AddPriorAuthorizationModel.AuthorizationCode",
+                                    placeholder = @Resource.AuthrizationCode,
+                                    maxlength = 15,
+                                    id = String.Format("AuthorizationCode{0}", Model.ReferralBillingAuthorization.TempType)
+                                })
+                                @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.AuthorizationCode)
+                            </div>
+
+                            <div class="form-group col-lg-6">
+                                <label class="control-label required">@Resource.StartDate</label>
+                                <div class="input-group date"
+                                    datepicker="AddPriorAuthorizationModel.StartDate"
+                                    data-ng-dateval="AddPriorAuthorizationModel.StartDate"
+                                    data-ng-maxdate="AddPriorAuthorizationModel.EndDate">
+                                    @Html.TextBoxFor(q => q.ReferralBillingAuthorization.StartDate,
+                                new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    placeholder = Resource.StartDate,
+                                    id = String.Format("StartDate{0}", Model.ReferralBillingAuthorization.TempType)
+                                })
+                                    @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.StartDate)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-6">
+                                <label class="control-label required">@Resource.EndDate</label>
+                                <div class="input-group date"
+                                    datepicker="AddPriorAuthorizationModel.EndDate"
+                                    data-ng-dateval="AddPriorAuthorizationModel.EndDate"
+                                    data-ng-mindate="AddPriorAuthorizationModel.StartDate">
+                                    @Html.TextBoxFor(q => q.ReferralBillingAuthorization.EndDate,
+                                    new
+                                    {
+                                        @class = "form-control input-sm dateInputMask",
+                                        placeholder = Resource.EndDate,
+                                        id = String.Format("EndDate{0}", Model.ReferralBillingAuthorization.TempType)
+                                    })
+                                    @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.EndDate)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm red" data-dismiss="modal" data-ng-click="ClosePriorAuthorizationModal()">@Resource.Cancel </button>
+                <input type="submit" data-ng-click="SavePriorAuthorization()" class="btn btn-sm green-jungle" value="@Resource.Save" />
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@*Add Map Service Code To Prior Authorization Modal*@
+<div class="modal fade modal-scroll addPAServiceCodeForm" id="model_AddPAServiceCode" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="ClosePAServiceCodeModal()" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title text-center"><strong>Map Service Code</strong></h4>
+            </div>
+
+            <div class="modal-body">
+                <form id="frmAddPAServiceCode">
+
+                    <div class="">
+                        <div class="">
+                            <div class="form-group col-lg-3">
+                                <label class="control-label">@Resource.Payor</label>
+                                <input class="form-control input-sm" data-ng-model="AddPAServiceCodeModel.PayorName" id="PAServiceCodePayor-@Model.ReferralBillingAuthorization.TempType" disabled=""/>
+                            </div>
+                            <div class="form-group col-lg-3">
+                                <label class="control-label">@Resource.AuthorizationHash</label>
+                                <input class="form-control input-sm" data-ng-model="AddPAServiceCodeModel.AuthorizationCode" id="PAServiceCodeAuth-@Model.ReferralBillingAuthorization.TempType" disabled=""/>
+                            </div>
+
+                            <div class="form-group col-lg-3">
+                                <label class="control-label">@Resource.StartDate</label>
+                                <div class="input-group date"
+                                    datepicker="AddPAServiceCodeModel.StartDate"
+                                    data-ng-dateval="AddPAServiceCodeModel.StartDate"
+                                    data-ng-mindate="AddPAServiceCodeModel.StartDate">
+                                    <input class="form-control input-sm dateInputMask" data-ng-model="AddPAServiceCodeModel.StartDate" id="PAServiceCodeStartDate-@Model.ReferralBillingAuthorization.TempType" disabled=""/>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3">
+                                <label class="control-label">@Resource.EndDate</label>
+
+                                <div class="input-group date"
+                                    datepicker="AddPAServiceCodeModel.EndDate"
+                                    data-ng-dateval="AddPAServiceCodeModel.EndDate"
+                                    data-ng-mindate="AddPAServiceCodeModel.StartDate">
+                                    <input class="form-control input-sm dateInputMask" data-ng-model="AddPAServiceCodeModel.EndDate" id="PAServiceCodeEndDate-@Model.ReferralBillingAuthorization.TempType" disabled=""/>
+                                </div>
+                            </div>
+
+
+
+                            <div class="form-group col-lg-9 col-md-9 col-sm-12">
+                                <label class="control-label required">@Resource.ServiceCode</label>
+
+                                <div class="replaceErrorDest">
+                                    <input type="text"
+                                           token-input
+                                           ng-val="AddPAServiceCodeModel.ServiceCodeID"
+                                           textfield='ServiceCode'
+                                           valuefield='ServiceCodeID'
+                                           searchurl="{{GetPayorServiceCodeListURL}}"
+                                           additional-filter-text='ReferralBillingAuthorizationID'
+                                           additional-filter-value='AddPAServiceCodeModel.ReferralBillingAuthorizationID'
+                                           placeholder="@Resource.EnterServiceCode"
+                                           tokenlimit='1'
+                                           ondeletecallback='RemovedPAServiceToken'
+                                           onaddedcallback='AddedPAServiceToken'
+                                           onresultsformatter='ServiceCodeResultsFormatter'
+                                           ontokenformatter="ServiceCodeTokenFormatter"
+                                           id="SearchPAServiceCodeToken"
+                                           customclass="form-control input-sm" 
+                                           disabled=""/>
+                                </div>
+
+                                @Html.TextBoxFor(q => q.ReferralBillingAuthorizationServiceCode.ServiceCodeID,
+                                    new
+                                    {
+                                        data_ng_model = "AddPAServiceCodeModel.ServiceCodeID",
+                                        @class = "form-control hideErrorContent replaceErrorSource"
+                                    })
+                                @Html.ValidationMessageFor(q => q.ReferralBillingAuthorizationServiceCode.ServiceCodeID)
+
+
+
+                            </div>
+
+
+
+
+
+
+                            <div class="form-group col-lg-12" data-ng-if="AddPAServiceCodeModel.ReferralBillingAuthorizationServiceCodeID==undefined &&  AddPAServiceCodeModel.ServiceCodeID > 0">
+                                <div>Service Type : <strong>{{AddPAServiceCodeModel.TempUnitType}}</strong></div>
+                                <div>Default Daily Unit Limit : <strong>{{AddPAServiceCodeModel.TempDailyUnitLimit}}</strong></div>
+                                <div>Default Max Unit Limit : <strong>{{AddPAServiceCodeModel.TempMaxUnit}}</strong></div>
+                            </div>
+
+
+
+
+                            <div class="form-group col-lg-3 clearfix">
+                                <label class="control-label required">@Resource.DailyUnitLimit</label>
+                                @Html.TextBoxFor(q => q.ReferralBillingAuthorizationServiceCode.DailyUnitLimit, new
+                                {
+                                    @class = "form-control input-sm",
+                                    data_ng_model = "AddPAServiceCodeModel.DailyUnitLimit",
+                                    placeholder = @Resource.DailyUnitLimit,
+                                    maxlength = 15,
+                                })
+                                @Html.ValidationMessageFor(q => q.ReferralBillingAuthorizationServiceCode.DailyUnitLimit)
+                            </div>
+
+                            <div class="form-group col-lg-3">
+                                <label class="control-label required">@Resource.MaxUnitLimit</label>
+                                @Html.TextBoxFor(q => q.ReferralBillingAuthorizationServiceCode.MaxUnitLimit, new
+                                {
+                                    @class = "form-control input-sm",
+                                    data_ng_model = "AddPAServiceCodeModel.MaxUnitLimit",
+                                    placeholder = @Resource.MaxUnitLimit,
+                                    maxlength = 15,
+                                })
+                                @Html.ValidationMessageFor(q => q.ReferralBillingAuthorizationServiceCode.MaxUnitLimit)
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-sm red" data-dismiss="modal" data-ng-click="ClosePAServiceCodeModal()">@Resource.Cancel </button>
+                <input type="submit" data-ng-click="SavePAServiceCodeDetails()" class="btn btn-sm green-jungle" value="@Resource.Save" />
+            </div>
+        </div>
+    </div>
+
+</div>

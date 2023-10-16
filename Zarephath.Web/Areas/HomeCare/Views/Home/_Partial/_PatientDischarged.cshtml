@@ -1,0 +1,123 @@
+﻿<div id="PatientDischargedList" class="row">
+    <div class="col-md-12">
+        <div class="portlet box">
+            <div class="portlet-title">
+                <div class="caption header-font-size-14 uppercase">
+                    Patient - Discharged
+                    <div class="pull-right padding-left-25" data-ng-show="PatientDischargedListAjaxStart">
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="collapse"></a>
+                    <a href="javascript:;" class="fullscreen"></a>
+                </div>
+            </div>
+
+            <div class="portlet-body table_font-size-12">
+
+                <div class="row form-group">
+                    <div class="col-sm-4">
+                        <div class="fields">
+                            <label>@Resource.StarDate</label>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="PatientDischargedListSearchModel.StartDate" ng-dateval="PatientDischargedListSearchModel.StartDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="fields">
+                            <label>@Resource.EndDate</label>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="PatientDischargedListSearchModel.EndDate" ng-dateval="PatientDischargedListSearchModel.EndDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+
+                        <div>
+                            <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Search" data-ng-click="SearchPatientDischargedList()" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="portlet-body" style="display: block;">
+                            <div class="table-responsive">
+                                <form id="frmReferralinterMessageList">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientDischargedListPager.sortColumn('Patient')">@Resource.Patient</a>
+                                                    <span class="sortorder" data-ng-show="PatientDischargedListPager.sortIndex === 'Patient'" data-ng-class="{reverse:PatientDischargedListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientDischargedListPager.sortColumn('CreatedDate')">@Resource.CreatedDate</a>
+                                                    <span class="sortorder" data-ng-show="PatientDischargedListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:PatientDischargedListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientDischargedListPager.sortColumn('CreatedBy')">@Resource.CreatedBy</a>
+                                                    <span class="sortorder" data-ng-show="PatientDischargedListPager.sortIndex === 'CreatedBy'" data-ng-class="{reverse:PatientDischargedListPager.reverse}"></span>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="item in PatientDischargedList | itemsPerPage: PatientDischargedListPager.pageSize" total-items="PatientDischargedListPager.totalRecords" current-page="PatientDischargedListPager.currentPage" pagination-id="PatientDischargedListPagerID">
+                                                <td>
+                                                    <span data-ng-bind="item.Patient"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.CreatedDate| orgdatetime"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.CreatedBy"></span>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12" data-ng-if="PatientDischargedList.length > 0">
+                        <div class="col-sm-6 pull-left no-left-padding"
+                             data-ng-hide="PatientDischargedListPager.currentPage==1 && (PatientDischargedListPager.currentPageSize < PatientDischargedListPager.pageSize)">
+                            @Resource.Showing <span data-ng-bind="(PatientDischargedListPager.pageSize * PatientDischargedListPager.currentPage) -PatientDischargedListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(PatientDischargedListPager.pageSize == PatientDischargedListPager.currentPageSize) ? (PatientDischargedListPager.pageSize * PatientDischargedListPager.currentPage) :(PatientDischargedListPager.pageSize * PatientDischargedListPager.currentPage) - PatientDischargedListPager.pageSize  + PatientDischargedListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PatientDischargedListPager.totalRecords"></span>&nbsp;@Resource.Records
+                        </div>
+                        <div class="pull-right">
+                            <dir-pagination-controls boundary-links="true" on-page-change="PatientDischargedListPager.pageChanged(newPageNumber)" pagination-id="PatientDischargedListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="PatientDischargedList.length == 0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br class="clearfix" />
+            </div>
+        </div>
+    </div>
+
+</div>

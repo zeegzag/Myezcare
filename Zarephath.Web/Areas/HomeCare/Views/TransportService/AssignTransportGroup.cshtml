@@ -1,0 +1,675 @@
+﻿@model  SetTransportAssignmentGroupModel
+
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null ? Resource.TransportAssignmentGroup : Resource.TransportAssignmentGroup));
+    bool boolIsPartialView = ViewBag.IsPartialView != null;
+    string isPartialView = boolIsPartialView ? "1" : "0";
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.TransportAssignmentGroup;
+    bool isEditMode = false;
+
+}
+
+
+
+@Html.Hidden("hdnSetTransportAssignmentGroupModel", Common.SerializeObject(Model))
+@Html.Hidden("IsPartialView", isPartialView)
+<div id="assigntransportgroupmodal" data-ng-controller="AssignTransportGroupController">
+    <div class="fscontainer" style="width: 100%;">
+        <!-- Modal content-->
+        <div class="">
+            <div class="modal-header">
+
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <a class="text-decoration-none sbold uppercase ng-binding">
+                        @Resource.AssignTransportationGroup
+                    </a>
+                    <small>@Resource.TransportationGroups</small>
+                    <div class="btn-group pull-right margin-right-10 padding-left-15">
+                        @if (Common.HasPermission(Constants.HC_Permission_TransportGroupService_AddUpdate))
+                        {
+                            <a href="" data-ng-click="GroupFormModel(0,'@Resource.CreateTrip')" class="btn btn-sm green-jungle letter-space pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.CreateTrip</a>
+                        }
+                    </div>
+                </h4>
+            </div>
+            <div class="@*modal-body*@">
+
+                <div class="row">
+                    <div class="col-sm-8" style="border-right: 1px solid #EFEFEF;">
+
+                        <div class="row">
+                            <div class="top pagination-sm" data-ng-show="AjaxStart">
+                                @Resource.Loading
+                                <img src="~/Assets/images/lazyload.gif" />
+                            </div>
+                        </div>
+                        <div class="row form-group margin-top-8 margin-bottom-3">
+
+
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label class="control-label">@Resource.Facility</label>
+                                    @Html.DropDownListFor(p => p.SearchTransportAssignmentGroupModel.FacilityID, Model.FacilityListModel.ToSelectList("", "FacilityName", "FacilityID"),
+                                              new
+                                              {
+                                                  data_ng_change = "SearchTransportGroup()",
+                                                  data_ng_model = "SearchTransportAssignmentGroupModel.FacilityID",
+                                                  data_ng_init = "SearchTransportAssignmentGroupModel.FacilityID=SearchTransportAssignmentGroupModel.FacilityID==null?'':SearchTransportAssignmentGroupModel.FacilityID",
+                                                  @class = "form-control input-sm"
+                                              })
+                                </div>
+                            </div>
+
+                            @*<div class="col-sm-1 small-select padding-right-0">
+                                    <div class="fields">
+                                        <label class="control-label">@Resource.TripDirection</label>
+                                        @Html.DropDownListFor(p => p.SearchTransportAssignmentGroupModel.TripDirectionId, Model.TripDirectionList.ToSelectList("", "TripDirectionName", "TripDirectionId", @Resource.Select, ""),
+                                                  new
+                                                  {
+                                                      data_ng_change = "SearchPatients()",
+                                                      data_ng_model = "SearchTransportAssignmentGroupModel.TripDirectionId",
+                                                      data_ng_init = "SearchTransportAssignmentGroupModel.TripDirectionId=SearchTransportAssignmentGroupModel.TripDirectionId==null?'':SearchTransportAssignmentGroupModel.TripDirectionId",
+                                                      @class = "form-control input-sm"
+                                                  })
+                                    </div>
+                                </div>*@
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label>@Resource.StartDate</label>
+                                    <div id="start-date" class="input-group date date-picker pull-right ng-isolate-scope pull-left"
+                                         datepicker="SearchTransportAssignmentGroupModel.StartDate"
+                                         ng-dateval="SearchTransportAssignmentGroupModel.StartDate"
+                                         style="max-width: 130px;"
+                                         data-ng-maxdate="SearchTransportAssignmentGroupModel.EndDate">
+                                        <input class="form-control input-sm dateInputMask" data-val="true"
+                                               data-ng-text-change="SearchTransportGroup()"
+                                               id="referral_Startdate" maxlength="50" name="SearchTransportAssignmentGroupModel.StartDate" placeholder="mm/dd/yyyy" type="text" value="">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label>@Resource.EndDate</label>
+                                    <div id="start-date" class="input-group date date-picker pull-right ng-isolate-scope pull-left"
+                                         datepicker="SearchTransportAssignmentGroupModel.EndDate"
+                                         ng-dateval="SearchTransportAssignmentGroupModel.EndDate"
+                                         style="max-width: 130px;"
+                                         data-ng-mindate="SearchTransportAssignmentGroupModel.StartDate">
+                                        <input class="form-control input-sm dateInputMask" data-val="true"
+                                               data-ng-text-change="SearchTransportGroup()"
+                                               id="referral_EndDate" maxlength="50" name="SearchTransportAssignmentGroupModel.EndDate" placeholder="mm/dd/yyyy" type="text" value="">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields text-center">
+                                    <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Search" data-ng-click="SearchPatients()" />
+                                    <input type='button' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Reset" data-ng-click="ResetSearchFilter()" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <hr class="clearfix">
+
+                        <div class="row">
+                            <!--  data-ng-if="PatientList.length > 0" -->
+                            <div class="col-sm-10">
+                                <div class="portlet-body compact" style="display: block;">
+                                    <div class="table-responsive" style="overflow-x :initial !important">
+                                        <table class=" table table-bordered table-striped table-condensed flip-content table-checkable">
+
+                                            <thead class="">
+                                                <tr>
+                                                    <th class="width-50px text-align-left">
+
+                                                        <div class="btn-group" data-ng-show="PatientList.length > 0">
+                                                            <input id="SelectAllReferral" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll(SelectAllCheckbox)" val="SelectAllCheckbox">
+                                                            <label for="SelectAllReferral"></label>
+                                                        </div>
+
+                                                    </th>
+                                                    <th>
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientListPager.sortColumn('ClientName')">@Resource.ClientLabel</a>
+                                                        <span class="sortorder" data-ng-show="PatientListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:PatientListPager.reverse}"></span>
+                                                    </th>
+                                                    <th>
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientListPager.sortColumn('Address')">@Resource.Address</a>
+                                                        <span class="sortorder" data-ng-show="PatientListPager.sortIndex === 'Address'" data-ng-class="{reverse:PatientListPager.reverse}"></span>
+                                                    </th>
+                                                    <th class="width-130px text-align-center">@Resource.Region</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody data-ng-if="PatientList.length > 0">
+                                                <!-- data-ng-if="PatientList.length > 0" -->
+                                                <tr>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text"
+                                                               data-ng-model="SearchTransportAssignmentGroupModel.ClientName"
+                                                               data-ng-change="SearchPatients()"
+                                                               data-ng-model-options="{debounce: 700}"
+                                                               class="form-control input-sm" placeholder='@Resource.Name' maxlength=50 />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text"
+                                                               data-ng-model="SearchTransportAssignmentGroupModel.Address"
+                                                               data-ng-change="SearchPatients()"
+                                                               data-ng-model-options="{debounce: 700}"
+                                                               class="form-control input-sm" placeholder='@Resource.Address' maxlength=50 />
+                                                    </td>
+                                                    <td>
+                                                        @Html.DropDownListFor(p => p.SearchTransportAssignmentGroupModel.FacilityID, Model.RegionModel.ToSelectList("", "RegionName", "RegionID"),
+                                                        new
+                                                        {
+                                                            data_ng_change = "SearchPatients()",
+                                                            data_ng_model = "SearchTransportAssignmentGroupModel.RegionID",
+                                                            data_ng_init = "SearchTransportAssignmentGroupModel.RegionID=SearchTransportAssignmentGroupModel.RegionID==null?'':SearchTransportAssignmentGroupModel.RegionID",
+                                                            @class = "form-control input-sm"
+                                                        })
+                                                    </td>
+                                                </tr>
+                                                <tr data-ng-if="PatientList.length > 0" dir-paginate="referral in PatientList | itemsPerPage: PatientListPager.pageSize"
+                                                    total-items="PatientListPager.totalRecords"
+                                                    current-page="PatientListPager.currentPage"
+                                                    pagination-id="PatientListPagerID">
+                                                    <td>
+                                                        <span class="pull-left" data-ng-show="referral.TransportGroupAssignPatientID === 0">
+                                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="referral.IsChecked" data-ng-change="SelectReferral(referral)" val="referral.IsChecked">
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <a href="#" ng-click="CheckAndAssign(referral)" data-ng-bind="referral.Name"></a>
+                                                    </td>
+                                                    <td>
+                                                        <span data-ng-bind="referral.Address"></span>
+                                                    </td>
+                                                    <td>
+                                                        <span>{{TransportGroupAssignPatientGetRegion(referral.RegionID)}}</span>
+                                                    </td>
+                                                </tr>
+
+                                            </tbody>
+                                            <tbody data-ng-if="PatientList.length == 0">
+                                                <tr>
+                                                    <td>
+                                                    </td>
+                                                    <td>
+                                                        <input type="text"
+                                                               data-ng-model="SearchTransportAssignmentGroupModel.ClientName"
+                                                               data-ng-change="SearchPatients()"
+                                                               data-ng-model-options="{debounce: 700}"
+                                                               class="form-control input-sm" placeholder='@Resource.Name' maxlength=50 />
+                                                    </td>
+                                                    <td>
+                                                        <input type="text"
+                                                               data-ng-model="SearchTransportAssignmentGroupModel.Address"
+                                                               data-ng-change="SearchPatients()"
+                                                               data-ng-model-options="{debounce: 700}"
+                                                               class="form-control input-sm" placeholder='@Resource.Address' maxlength=50 />
+                                                    </td>
+                                                    <td>
+                                                        @Html.DropDownListFor(p => p.SearchTransportAssignmentGroupModel.FacilityID, Model.RegionModel.ToSelectList("", "RegionName", "RegionID"),
+                                                        new
+                                                        {
+                                                            data_ng_change = "SearchPatients()",
+                                                            data_ng_model = "SearchTransportAssignmentGroupModel.RegionID",
+                                                            data_ng_init = "SearchTransportAssignmentGroupModel.RegionID=SearchTransportAssignmentGroupModel.RegionID==null?'':SearchTransportAssignmentGroupModel.RegionID",
+                                                            @class = "form-control input-sm"
+                                                        })
+                                                    </td>
+                                                </tr>
+                                                <tr data-ng-if="PatientList.length == 0">
+                                                    <td colspan="4">
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div>
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <div class="alert alert-danger">
+                                                                                @Html.Raw(Resource.NoRecordsFound)
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <div class="col-sm-12" data-ng-if="PatientList.length > 0">
+                                        <div class="col-sm-3 pull-left no-padding">
+                                            @Resource.Showing <span data-ng-bind="(PatientListPager.pageSize * PatientListPager.currentPage) - PatientListPager.pageSize  + 1"></span>
+                                            &nbsp;@Resource.To <span data-ng-bind="(PatientListPager.pageSize == PatientListPager.currentPageSize) ? (PatientListPager.pageSize * PatientListPager.currentPage) :(PatientListPager.pageSize * PatientListPager.currentPage) - PatientListPager.pageSize  + PatientListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PatientListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                        </div>
+                                        <div class="pull-right top pagination-sm">
+                                            <dir-pagination-controls boundary-links="true" max-size="PatientListPager.maxSize" on-page-change="PatientListPager.pageChanged(newPageNumber)" pagination-id="PatientListPagerID"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                            <div class="col-sm-2">
+                                <div class="row">
+                                    <div class="col-sm-12">&nbsp;</div>
+                                    <div class="col-sm-12">&nbsp;</div>
+                                    <div class="">
+                                        <a class="btn btn-sm green-jungle letter-space" data-ng-click="AssignReferral()">
+                                            <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AssignClient
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="row">
+                                <div class="col-sm-12">
+                                    <div data-ng-if="PatientList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>*@
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="row form-group margin-top-8 margin-bottom-3">
+                            <div class="col-sm-6 small-select pull-right">
+                                <div class="fields">
+                                    <label class="control-label">Groups</label>
+                                    <select class="form-control input-sm ng-pristine ng-untouched ng-valid"
+                                            data-ng-change="SearchTransportGroupDetail()"
+                                            data-ng-model="SearchTransportAssignmentGroupModel.TransportGroupID"
+                                            id="SearchTransportAssignmentGroupModel_TransportGroupID"
+                                            name="SearchTransportAssignmentGroupModel.TransportGroupID">
+                                        <option data-ng-repeat="tgitem in TransportGroup"
+                                                value="{{tgitem.TransportGroupID}}">
+                                            {{tgitem.Name}}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="clearfix">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div data-ng-if="TransportGroup.length == 0">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger">
+                                                @Resource.No_Group_found
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="TransportGroupDetail" class="row" data-ng-if="TransportGroup.length > 0">
+                            <div class="col-md-12">
+                                <div class="portlet box">
+                                    <div class="portlet-title">
+                                        <div class="caption header-font-size-14 uppercase">
+                                            <div class="pull-left">
+                                                <i data-ng-show="TransportGroupAssignPatientGetTripDirection(SelectedTransportGroup.TripDirection) == 'Up'" class="fa fa-arrow-circle-up"></i>
+                                                <i data-ng-show="TransportGroupAssignPatientGetTripDirection(SelectedTransportGroup.TripDirection) == 'Down'" class="fa fa-arrow-circle-down"></i>
+                                                {{SelectedTransportGroup.Name}}
+                                            </div>
+                                            <div class="pull-right padding-left-25" data-ng-show="SearchTransportGroupDetailAjaxStart">
+                                                <img src="~/Assets/images/lazyload.gif" />
+                                            </div>
+                                        </div>
+                                        <div class="tools">
+                                            @if (Common.HasPermission(Constants.HC_Permission_TransportGroupService_AddUpdate))
+                                            {
+                                                <a href="javascript:;" data-ng-click="GroupFormModel(SelectedTransportGroup.TransportGroupID,'@Resource.EditTrip')" style="color:#fff;"><i class="fa fa-edit"></i></a>
+                                            }                                                <a href="javascript:;" class="collapse"></a>
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body table_font-size-12" style="height:auto !important; min-height:0">
+
+
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="portlet-body compact" style="display: block;">
+                                                    <div>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <label class="control-label">@Resource.Facility:</label>
+                                                                <label class="">{{TransportGroupAssignPatientGetFacility(SelectedTransportGroup.FacilityID)}}</label>
+
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <label class="control-label">@Resource.TripDirection:</label>
+                                                                {{TransportGroupAssignPatientGetTripDirection(SelectedTransportGroup.TripDirection)}}
+                                                            </div>
+                                                            <div class="col-sm-12">
+                                                                <label class="control-label">@Resource.Vehicle:</label>
+                                                                {{TransportGroupAssignPatientGetVehicleName(SelectedTransportGroup.VehicleID ) }}
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <label class="control-label">@Resource.StartDate:</label>
+                                                                {{SelectedTransportGroup.StartDate | dateformat }}
+                                                            </div>
+                                                            <div class="col-sm-6">
+                                                                <label class="control-label">@Resource.EndDate:</label>
+                                                                {{SelectedTransportGroup.EndDate | dateformat  }}
+                                                            </div>
+
+                                                            <div class="col-sm-12">
+                                                                <label class="control-label">@Resource.RouteDescription:</label>
+                                                                {{SelectedTransportGroup.RouteDesc  }}
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="table-responsive" style="overflow-x :initial !important" data-ng-if="TransportGroupAssignPatient.length > 0">
+                                                        <table class=" table table-bordered table-striped table-condensed flip-content table-checkable">
+
+                                                            <thead class="">
+                                                                <tr>
+                                                                    <th>
+                                                                        @Resource.ClientLabel
+                                                                    </th>
+                                                                    <th>
+                                                                        @Resource.Address
+                                                                    </th>
+                                                                    <th class="width-50px text-align-center"></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody data-ng-if="TransportGroupAssignPatient.length > 0">
+                                                                <tr data-ng-repeat="referral in TransportGroupAssignPatient">
+                                                                    <td>
+                                                                        <a href="#" data-ng-bind="referral.Name">{{referral.Name}}</a>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span data-ng-bind="referral.Address">{{referral.Address}}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <a href="javascript:void(0)" title="Unassign Schedules" data-ng-click="UnAssignReferral(referral)" class="text-decoration-none">
+                                                                            <i class="fa fa-trash font-red" style="font-size:15px;"></i>
+                                                                        </a>
+                                                                        <a data-ng-show="referral.Note == null || referral.Note.length == '' " href="javascript:void(0)" title="Patient Note" class="text-decoration-none ng-scope"
+                                                                           data-ng-click="OpenAssignReferralModal(referral)">
+                                                                            <i class="fa fa-sticky-note"></i>
+                                                                        </a>
+                                                                        <a data-ng-show="referral.Note != null && referral.Note.length > 0 " style="color: #26c281;" href="javascript:void(0)" title="Patient Note" class="text-decoration-none ng-scope"
+                                                                           data-ng-click="OpenAssignReferralModal(referral)">
+                                                                            <i class="fa fa-sticky-note"></i>
+                                                                        </a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div id="fixedAside" class="asideBar-right fixed">
+        <div class="listContentinner" style="width:80%;">
+            <div class="closeasidebar" data-ng-click="GroupFormModelClosed()"><i class="fa fa-close"></i></div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <form id="frmaddTransportMapping" style="background-color: white !important">
+                        <div class="fscontainer">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12 paitentListMain">
+                                    <div class="btn-group margin-left-20PR">
+                                        <div class="top pagination-sm" data-ng-show="AjaxStart">
+                                            @Resource.Loading
+                                            <img src="~/Assets/images/lazyload.gif" />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space10"></div>
+                            </div>
+                            <div class="row form-group margin-left-5">
+                                <div class="legend">
+                                    {{FormTitle}}
+                                </div>
+                                <div class="employeeInfo">
+                                    <div class="col-md-12">
+                                        <div class="row">
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="field">
+                                                    <label class="control-label required">  @Resource.Name</label>
+                                                    <div class="field-box">
+                                                        @Html.TextBoxFor(m => m.TransportGroupModel.Name,
+                                                       new
+                                                            {
+                                                                data_ng_model = "TransportGroupModel.Name",
+                                                                @class = "form-control input-sm",
+                                                                placeholder = Resource.Name,
+                                                                maxlength = 25,
+                                                           minlength = 3,
+                                                                required = "required"
+                                                       })
+                                                        @Html.ValidationMessageFor(m => m.TransportGroupModel.Name)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="field">
+                                                    <label class="control-label required">  @Resource.Facility</label>
+                                                    <div class="field-box">
+                                                        @Html.DropDownListFor(p => p.TransportGroupModel.FacilityID, Model.FacilityListModel.ToSelectList("", "FacilityName", "FacilityID", @Resource.Select, ""),
+                                                            new
+                                                            {
+                                                                data_ng_model = "TransportGroupModel.FacilityID",
+                                                                data_ng_init = "TransportGroupModel.FacilityID=TransportGroupModel.FacilityID==null?'':TransportGroupModel.FacilityID",
+                                                                @class = "form-control input-sm requiredStrip",
+                                                                data_val_required = "The Facility is required.",
+                                                                data_val_number = "The Facility is required."
+                                                            })
+                                                        @Html.ValidationMessageFor(m => m.TransportGroupModel.FacilityID)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="field">
+                                                    <label class="control-label required">  @Resource.TripDirection</label>
+                                                    <div class="field-box">
+                                                        @Html.DropDownListFor(p => p.TransportGroupModel.TripDirection, Model.TripDirectionList.ToSelectList("", "TripDirectionName", "TripDirectionId", @Resource.Select, ""),
+                                                            new
+                                                            {
+                                                                data_ng_model = "TransportGroupModel.TripDirection",
+                                                                data_ng_init = "TransportGroupModel.TripDirection=TransportGroupModel.TripDirection==null?'':TransportGroupModel.TripDirection",
+                                                                @class = "form-control input-sm requiredStrip",
+                                                                data_val_required = "The Trip Direction is required.",
+                                                                data_val_number = "The Trip Direction is required."
+                                                            })
+                                                        @Html.ValidationMessageFor(m => m.TransportGroupModel.TripDirection)
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4 col-sm-6">
+                                                <div class="field">
+                                                    <label class="control-label required">@Resource.Vehicle</label>
+                                                    <div class="field-box">
+                                                        @*@Html.DropDownListFor(p => p.TransportGroupModel.VehicleID, Model.VehicleNameListModel.ToSelectList("", "VehicleName", "VehicleID", @Resource.Select, ""),
+                                                                new
+                                                                {
+                                                                    data_ng_model = "TransportGroupModel.VehicleID",
+                                                                    data_ng_init = "TransportGroupModel.VehicleID=TransportGroupModel.VehicleID==null?'':TransportGroupModel.VehicleID",
+                                                                    @class = "form-control input-sm requiredStrip",
+                                                                    data_val_required = "The Vehicle is required.",
+                                                                    data_val_number = "The Vehicle is required."
+                                                                })
+                                                            @Html.ValidationMessageFor(m => m.TransportGroupModel.VehicleID)*@
+
+                                                        <div class=" dropdown" style="border: solid 1px #8080805c; width: 100% ">
+                                                            <button class="btn  dropdown-toggle custom-Rdd" type="button" data-toggle="dropdown" style="width:100%">
+                                                                <span style="color: #848484;font-size:12px">{{selectedValue}}</span>
+                                                                <span class="caret pull-right"></span>
+                                                            </button>
+                                                            <ul class="dropdown-menu">
+                                                                @foreach (var item in Model.VehicleNameListModel)
+                                                                {
+                                                                    <li>
+                                                                        <a href="#" style="font-size:11px" data-ng-click="AssignValue('@item.VehicleID','@item.VINNumber')">
+                                                                            <span><b style="color: #c41212;">Vehicle Number:</b>@item.VINNumber &nbsp;<b style="color: #c41212;">Model:</b>@item.Model</span> &nbsp;<span><b style="color: #c41212;">Brand:</b>@item.BrandName</span>
+                                                                        </a>
+                                                                    </li>
+                                                                }
+
+                                                            </ul>
+                                                            @Html.ValidationMessageFor(m => m.TransportGroupModel.VehicleID)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="field">
+                                                    <label class="control-label required">   @Resource.StartDate</label>
+                                                    <div class="field-box">
+                                                        <div id="emp-visit-start-date" class="input-group date date-picker pull-right"
+                                                             datepicker="TransportGroupModel.StartDate" ng-dateval="TransportGroupModel.StartDate">
+                                                            @Html.TextBoxFor(m => m.TransportGroupModel.StartDate, new
+                                                            {
+                                                                    @class = "form-control input-sm dateInputMask",
+                                                                    maxlength = "50",
+                                                                    placeholder = Resource.DateFormat
+                                                            })
+                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="field">
+                                                    <label class="control-label required">    @Resource.EndDate</label>
+                                                    <div class="field-box">
+                                                        <div id="emp-visit-start-date" class="input-group date date-picker pull-right"
+                                                             datepicker="TransportGroupModel.EndDate" ng-dateval="TransportGroupModel.EndDate"
+                                                             data-ng-mindate="TransportGroupModel.StartDate">
+                                                            @Html.TextBoxFor(m => m.TransportGroupModel.EndDate, new
+                                                            {
+                                                                    @class = "form-control input-sm dateInputMask",
+                                                                    maxlength = "50",
+                                                                    placeholder = Resource.DateFormat
+                                                            })
+                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="col-md-3 col-sm-6">
+                                                <div class="field">
+                                                    <label class="control-label required">@Resource.RouteDescription</label>
+                                                    <div class="field-box">
+                                                        @Html.TextBoxFor(m => m.TransportGroupModel.RouteDesc,
+                                                       new
+                                                            {
+                                                                data_ng_model = "TransportGroupModel.RouteDesc",
+                                                                @class = "form-control input-sm",
+                                                                placeholder = "Route desc",
+                                                                required = "required"
+                                                        })
+                                                        @Html.ValidationMessageFor(m => m.TransportGroupModel.RouteDesc)
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-3 col-sm-12">
+                                                <div class="field">
+                                                    <label class="control-label">     &nbsp;</label>
+                                                    <div class="field-box d-flex justify-content-center text-center">
+
+                                                        <input type="button" data-ng-show="(TransportGroupModel.TransportGroupID == 0)" data-ng-click="SaveTransportGroup()" class="btn btn-sm green-jungle  margin-right-10" value="@Resource.Add" />
+                                                        <input type="button" data-ng-show="(TransportGroupModel.TransportGroupID > 0)" data-ng-click="SaveTransportGroup()" class="btn btn-sm blue margin-right-10" value="@Resource.Update" />
+
+                                                        <input type="button" data-ng-show="(TransportGroupModel.TransportGroupID == 0)" data-ng-click="CancelSaveTransportGroup()" class="btn btn-sm red-mint  margin-right-10" value="@Resource.Cancel" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="AssignReferralNoteModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-ng-click="CloseAssignReferralNoteModal()">&times;</button>
+
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <span>@Resource.PatientNote</span>
+                    </h4>
+
+                </div>
+                <div class="modal-body">
+
+
+                    <form id="modalAssignReferralNoteForm">
+
+                        <div class="clearfix margin-top-15">
+                            <div class="col-md-12 no-padding">
+                                <div class="form-group clearfix">
+                                    <label class="control-label required">Note</label>
+                                    <textarea rows="5" class="form-control input-sm" data-ng-model="TransportGroupAssignPatientModel.Note" maxlength="1000"
+                                              placeholder="@Resource.Note" data-val="true"
+                                              data-val-required="@Resource.ReasonRequired"
+                                              name="RemoveScheduleDetail.Notes" id="RemoveScheduleDetail_Notes"></textarea>
+                                    <span class="field-validation-valid" data-valmsg-for="RemoveScheduleDetail_Notes" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+
+                <div class="modal-footer">
+                    <div>
+                        <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseAssignReferralNoteModal()">@Resource.Cancel</button>
+                        <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="AssignReferralNote()">@Resource.Save</button>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/transportservice/addtransportmapping");
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/transportservice/AssignTransportGroup.js")
+    @*<script src="~/Assets/js/viewjs/siteApp/Areas/HomeCare/transportservice/addtransportmapping.js"></script>
+        Z:\application\Zarephath.Web\Assets\js\viewjs\siteApp\Areas\HomeCare\transportservice\AssignTransportGroup.js
+    *@
+}

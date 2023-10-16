@@ -1,0 +1,76 @@
+﻿@using Newtonsoft.Json
+@using Zarephath.Core.Models
+
+@model CronJobServiceModel
+
+@{
+    CacheHelper _cacheHelper = new CacheHelper();
+    CacheHelper_MyezCare ch_MyezcareOrg = new CacheHelper_MyezCare();
+    ReleaseNote releaseNote = ch_MyezcareOrg.GetCachedData<ReleaseNote>(CacheHelperName.ReleaseNote);
+    var rnID = releaseNote == null ? -1 : releaseNote.ReleaseNoteID;
+    MyEzcareOrganization myezCareOrg = ch_MyezcareOrg.GetCachedData<MyEzcareOrganization>();
+
+    Layout = null;
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>CronJOB</title>
+    <link rel='shortcut icon' href='@_cacheHelper.FavIcon' class="favicon-logo" type='image/x-icon' />
+    <link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,300i,400,400i,500,500i,600,600i,700,800,900&display=swap" rel="stylesheet">
+    @Styles.Render("~/CronJoblayout/css")
+</head>
+
+<body data-ng-app="myApp">
+
+    @Html.Hidden("hdnCronJobServiceModel", Common.SerializeObject(Model))
+
+    <div class="page-container" data-ng-controller="CronJobController">
+        <!-- BEGIN CONTENT -->
+        <div class="page-content-wrapper">
+            <div class="page-content  padding-20TB-50LR">
+                <div>
+                    <h2>
+                        <span data-ng-if="ServiceCompleted  == 0">Service is initiated</span>
+                        <span data-ng-if="ServiceCompleted== 1 ">Service is inprocess. It will take some time, please wait.</span>
+                        <span data-ng-if="ServiceCompleted == 2">Service is completed</span>
+                    </h2>
+
+                    <div class="progress">
+                        
+                        <div data-ng-if="ServiceCompleted== 1" class="progress-bar progress-bar-striped progress-bar-animated bg-info-latest" role="progressbar" style="width: 100%" aria-valuenow="100"
+                             aria-valuemin="0" aria-valuemax="100">Service is running, please wait...</div>
+
+                        <div data-ng-if="ServiceCompleted != 1" class="progress-bar progress-bar-striped bg-success-latest" role="progressbar" ng-style="{'width':CronJobServiceProgressModel.PercentComplete+'%'}" aria-valuenow="{{CronJobServiceProgressModel.PercentComplete}}"
+                             aria-valuemin="0" aria-valuemax="100">{{CronJobServiceProgressModel.PercentComplete}} %</div>
+                    </div>
+
+                </div>
+
+
+
+                <div data-ng-if="CronJobServiceProgressModel.PercentComplete>=0">
+
+                    Progress :  {{CronJobServiceProgressModel.PercentComplete}} %
+                </div>
+
+                <div>
+                    <p ng-bind-html="CronJobServiceProgressModel.ProgressMessage"></p>
+
+                </div>
+
+            </div>
+            <!-- END CONTENT BODY -->
+        </div>
+        <!-- END CONTENT -->
+
+    </div>
+
+</body>
+
+@Scripts.Render("~/assets/sitelayout/js")
+@Scripts.Render("~/assets/sitelayout/cronjobjs")
+
+</html>

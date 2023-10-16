@@ -1,0 +1,410 @@
+﻿@{
+    ViewBag.Title = Resource.PatientSchedule;
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_PatientTimeSlots;
+}
+@model HC_RTSModel
+
+@Html.Hidden("hdnRTSModel", Common.SerializeObject(Model))
+<style>
+    .bootstrap-select.form-control:not([class*="col-"]) {
+        width: 55% !important;
+    }
+</style>
+<div data-ng-controller="AddReferralTimeSlotsController">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            @{ Html.EnableClientValidation(false); }
+            <form id="frmAddReferral01">
+                @*<div data-ng-show="toggle">
+                        <div class="alert warning">
+                            <span class="closebtn">&times;</span>
+                            <strong>Warning!</strong> Old view will be deprecated in a month!.
+                        </div>
+                    </div>*@
+                <div class="row">
+                    <div class="form-group col-lg-8 col-md-8 col-sm-8 form-inline">
+
+                        @if (!Model.IsPartial)
+                        {
+                            <button type="button" id="prev" class="btn grey border-grey-cascade btn-sm" title="Previous" data-ng-click="prevOption()">
+                                <i class="fa fa-backward"></i>
+                            </button>
+                        }
+
+                        <select class="form-control input-sm" selectpicker style="width:20% !important"
+                                data-ng-init="TempSearchRTSMaster.ReferralID=TempSearchRTSMaster.ReferralID==''?null:TempSearchRTSMaster.ReferralID.toString()"
+                                data-ng-model="TempSearchRTSMaster.ReferralID"
+                                name="RTSModelReferral"
+                                data-ng-change="SearchRTSMasterList()" disabled="@(Model.IsPartial == true && Model.SearchRTSMaster.ReferralID > 0)">
+                            <option value="">@Resource.SelectPatient</option>
+                            <option data-ng-repeat="option in RTSModel.ReferralList" value="{{option.Value}}">{{option.Name}}</option>
+                        </select>
+
+                        @if (!Model.IsPartial)
+                        {
+                            <button type="button" id="next" class="btn grey border-grey-cascade btn-sm" title="Next" data-ng-click="nextOption()">
+                                <i class="fa fa-forward"></i>
+                            </button>
+                        }
+
+
+
+                        <button type="button" class="btn grey border-grey-cascade btn-sm margin-right-05 margin-left-20"
+                                data-ng-click="RefreshRTSMaster()" title="@Resource.Refresh">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                        </button>
+
+                        @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_PatientSchedule_Add)))
+                        {
+                            <button type="button" class="btn btn-sm green-jungle"
+                                    data-ng-show="TempSearchRTSMaster.ReferralID>0" data-ng-click="OpenRTSMasterModal($event)"
+                                    title="@Resource.AddReferralSchedule">
+                                <i class="fa fa-plus" aria-hidden="true">&nbsp;&nbsp;</i>@Resource.AddReferralSchedule
+                            </button>
+                        }
+                        <div class="col-lg-12 col-md-12 col-sm-12" style="display:flex;margin-left: 118%;">
+                            <div style="margin-top:4px;margin-right:9px">New</div>
+                            <input class="toggle" type="checkbox" ng-click="ToggleView($event)" />
+                            <div style="margin-top:4px;margin-left:9px">Legacy</div>
+                        </div>
+                    </div>
+                    @*<div class="form-group col-lg-4 col-md-4 col-sm-4 form-inline">
+
+                            <span class="badge badge-primary">@Resource.AuthorizedHours</span>
+                            <span class="badge badge-secondary">@Resource.TotalHours</span>
+                            <span class="badge badge-warning">@Resource.UsedHours </span>
+                            <span class="badge badge-info">@Resource.RemainingHrs</span>
+                        </div>*@
+                </div>
+
+                <div class="row">
+
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4 form-inline">
+                        <select class="form-control input-sm"
+                                data-ng-init="null"
+                                data-ng-model="selectedPatientStatusFilter"
+                                name="PatientStatusFilter"
+                                @*data-ng-change="FilterPatientStatus()" disabled="@(Model.IsPartial == true && Model.SearchRTSMaster.ReferralID > 0)">*@
+                                data-ng-change="FilterPatientStatus()">
+                            <option value="">@Resource.SelectPatientFilter</option>
+                            <option data-ng-repeat="option in patientStatusFilter" value="{{option}}">{{option}}</option>
+                        </select>
+                    </div>
+                </div>
+
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+
+                        <div class="inline-block pull-right" data-ng-show="RTSMasterList.length > 0">
+                            <div class="pull-right margin-left-5">
+                                <dir-pagination-controls boundary-links="true" max-size="RTSMasterListPager.maxSize" on-page-change="RTSMasterListPager.pageChanged(newPageNumber)" pagination-id="RTSMasterListPager"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space20"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            <div class="table-responsive">
+
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+
+                                            @*<th class="">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSMasterListPager.sortColumn('Name')">@Resource.Name</a>
+                                                    <span class="sortorder" data-ng-show="RTSMasterListPager.sortIndex === 'Name'" data-ng-class="{reverse:RTSMasterListPager.reverse}"></span>
+                                                </th>*@
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSMasterListPager.sortColumn('StartDate')">@Resource.StartDate</a>
+                                                <span class="sortorder" data-ng-show="RTSMasterListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:RTSMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSMasterListPager.sortColumn('EndDate')">@Resource.EndDate</a>
+                                                <span class="sortorder" data-ng-show="RTSMasterListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:RTSMasterListPager.reverse}"></span>
+                                            </th>
+                                            @*@if (!SessionHelper.IsCaseManagement)
+                                                {
+                                                    <th>
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSMasterListPager.sortColumn('TotalRTSDetailCount')">@Resource.SlotsHash</a>
+                                                        <span class="sortorder" data-ng-show="RTSMasterListPager.sortIndex === 'TotalRTSDetailCount'" data-ng-class="{reverse:RTSMasterListPager.reverse}"></span>
+                                                    </th>
+                                                }*@
+                                            <th>@Resource.CareType</th>
+                                            <th>Authorization</th>
+                                            <th>Information</th>
+                                            <th class="width-200px col-sm-3">@Resource.Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr data-ng-class="{'deleted':item.IsDeleted,'activeBgColor':item.ActiveStat, 'table-row-selected':SearchRTSDetail.ReferralTimeSlotMasterID==item.ReferralTimeSlotMasterID}"
+                                            dir-paginate="item in RTSMasterList | itemsPerPage: RTSMasterListPager.pageSize" total-items="RTSMasterListPager.totalRecords" current-page="RTSMasterListPager.currentPage" pagination-id="RTSMasterListPager">
+                                            {{item | json}}
+                                            @*<td>{{item.Name != null ? item.Name : '@Resource.NA'}}</td>*@
+                                            <td>{{item.StartDate | dateformat | orgdate }}</td>
+                                            <td>{{(item.EndDate!=null) ? (item.EndDate | dateformat | orgdate ) : '@Resource.NA'}}</td>
+                                            @*@if (!SessionHelper.IsCaseManagement)
+                                                {
+                                                    <td>{{item.TotalRTSDetailCount}}</td>
+                                                }*@
+                                            <td>{{item.CareType}}</td>
+                                            <td>{{item.AuthorizationCode}}</td>
+                                            <td>
+                                                <a href="javascript:void(0);" data-ng-click="GetReferralTimeSlotDetail($event,item)" data-ng-bind="item.DayName"></a>
+
+                                                @*<span class="badge badge-green" ng-if="item.ActiveStat">@Resource.Active</span>*@
+                                                @* <span class="badge badge-danger" ng-if="item.EndDate">@Resource.Expired</span>*@
+                                                @*<span class="badge badge-danger" ng-if="item.EndDate ==null">@Resource.BadgeError</span>*@
+                                                @*<span class="badge badge-primary" ng-if="item.EndDate !=null">{{item.AllowedTime}}</span>
+                                                    <span class="badge badge-secondary" ng-if="item.EndDate !=null">{{item.ScheduledHours}}</span>
+                                                    <span class="badge badge-warning" ng-if="item.EndDate !=null">{{item.UsedHours }}</span>
+                                                    <span class="badge badge-info" ng-if="item.EndDate !=null">{{item.PendingHours}}</span>*@
+                                            </td>
+                                            <td>
+                                                @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_PatientSchedule_Add)))
+                                                {
+                                                    <a href="javascript:void(0);" data-ng-click="OpenRTSMasterModal($event,item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                    <a href="javascript:void(0);" data-ng-show="item.IsDeleted" class="btn btn-xs green" data-ng-click="OpenRTSDeleteModal($event,item, 0)">@Resource.Active </a>
+                                                    <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-disabled="item.IsDeleted" data-ng-click="item.IsDeleted ? false : OpenRTSDeleteModal($event,item,1)" class="btn btn-xs red margin-right-05"><i class="fa fa-trash"></i> </a>
+                                                    <a href="javascript:void(0);" data-ng-disabled="item.IsDeleted" class="btn btn-xs green-jungle" data-ng-click="item.IsDeleted ? false : OpenEmpRefSchModal($event,item)">@Resource.ScheduleNow </a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="RTSMasterList.length > 0">
+                <div class="col-sm-6 pull-left no-padding margin-top-5">
+                    @Resource.Showing <span data-ng-bind="(RTSMasterListPager.pageSize * RTSMasterListPager.currentPage) - RTSMasterListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(RTSMasterListPager.pageSize == RTSMasterListPager.currentPageSize) ? (RTSMasterListPager.pageSize * RTSMasterListPager.currentPage) :(RTSMasterListPager.pageSize * RTSMasterListPager.currentPage) - RTSMasterListPager.pageSize  + RTSMasterListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="RTSMasterListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="RTSMasterListPager.maxSize" on-page-change="RTSMasterListPager.pageChanged(newPageNumber)" pagination-id="RTSMasterListPager"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div data-ng-if="RTSMasterList.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="referralTimeSlotDtl" class="modal fade" role="dialog">
+            <div class="modal-dialog modal-lg" style="width: 70%;">
+                <!-- Modal content-->
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="caption margin-bottom-0 margin-top-5">
+                        </h4>
+
+
+                    </div>
+                    <div class="modal-body padding-top-0">
+                        <div class="row">
+                            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.StartDate</label>
+                                <div class="input-group date" datepicker="SearchReferralTimeSlotDetail.StartDate"
+                                     data-ng-dateval="SearchReferralTimeSlotDetail.StartDate">
+                                    @Html.TextBoxFor(q => q.SearchReferralTimeSlotDetail.StartDate,
+                                                     new
+                                                         {
+                                                             @class = "form-control input-sm dateInputMask",
+                                                             placeholder = Resource.StartDate,
+                                                         })
+                                    @Html.ValidationMessageFor(q => q.SearchReferralTimeSlotDetail.StartDate)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.EndDate</label>
+                                <div class="input-group date" datepicker="SearchReferralTimeSlotDetail.EndDate"
+                                     data-ng-dateval="SearchReferralTimeSlotDetail.EndDate">
+                                    @Html.TextBoxFor(q => q.SearchReferralTimeSlotDetail.EndDate,
+                                        new
+                                        {
+                                            @class = "form-control input-sm dateInputMask",
+                                            placeholder = Resource.EndDate,
+                                        })
+                                    @Html.ValidationMessageFor(q => q.SearchReferralTimeSlotDetail.EndDate)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.Employee</label>
+                                <div>
+                                    @Html.TextBoxFor(q => q.SearchReferralTimeSlotDetail.ClientName,
+                                        new
+                                        {
+                                            @class = "form-control input-sm",
+                                            placeholder = Resource.Employee,
+                                            data_ng_model = "SearchReferralTimeSlotDetail.ClientName",
+                                        })
+                                    @Html.ValidationMessageFor(q => q.SearchReferralTimeSlotDetail.ClientName)
+
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-2 col-md-3 col-sm-3 padding-top-18 padding-right-0">
+                                <div class="btn-group">
+                                    <button type="button" data-ng-click="SearchTimeSlotDetail()" class="btn btn-sm blue cancel margin-right-10">@Resource.Search</button>
+                                    <button data-ng-click="ResetTimeSlotDetail()" class="btn btn-sm dark cancel">@Resource.Reset</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="portlet-body compact" style="display: block;">
+                                    <div class="table-responsive">
+                                        <table class="table table-bordered table-striped table-condensed flip-content">
+                                            <thead class="flip-content">
+                                                <tr class="bold">
+                                                    <td>Sr#.</td>
+                                                    <td class="text-align-center">@Resource.Date</td>
+                                                    <td>@Resource.Day</td>
+                                                    <td class="text-align-center">@Resource.StartTime</td>
+                                                    <td class="text-align-center">@Resource.EndTime</td>
+                                                    <td class="text-align-center">@Resource.Status</td>
+                                                    <td>@Resource.Employee</td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr dir-paginate="obj in ReferralTimeSlotList  | itemsPerPage: ReferralTimeSlotDetailPager.pageSize" total-items="ReferralTimeSlotDetailPager.totalRecords" current-page="ReferralTimeSlotDetailPager.currentPage" pagination-id="ReferralTimeSlotDetailPager">
+                                                    <td>{{((ReferralTimeSlotDetailPager.currentPage-1) * ReferralTimeSlotDetailPager.pageSize)+ $index+1}}</td>
+                                                    <td class="text-align-center">{{obj.ReferralTSDate|orgdate}}</td>
+                                                    <td>{{obj.DayName}}</td>
+                                                    <td class="text-align-center">{{obj.ReferralTSStartTime|orgtime}}</td>
+                                                    <td class="text-align-center">{{obj.ReferralTSEndTime|orgtime}}</td>
+                                                    <td class="text-align-center">{{obj.ReferralTSDateID==0?"Not Schedule":"Schedule"}}</td>
+                                                    @*<td>{{obj.EmployeeName}}</td>*@
+                                                    <td>
+                                                        <a id="pop-Employee" class="conditionstatus editable editable-click" data-toggle="popover" ng-list="" popover-html="#popover-Employee" data-ng-model="obj.EmployeeName" data-ng-bind="obj.EmployeeName" ng-value="obj.EmployeeID" savecallback="ChangeEmployee" ng-data="obj" ng-header="Employee" ng-width="350"></a>
+                                                        @*<a id="pop-employee" class="conditionstatus editable editable-click" data-toggle="popover" ng-list="" popover-html="#popover-employee" data-ng-model="obj.EmployeeName" data-ng-bind="obj.EmployeeName" ng-value="obj.EmployeeID" savecallback="SaveAssignee" ng-data="obj" ng-header="Assignee" ng-width="350"></a>*@
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12" data-ng-if="ReferralTimeSlotList.length > 0">
+                                <div class="col-sm-6 pull-left no-padding margin-top-5">
+                                    @Resource.Showing <span data-ng-bind="(ReferralTimeSlotDetailPager.pageSize * ReferralTimeSlotDetailPager.currentPage) - ReferralTimeSlotDetailPager.pageSize  + 1"></span>
+                                    &nbsp;@Resource.To <span data-ng-bind="(ReferralTimeSlotDetailPager.pageSize == ReferralTimeSlotDetailPager.currentPageSize) ? (ReferralTimeSlotDetailPager.pageSize * ReferralTimeSlotDetailPager.currentPage) :(ReferralTimeSlotDetailPager.pageSize * ReferralTimeSlotDetailPager.currentPage) - ReferralTimeSlotDetailPager.pageSize  + ReferralTimeSlotDetailPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralTimeSlotDetailPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                                </div>
+                                <div class="pull-right top pagination-sm">
+                                    <dir-pagination-controls boundary-links="true" max-size="ReferralTimeSlotDetailPager.maxSize" on-page-change="ReferralTimeSlotDetailPager.pageChanged(newPageNumber)" pagination-id="ReferralTimeSlotDetailPager"></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <div id="popover-Employee" class="hidden">
+                <div>
+                    <form class="form-inline editableform" style="">
+                        <div class="control-group form-group">
+                            <div>
+                                <div class="editable-input">
+                                    @Html.DropDownListFor(p => p.SearchReferralTimeSlotDetail.EmployeeID, Model.AssigneeList.ToSelectList(Model.SearchReferralTimeSlotDetail.EmployeeID.ToString() ?? "", "EmployeeName", "EmployeeID", Resource.SelectAssignee, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_number = "",
+                                                                  id = "EmployeeID",
+                                                                  data_ng_model = "ngValue",
+                                                                  data_ng_init = "ngValue=ngValue==''?null:ngValue",
+                                                                  @class = "form-control input-sm"
+                                                              })
+                                    @Html.ValidationMessageFor(m => m.SearchReferralTimeSlotDetail.EmployeeID)
+                                </div>
+                                <div class="editable-buttons">
+                                    <button type="submit" class="btn btn-primary btn-sm" data-ng-click="Save()"><i class="glyphicon glyphicon-ok"></i></button>
+                                    <button type="button" class="btn btn-default btn-sm" data-ng-click="Cancel()"><i class="glyphicon glyphicon-remove"></i></button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+
+
+        </div>
+
+
+
+        @if (SessionHelper.IsHomeCare)
+        {
+            @Html.Partial("/Areas/HomeCare/Views/Schedule/Partial/01/_EmpRefSchDetailPopover.cshtml")
+        }
+        @if (SessionHelper.IsDayCare)
+        {
+            @Html.Partial("/Areas/HomeCare/Views/Schedule/Partial/DayCare/_EmpRefSchDetailPopover.cshtml", new HC_DayCare_ScheduleAssignmentModel())
+        }
+
+
+        @Html.Partial("Partial/_AddRTSMaster", Model)
+        @Html.Partial("Partial/_AddRTSByPriorAuth", Model)
+    </div>
+</div>
+
+
+<script id="schemployeedetail-popover" type="text/ng-template">
+    @Html.Partial("/Areas/HomeCare/Views/Schedule/Partial/PrivateDuty/_EmployeeDetailPopover.cshtml")
+</script>
+@section Scripts{
+
+    @if (!Model.IsPartial)
+    {
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/referral/referraltimeslots")
+        if (SessionHelper.IsHomeCare)
+        {
+            @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/emprefschoptions")
+        }
+        if (SessionHelper.IsDayCare)
+        {
+            @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/daycare/emprefschoptions")
+        }
+
+        <script type="text/javascript">
+            var RefFutureSchDeleteConfirmation = '@Resource.RefFutureSchDeleteConfirmation';
+            var RefFutureSchDeleteConfirmationMaster = '@Resource.RefFutureSchDeleteConfirmationMaster';
+            var TimeSlotForceUpdateConfirmation = '@Resource.ReferralTimeSlotForceUpdateConfirmation';
+            var isCaseManagement = '@(SessionHelper.IsCaseManagement ? "1" : "0")';
+            var PatientForceSchedulesConfirmation  = '@Resource.PatientForceSchedulesConfirmation';
+        </script>
+    }
+
+}
+
+
+

@@ -1,0 +1,228 @@
+﻿
+<div class="row">
+    <div class="col-sm-12">
+        <div class="fscontainer">
+            <div class="legend">
+                @Resource.AllergyDetails
+                <i class="fa fa-question-circle font-size-15" data-ng-tooltip="Allergy Details"
+                   data-ng-custom-class="tooltip-extra-z-index"></i>
+            </div>
+            <div class="patientContainermain">
+                <div class="row">
+                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <label class="control-label">
+                                    Allergy
+
+                                </label>
+
+
+                                <input class="form-control input-sm" id="txtsearch" data-ng-model="searchAllergy" placeholder="Type Allergy.." />
+                            </div>
+
+                            
+
+                            <div class="col-sm-4" style="padding-top:18px;">
+
+                                <a class="btn btn-default grey btn-sm" ng-click="GetReferralAllergyList()">Search</a>
+                                <a class="btn btn-default grey btn-sm" ng-click="ResetReferralAllergyList();">Reset</a>
+                                @*@if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Allergy_Add))
+                                    {*@
+
+                                <a href="#AddAllergyModal" data-toggle="modal" class="btn btn-sm green-jungle" data-ng-click="">
+                                    <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddAllergy
+                                </a>
+                                @*}*@
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12 mb-0"  data-ng-cloak>
+                        <div class="table-responsive">
+                            <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                <thead>
+                                    <tr>
+
+                                        <th>Causative Agent</th>
+                                        <th width="120">Date</th>
+                                        <th width="120">Status</th>
+                                        <th>Reaction</th>
+                                        <th>Reported By</th>
+                                        <th>Action</th>
+
+
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="item in ReferralAllergy">
+                                    <tr>
+
+                                        <td>
+                                            <a class="btn btn-link" ng-init="toggle[$index] = false" ng-click="toggle[$index] = !toggle[$index]">
+                                                <span class="glyphicon glyphicon-plus-sign" ng-if="!toggle[$index]"></span>
+                                                <span class="glyphicon glyphicon-minus-sign" ng-if="toggle[$index]"></span>
+                                            </a>&nbsp;
+                                            {{item.Allergy}}
+                                        </td>
+                                        <td>{{item.CreatedOn}}</td>
+                                        <td>{{item.StatusName}}</td>
+                                        <td>{{item.Reaction}}</td>
+                                        <td>{{item.ReportedByName}}</td>
+                                        <td>
+
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Allergy_Delete))
+                                                {
+                                            <a href="#AddAllergyModal" data-toggle="modal" data-ng-click="UpdateAllergy(item)" class="btn btn-xs blue margin-right-05 ng-scope"><i class="fa fa-edit"></i> </a>
+                                            <a class="btn btn-xs red" href="javascript:void(0);" data-ng-click="DeleteAllergy(item)"><i class="fa fa-trash"></i> </a>
+                                            }
+                                        </td>
+
+
+
+                                    </tr>
+                                    <tr ng-if="toggle[$index]">
+                                        <td colspan="6"><b>Comment:</b>{{item.Comment}}</td>
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+
+
+    <div class="modal fade" id="AddAllergyModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span data-ng-show="!IsEdit">@Resource.AddAllergy</span><span data-ng-show="IsEdit">Edit Allergy</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmAllergy">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-3">
+                                            <label class="control-label required">@Resource.CausativeAgent</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <input type="text" style="display:none" class="form-control input-sm requiredStrip" placeholder="@Resource.CausativeAgent"  data-ng-model="ReferralAllergyModel.Id"  />
+                                            <input type="text" class="form-control input-sm requiredStrip" placeholder="@Resource.CausativeAgent" maxlength="100" data-ng-model="ReferralAllergyModel.Allergy" data-val-required="Requird" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-3">
+
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <input type="radio" name="RBCheckedResume" style="height: 15px; width: 18px;" data-ng-model="ReferralAllergyModel.Status" ng-value="1" /> <span style="position:relative;top:-3px;font-size:12px;">Observed</span> &nbsp;
+                                            <input type="radio" name="RBCheckedResume" style="height: 15px; width: 18px;" data-ng-model="ReferralAllergyModel.Status" ng-value="2" /> <span style="position:relative;top:-3px;font-size:12px;">Historical</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-3">
+                                            <label class="control-label required">@Resource.Reaction</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <input type="text" class="form-control input-sm requiredStrip" placeholder="@Resource.Reaction" maxlength="100" data-ng-model="ReferralAllergyModel.Reaction" data-val-required="Requird" />
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-3">
+                                            <label class="control-label required">Reported By</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <select class="form-control" ng-model="selecteditem">
+                                                <option value="0" ng-selected="0">Select Reported By</option>
+                                                <option ng-repeat="data in ReportedBy" ng-selected="selecteditem == data.value" value="{{data.Value}}">{{data.Title}} </option>
+                                            </select>
+                                            @*<input type="text" class="form-control input-sm requiredStrip" placeholder="Reported By" maxlength="100" data-ng-model="ReferralAllergyModel.ReportedBy" data-val-required="Requird" />*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="col-sm-3">
+                                            <label class="control-label">@Resource.Comment</label>
+                                        </div>
+                                        <div class="col-sm-8">
+                                            <textarea rows="5" class="form-control input-sm" data-ng-model="ReferralAllergyModel.Comment" maxlength="1000"
+                                                      placeholder="@Resource.Comment" data-val="true"
+                                                      
+                                                      name="Notes" id="Notes"></textarea>
+                                            @*<span class="field-validation-valid" data-valmsg-for="Notes" data-valmsg-replace="true"></span>*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-sm-11">
+                            <div class="form-group col-sm-12">
+
+                                <button type="button" class="btn btn-danger" data-dismiss="modal" ng-click="ResetAllergy()">@Resource.Cancel</button>@*data-ng-click="ResetEmployeeInternamMessage()"*@
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Allergy_Add))
+                                {
+                                    <button type="submit" data-ng-click="saveAllergy()" class="btn green-jungle">@Resource.Save</button>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+
+
+</div>
+

@@ -1,0 +1,127 @@
+﻿<div class="col-sm-12 no-padding">
+    <h5 class="caption">
+        <b>@Resource.Employee: </b>
+        @*<a class="text-decoration-none sbold uppercase" data-ng-href="@Constants.HC_AddEmployee{{DetailModel.EmployeeDetail.EncryptedEmployeeID}}" data-ng-bind="DetailModel.EmployeeDetail.EmployeeName" target="_blank"></a>*@
+    <span class="text-decoration-none sbold uppercase" >{{DetailModel.EmployeeDetail.EmployeeName}}</span>
+    </h5>
+    <div class="rd_popupempdetail">
+        <div class="rd_popupempdetailleft">
+            <p><b>@Resource.EmployeeID : </b><span>{{DetailModel.EmployeeDetail.EmployeeUniqueID ? DetailModel.EmployeeDetail.EmployeeUniqueID :'@Resource.NA'}}</span></p>
+            <div class="rd_popupempcontact">
+
+                <p class="rd_popupempaddress">
+                    <b>@Resource.Address: </b>
+
+                    <span data-ng-show="DetailModel.EmployeeDetail.FullAddress">{{DetailModel.EmployeeDetail.Address }}<br />
+                        {{DetailModel.EmployeeDetail.City }}, {{DetailModel.EmployeeDetail.StateCode }} {{DetailModel.EmployeeDetail.ZipCode }}</span>
+                    <span data-ng-hide="DetailModel.EmployeeDetail.FullAddress">@Resource.NALbl</span>
+                </p>
+                <p class="rd_popupempemail">
+                    <span><i class="fa fa-envelope margin-right-05" aria-hidden="true"></i>: <a href="mailto:{{DetailModel.EmployeeDetail.Email }}">{{DetailModel.EmployeeDetail.Email?DetailModel.EmployeeDetail.Email:'@Resource.NA' }}</a></span>
+                    <span><i class="fa fa-phone margin-right-05" aria-hidden="true"></i>: <a href="#">{{DetailModel.EmployeeDetail.MobileNumber | phoneformat}}</a></span>
+                </p>
+            </div>
+            <p>
+                <b>@Resource.Skills :
+                </b>
+                <span data-ng-if="DetailModel.SkillList.length==0">@Resource.NALbl</span>
+                <span class="badge badge-roundless badge-success margin-right-05" ng-repeat="item in DetailModel.SkillList">
+                    {{item.PreferenceName}}
+                </span>
+            </p>
+            <p>
+                <b>@Resource.Preferences : </b>
+                <span data-ng-if="DetailModel.PreferenceList.length==0">@Resource.NALbl</span>
+                <span class="badge badge-roundless badge-success margin-right-05" ng-repeat="item in DetailModel.PreferenceList">
+                    {{item.PreferenceName}}
+                </span>
+            </p>
+            <p>
+                <b>@Resource.Patient : </b>
+                <a ng-repeat="item in DetailModel.PatientList" href="" data-ng-click="DetailModel.CallBack(item)">
+                    {{item.PatientName}} |
+                </a>
+            </p>
+
+        </div>
+        <div class="rd_popupempdetailleft">
+            <h5 class="badge badge-warning badge-roundless margin-top-0 margin-bottom-10 font-black font-size-13 font-weight-500">@Resource.EmployeeWorkingHrs</h5>
+            <div data-ng-show="DetailModel.ETSMaster.StartDate">
+                <div class="font-size-12">@Resource.From {{DetailModel.ETSMaster.StartDate | orgdate}} @Resource.To {{DetailModel.ETSMaster.EndDate ? (DetailModel.ETSMaster.EndDate | orgdate) : '@Resource.NA'}}</div>
+                @*<ul class="client_time">
+                    <li data-ng-repeat="item in DetailModel.ListETSDetail"><b>{{item.StrDayName}}</b> {{item.StrStartTime}} - {{item.StrEndTime}}</li>
+                </ul>*@
+                <div class="compact">
+                    <table class="table table-bordered table-striped table-condensed flip-content">
+                        <thead class="flip-content">
+                            <tr>
+                                <th>@Resource.Day</th>
+                                <th>@Resource.StartTime</th>
+                                <th>@Resource.EndTime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in DetailModel.ListETSDetail" data-ng-class="{'bg-green':item.RemainingSlotCount==0}">
+                                <td>{{item.StrDayName}}</td>
+                                <td>{{item.StrStartTime}}</td>
+                                <td>{{item.StrEndTime}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            @*<div data-ng-hide="DetailModel.ETSMaster.StartDate" class="font-size-12">@Resource.NotFound</div>*@
+            <div class="row">
+                <div class="col-sm-12">
+                    <div data-ng-hide="DetailModel.ETSMaster.StartDate">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger padding-5">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="dataTables_wrapper margin-top-5 rd_popupemptimeslot">
+        <div><b>PTO Details</b></div>
+        <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+            <thead>
+                <tr>
+                    <th><strong>@Resource.StartTime</strong></th>
+                    <th><strong>@Resource.EndTime</strong></th>
+                    <th><strong>@Resource.CommentReason</strong></th>
+                    @*<th><strong>@Resource.HashSchedules</strong></th>*@
+                    <th><strong>@Resource.Status</strong></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="item in DetailModel.ListEmployeePTO">
+                    <td>{{item.StartTime | orgdatetime}}</td>
+                    <td>{{item.EndTime | orgdatetime}}</td>
+                    <td>{{item.EmployeeComment}}</td>
+                    @*<td>{{item.ScheduleCount}}</td>*@
+                   <td>{{item.DayOffStatus}}</td>
+                </tr>
+
+            </tbody>
+        </table>
+        @*<div data-ng-hide="DetailModel.ListEmployeePTO.length=0" class="font-size-12">@Resource.NotFound</div>*@
+        <div class="row">
+            <div class="col-sm-12">
+                <div data-ng-if="DetailModel.ListEmployeePTO.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger padding-5">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

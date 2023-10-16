@@ -1,0 +1,270 @@
+﻿@model SetRolePermissionModel
+@{
+                /**/
+
+                ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.RolePermission);
+                Layout = "~/Views/Shared/_Layout.cshtml";
+                ViewBag.SelectedMenuItem = Resource.SMI_RoleAndPermission;
+}
+@Html.Hidden("hdnRolePermissionModel", Common.SerializeObject(Model))
+
+@section styles{
+<style type="text/css">
+    #3016_anchor > i.jstree-checkbox {
+        display: none !important;
+    }
+</style>
+}
+
+<div data-ng-controller="RolePermissionController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.RolePermission<small style="text-transform:capitalize">&nbsp;&nbsp;Search And Set Role Permission Details</small>
+        </h3>
+    </div>
+    <div class="row">
+        <form id="frmrolepermission">
+            <div class="">
+                <div class="col-lg-8 col-md-8 col-sm-12">
+
+                    <div class="permissionList">
+                        <div class="row-fluid">
+                            <div class="caption">
+                                <i class=" icon-layers font-green"></i>
+                                <span class="caption-subject font-green bold uppercase font-size-17">System - Permissions</span>
+                                @*<div class="caption-desc font-grey-cascade">
+                                Default system permission list. You can
+                               <b>check & assign permissions</b>
+                                to selected roles.
+                            </div>*@
+                                <div class="space10"></div>
+                                <div class="col-sm-6">
+                                    <label class="control-label">@Resource.RoleName <a href="javascript:void(0);" data-ng-click="OpenAddRolePopUp()" class="btn btn-sm green-jungle pull-right letter-space"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddRole</a>&nbsp;&nbsp;</label>
+                                    <div class="form-group">
+                                        <select name="mySelect" id="mySelect" class="form-control"
+                                                data-ng-options="obj.RoleID as obj.RoleName for obj in RoleList"
+                                                data-ng-model="SearchRolePermission.RoleID"
+                                                @*data-ng-init="SearchRolePermission.RoleID = SearchRolePermission.RoleID==''? null: SearchRolePermission.RoleID"*@
+                                                data-ng-change="GetRolePermission(SearchRolePermission)"
+                                                data-ng-setname="SearchRolePermission.RoleName">
+                                            <option value="" selected>@Resource.SelectRole</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 ">
+                                    <label class="control-label" style="margin-bottom:8px" >Permissions </label>
+                                    <div class="form-group">
+                                        <select name="mySelect" id="mySelect" class="form-control"
+                                                data-ng-model="PermissionType"
+                                                data-ng-change="GetPermissionType(PermissionType)">
+                                            <option value="" selected>@Resource.SelectRole</option>
+                                            <option value="1" data-ng-if="SearchRolePermission.RoleID > 0">@Resource.MobilePermissions</option>
+                                            <option value="2" data-ng-if="SearchRolePermission.RoleID > 0">@Resource.WebPermissions</option>
+                                            <option value="3" data-ng-if="SearchRolePermission.RoleID > 0">Report Permissions</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="font-sm col-md-11 ">
+                    <b class="font-red-thunderbird">@Resource.NoteLabel</b><i> @Html.Raw(Resource.RolePermissionNote)</i>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 margin-top-15" data-ng-if="SearchRolePermission.RoleID > 0">
+                <div class="col-md-2">
+                    <label class="control-label"><strong>@Resource.SelectedRole</strong></label>
+                </div>
+                <div class="col-md-6 ">
+                    <span data-ng-show="!IsEditRoleName" data-ng-bind="SearchRolePermission.RoleName"></span>
+                    @Html.TextBoxFor(m => m.SearchRolePermissionModel.RoleName, new { @class = "input-sm", data_ng_model = "SearchRolePermission.RoleName", data_ng_show = "IsEditRoleName", maxlength = "50", placeholder = Resource.RoleName })
+                    @Html.ValidationMessageFor(m => m.SearchRolePermissionModel.RoleName)
+                    <button id="btnEditRole" data-ng-click="IsEditRoleName?UpdateRoleName():EditRoleName()"><span class="{{IsEditRoleName?'glyphicon glyphicon-floppy-disk color-blue':'glyphicon glyphicon-pencil color-blue'}}"></span></button>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 padding-top-20 padding-left-0 padding-right-0">
+                <div class="col-lg-12 col-md-6 col-sm-12" data-ng-if="SearchRolePermission.RoleID > 0 && PermissionType > 0">
+                    <div class="">
+                        <div>
+                            @*<div class="space20"></div>*@
+                            <div class="portlet-body compact">
+                                <div class="dataTables_wrapper external-events-group table-responsive">
+                                </div>
+                            </div>
+                            <div class="">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div ng-if="PermissionType == 1">
+                                            <i class="glyphicon glyphicon-tree-conifer"></i>&nbsp; @Resource.MobilePermissions
+                                        </div>
+                                        <div ng-if="PermissionType == 2">
+                                            <i class="glyphicon glyphicon-tree-conifer"></i>&nbsp;@Resource.WebPermissions
+                                        </div>
+                                        <div ng-if="PermissionType == 3">
+                                            <i class="glyphicon glyphicon-tree-conifer"></i>&nbsp; Report Permission
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" data-ng-show="SearchRolePermission.RoleID > 0 && PermissionType == 2">
+                                        <div id="jstreeid" data-ng-click="SetPermission()" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="PermissionList" tree="treeInstance" tree-events="ready:ExpandTreeView;changed:SaveRoleWisePermission;hover_node:ShowDescription;"></div>
+                                        <a href="javascript:void(0);" style="margin-right:10px" data-ng-click="SavePermissions()" class="btn btn-sm blue pull-left letter-space"><i class="fa fa-copy">&nbsp;&nbsp;</i>@Resource.Save</a>&nbsp;&nbsp;
+                                    </div>
+                                    <div class="panel-body" data-ng-show="SearchRolePermission.RoleID > 0 && PermissionType == 1">
+                                        <div id="jstreeidMobile" data-ng-click="SetPermission()" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="MobilePermissionList" tree="treeInstanceMobile" tree-events="ready:ExpandTreeView;changed:MobileSaveRoleWisePermission;hover_node:ShowDescription;"></div>
+                                        <a href="javascript:void(0);" style="margin-right:10px" data-ng-click="SavePermissions()" class="btn btn-sm blue pull-left letter-space"><i class="fa fa-copy">&nbsp;&nbsp;</i>@Resource.Save</a>&nbsp;&nbsp;
+                                    </div>
+                                    <div class="panel-body" data-ng-show="SearchRolePermission.RoleID > 0 && PermissionType == 3">
+                                        <table ng-if="ListOfReports" class="table table-bordered table-striped table-condensed flip-content">
+                                            <thead>
+                                                <tr>
+                                                    <th>
+                                                        <input id="SelectAllReport" class="unicheckbox" type="checkbox" data-ng-model="selectAll" ng-click="checkAll(selectAll)">
+                                                    </th>
+                                                    <th>Report Name</th>
+                                                    <th>Report Description</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr ng-repeat="report in ListOfReports">
+                                                    <td>
+                                                        <input type="checkbox" class="unicheckbox" ng-model="report.IsChecked" ng-click="SelectReport(report)" val="report.IsChecked">
+                                                    </td>
+                                                    <td>
+                                                        {{report.ReportName}}
+                                                    </td>
+                                                    <td>
+                                                        {{report.ReportDescription}}
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <a href="javascript:void(0);" style="margin-right:10px" data-ng-click="SaveMapReport()" class="btn btn-sm blue pull-left letter-space"><i class="fa fa-copy">&nbsp;&nbsp;</i>@Resource.Save</a>&nbsp;&nbsp;
+                                    </div>
+
+                                        <div class="text-align-center margin-15" data-ng-if="!(SearchRolePermission.RoleID > 0)">@Resource.NoRecordFoundMessage</div>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!--<div class="col-lg-12 col-md-12 col-sm-12">
+                    <div class="">
+                        <div>-->
+                            @*<div class="space20"></div>*@
+                            <!--<div class="portlet-body compact">
+                                <div class="dataTables_wrapper external-events-group table-responsive">
+                                </div>
+                            </div>
+                            <div class="">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div>
+                                            <i class="glyphicon glyphicon-tree-conifer"></i>&nbsp; @Resource.MobilePermissions
+                                        </div>
+                                    </div>
+                                    <div class="panel-body" data-ng-show="SearchRolePermission.RoleID > 0">
+                                        <div id="jstreeidMobile" data-ng-click="SetPermission()" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="MobilePermissionList" tree="treeInstanceMobile" tree-events="ready:ExpandTreeView;changed:MobileSaveRoleWisePermission;hover_node:ShowDescription;"></div>
+                                    </div>
+                                    <div class="text-align-center margin-15" data-ng-if="!(SearchRolePermission.RoleID > 0)">@Resource.NoRecordFoundMessage</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
+            </div>
+        </form>
+
+
+
+        <div class="modal fade" id="AddNewRoleModal" tabindex="-1" role="dialog" aria-labelledby="AddNewRoleLabel">
+            <div class="modal-dialog" role="document">
+                <form id="frmnewrole">
+                    <div class="modal-content ">
+                        <div class="modal-header caption-desc ">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="H1">@Resource.AddNewRole</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="form-group col-sm-12">
+                                            @*<div class="col-sm-3">
+                                                    <label class="control-label">@Resource.RoleName</label>
+                                                </div>*@
+                                            <div class="col-sm-12" id="roles">
+                                                @Html.TextBoxFor(m => m.SearchRolePermissionModel.AddNewRoleName, new { @class = "form-control", data_ng_model = "RoleModel.RoleName", maxlength = "50", placeholder = Resource.RoleName })
+                                                @Html.ValidationMessageFor(m => m.SearchRolePermissionModel.AddNewRoleName)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <input type="button" data-ng-click="ResetRoleModel()" class="btn btn-danger" data-dismiss="modal" value="@Resource.Cancel" />
+                                        <input type="submit" data-ng-click="AddNewRole()" class="btn green-jungle " value="@Resource.Save" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        @*<div class="modal fade" id="AddMapReportModal" tabindex="-1" role="dialog" aria-labelledby="AddNewRoleLabel">
+            <div class="modal-dialog" role="document">
+                <form id="frmnewrole">
+                    <div class="modal-content ">
+                        <div class="modal-header caption-desc ">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="H1">ADD MAP Report</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="table-responsive ">
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <input type="button" data-ng-click="ResetRoleModel()" class="btn btn-danger" data-dismiss="modal" value="@Resource.Cancel" />
+                                        
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>*@
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/security/rolepermission.js")
+}

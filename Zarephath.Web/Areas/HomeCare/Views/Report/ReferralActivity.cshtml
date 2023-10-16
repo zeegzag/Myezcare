@@ -1,0 +1,473 @@
+﻿@{
+    ViewBag.Title = "Referral Activity";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_GroupTimesheetReports;
+}
+
+@model ReferralActivityModel
+@Html.Hidden("hdnSetGroupTimesheetListPage", Common.SerializeObject(Model))
+
+<style>
+    .form-group .fields label {
+        margin-left: 2px;
+    }
+
+    .btn-default:hover, .btn-default:focus, .btn-default.focus {
+        background-color: white;
+    }
+
+    .btn-default:active, .btn-default.active, .open > .btn-default.dropdown-toggle {
+        background-color: white;
+    }
+
+        .btn-default:active:hover, .btn-default:active:focus, .btn-default:active.focus, .btn-default.active:hover, .btn-default.active:focus, .btn-default.active.focus, .open > .btn-default.dropdown-toggle:hover, .open > .btn-default.dropdown-toggle:focus, .open > .btn-default.dropdown-toggle.focus {
+            background-color: white;
+        }
+
+    .bootstrap-select .dropdown-toggle:focus {
+        outline: none !important;
+    }
+</style>
+
+<div data-ng-controller="GroupTimesheetListController">
+
+    <div class="page-bar">
+        <h3 class="page-title">
+            Referral Activity
+        </h3>
+    </div>
+    @*<div class="col-sm-12 small-select  padding-left-0">
+            <input type="button" data-ng-click="SaveEmployeeData()" class="btn btn-sm green-jungle " value="Print" /> &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input type="button" data-ng-click="SaveEmployeeData()" class="btn btn-sm green-jungle " value="Save" />
+        </div>*@
+
+
+    <div>
+        <div class="col-sm-2 small-select padding-right-0">
+            <label>Year</label>
+            <select class="form-control input-sm"
+                    data-val="true" actions-box="true">
+                <option value="{{Year}}">{{Year}}</option>
+            </select>
+        </div>
+    </div>
+    <div>
+        <div class="col-sm-2 small-select padding-right-0">
+            <label>Month</label>
+            <select class="form-control input-sm" title="Select Month"
+                    data-val="true" actions-box="true" data-ng-model="month" data-ng-change="RefreshReferrals(month)">
+                <option data-ng-repeat="option in months" value="{{option}}">
+                    {{option}}
+                </option>
+            </select>
+        </div>
+    </div>
+    <div>
+        <div class="col-sm-2 small-select padding-right-0">
+            <label>Add/Edit</label>
+            <select class="form-control input-sm" data-val="true" actions-box="true"
+                    data-ng-model="AddEdit" data-ng-change="AddOrEdit(AddEdit)">
+                <option value="0">
+                    Select Add or Edit
+                </option>
+                <option value="Add">
+                    Add
+                </option>
+                <option value="Edit">
+                    Edit
+                </option>
+            </select>
+        </div>
+    </div>
+    <div data-ng-show="showAdd">
+        <div class="col-sm-2 small-select padding-right-0">
+            <label>@Resource.Patient</label>
+            <select class="form-control input-sm" title="@Resource.SelectPatient"
+                    data-val="true" actions-box="true" multiple="multiple"
+                    selectpicker="SearchGroupTimesheetListPage.ReferralIDs" name="SearchGroupTimesheetListPage.ReferralIDs">
+                <option data-ng-repeat="option in Referrals"
+                        value="{{option.ReferralID}}">
+                    {{option.ReferralName}}
+                </option>
+            </select>
+        </div>
+    </div>
+
+    <div data-ng-show="showEdit">
+        <div class="col-sm-2 small-select padding-right-0">
+            <label>@Resource.Patient</label>
+            <select class="form-control input-sm" title="@Resource.SelectPatient"
+                    data-val="true" data-ng-change="BindEdit(EditPatient)"
+                    data-ng-model="EditPatient"
+                    selectpicker="SearchGroupTimesheetListPage.ReferralIDs" name="SearchGroupTimesheetListPage.ReferralIDs">
+
+                <option data-ng-repeat="option in Referrals"
+                        value="{{option.ReferralID}}">
+                    {{option.ReferralName}}
+                </option>
+            </select>
+        </div>
+    </div>
+    <div>
+        <div class="col-sm-2 small-select padding-right-0 padding-top-15">
+
+            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            @*<a href="javascript:;" data-ng-click="ReportNavigation()" title="Print"><img src="~/Assets/images/printer.ico" class="print-img" /></a>*@
+            <a href="javascript:;" class="btn blue btn-sm blue border-green-cascade" data-ng-click="ReportNavigation()" title="Print">
+                <span class="glyphicon glyphicon-print"></span> Print
+            </a>
+        </div>
+    </div>
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <br />
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive">
+                        <form id="frmAgencyList">
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-200px">
+                                            <a class="anchor_color">Category</a>
+                                        </th>
+                                        <th class="width-20px">
+                                            <a class="anchor_color">Name</a>
+                                        </th>
+                                        <th class="width-20px">
+                                            <a class="anchor_color">Select All</a>
+                                        </th>
+                                        <th>
+                                            1
+                                        </th>
+                                        <th>
+                                            2
+                                        </th>
+                                        <th>
+                                            3
+                                        </th>
+                                        <th>
+                                            4
+                                        </th>
+                                        <th>
+                                            5
+                                        </th>
+                                        <th>
+                                            6
+                                        </th>
+                                        <th>
+                                            7
+                                        </th>
+                                        <th>
+                                            8
+                                        </th>
+                                        <th>
+                                            9
+                                        </th>
+                                        <th>
+                                            10
+                                        </th>
+                                        <th>
+                                            11
+                                        </th>
+                                        <th>
+                                            12
+                                        </th>
+                                        <th>
+                                            13
+                                        </th>
+                                        <th>
+                                            14
+                                        </th>
+                                        <th>
+                                            15
+                                        </th>
+                                        <th>
+                                            16
+                                        </th>
+                                        <th>
+                                            17
+                                        </th>
+                                        <th>
+                                            18
+                                        </th>
+                                        <th>
+                                            19
+                                        </th>
+                                        <th>
+                                            20
+                                        </th>
+                                        <th>
+                                            21
+                                        </th>
+                                        <th>
+                                            22
+                                        </th>
+                                        <th>
+                                            23
+                                        </th>
+                                        <th>
+                                            24
+                                        </th>
+                                        <th>
+                                            25
+                                        </th>
+                                        <th>
+                                            26
+                                        </th>
+                                        <th>
+                                            27
+                                        </th>
+                                        <th>
+                                            28
+                                        </th>
+                                        <th>
+                                            29
+                                        </th>
+                                        <th>
+                                            30
+                                        </th>
+                                        <th>
+                                            31
+                                        </th>
+                                        <th class="width-20px">
+                                            Total
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="item in ReferralActivityList.ReferralActivityList ">
+                                        <td class="width-200px" data-ng-bind="item.Category ? item.Category:'@Resource.NA'"> </td>
+
+                                        <td data-ng-bind="item.Name ? item.Name:'@Resource.NA'"> </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" data-ng-change="SelectAllDays(item)" val="item.IsChecked">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day1" val="item.Day1" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day2" val="item.Day2" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day3" val="item.Day3" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day4" val="item.Day4" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day5" val="item.Day5" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day6" val="item.Day6" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day7" val="item.Day7" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day8" val="item.Day8" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day9" val="item.Day9" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day10" val="item.Day10" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day11" val="item.Day11" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day12" val="item.Day12" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day13" val="item.Day13" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day14" val="item.Day14" data-ng-change="CalculateDays(item)">
+
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day15" val="item.Day15" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day16" val="item.Day16" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day17" val="item.Day17" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day18" val="item.Day18" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day19" val="item.Day19" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day20" val="item.Day20" data-ng-change="CalculateDays(item)">
+
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day21" val="item.Day21" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day22" val="item.Day22" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day23" val="item.Day23" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day24" val="item.Day24" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day25" val="item.Day25" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day26" val="item.Day26" data-ng-change="CalculateDays(item)">
+
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day27" val="item.Day27" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day28" val="item.Day28" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day29" val="item.Day29" data-ng-change="CalculateDays(item)">
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day30" val="item.Day30" data-ng-change="CalculateDays(item)">
+
+                                        </td>
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.Day31" val="item.Day31" data-ng-change="CalculateDays(item)">
+
+                                        </td>
+                                        <td>
+                                            {{ item.Total ? item.Total:0   }}   @*{{item.Total}}*@
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-2 small-select padding-left-100 ">
+                <input type="button" data-ng-click="SaveEmployeeData()" class="btn btn-sm green-jungle " value="Save" />
+
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div data-ng-show="showEdit && SearchGroupTimesheetListPage.ReferralIDs.length >0">
+                <b>Notes</b>
+                <br/>
+                <div class="col-sm-12">
+                    <div class="portlet-body compact" style="display: block;">
+                        <div class="table-responsive">
+                            <form id="frmNoteList">
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+                                            <th class="width-100%">
+                                                <a class="anchor_color">Description</a>
+                                            </th>
+                                            <th class="width-120px">
+                                                <a class="anchor_color">Initials</a>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="item in ReferralActivityList.ReferralNotesList ">
+                                            <td class="width-100%">
+                                                <input class="form-control input-sm" style="width:100%" type="text" data-ng-model="item.Description">
+                                            </td>
+                                            <td>
+                                                <input class="form-control input-sm" type="text" data-ng-model="item.Initials">
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-2 small-select padding-left-100 ">
+                    <input type="button" data-ng-show="status==0" data-ng-click="AddNotes()" class="btn btn-sm green-jungle " value="Add Notes" />
+                    <input type="button" data-ng-show="status==1" data-ng-click="SaveNotes()" class="btn btn-sm green-jungle " value="Save Notes" />
+                    
+                </div>
+                <div class="col-sm-2 small-select padding-left-100 ">
+                    <input type="button" data-ng-show="status==1" data-ng-click="CancelEdit()" class="btn btn-sm blue border-green-cascade" value="Cancel Edit" />
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div data-ng-show="showEdit && SearchGroupTimesheetListPage.ReferralIDs.length >0">
+                <div class="col-sm-12">
+                    <div class="portlet-body compact" style="display: block;">
+                        <div class="table-responsive">
+                            <form id="frmNoteList">
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+                                            <th class="width-20px">
+                                                <a class="anchor_color">Date</a>
+                                            </th>
+                                            <th class="width-100%">
+                                                <a class="anchor_color">Description</a>
+                                            </th>
+                                            <th class="width-120px">
+                                                <a class="anchor_color">Initials</a>
+                                            </th>
+                                            <th class="width-120px">
+                                                <a class="anchor_color">Action</a>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="item in ReferralNotes">
+                                            <td> {{item.Date  | orgdate }} </td>
+                                            <td data-ng-bind="item.Description ? item.Description:'@Resource.NA'"> </td>
+                                            <td data-ng-bind="item.Initials ? item.Initials:'@Resource.NA'"> </td>
+                                            <td>
+                                                <a href=""
+                                                   class="btn btn-xs blue margin-right-05"
+                                                   data-ng-click="EditNotes(item)">
+                                                    <i class="fa fa-edit"></i>
+                                                </a>
+                                                <a href="javascript:void(0);"
+                                                   class="btn btn-xs red "
+                                                   data-ng-click="DeleteNotes(item.ReferralActivityNoteId)">
+                                                    <i class="fa fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/referralactivity.js")
+
+
+}

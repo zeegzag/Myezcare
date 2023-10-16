@@ -1,0 +1,199 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.ServicePlanList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ServicePlanList;
+}
+@model SetServicePlanListModel
+@Html.Hidden("hdnServicePlanListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="ServicePlanListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.ServicePlanList @*&nbsp;<small>@Resource.FacilityHouseInformation</small>*@
+            <a href="@Constants.ServicePlanAddURL" class="btn btn-sm green-jungle letter-space pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.ServicePlan</a>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchServicePlanModel.IsDeleted, Model.ActiveFilter.ToSelectList(Convert.ToString(Model.SearchServicePlanModel.IsDeleted), "Name", "Value", "", ""),
+                    new
+                    {
+                        id = "IsDeleted",
+                        data_ng_model = "SearchServicePlanModel.IsDeleted",
+                        data_ng_init = "SearchServicePlanModel.IsDeleted = SearchServicePlanModel.IsDeleted==null?'-1':SearchServicePlanModel.IsDeleted.toString()",
+                        @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                        data_ng_change = "SearchServicePlan()"
+                    })
+            </div>
+            <div class="btn-group" data-ng-if="SelectedServicePlanIds.length > 0">
+                <button type="button" data-ng-click="DeleteServicePlan()" class="btn blue btn-sm grey border-grey-cascade">
+                    <i class="fa fa-random margin-right-10"></i>{{SearchServicePlanModel.IsDeleted==0 ?'@Resource.DisableSelected' :(SearchServicePlanModel.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                </button>
+            </div>
+            <div class="inline-block pull-right" data-ng-show="ServicePlanList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" on-page-change="ServicePlanListPager.pageChanged(newPageNumber)" pagination-id="ServicePlanListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="">
+                        <form id="frmServicePlanlist">
+                            <table class="table table-pinned table-bordered table-striped table-condensed">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-50px text-align-left">
+                                            <div class="btn-group" data-ng-show="ServicePlanList.length > 0">
+                                                <input id="SelectAllServicePlan" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll(SelectAllCheckbox)" val="SelectAllCheckbox">
+                                                <label for="SelectAllServicePlan"></label>
+                                            </div>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('ServicePlanName')">@Resource.ServicePlan</a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'ServicePlanName'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('SetupFees')">@Resource.SetupFees</a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'SetupFees'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('PerPatientPrice')">@Resource.PerPatientPrice</a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'PerPatientPrice'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('NumberOfDaysForBilling')">@Resource.NumberOfDaysForBilling</a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'NumberOfDaysForBilling'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('Patient')">@Resource.HashPatients
+                                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.SPPatientHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                            </a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'Patient'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('Facility')">@Resource.HashFacilities
+                                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.SPFacilityHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                            </a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'Facility'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('Task')">@Resource.HashTasks
+                                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.SPTasksHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                            </a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'Task'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('Employee')">@Resource.HashEmployees
+                                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.SPEmployeeHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                            </a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'Employee'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServicePlanListPager.sortColumn('Billing')">@Resource.PercentBilling
+                                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.SPBillingHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                            </a>
+                                            <span class="sortorder" data-ng-show="ServicePlanListPager.sortIndex === 'Billing'" data-ng-class="{reverse:ServicePlanListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-120px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        <td></td>
+                                        <td class="">
+                                            @Html.TextBoxFor(m => m.SearchServicePlanModel.ServicePlanName, new { data_ng_model = "SearchServicePlanModel.ServicePlanName", @class = "form-control input-sm", placeholder = Resource.ServicePlanName, maxlength = 100 })
+                                        </td>
+                                        <td class="">
+                                            @Html.TextBoxFor(m => m.SearchServicePlanModel.SetupFees, new { data_ng_model = "SearchServicePlanModel.SetupFees", @class = "form-control input-sm", placeholder = Resource.SetupFees, maxlength = 10 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchServicePlanModel.PerPatientPrice, new { data_ng_model = "SearchServicePlanModel.PerPatientPrice", @class = "form-control input-sm", placeholder = Resource.PerPatientPrice, maxlength = 100 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchServicePlanModel.NumberOfDaysForBilling, new { data_ng_model = "SearchServicePlanModel.NumberOfDaysForBilling", @class = "form-control input-sm", placeholder = Resource.NumberOfDaysForBilling, maxlength = 100 })
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-align-center">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchServicePlan()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':ServicePlan.IsDeleted}" dir-paginate="servicePlan in ServicePlanList | itemsPerPage: ServicePlanListPager.pageSize" total-items="ServicePlanListPager.totalRecords" current-page="ServicePlanListPager.currentPage" pagination-id="ServicePlanListPagerID">
+                                        <td>
+                                            <span class="pull-left">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="servicePlan.IsChecked" val="servicePlan.IsChecked">
+                                            </span>
+                                        </td>
+                                        <td data-ng-bind="servicePlan.ServicePlanName"></td>
+                                        <td data-ng-bind="servicePlan.SetupFees"></td>
+                                        <td data-ng-bind="servicePlan.PerPatientPrice"></td>
+                                        <td data-ng-bind="servicePlan.NumberOfDaysForBilling"></td>
+                                        <td data-ng-bind="servicePlan.Patient"></td>
+                                        <td data-ng-bind="servicePlan.Facility"></td>
+                                        <td data-ng-bind="servicePlan.Task"></td>
+                                        <td data-ng-bind="servicePlan.Employee"></td>
+                                        <td data-ng-bind="servicePlan.Billing"></td>
+                                        <td class="text-align-center">
+                                            <a href="{{AddServicePlanURL + servicePlan.EncryptedServicePlanID}}" class="btn btn-xs blue">@Resource.Edit </a>
+                                            <a href="javascript:void(0);" data-ng-show="servicePlan.IsDeleted" data-ng-click="DeleteServicePlan(servicePlan,'@Resource.Enable')" class="btn btn-xs green servicePlan-enbl-cls">@Resource.Enable</a>
+                                            <a href="javascript:void(0);" data-ng-show="!servicePlan.IsDeleted" data-ng-click="DeleteServicePlan(servicePlan,'@Resource.Disable')" class="btn btn-xs red ">@Resource.Disable</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="ServicePlanList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(ServicePlanListPager.pageSize * ServicePlanListPager.currentPage) - ServicePlanListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(ServicePlanListPager.pageSize == ServicePlanListPager.currentPageSize) ? (ServicePlanListPager.pageSize * ServicePlanListPager.currentPage) :(ServicePlanListPager.pageSize * ServicePlanListPager.currentPage) - ServicePlanListPager.pageSize  + ServicePlanListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ServicePlanListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" on-page-change="ServicePlanListPager.pageChanged(newPageNumber)" pagination-id="ServicePlanListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ServicePlanList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/serviceplan/serviceplanlist")
+
+    <script type="text/javascript">
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.ServicePlan)';
+        var ServicePlanDelete = GetHtmlString('@Resource.ServicePlanDelete');
+    </script>
+}

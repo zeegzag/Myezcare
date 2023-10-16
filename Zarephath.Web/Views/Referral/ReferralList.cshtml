@@ -1,0 +1,710 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.ReferralList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ReferralList;
+}
+@model SetReferralListModel
+<link href="~/Assets/css/sitecss/bootstrap-editable.css" rel="stylesheet" />
+@Html.Hidden("hdnSetReferralListModel", Common.SerializeObject(Model))
+<div data-ng-controller="ReferralListController">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.ClientList
+            <small>@Resource.ClientsInfomation</small>
+            <a href="{{AddReferralURL}}" class="btn btn-sm green-jungle letter-space pull-right">
+                <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Referral
+            </a>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="portlet-body" style="display: block;">
+                <div>
+                    <button type="button" class="btn btn-sm btn-primary collapsed blue grey border-grey-cascade" data-toggle="collapse" data-target="#filter-panel">
+                        <i class="fa fa-sliders" aria-hidden="true"></i>&nbsp;All Filters
+                    </button>
+
+                    <div id="filter-panel" class="collapse in filter-panel">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <div class="col-md-2 col-sm-2">
+                                    <h6 class="sort-title">@Resource.Sortby</h6>
+                                    <hr>
+                                    <ul class="sort-list-info">
+                                        <li>
+                                            <a class="" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ClientName')">@Resource.Name</a>
+                                            <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                        </li>
+                                        <li>
+                                            <a class="" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ContractName')">@Resource.Payor</a>
+                                            <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ContractName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                        </li>
+                                        <li>
+                                            <a class="" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('FaciliatorName')">@Resource.CaseManager</a>
+                                            <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'FaciliatorName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                        </li>
+                                        <li>
+                                            <a class="" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('AssigneeName')">@Resource.Assignee</a>
+                                            <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'AssigneeName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                        </li>
+                                        <li>
+                                            <a class="" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Status')">@Resource.Status</a>
+                                            <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Status'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                        </li>
+                                        <li>
+                                            <a class="" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('CreatedDate')">@Resource.CreatedDate</a>
+                                            <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                        </li>
+                                        <li>
+                                            <a class="" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ModifiedDate')">@Resource.ModifiedDate</a>
+                                            <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ModifiedDate'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="col-md-10 col-sm-10">
+                                    <form>
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.Name</label>
+                                            @Html.TextBoxFor(m => m.SearchReferralListModel.ClientName, new { data_ng_model = "TempSearchReferralModel.ClientName", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.Payor</label>
+                                            @Html.DropDownListFor(p => p.SearchReferralListModel.PayorID, Model.Payors.ToSelectList(Model.SearchReferralListModel.PayorID.ToString() ?? "", "PayorName", "PayorID", Resource.SelectPayor, ""),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          id = "PayorID",
+                                                                          data_ng_model = "TempSearchReferralModel.PayorID",
+                                                                          data_ng_init = "TempSearchReferralModel.PayorID=TempSearchReferralModel.PayorID==''?null:TempSearchReferralModel.PayorID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.Status</label>
+                                            @Html.DropDownListFor(p => p.SearchReferralListModel.ReferralStatusID, Model.ReferralStatuses.ToSelectList(Model.SearchReferralListModel.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", Resource.SelectStatus, ""),
+                                                                  new
+                                                                      {
+                                                                          //  convert_to_number = "",
+                                                                          id = "ReferralStatusID",
+                                                                          data_ng_model = "TempSearchReferralModel.ReferralStatusID",
+                                                                          data_ng_init = "TempSearchReferralModel.ReferralStatusID=TempSearchReferralModel.ReferralStatusID==''?null:TempSearchReferralModel.ReferralStatusID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })
+                                        </div>
+                                        @if (Common.HasPermission(Constants.Permission_View_All_Referral))
+                                        {
+                                            <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                                <label class="control-label">@Resource.Assignee</label>
+                                                @Html.DropDownListFor(p => p.SearchReferralListModel.AssigneeID, Model.Assignee.ToSelectList(Model.SearchReferralListModel.AssigneeID.ToString() ?? "", "Name", "EmployeeID", Resource.SelectAssignee, ""),
+                                                                      new
+                                                                          {
+                                                                              convert_to_number = "",
+                                                                              id = "AssigneeID",
+                                                                              data_ng_model = "TempSearchReferralModel.AssigneeID",
+                                                                              data_ng_init = "TempSearchReferralModel.AssigneeID=TempSearchReferralModel.AssigneeID==''?null:TempSearchReferralModel.AssigneeID",
+                                                                              @class = "form-control input-sm",
+                                                                              data_val = false
+                                                                          })
+                                            </div>
+                                        }
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6" style="display: none">
+                                            <label class="control-label">@Resource.CheckListCompleted</label>
+                                            @* @Html.DropDownListFor(p => p.SearchReferralListModel.ChecklistID, Model.Checklist.ToSelectList(Model.SearchReferralListModel.ChecklistID.ToString() ?? "", "Name", "Value"),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          id = "ChecklistID",
+                                                                          data_ng_model = "TempSearchReferralModel.ChecklistID",
+                                                                          data_ng_init = "TempSearchReferralModel.ChecklistID=TempSearchReferralModel.ChecklistID==''?null:TempSearchReferralModel.ChecklistID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })*@
+                                            @Html.DropDownListFor(m => m.SearchReferralListModel.ChecklistID, Model.Checklist.ToSelectList(Convert.ToString(Model.SearchReferralListModel.ChecklistID), "Name", "Value", "", ""),
+                                                                  new
+                                                                      {
+                                                                          id = "ChecklistID",
+                                                                          data_ng_model = "TempSearchReferralModel.ChecklistID",
+                                                                          data_ng_init = "TempSearchReferralModel.ChecklistID = TempSearchReferralModel.ChecklistID==null?'-1':TempSearchReferralModel.ChecklistID.toString()",
+                                                                          @class = "form-control input-sm"
+                                                                      })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6" style="display: none">
+                                            <label class="control-label">@Resource.ClinicalReviewdone</label>
+                                            @Html.DropDownListFor(m => m.SearchReferralListModel.ClinicalReviewID, Model.ClinicalReview.ToSelectList(Convert.ToString(Model.SearchReferralListModel.ClinicalReviewID), "Name", "Value", "", ""),
+                                                                  new
+                                                                      {
+                                                                          id = "ClinicalReviewID",
+                                                                          data_ng_model = "TempSearchReferralModel.ClinicalReviewID",
+                                                                          data_ng_init = "TempSearchReferralModel.ClinicalReviewID = TempSearchReferralModel.ClinicalReviewID==null?'-1':TempSearchReferralModel.ClinicalReviewID.toString()",
+                                                                          @class = "form-control input-sm"
+                                                                      })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6" style="display: none">
+                                            <label class="control-label">@Resource.CaseManagerNotify</label>
+                                            @Html.DropDownListFor(m => m.SearchReferralListModel.NotifyCaseManagerID, Model.NotifyCaseManager.ToSelectList(Convert.ToString(Model.SearchReferralListModel.NotifyCaseManagerID), "Name", "Value", "", ""),
+                                                                  new
+                                                                      {
+                                                                          id = "NotifyCaseManagerID",
+                                                                          data_ng_model = "TempSearchReferralModel.NotifyCaseManagerID",
+                                                                          data_ng_init = "TempSearchReferralModel.NotifyCaseManagerID = TempSearchReferralModel.NotifyCaseManagerID==null?'-1':TempSearchReferralModel.NotifyCaseManagerID.toString()",
+                                                                          @class = "form-control input-sm"
+                                                                      })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.Service</label>
+                                            @Html.DropDownListFor(m => m.SearchReferralListModel.ServiceID, Model.Services.ToSelectList(Convert.ToString(Model.SearchReferralListModel.ServiceID), "Name", "Value", "", ""),
+                                                                  new
+                                                                      {
+                                                                          id = "ServiceID",
+                                                                          data_ng_model = "TempSearchReferralModel.ServiceID",
+                                                                          data_ng_init = "TempSearchReferralModel.ServiceID = TempSearchReferralModel.ServiceID==null?'-1':TempSearchReferralModel.ServiceID.toString()",
+                                                                          @class = "form-control input-sm"
+                                                                      })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.CaseManager</label>
+                                            @Html.DropDownListFor(p => p.SearchReferralListModel.CaseManagerID, Model.Facillator.ToSelectList(Model.SearchReferralListModel.CaseManagerID.ToString() ?? "", "Name", "CaseManagerID", Resource.SelectCaseManager, ""),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          id = "CaseManagerID",
+                                                                          data_ng_model = "TempSearchReferralModel.CaseManagerID",
+                                                                          data_ng_init = "TempSearchReferralModel.CaseManagerID=TempSearchReferralModel.CaseManagerID==''?null:TempSearchReferralModel.CaseManagerID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.CaseManagerPhone </label>
+                                            @Html.TextBoxFor(m => m.SearchReferralListModel.CaseManagerPhone, new
+                                                {
+                                                    data_ng_model = "TempSearchReferralModel.CaseManagerPhone",
+                                                    @class = "form-control input-sm",
+                                                    placeholder = @Resource.CaseManagerPhone,
+                                                    maxlength = 20
+                                                })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.Agency</label>
+                                            @Html.DropDownListFor(p => p.SearchReferralListModel.AgencyID, Model.Agencies.ToSelectList(Model.SearchReferralListModel.AgencyID.ToString() ?? "", "NickName", "AgencyID", Resource.SelectAgency, ""),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          id = "AgencyID",
+                                                                          data_ng_model = "TempSearchReferralModel.AgencyID",
+                                                                          data_ng_init = "TempSearchReferralModel.AgencyID=TempSearchReferralModel.AgencyID==''?null:TempSearchReferralModel.AgencyID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })
+                                        </div>
+                                        @*<div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.AgencyLocation</label>
+                                            @Html.DropDownListFor(p => p.SearchReferralListModel.AgencyLocationID, Model.AgencyLocations.ToSelectList(Model.SearchReferralListModel.AgencyLocationID.ToString() ?? "", "LocationName", "AgencyLocationID", Resource.SelectAgencyLocation, ""),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          id = "AgencyLocationID",
+                                                                          data_ng_model = "TempSearchReferralModel.AgencyLocationID",
+                                                                          data_ng_init = "TempSearchReferralModel.AgencyLocationID=TempSearchReferralModel.AgencyLocationID==''?null:TempSearchReferralModel.AgencyLocationID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })
+                                        </div>*@
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.IsDraft</label>
+                                            @Html.DropDownListFor(m => m.SearchReferralListModel.IsSaveAsDraft, Model.Draft.ToSelectList(Convert.ToString(Model.SearchReferralListModel.IsSaveAsDraft), "Name", "Value", "", ""),
+                                                                  new
+                                                                      {
+                                                                          id = "IsSaveAsDraft",
+                                                                          data_ng_model = "TempSearchReferralModel.IsSaveAsDraft",
+                                                                          data_ng_init = "TempSearchReferralModel.IsSaveAsDraft = TempSearchReferralModel.IsSaveAsDraft==null?'-1':TempSearchReferralModel.IsSaveAsDraft.toString()",
+                                                                          @class = "form-control input-sm"
+                                                                      })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.AHCCCSID</label>
+                                            @Html.TextBoxFor(m => m.SearchReferralListModel.AHCCCSID, new { data_ng_model = "TempSearchReferralModel.AHCCCSID", @class = "form-control input-sm", placeholder = Resource.AHCCCSID, maxlength = 20 })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.CISNumber</label>
+                                            @Html.TextBoxFor(m => m.SearchReferralListModel.CISNumber, new
+                                                {
+                                                    data_ng_model = "TempSearchReferralModel.CISNumber",
+                                                    @class = "form-control input-sm",
+                                                    placeholder = @Resource.CISNumber,
+                                                    maxlength = 20
+                                                })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.ParentNameS </label>
+                                            @Html.TextBoxFor(m => m.SearchReferralListModel.ParentName, new
+                                                {
+                                                    data_ng_model = "TempSearchReferralModel.ParentName",
+                                                    @class = "form-control input-sm",
+                                                    placeholder = @Resource.ParentNameS,
+                                                    maxlength = 20
+                                                })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.ParentPhone </label>
+                                            @Html.TextBoxFor(m => m.SearchReferralListModel.ParentPhone, new
+                                                {
+                                                    data_ng_model = "TempSearchReferralModel.ParentPhone",
+                                                    @class = "form-control input-sm",
+                                                    placeholder = @Resource.ParentPhone,
+                                                    maxlength = 20
+                                                })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.Language</label>
+                                            @Html.DropDownListFor(p => p.SearchReferralListModel.LanguageID, Model.LanguageModel.ToSelectList(Model.SearchReferralListModel.LanguageID.ToString() ?? "", "Name", "LanguageID", Resource.SelectLanguage, ""),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          id = "LanguageID",
+                                                                          data_ng_model = "TempSearchReferralModel.LanguageID",
+                                                                          data_ng_init = "TempSearchReferralModel.LanguageID=TempSearchReferralModel.LanguageID==''?null:TempSearchReferralModel.LanguageID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.Region</label>
+                                            @Html.DropDownListFor(p => p.SearchReferralListModel.RegionID, Model.RegionModel.ToSelectList(Model.SearchReferralListModel.RegionID.ToString() ?? "", "RegionName", "RegionID", Resource.SelectRegion, ""),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          id = "RegionID",
+                                                                          data_ng_model = "TempSearchReferralModel.RegionID",
+                                                                          data_ng_init = "TempSearchReferralModel.RegionID=TempSearchReferralModel.RegionID==''?null:TempSearchReferralModel.RegionID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6 pull-right margin-top-18">
+                                            <label class="control-label"></label>
+                                            <div class="pull-left col-md-push-1 col-md-11 no-padding">
+                                                <div class="col-md-6 no-right-padding">
+                                                    <button type="submit" class="btn btn-sm btn-primary form-control" data-ng-click="SearchReferral()">
+                                                        @Resource.Search
+                                                    </button>
+                                                </div>
+                                                <div class="col-md-6 no-right-padding">
+                                                    <button class="btn btn-sm grey border-grey-cascade form-control" data-ng-click="ResetSearchFilter()">
+                                                        @Resource.Reset
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="space20"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+            {
+                <div class="btn-group" data-ng-show="ReferralList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllReferral" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllReferral"></label>
+                    </span>
+                </div>
+            }
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchReferralListModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchReferralListModel.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempSearchReferralModel.IsDeleted",
+                                                                          data_ng_init = "TempSearchReferralModel.IsDeleted = TempSearchReferralModel.IsDeleted==null?'-1':TempSearchReferralModel.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchReferral()"
+                                                                      })
+            </div>
+            @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+            {
+                <div class="btn-group" data-ng-if="SelectedReferralIds.length > 0">
+                    <button type="button" data-ng-click="DeleteReferral()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchReferralModel.IsDeleted==0?'@Constants.DisableSelected' :(TempSearchReferralModel.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}</button>
+                </div>
+            }
+
+            <div class="btn-group margin-left-20PR">
+                    <div class="top pagination-sm" data-ng-show="AjaxStart">
+                        @Resource.Loading
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+
+            <div class="inline-block pull-right" data-ng-show="ReferralList.length > 0">
+                <input data-ng-model="ReferralListPager.currentPage" data-ng-model-options="{ debounce: 500 }" class="form-control input-sm setPagesize text-center" maxlength="4" />
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="ReferralListPager.maxSize" on-page-change="ReferralListPager.pageChanged(newPageNumber)" pagination-id="ReferralListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+
+
+    <div class="row" data-ng-if="ReferralList.length > 0">
+        <div class="col-sm-12">
+            <div class="portlet-body compact" style="display: block;">
+                <div class="table-responsive">
+                    <table class=" table table-bordered table-striped table-condensed flip-content table-checkable">
+
+                        <thead class="">
+                            <tr>
+                                <th class="width-50px"></th>
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ClientName')">@Resource.ClientLabel</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('NickName')">@Resource.NickName</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'NickName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Status')">@Resource.Status</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Status'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('AHCCCSID')">@Resource.AHCCCSID</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'AHCCCSID'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('CISNumber')">@Resource.CISLabel</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'CISNumber'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Gender')">@Resource.Sex</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Gender'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Age')">@Resource.Age</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Age'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ContractName')">@Resource.Payor</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ContractName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('CompanyName')">@Resource.Agency</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'CompanyName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('FaciliatorName')">@Resource.CaseManager</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'FaciliatorName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+
+                                <th>
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('AssigneeName')">@Resource.Assignee</a>
+                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'AssigneeName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                </th>
+
+                                @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                                {
+                                    <th class="width-130px"></th>
+                                }
+                            </tr>
+                        </thead>
+
+
+                        <tbody data-ng-if="ReferralList.length > 0" dir-paginate="referral in ReferralList | itemsPerPage: ReferralListPager.pageSize" total-items="ReferralListPager.totalRecords" current-page="ReferralListPager.currentPage" pagination-id="ReferralListPagerID">
+                            <tr data-ng-class="{'deleted':referral.IsDeleted}">
+                                <td>
+                                    @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                                    {
+                                        <span class="pull-left">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="referral.IsChecked" data-ng-change="SelectReferral(referral)" val="referral.IsChecked">
+                                        </span>
+                                    }
+
+                                    <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle pull-left"
+                                        data-toggle="collapse" data-ng-attr-data-target="{{'#ReferralDetails-'+referral.ReferralID }}"></span>
+
+
+
+                                </td>
+
+                                <td>
+                                    <a href="#" data-ng-href="/referral/addreferral/{{referral.EncryptedReferralID}}" data-ng-bind="referral.Name" target="_blank"></a>
+                                    <span>
+                                        <i class="fa fa-star priority" data-ng-if="referral.IsSaveAsDraft" title="@Resource.DraftTitle"></i>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span data-ng-bind="referral.ClientNickName ? referral.ClientNickName:'@Resource.NA'"></span>
+                                </td>
+                                <td>
+                                    @*<span data-ng-bind="referral.Status"></span>*@
+                                    <a id="pop-status" data-ng-if="!referral.IsSaveAsDraft" class="conditionstatus editable editable-click" data-toggle="popover" href="javascript:void(0);" popover-html="#popover-status" data-ng-bind="referral.Status" ng-value="referral.ReferralStatusID" savecallback="SaveStatus" ng-data="referral" ng-header="Status?"></a>
+                                    <span data-ng-if="referral.IsSaveAsDraft" data-ng-bind="referral.Status"></span>
+                                </td>
+                                <td>
+                                    <span data-ng-bind="referral.AHCCCSID? referral.AHCCCSID:'@Resource.NA'"></span>
+                                </td>
+                                <td>
+                                    <span data-ng-bind="referral.CISNumber? referral.CISNumber:'@Resource.NA'"></span>
+                                </td>
+
+                                <td>
+                                    <span data-ng-bind="referral.Gender"></span>
+                                </td>
+                                <td>
+                                    <span data-ng-bind="referral.Age"></span>
+                                </td>
+                                <td>
+                                    <span data-ng-bind="referral.ContractName? referral.ContractName:'@Resource.NA'"></span>
+                                </td>
+                                <td>
+                                    <span data-ng-bind="referral.CompanyName? referral.CompanyName:'@Resource.NA'"></span>
+                                </td>
+                                <td>
+                                    <span data-ng-bind="referral.FaciliatorName? referral.FaciliatorName:'@Resource.NA'"></span>
+                                </td>
+
+                                <td>
+                                    <a id="pop-assignee" class="conditionstatus editable editable-click" data-toggle="popover" ng-list="ReferralModel.AssigneeList" popover-html="#popover-assingee" data-ng-model="referral.AssigneeName" data-ng-bind="referral.AssigneeName" ng-value="referral.Assignee" savecallback="SaveAssignee" ng-data="referral" data-ng-bind="referral.AssigneeName" ng-header="Assignee"></a>
+                                </td>
+
+                                @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                                {
+                                    <td>
+                                        <a href="javascript:void(0);" data-ng-show="referral.IsDeleted" data-ng-click="DeleteReferral(referral,'Enable')" class="btn btn-xs green pull-right referral-enbl-cls">@Resource.Enable</a>
+                                        <a href="javascript:void(0);" data-ng-show="!referral.IsDeleted" data-ng-click="DeleteReferral(referral,'Disable')" class="btn btn-xs red pull-right">@Resource.Disable</a>
+                                        <a href="javascript:;" target="_blank" data-ng-href="/referral/addreferral/{{referral.EncryptedReferralID}}" class="btn btn-xs blue pull-right margin-right-05">@Resource.Edit </a>
+
+                                        <a class="pull-right padding-right-10" href="javascript:void(0);" data-ng-if="!referral.IsSaveAsDraft" email-confirmation yes-callback="SendReceiptNotificationEmail(referral)" header="@Resource.SendReferralNotificationEmailText"  title="@Resource.NotifyEmailCaseManager">
+                                            <span data-ng-class="{'badge-info':!reChecklistIDferral.NotifyCaseManager,'badge-success':referral.NotifyCaseManager}" class="referralEmailCM badge" data-ng-class="{'badge-info':!reChecklistIDferral.NotifyCaseManager,'badge-success':referral.NotifyCaseManager}">
+                                                <i class="fa fa-inbox"></i>
+                                            </span>
+                                        </a>
+                                    </td>
+                                }
+                            </tr>
+
+                            <tr data-ng-attr-id="{{'ReferralDetails-'+referral.ReferralID }}" class="collapse collapseDestination">
+                                <td></td>
+                                <td colspan="11">
+                                    <div class="padding-left-right-10">
+                                        <strong>@Resource.ReferralDetails</strong>
+                                        <div class="row">
+                                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                                <div class="portlet-body compact" style="display: block;">
+                                                    <div class="table-responsive ">
+                                                        <table class="table table-bordered table-striped table-condensed flip-content tblAdjudicationHostory">
+                                                            <thead class="flip-content">
+                                                                <tr>
+                                                                    <th class="text-align-left col-sm-6">
+                                                                        <span class="anchor_color">@Resource.PlacementRequirement</span>
+                                                                    </th>
+                                                                    <th class="col-sm-3">
+                                                                        <span class="">@Resource.ReferralSummary</span>
+                                                                    </th>
+                                                                    <th class="col-sm-3">
+                                                                        @*<span class="">@Resource.ReferralSummary</span>*@
+                                                                    </th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td class="text-align-left">
+                                                                        <div>
+                                                                            <div class="space5"></div>
+                                                                            <div class="BatchSummaryDiv">
+                                                                                <div class="td-batch-summary">@Resource.PlacementRequirement:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    {{ referral.PlacementRequirement?referral.PlacementRequirement:'@Resource.NoPlacementRequirement'}}
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="space5"></div>
+                                                                            <div class="BatchSummaryDiv">
+                                                                                <div class="td-batch-summary">@Resource.Service:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    {{referral.Services?referral.Services:'N/A'}}
+                                                                                </div>
+                                                                            </div>
+                                                                            <div class="space5"></div>
+                                                                        </div>
+                                                                        @*<div>
+                                                                            <div class="space20"></div>
+                                                                            <strong><u>@Resource.ModificationDetails</u></strong>
+                                                                            <div>
+                                                                                <div class="BatchSummaryDiv">
+                                                                                    <div class="td-services-summary">@Resource.CreatedDate:</div>
+                                                                                    <div class="BatchServiceDesc">{{referral.CreatedDate | dateformat }}</div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div class="td-services-summary">@Resource.CreatedBy: </div>
+                                                                                    <div class="BatchServiceDesc">{{referral.CreatedName}}</div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <div class="BatchSummaryDiv">
+                                                                                    <div class="td-services-summary">@Resource.UpdatedDate:</div>
+                                                                                    <div class="BatchServiceDesc">{{referral.UpdatedDate | dateformat }}</div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div class="td-services-summary">@Resource.UpdatedBy: </div>
+                                                                                    <div class="BatchServiceDesc">{{referral.UpdatedName}}</div>
+                                                                                </div>
+                                                                            </div>
+
+
+                                                                        </div>*@
+                                                                    </td>
+
+                                                                    <td>
+
+                                                                        <div>
+                                                                            <div class="space10"></div>
+                                                                            <strong><u>@Resource.ModificationDetails</u></strong>
+                                                                            <div>
+                                                                                <div class="BatchSummaryDiv">
+                                                                                    <div class="td-services-summary">@Resource.CreatedDate:</div>
+                                                                                    <div class="BatchServiceDesc">{{referral.CreatedDate | dateformat }}</div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div class="td-services-summary">@Resource.CreatedBy: </div>
+                                                                                    <div class="BatchServiceDesc">{{referral.CreatedName}}</div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <div class="BatchSummaryDiv">
+                                                                                    <div class="td-services-summary">@Resource.UpdatedDate:</div>
+                                                                                    <div class="BatchServiceDesc">{{referral.UpdatedDate | dateformat }}</div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div class="td-services-summary">@Resource.UpdatedBy: </div>
+                                                                                    <div class="BatchServiceDesc">{{referral.UpdatedName}}</div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="space10"></div>
+                                                                        </div>
+
+                                                                    </td>
+
+
+
+                                                                    <td>
+
+                                                                        <div>
+                                                                            <div class="space10"></div>
+                                                                            <strong><u>@Resource.ReviewDetails</u></strong>
+                                                                            <div>
+                                                                                <div class="BatchSummaryDiv">
+                                                                                    <div class="td-services-summary">@Resource.CheckListDate:</div>
+                                                                                    <div class="BatchServiceDesc"><span data-ng-if="referral.ChecklistName!=null">{{referral.ChecklistCompletedDate | datetimeformat | orgdatetime}}</span></div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div class="td-services-summary">@Resource.CheckListBy:</div>
+                                                                                    <div class="BatchServiceDesc">{{referral.ChecklistName?referral.ChecklistName:'@Resource.Notdone'}}</div>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <div class="BatchSummaryDiv">
+                                                                                    <div class="td-services-summary">@Resource.ClinicalReviewDate:</div>
+                                                                                    <div class="BatchServiceDesc"><span data-ng-if="referral.ClinicalReviewName!=null">{{referral.SparFormCompletedDate | datetimeformat | orgdatetime}}</span></div>
+                                                                                </div>
+                                                                                <div>
+                                                                                    <div class="td-services-summary">@Resource.ClinicalReviewBy:</div>
+                                                                                    <div class="BatchServiceDesc">{{referral.ClinicalReviewName?referral.ClinicalReviewName:'@Resource.Notdone'}}</div>
+                                                                                </div>
+                                                                            </div>
+
+                                                                            <div class="space10"></div>
+                                                                        </div>
+
+                                                                    </td>
+
+
+                                                                </tr>
+
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                             <td></td>
+                            </tr>
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12" data-ng-if="ReferralList.length > 0">
+        <div class="col-sm-3 pull-left no-padding">
+            @Resource.Showing <span data-ng-bind="(ReferralListPager.pageSize * ReferralListPager.currentPage) - ReferralListPager.pageSize  + 1"></span>
+            &nbsp;@Resource.To <span data-ng-bind="(ReferralListPager.pageSize == ReferralListPager.currentPageSize) ? (ReferralListPager.pageSize * ReferralListPager.currentPage) :(ReferralListPager.pageSize * ReferralListPager.currentPage) - ReferralListPager.pageSize  + ReferralListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralListPager.totalRecords"></span>&nbsp;@Resource.Records
+        </div>
+        <div class="pull-right top pagination-sm">
+            <dir-pagination-controls boundary-links="true" max-size="ReferralListPager.maxSize" on-page-change="ReferralListPager.pageChanged(newPageNumber)" pagination-id="ReferralListPagerID"></dir-pagination-controls>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ReferralList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@Html.Partial("_Popover")
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/referral/referrallist")
+
+    <script type="text/javascript">
+        var DeleteReferralConfirmMessage = '@Resource.DeleteReferralConfirmMessage';
+        var DeleteAllReferralConfirmMessage = '@Resource.DeleteAllReferralConfirmMessage';
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Referral)';
+        var ReferralDependencyExistMessage = '@Resource.ReferralDependencyExistMessage';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.Referral)';
+        var Inactive = '@((int)ReferralStatus.ReferralStatuses.Inactive)';
+        var ReferralAccepted = '@((int)ReferralStatus.ReferralStatuses.ReferralAccepted)';
+        var SendNotificationToCM = GetHtmlString('@Resource.SendNotificationToCM');
+        var SendNotificationToCMReferralAccepted = GetHtmlString('@Resource.SendNotificationToCMReferralAccepted');
+    </script>
+}

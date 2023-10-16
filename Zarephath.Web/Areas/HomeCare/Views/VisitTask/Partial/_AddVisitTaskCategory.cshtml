@@ -1,0 +1,230 @@
+﻿@model AddVisitTaskModel
+<div class="modal fade" id="addCategoryModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="font-size-20">@Resource.AddCategory</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <form id="frmVisitTaskCategory">
+                            <div class="col-md-12 col-md-12 no-padding">
+                                <div class="col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required margin-bottom-5">@Resource.TaskType</label>
+
+                                    @Html.DropDownListFor(p => p.Category.VisitTaskType, Model.VisitTaskTypes.ToSelectList(Model.VisitTask.VisitTaskType ?? "", "Name", "Value", @Resource.SelectTaskType, ""),
+                                                                          new
+                                                                          {
+                                                                              data_ng_model = "Category.VisitTaskType",
+                                                                              data_ng_init = "Category.VisitTaskType=Category.VisitTaskType==''?null:Category.VisitTaskType",
+                                                                              @class = "form-control input-sm requiredStrip"
+                                                                          })
+                                    @Html.ValidationMessageFor(q => q.Category.VisitTaskType)
+
+                                </div>
+                                <div class="col-lg-4 col-md-6 col-sm-6">
+                                    <label class="control-label required margin-bottom-5">@Resource.Category</label>
+                                    @Html.TextBoxFor(m => m.Category.CategoryName, new
+                                    {
+                                        @class = "form-control input-sm",
+                                        maxlength = "200",
+                                        data_ng_model = "Category.CategoryName",
+                                        placeholder = Resource.Category
+                                    })
+                                    @Html.ValidationMessageFor(m => m.Category.CategoryName)
+                                </div>
+
+                                <div class="col-lg-4 col-md-2 col-sm-4 margin-top-23">
+                                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveCategory()">@Resource.Save</button>
+                                    <button type="button" class="btn btn-sm red-mint" data-ng-click="ResetCategory()">@Resource.Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                        <hr style="display: inline-block; width: 100%;" />
+
+                        @*<div data-ng-show="Categories.length > 0">*@
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact" style="display: block;">
+                                        <div class="table-responsive emp_timeslotstbl scrollableTable">
+                                            <form>
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th>@Resource.Category</th>
+                                                            <th>@Resource.Type</th>
+                                                            <th class="width-80px">@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="text" data-ng-model="Search.CategoryName" class="form-control input-xs" />
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" data-ng-model="Search.Type" class="form-control input-xs" />
+                                                            </td>
+                                                            <td class="padding-5">
+                                                                <button type="submit" class="btn btn-xs btn-default" data-ng-click="GetModelCategoryList(true)" data-ng-tooltip="@Resource.Search">
+                                                                    <i class="fa fa-search"></i>
+                                                                </button>
+                                                                @*<a href="javascript:void(0);" class="btn btn-xs btn-default" data-ng-click="GetModelCategoryList(true)" title="@Resource.Search">
+                                                                    <i class="fa fa-search"></i>
+                                                                </a>*@
+                                                                <a href="javascript:void(0);" class="btn btn-xs btn-default" data-ng-click="Reset(true)" data-ng-tooltip="@Resource.Reset">
+                                                                    <i class="fa fa-refresh"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr data-ng-repeat="item in Categories">
+                                                            <td>{{item.VisitTaskCategoryName}}</td>
+                                                            <td>{{item.VisitTaskCategoryType}}</td>
+                                                            <td class="text-align-center">
+                                                                <a href="javascript:void(0);"  data-ng-click="EditCategory(item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                            <div data-ng-if="Categories.length == 0">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addSubCategoryModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="font-size-20">@Resource.AddSubCategory</span>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <form id="frmVisitTaskSubCategory">
+                            <div class="col-md-12 col-md-12 no-padding">
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <label class="control-label required margin-bottom-5">@Resource.TaskType</label>
+
+                                    @Html.DropDownListFor(p => p.Category.SubVisitTaskType, Model.VisitTaskTypes.ToSelectList(Model.VisitTask.VisitTaskType ?? "", "Name", "Value", @Resource.SelectTaskType, ""),
+                                                                       new
+                                                                       {
+                                                                           data_ng_model = "Category.VisitTaskType",
+                                                                           data_ng_init = "Category.VisitTaskType=Category.VisitTaskType==''?null:Category.VisitTaskType",
+                                                                           @class = "form-control input-sm requiredStrip",
+                                                                           data_ng_change = "GetVisitTaskCategoryByModel()"
+                                                                       })
+                                    @Html.ValidationMessageFor(p => p.Category.SubVisitTaskType)
+                                </div>
+
+                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                    <label class="control-label required margin-bottom-5">@Resource.Category</label>
+                                    <select id="parentCategoryLevel" class="form-control input-sm requiredStrip" data-ng-model="Category.ParentCategoryLevel"
+                                            data-val="true" data-val-required="@Resource.CategoryNameRequired" data-original-title="@Resource.CategoryNameRequired"
+                                            data-ng-options="item.VisitTaskCategoryID as item.VisitTaskCategoryName for item in PopupVisitTaskCategories">
+                                        <option value="">@Resource.SelectCategory</option>
+                                    </select>
+                                </div>
+
+                                <div class="col-lg-6 col-md-10 col-sm-6 margin-top-15">
+                                    <label class="control-label required margin-bottom-5">@Resource.SubCategory</label>
+                                    @Html.TextBoxFor(m => m.Category.SubCategoryName, new
+                               {
+                                   @class = "form-control input-sm",
+                                   maxlength = "200",
+                                   data_ng_model = "Category.SubCategoryName",
+                                   placeholder = Resource.Category
+                               })
+                                    @Html.ValidationMessageFor(m => m.Category.SubCategoryName)
+                                </div>
+
+                                <div class="col-lg-6 col-md-2 col-sm-4 margin-top-37">
+                                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveSubCategory()">@Resource.Save</button>
+                                    <button type="button" class="btn btn-sm red-mint" data-ng-click="ResetCategory()">@Resource.Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                        <hr style="display: inline-block; width: 100%;" />
+
+                        @*<div data-ng-show="Categories.length > 0">*@
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact" style="display: block;">
+                                        <div class="table-responsive emp_timeslotstbl scrollableTable">
+                                            <form>
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th>@Resource.SubCategory</th>
+                                                            <th>@Resource.Category</th>
+                                                            <th class="width-80px">@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <input type="text" data-ng-model="Search.SubCategoryName" class="form-control input-xs" />
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" data-ng-model="Search.CategoryName" class="form-control input-xs" />
+                                                            </td>
+                                                            <td class="padding-5">
+                                                                <button type="submit" class="btn btn-xs btn-default" data-ng-click="GetModelCategoryList(false)" data-ng-tooltip="@Resource.Search">
+                                                                    <i class="fa fa-search"></i>
+                                                                </button>
+                                                                @*<a href="javascript:void(0);" class="btn btn-xs btn-default" data-ng-click="GetModelCategoryList(false)" title="@Resource.Search">
+                                                                    <i class="fa fa-search"></i>
+                                                                </a>*@
+                                                                <a href="javascript:void(0);" class="btn btn-xs btn-default" data-ng-click="Reset(false)" data-ng-tooltip="@Resource.Reset">
+                                                                    <i class="fa fa-refresh"></i>
+                                                                </a>
+                                                            </td>
+                                                        </tr>
+                                                        <tr data-ng-repeat="item in Categories">
+                                                            <td>{{item.VisitTaskCategoryName}}</td>
+                                                            <td>{{item.ParentCategoryName}}</td>
+                                                            <td class="text-align-center">
+                                                                <a href="javascript:void(0);" data-ng-click="EditSubCategory(item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                            <div data-ng-if="Categories.length == 0">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,1009 @@
+﻿
+<script src="~/Assets/js/sitejs/signature.js"></script>
+@model GetDmas99Model
+@Html.Hidden("hdnDmas99Model", Common.SerializeObject(Model))
+
+<div data-ng-controller="Dmas99ListController">
+
+    <!----------------------DMAS 97 LIST-------------------------------------->
+    <div data-ng-if="IsShow==true">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="btn-group">
+                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                    </button>
+                </div>
+
+                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_DMAS99_Add))
+                {
+                    <div class="btn-group padding-left-15 pull-right">
+                        <button type="button" class="btn btn-primary btn-sm pull-right" data-ng-click="AddDmas99()"><i class="fa fa-plus">&nbsp;&nbsp;</i>DMAS-99</button>
+                    </div>
+                }
+
+            </div>
+            <div class="space20"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-400px text-align-center">
+                                            <a class="anchor_color" href="javascript:void(0);">ID</a>
+                                        </th>
+                                        <th class="width-400px text-align-center">
+                                            <a class="anchor_color" href="javascript:void(0);">CREATED BY</a>
+                                        </th>
+                                        <th class="width-400px text-align-center">CREATED DATE</th>
+                                        <th class="width-400px text-align-center">ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-ng-repeat="item in Dmas99List">
+                                    <tr>
+                                        <td class="text-align-center">{{item.Dmas99ID}}</td>
+                                        <td class="text-align-center">{{item.EmployeeName}}</td>
+                                        <td class="text-align-center">{{item.CreatedDate}}</td>
+                                        <td class="text-align-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_DMAS99_Add))
+                                            {
+                                                <a data-ng-click="AddDmas99(item)" class="btn btn-xs blue" title="Edit"><i class="fa fa-edit"></i></a>
+                                                <a data-ng-click="DeleteDmas99(item)" class="btn btn-xs red" title="Delete"><i class="fa fa-trash"></i></a>
+                                            }
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_DMAS99_Delete))
+                                            {
+                                                <a data-ng-click="DeleteDmas99(item)" class="btn btn-xs red" title="Delete"><i class="fa fa-trash"></i></a>
+                                            }
+                                            <a href="@Constants.Generate_Dmas99_Pdf{{item.Dmas99ID}}" class="btn btn-xs green-jungle" title="Print Pdf"><i class="fa fa-print"></i></a>
+                                            @*<a data-ng-click="Print(item)" class="btn btn-xs green-jungle" title="Print Pdf"><i class="fa fa-print"></i></a>*@
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_DMAS99_Add))
+                                            {
+                                                <a data-ng-click="Clone(item)" class="btn btn-xs blue-dark" title="Clone"><i class="fa fa-clone"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.Form)';
+        </script>
+    </div>
+    <!----------------------DMAS 97 LIST-------------------------------------->
+    <!----------------------DMAS 97 ADD-------------------------------------->
+    <div data-ng-if="IsShow==false">
+        <input type="hidden" data-ng-model="GetDmas99Model.Dmas99Model.Dmas99ID" />
+        <form id="briggsForm" name="briggsForm" class="ng-pristine ng-valid ng-valid-maxlength ng-valid-pattern ng-valid-email">
+            <DIV id="page_1">
+                <DIV class="text-center ft0 margin-top-20">
+                    Community-Based</NOBR> Care Recipient Assessment Report
+                </DIV>
+
+                <div class="container margin-left-10 margin-top-10 dmas-97-s1">
+                    <div class="col-12 col-sm-4 col-md-4 col-lg-4 dmas-97-s2">
+                        <nobr><input type="radio" name="51" data-ng-model="GetDmas99Model.Dmas99Model.Services" value="Agency"> Agency-Directed</nobr> Services
+                    </div>
+                    <div class="col-12 col-sm-4 col-md-4 col-lg-4 padding-top-4px">
+                        <nobr><input type="radio" name="51" data-ng-model="GetDmas99Model.Dmas99Model.Services" value="Consumer"> Consumer-Directed</nobr> Services
+                    </div>
+
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label class="control-label dmas-97-s6">Assessment Date:</label>
+                        <div class="input-group date dmas-97-s3" id="dmas99assessmentdate"
+                             datepicker="GetDmas99Model.Dmas99Model.AssessmentDate"
+                             data-ng-dateval="GetDmas99Model.Dmas99Model.AssessmentDate"
+                             data-ng-mindate="CurrentDate">
+                            <input type="text" id="date1" class="input-sm dateInputMask dmas-97-s4" />
+                        </div>
+                    </div>
+
+                </div>
+
+                <table cellpadding=0 cellspacing=0 class="border-all-cover margin-0px-10px width-845px">
+                    <tr>
+                        <td style="padding: 4px 58px"><input type="radio" name="r02" data-ng-model="GetDmas99Model.Dmas99Model.Visit" value="Initial Visit" />  Initial Visit</td>
+                        <td style="padding: 4px 32px"><input type="radio" name="r02" data-ng-model="GetDmas99Model.Dmas99Model.Visit" value="Routine Visit" />  Routine Visit</td>
+                        <td style="padding: 4px 58px"><input type="radio" name="r02" data-ng-model="GetDmas99Model.Dmas99Model.Visit" value="Six-Month Visit" /><NOBR>&nbsp;Six-Month</NOBR> <NOBR>Re-assessment</NOBR></td>
+                    </tr>
+                </table>
+
+                <TABLE cellpadding=0 cellspacing=0 class="t0">
+                    <TR>
+                        <TD class="tr7 td0"><P class="p1 ft1">&nbsp;</P></TD>
+                        <TD colspan=4 class="tr7 td49"><P class="p9 ft2"><label class="required"></label>Recipient’s Name:<input type="text" name="" class="txtbx1 height-17px width-160px" data-ng-model="GetDmas99Model.DmasReferrals.PatientName" required></P></TD>
+
+                        <TD class="tr7 td45"><P class="p1 ft1">&nbsp;</P></TD>
+                        <TD colspan=6 class="tr7 td46"><P class="p1 ft2 text-align-right margin-top--25px"> Date of Birth: </P></TD>
+                        <td colspan="2">
+                            <div class="input-group"
+                                 datepicker="GetDmas99Model.DmasReferrals.Dob"
+                                 data-ng-dateval="GetDmas99Model.DmasReferrals.Dob"
+                                 data-ng-mindate="CurrentDate"
+                                 data-ng-model="GetDmas99Model.DmasReferrals.Dob">
+                                <input type="text" id="date2" class="txtbx1 dateInputMask height-17px width-160px" />
+                            </div>
+                        </td>
+
+                    </TR>
+                    <TR>
+                        <TD class="tr7 td0"><P class="p1 ft1">&nbsp;</P></TD>
+                        <TD colspan=4 class="tr7 td49">
+                            <P class="p9 ft2">Medicaid ID #:
+                               <select data-ng-model="GetDmas99Model.Dmas99Model.MedicaidID" data-val="true" style="width:175px">
+                                   <option value="" selected>Select</option>
+                                   <option data-ng-repeat="item in GetDmas99Model.DmasPayorList" value="{{item.BeneficiaryNumber}}">{{item.BeneficiaryNumber}}</option>
+                               </select>
+                            </P>
+                        </TD>
+
+                        <TD class="tr7 td45"><P class="p1 ft1">&nbsp;</P></TD>
+                        <TD colspan=6 class="tr7 td46">
+                            <P class="p1 ft2 text-align-right margin-top--25px">Start of Care:</P>
+                        </TD>
+                        <td colspan="2">
+                            <div class="input-group date"
+                                 datepicker="GetDmas99Model.Dmas99Model.StartOfCare"
+                                 data-ng-dateval="GetDmas99Model.Dmas99Model.StartOfCare"
+                                 data-ng-mindate="CurrentDate">
+                                <input type="text" id="date3" class="txtbx1 dateInputMask height-17px width-160px" />
+                            </div>
+                        </td>
+
+                    </TR>
+                    <TR>
+                        <TD class="tr8 td0"><P class="p1 ft1">&nbsp;</P></TD>
+                        <TD colspan=12 class="tr8 td52"><P class="p9 ft2">Recipient’s Current Address:<input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.DmasReferrals.address1" style="width: 340px;"></P></TD>
+
+                        <TD colspan=10 class="tr8 td10"><P class="p1 ft2">Agency Name:<input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.DmasReferrals.NickName" style="width: 178px;"></P></TD>
+                    </TR>
+                    <TR>
+                        <TD class="tr8 td0"><P class="p1 ft1">&nbsp;</P></TD>
+                        <td colspan="12" class="tr8 td10"><p class="p1 ft2"><input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.DmasReferrals.address2" style="width: 505px; margin-left: 8px;"></p></td>
+                        <td colspan="10" class="tr8 td52"><p class="p9 ft2">Provider ID #:<input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.DmasReferrals.NPI" style="width: 181px;"></p></td>
+
+                    </TR>
+                    <TR>
+                        <TD class="tr8 td0"><P class="p1 ft1">&nbsp;</P></TD>
+                        <TD colspan=12 class="tr8 td43"><P class="p9 ft2">Recipient’s Phone:<input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.DmasReferrals.Phone1" style="width: 396px;"></P></TD>
+
+                        <TD colspan=10 class="tr8 td55"><P class="p1 ft2">Recipient’s SSN#:<input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.DmasReferrals.SocialSecurityNumber" style="width: 159px;"></P></TD>
+
+                    </TR>
+                    <TR>
+                        <TD class="tr9 td26"><P class="p1 ft1">&nbsp;</P></TD>
+                        <TD colspan=22 class="tr9"><P class="p9 ft6">FUNCTIONAL STATUS</P></TD>
+                    </TR>
+
+
+                    <table class="example-table">
+                        <thead>
+                            <tr>
+                                <th rowspan="2">ADLs</th>
+                                <th rowspan="2">
+                                    Needs No
+                                    Help
+                                </th>
+                                <th rowspan="2">
+                                    MH
+                                    Only
+                                </th>
+                                <th colspan="2">Human Help</th>
+                                <th colspan="2">MH & Human Help</th>
+                                <th rowspan="2">
+                                    Always
+                                    Performed
+                                    By Others
+                                </th>
+                                <th rowspan="2">
+                                    Is Not
+                                    Performed
+                                    At All
+                                </th>
+                            </tr>
+                            <tr>
+                                <td>Supervise</td>
+                                <td>Phys. Asst.</td>
+                                <td>Supervise</td>
+                                <td>Phys. Asst.</td>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            <tr>
+                                <td>Bathing</td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.BathNNH">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.BathMHO">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BathHuSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BathHuPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BathMHSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BathMHPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BathAPO" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BathINP" /></td>
+                            </tr>
+                            <tr>
+                                <td>Dressing</td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.DresNNH">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.DresMHO">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.DresHuSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.DresHuPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.DresMHSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.DresMHPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.DresAPO" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.DresINP" /></td>
+                            </tr>
+                            <tr>
+                                <td>Toileting</td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.ToilNNH">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.ToilMHO">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.ToilHuSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.ToilHuPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.ToilMHSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.ToilMHPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.ToilAPO" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.ToilINP" /></td>
+                            </tr>
+                            <tr>
+                                <td>Transferring</td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.TranNNH">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.TranMHO">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.TranHuSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.TranHuPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.TranMHSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.TranMHPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.TranAPO" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.TranINP" /></td>
+                            </tr>
+                            <tr>
+                                <td>Eating/Feeding</td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.EatNNH">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+                                <td>
+                                    <select class="drpdwn1" data-ng-model="GetDmas99Model.Dmas99Model.EatMHO">
+                                        <option value="" selected="selected" disabled>-select-</option>
+                                        <option value="Yes">Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.EatHuSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.EatHuPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.EatMHSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.EatMHPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.EatAPO" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.EatINP" /></td>
+                            </tr>
+                            <tr>
+                                <td colspan="9">&nbsp;</td>
+                            </tr>
+
+
+
+                        </tbody>
+                    </table>
+
+                    <table class="example-table">
+                        <thead>
+                            <tr>
+                                <td>CONTINENCE</td>
+                                <td>Continent</td>
+                                <td>Incontinent &lt; Weekly</td>
+                                <td>Incontinent Self Care</td>
+                                <td>Incontinent Weekly or &gt;</td>
+                                <td>External Device Not Self Care</td>
+                                <td>Indwelling Cath Not Self Care</td>
+                                <td>Ostomy Not Self Care</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Bowel</td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BowCon" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BowWeek" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BowSelf" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BowInConWeek" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BowExDe" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BowInCa" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BowOsNo" /></td>
+                            </tr>
+                            <tr>
+                                <td>Bladder</td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BladCon" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BladWeek" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BladSelf" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BladInConWeek" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BladExDe" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BladInCa" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BladOsNo" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <table class="example-table">
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="text-left td-height-14">MOBILITY</td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td rowspan="2">
+                                    Needs No
+                                    Help
+                                </td>
+                                <td rowspan="2">
+                                    MH
+                                    Only
+                                </td>
+                                <td colspan="2">Human Help</td>
+                                <td colspan="2">MH & Human Help</td>
+                                <td rowspan="2">
+                                    Confined
+                                    Moves About
+                                </td>
+                                <td rowspan="2">
+                                    Confined Does Not
+                                    Move About
+                                </td>
+                            </tr>
+
+                            <tr>
+                                <td>Supervise</td>
+                                <td>Phys. Asst.</td>
+                                <td>Supervise</td>
+                                <td>Phys. Asst.</td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.MobNNH" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.MobMHO" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.MobHuSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.MobHuPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.MobMHSup" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.MobMHPhy" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.MobCMA" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.MobCDN" /></td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <br>
+                    <table class="example-table">
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="text-left td-height-14">ORIENTATION</td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td>Oriented</td>
+                                <td>Disoriented-Some Spheres/Sometimes</td>
+                                <td>Disoriented-Some Spheres/All Times</td>
+                                <td>Disoriented-All Spheres/Sometimes</td>
+                                <td>Disoriented-All Spheres/All Times</td>
+                                <td>Semi-Comatose/ Comatose</td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.Oriented" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.OrieDsSt" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.OrieDsAt" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.OrieDaSt" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.OrieDaAt" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.OrieSeCo" /></td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+
+                    <table class="example-table">
+                        <tr>
+                            <td>
+                                Spheres Affected: &nbsp;
+                                <input type="text" class="txtbx2 text-align-left" data-ng-model="GetDmas99Model.Dmas99Model.SpheresAffected" style="width:150px;"/>
+                            </td>
+                            <td>
+                                Source of Info: &nbsp;
+                                <input type="text" class="txtbx2 text-align-left" data-ng-model="GetDmas99Model.Dmas99Model.SourceInfo" style="width:150px;"/>
+                            </td>
+                        </tr>
+                    </table>
+                    <br>
+
+                    <table class="example-table">
+                        <tbody>
+                            <tr>
+                                <td colspan="8" class="text-left td-height-14">BEHAVIOR</td>
+                            </tr>
+                        </tbody>
+                        <tbody>
+                            <tr>
+                                <td>Appropriate</td>
+                                <td>Wandering/Passive &lt; Than Weekly</td>
+                                <td>Wandering/Passive Weekly or &gt;</td>
+                                <td>Abusive/Aggressive/ Disruptive&lt; Weekly</td>
+                                <td>Abusive/Aggressive/ Disruptive &gt; Weekly</td>
+                                <td>Semi-Comatose/ Comatose</td>
+                            </tr>
+
+                            <tr>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.Appropriate" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BehWpLe" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BehWpGr" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BehAdLe" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BehAdGr" /></td>
+                                <td><input type="text" class="txtbx2" data-ng-model="GetDmas99Model.Dmas99Model.BehSeCo" /></td>
+                            </tr>
+                            <tr>
+                                <td colspan="8" class="text-left">Describe Inappropriate Behavior: &nbsp;
+                                    <input type="text" class="txtbx2 text-align-left" data-ng-model="GetDmas99Model.Dmas99Model.DesInappropriateBehavior" style="width:150px;"/>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                    </table>
+                    <table class="example-table">
+                        <tr>
+                            <td></td>
+                            <td>
+                                Source of Info: &nbsp;
+                                <input type="text" class="txtbx2 text-align-left" data-ng-model="GetDmas99Model.Dmas99Model.SourceInfo2" style="width:150px;" />
+                            </td>
+                        </tr>
+                    </table>
+                    <p></p>
+                    <table class="no-border-table">
+                        <thead>
+                            <tr>
+                                <th class="text-left padding-left-10 border-right">JOINT MOTION</th>
+                                <th class="text-left padding-left-10">MED. ADMINISTRATION</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td style="border-right:1px solid;"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkWithinNormalLimit" /> Within normal limits or instability corrected 0</td>
+                                <td><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkWithoutAssistance" /> Without assistance 0</td>
+                            </tr>
+
+                            <tr>
+                                <td style="border-right:1px solid;"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkLimitedMotion" /> Limited motion  1</td>
+                                <td><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkMonitoredByLayPerson " /> Administered/monitored by lay person  1</td>
+                            </tr>
+
+                            <tr>
+                                <td style="border-right:1px solid;"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkInstabilityUncorrected" /> Instability uncorrected or immobile  2</td>
+                                <td><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkMonitoredByNursing" /> Administered/monitored by professional nursing staff 2</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </TABLE>
+                <P class="p40 ft6">MEDICAL/NURSING INFORMATION</P>
+
+                <div class="border-all-cover margin-0px-10px">
+                    <P class="p41">Diagnoses: <input type="text" name="" class="txtbx1 height-17px width-670px" data-ng-model="GetDmas99Model.Dmas99Model.Diagnoses"></P>
+                    <P class="p42">Medications: <input type="text" name="" class="txtbx1 height-17px width-660px" data-ng-model="GetDmas99Model.Dmas99Model.Medications"></P>
+                    <P class="p42">Current Health Status/Condition:<input type="text" name="" class="txtbx1 height-17px width-534px" data-ng-model="GetDmas99Model.Dmas99Model.CurrHealthStatus"></P>
+                    <P class="p42">Current Medical Nursing Needs:<input type="text" name="" class="txtbx1 height-17px width-540px" data-ng-model="GetDmas99Model.Dmas99Model.CurrMedicalNeeds"></P>
+                    <P class="p42">Therapies/Special Medical Procedures:<input type="text" name="" class="txtbx1 height-17px width-492px" data-ng-model="GetDmas99Model.Dmas99Model.TherapiesMedProc"></P>
+
+                    <table class="margin-left-14">
+                        <tr>
+                            <td colspan="2">Hospitalizations Date(s):</td>
+                            <td colspan="2">
+                                <div class="input-group date p43" id="dmas99hospitalizationdate"
+                                     datepicker="GetDmas99Model.Dmas99Model.HospitalizationDate"
+                                     data-ng-dateval="GetDmas99Model.Dmas99Model.HospitalizationDate"
+                                     data-ng-mindate="GetDmas99Model.Dmas99Model.HospitalizationDate">
+                                    <input type="text" class=" dateInputMask width-200px">
+									 <span class="field-validation-valid"></span>
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </td>
+                            <td colspan="2"><p class="margin-left-10"></p></td>
+                            <td>Reason(s): </td>
+                            <td colspan="2"><input type="text" class="txtbx1 height-17px width-255px" data-ng-model="GetDmas99Model.Dmas99Model.Reason"></td>
+                        </tr>
+                    </table>
+                </div>
+
+                <P class="p41 ft8"><NOBR>DMAS-99</NOBR> rev. 09/09<SPAN style="padding-left:576px;">Page 1</SPAN></P>
+
+                <P class="p44 ft23">This form contains <NOBR>patient-identifiable</NOBR> information and is intended for review and use of no one except authorized parties. Misuse or disclosure of this information is prohibited by State and Federal Laws. If you have obtained this form by mistake, please send it to: DMAS, 600 East</P>
+                <TABLE cellpadding=0 cellspacing=0 class="t1" style="margin-bottom: 20px;">
+                    <TR>
+                        <TD class="tr21 td186"><P class="p1 ft23">Broad Street, Suite 1300, Richmond, VA 23219<SPAN class="ft9">.</SPAN></P></TD>
+                        <TD class="tr21 td192"><P class="p1 ft7">Do not alter or revise this form in any manner.</P></TD>
+                    </TR>
+                </TABLE>
+
+            </DIV>
+
+            <DIV id="page_2">
+                <div class="row container margin-left-10 margin-top-10" style="height: 30px; width:845px;">
+                    <div class="col-sm-6 p45 ft2">
+                        Recipient Name:&nbsp;<input type="text" class="txtbx1 height-17px width-160px" data-ng-model="GetDmas99Model.DmasReferrals.PatientName" />
+                    </div>
+                    <div class="col-sm-6">
+                        <P class="input-group date p45 ft2"
+                           datepicker="GetDmas99Model.Dmas99Model.AssessmentDate"
+                           data-ng-dateval="GetDmas99Model.Dmas99Model.AssessmentDate"
+                           data-ng-mindate="CurrentDate">
+                            Date of Assessment:
+                            <input type="text" id="date5" class="txtbx1 height-17px width-160px dateInputMask" >
+                        </P>
+                    </div>
+                </div>
+
+                <P class="p46 ft24">SUPPORT SYSTEM</P>
+
+                <DIV class="border-all-cover margin-0px-10px">
+                    <P class="p47 ft9">Waiver services the recipient is receiving, and the provider agency, at the time of the visit (check all that apply):</P>
+                    <TABLE cellpadding=0 cellspacing=0 class="t2">
+                        <TR height=0>
+                            <TD width=334px></TD>
+                            <TD width=36px></TD>
+                            <TD width=319px></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=2 class="tr16 td193"><P class="p1 ft16"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChktyAgencyPersonalCare" />&nbsp;Agency Personal Care: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.tyAgencyPersonalCare" style="width: 249px;height:17px"></P></TD>
+                            <TD class="tr16 td194"><P class="p1 ft8"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkCDPersonalCare" />&nbsp;CD Personal Care <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.CDPersonalCare" style="width: 266px;height:17px"></P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=2 class="tr16 td193"><P class="p1 ft16"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkAgencyRespite" />&nbsp;Agency Respite <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.AgencyRespite" style="width: 300px;height:17px"></P></TD>
+                            <TD class="tr16 td194"><P class="p1 ft8"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkCDRespite" />&nbsp;CD Respite <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.CDRespite" style="width: 300px;height:17px"></P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=2 class="tr16 td195"><P class="p1 ft16"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkADHC" />&nbsp;ADHC <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ADHC" style="width: 355px;height:17px"></P></TD>
+                            <TD class="tr16 td196"><P class="p1 ft16"><input type="checkbox" name="ch1" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ChkPERS" />&nbsp;PERS <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.PERS" style="width: 324px;height:17px"></P></TD>
+                        </TR>
+                    </TABLE>
+                    <P class="p48 ft16">What Waiver service is the patient pay to be deducted? <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.WhWaSerIsThPatPayToBeDed" style="width: 792px;height:17px"></P>
+                    <P class="p48 ft16">Hours the aide provides care to the recipient: Total Weekly Hours: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.TotalWeeklyHours" style="width: 180px;height:17px"> Days Per Week:<input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.DaysPerWeek" style="width: 170px;height:17px"></P>
+                    <P class="p48 ft16">Specific Hours the aide is in the recipient’s home: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.SpecHoursAidIsReciHome" style="width: 792px;height:17px"></P>
+                    <P class="p48 ft16">Other <NOBR>Medicaid/non-Medicaid</NOBR> funded services received: (example: services through the Veterans Administration)<input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.OtMedNonMedFundSerRcvd1" style="width: 197px;height:17px"></P>
+                    <P class="p48 ft18"><input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.OtMedNonMedFundSerRcvd2" style="width: 795px;height:17px"></P>
+                    <P class="p48 ft16">Who is the primary care giver(s): <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.WhoIsThePrimaryCareGiver" style="width: 792px;height:17px"></P>
+                    <TABLE cellpadding=0 cellspacing=0 class="t3">
+                        <TR>
+                            <TD class="tr16 td197"><P class="p1 ft16">Does the primary care giver (PCG) live with the recipient:</P></TD>
+                            <TD class="tr16 td56"><P class="p1 ft16"><input type="radio" name="r03" data-ng-model="GetDmas99Model.Dmas99Model.PrimCareGvrLiveWithReci" value="Yes"> Yes</P></TD>
+                            <TD class="tr16 td198"><P class="p1 ft8"><input type="radio" name="r03" data-ng-model="GetDmas99Model.Dmas99Model.PrimCareGvrLiveWithReci" value="No"> No Relationship to recipient: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.NoRelationshipReci" style="width: 185px;height:17px"></P></TD>
+                        </TR>
+                    </TABLE>
+                    <P class="p48 ft16">Type of care the PCG provides to the recipient: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.PCGProvidesToTheReci1" style="width: 450px;height:17px"></P>
+                    <P class="p48 ft16"><input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.PCGProvidesToTheReci2" style="width: 702px;height:17px"></P>
+                    <P class="p48 ft16">
+                        How often does the PCG see the recipient?
+                        <span class="ft25"><input type="radio" name="Daily" data-ng-model="GetDmas99Model.Dmas99Model.RdBtHowOfDoesPCGSeeTheReci" value="Daily" /></span> Daily
+                        <span class="ft25"><input type="radio" name="Daily" data-ng-model="GetDmas99Model.Dmas99Model.RdBtHowOfDoesPCGSeeTheReci" value="Weekly" /></span> Weekly
+                        <span class="ft25"><input type="radio" name="Daily" data-ng-model="GetDmas99Model.Dmas99Model.RdBtHowOfDoesPCGSeeTheReci" value="Monthly" /></span> Monthly
+                        <span class="ft25"><input type="radio" name="Daily" data-ng-model="GetDmas99Model.Dmas99Model.RdBtHowOfDoesPCGSeeTheReci" value="Other" /></span> Other  <input type="text" name="" data-ng-model="GetDmas99Model.Dmas99Model.HowOfDoesPCGSeeTheReci" class="txtbx1" style="width: 269px;height:17px">
+                    </P>
+                    <P class="p48 ft18">Who other than the recipient is authorized to sign the aide records?<input type="text" name="" data-ng-model="GetDmas99Model.Dmas99Model.WhOtThReciAuthorzdToSignAidRecord" class="txtbx1" style="width: 344px;height:17px"></P>
+                    <TABLE cellpadding=0 cellspacing=0 class="t4">
+                        <TR>
+                            <TD class="tr21 td199"><P class="p1 ft9">Is the recipient receiving PERS?:<input type="radio" name="r05" data-ng-model="GetDmas99Model.Dmas99Model.IsReciReceivingPERS" value="Yes"> Yes</P></TD>
+                            <TD class="tr21 td200"><P class="p1 ft9"><input type="radio" name="r05" data-ng-model="GetDmas99Model.Dmas99Model.IsReciReceivingPERS" value="No"> No If applicable, is he/she receiving a Medication Monitor?:<input type="radio" name="r06" data-ng-model="GetDmas99Model.Dmas99Model.HeRecevingMedMonitor" value="Yes"> Yes</P></TD>
+                            <TD class="tr21 td47"><P class="p1 ft9"><input type="radio" name="r06" data-ng-model="GetDmas99Model.Dmas99Model.HeRecevingMedMonitor" value="No"> No</P></TD>
+                        </TR>
+                    </TABLE>
+                    <P class="p46 ft7"><SPAN class="ft26">If the recipient has PERS and/or Medication Monitoring, answer the following questions</SPAN>:</P>
+                    <TABLE cellpadding=0 cellspacing=0 class="t5">
+                        <TR>
+                            <TD class="tr4 td201"><P class="p1 ft9">Is the recipient 14 years of age or older?:</P></TD>
+                            <TD class="tr4 td202"><P class="p1 ft9"><input type="radio" name="r07" data-ng-model="GetDmas99Model.Dmas99Model.IsReci14YrsOfAgeOrOld" value="Yes"> Yes </P></TD>
+                            <TD class="tr4 td203"><P class="p1 ft9"><input type="radio" name="r07" data-ng-model="GetDmas99Model.Dmas99Model.IsReci14YrsOfAgeOrOld" value="No"> No </P></TD>
+                            <TD class="tr4 td56"><P class="p1 ft1">&nbsp;</P></TD>
+                            <TD class="tr4 td204"><P class="p1 ft1">&nbsp;</P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=2 class="tr17 td205"><P class="p1 ft18">Is PERS adequate to meet the recipient’s needs?:</P></TD>
+                            <TD class="tr17 td203"><P class="p30 ft18"><input type="radio" name="r08" data-ng-model="GetDmas99Model.Dmas99Model.IsPERSAdequateMeetReciNeed" value="Yes"> Yes </P></TD>
+                            <TD class="tr17 td56"><P class="p1 ft18"><input type="radio" name="r08" data-ng-model="GetDmas99Model.Dmas99Model.IsPERSAdequateMeetReciNeed" value="No"> No </P></TD>
+                            <TD class="tr17 td204"><P class="p1 ft17">&nbsp;</P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=3 class="tr16 td195"><P class="p1 ft16">Is there time when the telephone service is disconnected?:</P></TD>
+                            <TD class="tr16 td56"><P class="p9 ft16"><input type="radio" name="r09" data-ng-model="GetDmas99Model.Dmas99Model.TimeWhenPhoneServiceDiscontd" value="Yes"> Yes</P></TD>
+                            <TD class="tr16 td204"><P class="p1 ft16"><input type="radio" name="r09" data-ng-model="GetDmas99Model.Dmas99Model.TimeWhenPhoneServiceDiscontd" value="No"> No</P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=3 class="tr21 td195"><P class="p1 ft9">Is the recipient pleased with the service from PERS provider?</P></TD>
+                            <TD class="tr21 td56"><P class="p21 ft9"><input type="radio" name="r10" data-ng-model="GetDmas99Model.Dmas99Model.ReciPleasedWithServicePERSPrvdr" value="Yes"> Yes</P></TD>
+                            <TD class="tr21 td204"><P class="p28 ft9"><input type="radio" name="r10" data-ng-model="GetDmas99Model.Dmas99Model.ReciPleasedWithServicePERSPrvdr" value="No"> No</P></TD>
+                        </TR>
+                    </TABLE>
+                    <P class="p49 ft7"><NOBR>CONSUMER-DIRECTED</NOBR> SPECIFIC:</P>
+                    <P class="p48 ft9">Person directing/managing the care: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.PersonDirectingCare" style="width: 100px;height:17px"> Relationship to recipient: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.DirectingCareRelationshipToReci" style="width: 100px;height:17px"></P>
+                    <P class="p48 ft18">Person providing the care: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.PersonProvidingCare" style="width: 100px;height:17px"> Relationship to recipient: <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.ProvidingCareRelationshipToReci" style="width: 100px;height:17px"></P>
+                    <TABLE cellpadding=0 cellspacing=0 class="t6">
+                        <TR height=0>
+                            <TD width=268px></TD>
+                            <TD width=123px></TD>
+                            <TD width=44px></TD>
+                            <TD width=34px></TD>
+                            <TD width=44px></TD>
+                            <TD width=160px></TD>
+                            <TD width=15px></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=2 class="tr21 td206"><P class="p1 ft9">Is the recipient in need of PERS at all times to be maintained safely?:</P></TD>
+                            <TD class="tr21 td202"><P class="p1 ft9"><input type="radio" name="r11" data-ng-model="GetDmas99Model.Dmas99Model.ReciNeedOfPERSAtAllTimesToMaSafely" value="Yes"> Yes</P></TD>
+                            <TD class="tr21 td207"><P class="p1 ft9"><input type="radio" name="r11" data-ng-model="GetDmas99Model.Dmas99Model.ReciNeedOfPERSAtAllTimesToMaSafely" value="No"> No</P></TD>
+                            <TD class="tr21 td202"><P class="p1 ft1">&nbsp;</P></TD>
+                            <TD class="tr21 td208"><P class="p1 ft1">&nbsp;</P></TD>
+                            <TD class="tr21 td156"><P class="p1 ft1">&nbsp;</P></TD>
+                        </TR>
+                        <TR>
+                            <TD class="tr4 td209"><P class="p1 ft1">&nbsp;</P></TD>
+                            <TD colspan=3 class="tr4 td210"><P class="p2 ft7"><NOBR>AGENCY-DIRECTED</NOBR> SPECIFIC:</P></TD>
+                            <TD class="tr4 td202"><P class="p1 ft1">&nbsp;</P></TD>
+                            <TD class="tr4 td208"><P class="p1 ft1">&nbsp;</P></TD>
+                            <TD class="tr4 td156"><P class="p1 ft1">&nbsp;</P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=4 class="tr16 td211"><P class="p1 ft16">Is the recipient in need of supervision or PERS at all times to be maintained safely?:</P></TD>
+                            <TD class="tr16 td202"><P class="p1 ft16"><input type="radio" name="r12" data-ng-model="GetDmas99Model.Dmas99Model.ReciNeedOfSupVisionAtAllTimesToMaSafely" value="Yes"> Yes</P></TD>
+                            <TD class="tr16 td208"><P class="p1 ft16"><input type="radio" name="r12" data-ng-model="GetDmas99Model.Dmas99Model.ReciNeedOfSupVisionAtAllTimesToMaSafely" value="No"> No</P></TD>
+                            <TD class="tr16 td156"><P class="p1 ft15">&nbsp;</P></TD>
+                        </TR>
+                        <TR>
+                            <TD class="tr21 td209"><P class="p1 ft9">Is the recipient receiving supervision?:<input type="radio" name="r13" data-ng-model="GetDmas99Model.Dmas99Model.ReciReceivingSupVision" value="Yes" /> Yes</P></TD>
+                            <TD colspan=5 class="tr21 td212"><P class="p1 ft9"><input type="radio" name="r13" data-ng-model="GetDmas99Model.Dmas99Model.ReciReceivingSupVision" value="No" /> No If yes, has he/she been informed of PERS (if applicable) ?:<input type="radio" name="r14" data-ng-model="GetDmas99Model.Dmas99Model.IfYesHasHeBeenInformedOfPERS" value="Yes"> Yes </P></TD>
+                            <TD class="tr21 td156"><P class="p1 ft8"><input type="radio" name="r14" data-ng-model="GetDmas99Model.Dmas99Model.IfYesHasHeBeenInformedOfPERS" value="No"> No</P></TD>
+                        </TR>
+                    </TABLE>
+                    <p></p>
+                </DIV>
+                <p></p>
+                <P class="p48 ft24">SERVICE FACILITATOR / RN SUPERVISION</P>
+                <div class="border-all-cover margin-0px-10px">
+                    <P class="input-group date p47 ft9"
+                       datepicker="GetDmas99Model.Dmas99Model.DatesOfRNSupervisory"
+                       data-ng-dateval="GetDmas99Model.Dmas99Model.DatesOfRNSupervisory"
+                       data-ng-mindate="CurrentDate">
+                        Dates of RN supervisory / SF visits for the last 6 months:
+                        <input type="text" id="date6" class="txtbx1 dateInputMask height-17px width-200px">
+                    </P>
+                    <TABLE cellpadding=0 cellspacing=0 class="t7">
+                        <TR height=0>
+                            <TD width=92px></TD>
+                            <TD width=46px></TD>
+                            <TD width=79px></TD>
+                            <TD width=48px></TD>
+                            <TD width=52px></TD>
+                            <TD width=48px></TD>
+                            <TD width=67px></TD>
+                            <TD width=61px></TD>
+                            <TD width=30px></TD>
+                            <TD width=101px></TD>
+                            <TD width=96px></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=8 class="tr13 td213"><P class="p1 ft9"><NOBR>*<SPAN class="ft26">Agency-directed</SPAN></NOBR><SPAN class="ft26"> only</SPAN>: Did the recipient/caregiver agree to frequency of visits, and is it documented in the recipient’s file?</P></TD>
+                            <TD class="tr16 td215"><P class="p50 ft16"><input type="radio" name="r15" data-ng-model="GetDmas99Model.Dmas99Model.ReciAgreeToFreqOfVisit" value="Yes"> Yes &nbsp;</P></TD>
+                            <TD class="tr16 td184"><P class="p1 ft16"><input type="radio" name="r15" data-ng-model="GetDmas99Model.Dmas99Model.ReciAgreeToFreqOfVisit" value="No"> No </P></TD>
+                            <TD colspan=2 class="tr13 td214"><P class="p31 ft9"></P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=5 class="tr16 td216"><P class="p51 ft8">Frequency of supervisory visits (pick one choice)</P></TD>
+                            <TD class="tr16 td217">
+                                <P class="p1 ft16">
+                                    <SPAN class="ft25">
+                                        <input type="radio" name="r16" data-ng-model="GetDmas99Model.Dmas99Model.FreqOfSupervisoryVisit" value="30Days" />
+                                    </SPAN> 30 days
+                                </P>
+                            </TD>
+                            <TD class="tr16 td218">
+                                <P class="p22 ft16" style="text-align:center;">
+                                    <SPAN class="ft25">
+                                        <input type="radio" name="r16" data-ng-model="GetDmas99Model.Dmas99Model.FreqOfSupervisoryVisit" value="60Days" />
+                                    </SPAN> 60 days
+                                </P>
+                            </TD>
+                            <TD class="tr16 td219">
+                                <P class="p1 ft16">
+                                    <SPAN class="ft25">
+                                        <input type="radio" name="r16" data-ng-model="GetDmas99Model.Dmas99Model.FreqOfSupervisoryVisit" value="90Days" />
+                                    </SPAN> 90 days
+                                </P>
+                            </TD>
+                            <TD class="tr16 td61"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD colspan="3" class="tr16 td61"><P class="p1 ft15">&nbsp;</P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=3 class="tr16 td220"><P class="p1 ft16">Supervisory Visit for Personal Care:</P></TD>
+                            <TD class="tr16 td203"><P class="p1 ft16"><input type="radio" name="r17" data-ng-model="GetDmas99Model.Dmas99Model.SupVisitForPersonalCare" value="Yes" /> Yes </P></TD>
+                            <TD class="tr16 td221"><P class="p1 ft16"><input type="radio" name="r17" data-ng-model="GetDmas99Model.Dmas99Model.SupVisitForPersonalCare" value="No" /> No </P></TD>
+                            <TD colspan="3" class="tr16 td221"><P class="p1 ft16">Supervisory Visit for Respite Care: </P></TD>
+                            <TD class="tr16 td61"><P class="p22 ft16"><input type="radio" name="r18" data-ng-model="GetDmas99Model.Dmas99Model.SupVisitForRespiteCare" value="Yes" /> Yes</P></TD>
+                            <TD class="tr16 td214"><P class="p20 ft16"><input type="radio" name="r18" data-ng-model="GetDmas99Model.Dmas99Model.SupVisitForRespiteCare" value="No" /> No </P></TD>
+                            @*<TD colspan="3" class="tr16 td214"><P class="p20 ft22">(check all that apply)</P></TD>*@
+                        </TR>
+                        <TR>
+                            <TD colspan=5 class="tr16 td222"><P class="p1 ft16">Does the aide document accurately the care provided?</P></TD>
+                            <TD class="tr16 td203"><P class="p1 ft16"><input type="radio" name="r19" data-ng-model="GetDmas99Model.Dmas99Model.DoesAideDocAccurateCareProvided" value="Yes"> Yes</P></TD>
+                            <TD class="tr16 td223"><P class="p52 ft16"><input type="radio" name="r19" data-ng-model="GetDmas99Model.Dmas99Model.DoesAideDocAccurateCareProvided" value="No"> No</P></TD>
+                            <TD class="tr16 td217"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD class="tr16 td61"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD class="tr16 td218"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD class="tr16 td219"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD class="tr16 td219"><P class="p1 ft15">&nbsp;</P></TD>
+                        </TR>
+                        <TR>
+                            <TD colspan=5 class="tr16 td222"><P class="p1 ft16">Does the Service Plan reflect the needs of the recipient?</P></TD>
+                            <TD class="tr16 td203"><P class="p1 ft16"><input type="radio" name="r20" data-ng-model="GetDmas99Model.Dmas99Model.DoesServicePlanReflectNeedOfReci" value="Yes"> Yes</P></TD>
+                            <TD class="tr16 td223"><P class="p52 ft16"><input type="radio" name="r20" data-ng-model="GetDmas99Model.Dmas99Model.DoesServicePlanReflectNeedOfReci" value="No"> No</P></TD>
+                            <TD class="tr16 td217"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD class="tr16 td61"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD class="tr16 td218"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD class="tr16 td219"><P class="p1 ft15">&nbsp;</P></TD>
+                            <TD class="tr16 td219"><P class="p1 ft15">&nbsp;</P></TD>
+                        </TR>
+                    </TABLE>
+
+                    <P class="p48 ft18">If No to either, please describe <NOBR>follow-up:</NOBR> <input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.PleaseDescribeFollowUp1" style="width: 722px;height:17px"></P>
+                    <P class="p48 ft9"><input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.PleaseDescribeFollowUp2" style="width: 722px;height:17px"></P>
+                </div>
+                <p></p>
+                <P class="p47 ft24">CONSISTENCY AND CONTINUITY</P>
+
+                <div class="border-all-cover margin-0px-10px">
+                    <P class="p53 ft9">Number of days of no service in the last 6 months: (Do not include hospitalizations) <input type="text" name="" class="txtbx1 height-17px width-100px" data-ng-model="GetDmas99Model.Dmas99Model.NumOfDayNoService6Month"></P>
+                    <P class="p48 ft9">Number of aides assigned to the case in the last 6 months: Regular Aides: <input type="text" name="" class="txtbx1 height-17px width-100px" data-ng-model="GetDmas99Model.Dmas99Model.RegularAides"> <NOBR>Sub-Aides:</NOBR> <input type="text" name="" data-ng-model="GetDmas99Model.Dmas99Model.SubAides" class="txtbx1 height-17px width-100px"></P>
+                    <TABLE cellpadding=0 cellspacing=0 class="t8">
+                        <TR>
+                            <TD class="tr16 td224"><P class="p1 ft16">Has the recipient or caregiver had any problems with the care provided in the last six months?</P></TD>
+                            <TD class="tr16 td56"><P class="p1 ft16"><input type="radio" name="r21" data-ng-model="GetDmas99Model.Dmas99Model.ReciOrCareGiverHadPrblmWithCareProvided" value="Yes"> Yes</P></TD>
+                            <TD class="tr16 td225"><P class="p1 ft16"><input type="radio" name="r21" data-ng-model="GetDmas99Model.Dmas99Model.ReciOrCareGiverHadPrblmWithCareProvided" value="No"> No If yes, please describe</P></TD>
+                        </TR>
+                    </TABLE>
+                    <P class="p48 ft16">problem(s) and the <NOBR>follow-up</NOBR> taken: <input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.Dmas99Model.FollowUpTaken1" style="width: 721px;"></P>
+                    <P class="p48 ft18"><input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.Dmas99Model.FollowUpTaken2" style="width: 722px;"></P>
+                    <TABLE cellpadding=0 cellspacing=0 class="t8">
+                        <TR>
+                            <TD class="tr16 td226"><P class="p1 ft16">Is the recipient satisfied with the service he/she is receiving by the provider agency?:</P></TD>
+                            <TD class="tr16 td203"><P class="p1 ft16"><input type="radio" name="r22" data-ng-model="GetDmas99Model.Dmas99Model.ReciSatisfyWithServiceReceiveByProAgency" value="Yes"> Yes</P></TD>
+                            <TD class="tr16 td227"><P class="p1 ft16"><input type="radio" name="r22" data-ng-model="GetDmas99Model.Dmas99Model.ReciSatisfyWithServiceReceiveByProAgency" value="No"> No If no, please describe and the</P></TD>
+                        </TR>
+                    </TABLE>
+                    <P class="p48 ft16"><NOBR>follow-up</NOBR> taken: <input type="text" name="" class="txtbx1 height-17px width-634px" data-ng-model="GetDmas99Model.Dmas99Model.ProAgencyFollowUpTaken1"></P>
+                    <P class="p48 ft9"><input type="text" name="" class="txtbx1 height-17px" data-ng-model="GetDmas99Model.Dmas99Model.ProAgencyFollowUpTaken2" style="width: 722px;"></P>
+                </div>
+
+                <TABLE cellpadding=0 cellspacing=0 class="t9">
+                    <TR>
+                        <TD class="tr4 td231"><P class="p55 ft9" style="margin-top: -22px;">Date of most recent <NOBR>DMAS-225: </NOBR></P></TD>
+                        <td colspan="2">
+                            <div class="input-group date"
+                                 datepicker="GetDmas99Model.Dmas99Model.DateOfMostRecentDMAS225"
+                                 data-ng-dateval="GetDmas99Model.Dmas99Model.DateOfMostRecentDMAS225"
+                                 data-ng-mindate="CurrentDate">
+                                <input type="text" id="date7" class="txtbx1 dateInputMask" style="width: 250px; height:17px;" />
+                            </div>
+                        </td>
+                        <TD><P class="p1 ft1">&nbsp;</P></TD>
+                        <TD class="tr4 td231"><P class="p55 ft9">Patient Pay Amount (if applicable):<input type="text" name="" data-ng-model="GetDmas99Model.Dmas99Model.PatientPayAmount" class="txtbx1" style="width: 136px;height:17px"></P></TD>
+                        <TD class="tr22 td232"><P class="p1 ft1">&nbsp;</P></TD>
+                    </TR>
+                </TABLE>
+
+                <table class="border-all-cover margin-0px-10px width-845px">
+                    <TR>
+                        <TD colspan="3" class="tr19 td235">
+                            <P class="p54 ft9">
+                                Aide Present During Visit?&nbsp;
+                                <input type="radio" name="r24" data-ng-model="GetDmas99Model.Dmas99Model.AidePresentDuringVisit" value="Yes"> Yes
+                                <input type="radio" name="r24" data-ng-model="GetDmas99Model.Dmas99Model.AidePresentDuringVisit" value="No"> No
+                            </P>
+                        </TD>
+                        <td></td>
+                        <TD class="tr19 td234">
+                            <P class="p9 ft9">
+                                Name of Aide:&nbsp;
+                                <input type="text" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.NameOfAide" />
+                            </P>
+                        </TD>
+                        <TD class="tr19 td236"><P class="p1 ft1">&nbsp;</P></TD>
+                    </TR>
+                </table>
+
+                <P class="p46 ft27"><SPAN class="ft9">SF / NURSING NOTES: </SPAN>(if additional space is needed, use the back or add attachment)</P>
+                <TABLE cellpadding=0 cellspacing=0 class="t10">
+                    <TR>
+                        <TD class="tr3 td237"><P class="p29 ft9">Is Personal Care Aide Related to the Recipient?</P></TD>
+                        <TD class="tr3 td238"><P class="p1 ft9"><input type="radio" name="r23" data-ng-model="GetDmas99Model.Dmas99Model.PersonalCareAideRelatedReci" value="Yes"> Yes</P></TD>
+                        <TD class="tr3 td239"><P class="p1 ft9"><input type="radio" name="r23" data-ng-model="GetDmas99Model.Dmas99Model.PersonalCareAideRelatedReci" value="No"> No <NOBR>---</NOBR> If yes, please indicate relationship:</P></TD>
+                    </TR>
+                    <TR>
+                        <P class="p48 ft9"><input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.SfNursingNotes1" style="width: 722px;height:17px"></P>
+                    </TR>
+                    <TR>
+                    <TR>
+                        <P class="p48 ft9"><input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.SfNursingNotes2" style="width: 722px;height:17px"></P>
+                    </TR>
+                    <TR>
+                        <P class="p48 ft9"><input type="text" name="" class="txtbx1" data-ng-model="GetDmas99Model.Dmas99Model.SfNursingNotes3" style="width: 722px;height:17px"></P>
+                    </TR>
+                </TABLE>
+                <p></p>
+                <TABLE cellpadding=0 cellspacing=0 class="t11">
+                    <TR>
+                        <td><p class="tr13 td240 ft-dmas-97-7">Client/Caregiver Signature:</p></td>
+                        <td colspan="2" name="signature_container" id="signature_container">
+                            <div class="pf-signature-view" data-toggle="modal" data-target="#signatureModal1" style="height:45px;width:170px; border:1px solid">
+                                <img id="saveSignature" data-ng-src={{GetDmas99Model.Dmas99Model.Sign}} style="height:45px;width:170px;border:1px solid" />
+                            </div>
+                        </td>
+                        <td colspan="2"><p class="p-dmas-97-7 ft-dmas-97-7 text-align-right">Date: </p></td>
+                        <td colspan="5">
+                            <div class="input-group date"
+                                 datepicker="GetDmas99Model.Dmas99Model.SignDate"
+                                 data-ng-dateval="GetDmas99Model.Dmas99Model.SignDate"
+                                 data-ng-mindate="CurrentDate" id="dmas-99-SignDate">
+                                <input type="text" id="date8" class="height-28 dateInputMask" />
+								<span class="field-validation-valid"></span>
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </td>
+                    </TR>
+                    <tr>
+                        <td colspan="10" class="tr-dmas-97-4 td-dmas-97--dmas-97-71"><p class="p-dmas-97-7 ft-dmas-97-7"></p></td>
+                    </tr>
+                    <TR>
+                        <td><p class="p1 ft-dmas-97-7">RN, LPN or SF</p><p class="p-dmas-97-7 ft-dmas-97-7">Signature:</p></td>
+                        <td colspan="2" class="tr7" name="signature_container" id="signature_container">
+                            <p></p>
+                            <div class="pf-signature-view" data-toggle="modal" data-target="#signatureModal2" style="height:45px;width:170px; border:1px solid">
+                                <img class="pf-img-init" id="saveSignature1" data-ng-src={{GetDmas99Model.Dmas99Model.RnSign}} style="height:45px;width:170px; border:1px solid">
+                            </div><p></p>
+                        </td>
+                        <td colspan="2"><p class="p-dmas-97-7 ft-dmas-97-7 text-align-right">Date: </p></td>
+                        <td colspan="5">
+                            <div class="input-group date"
+                                 datepicker="GetDmas99Model.Dmas99Model.RnSignDate"
+                                 data-ng-dateval="GetDmas99Model.Dmas99Model.RnSignDate"
+                                 data-ng-mindate="CurrentDate" id="dmas-99-RnSignDate">
+                                <input type="text" id="date9" class="height-28 dateInputMask" />
+								<span class="field-validation-valid"></span>
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </td>
+                </TABLE>
+
+            </DIV>
+
+            <div style="margin-top:20px; margin-left: 33%;">
+                <button type="submit" data-ng-click="SaveDmas99()" class="btn btn-sm green-jungle">Save</button>
+                <button class="btn btn-sm red" data-ng-click="Cancel()" type="reset">Cancel</button>
+            </div>
+
+            <div id="signatureModal1" class="modal margin-top-19" role="dialog" style="display: none;">
+                <div class="pf-signature-alignment-helper">
+                    <div class="modal-dialog pf-signature-center-align" role="document">
+                        <div class="modal-content pf-modal-canvass-wrapper">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Signature</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="canvas">
+                                    <canvas class="roundCorners" id="newSignature" style="position: relative; margin: 0; padding: 0; border: 1px solid #c4caac;z-index:9999"></canvas>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="pull-left">
+                                    <button type="button" class="btn btn-info" onclick="signatureClear()">Clear</button>
+                                </div>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="signatureSave()">Save</button>
+                                <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                                <script>signatureCapture();</script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div id="signatureModal2" class="modal" role="dialog" style="display: none;">
+                <div class="pf-signature-alignment-helper">
+                    <div class="modal-dialog pf-signature-center-align" role="document">
+                        <div class="modal-content pf-modal-canvass-wrapper">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Signature</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="canvas">
+                                    <canvas class="roundCorners" id="newSignature1" style="position: relative; margin: 0; padding: 0; border: 1px solid #c4caac;z-index:9999"></canvas>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="pull-left">
+                                    <button type="button" class="btn btn-info" onclick="signatureClear1()">Clear</button>
+                                </div>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="signatureSave1()">Save</button>
+                                <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                                <script>signatureCapture1();</script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <div ng-init="callBack()"></div>
+    </div>
+
+    <!----------------------DMAS 97 ADD-------------------------------------->
+
+</div>
+

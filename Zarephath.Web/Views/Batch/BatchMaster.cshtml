@@ -1,0 +1,530 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, @Resource.Batch);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_Batch837;
+}
+
+@model AddBatchModel
+@Html.Hidden("hdnBatchModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="BatchController" class="batchMaserContainer">
+    <div class="batchMaserContainerInner">
+        <div class="page-bar">
+            <h3 class="page-title">
+                @Resource.Batch837 &nbsp;<small>@Resource.Batch837RelatedInformations
+                </small>
+            </h3>
+        </div>
+
+        <div class="row">
+            <form id="FrmBatch">
+                <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+                    <div class="form-group col-lg-2 col-md-3 col-sm-3 ">
+                        <label class="control-label">@Resource.BatchType</label>
+                        <div>
+                            @Html.DropDownListFor(p => p.Batch.BatchTypeID, Model.BatchTypeList.ToSelectList(Model.Batch.BatchTypeID.ToString() ?? "", "BatchTypeName", "BatchTypeID", @Resource.SelectBatchType, ""), new
+                                {
+                                    convert_to_number = "",
+                                    data_ng_model = "BatchModel.Batch.BatchTypeID",
+                                    data_ng_init = "BatchModel.Batch.BatchTypeID=BatchModel.Batch.BatchTypeID==''?null:BatchModel.Batch.BatchTypeID.toString()",
+                                    @class = "form-control input-sm",
+                                })
+                            @Html.ValidationMessageFor(q => q.Batch.BatchTypeID)
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                        <label class="control-label">@Resource.Payor</label>
+                        <div>
+                            @Html.DropDownListFor(p => p.Batch.PayorID, Model.PayorList.ToSelectList(Model.Batch.PayorID.ToString() ?? "", "PayorName", "PayorID", @Resource.SelectPayor, ""),
+                                                  new
+                                                      {
+                                                          convert_to_number = "",
+                                                          data_ng_model = "BatchModel.Batch.PayorID",
+                                                          data_ng_init = "BatchModel.Batch.PayorID=BatchModel.Batch.PayorID==''?null:BatchModel.Batch.PayorID.toString()",
+                                                          @class = "form-control input-sm",
+                                                      })
+                            @Html.ValidationMessageFor(q => q.Batch.PayorID)
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                        <label class="control-label">@Resource.SiteBillingProvider</label>
+                        <div class="groupErrorParent  transportation-dropdown">
+                            <select class="form-control input-sm groupError selectpicker" data-buttonStyle="btn-sm btn-default" multiple="multiple"
+                                    title="@Resource.SelectFacility" id="BillingProviderID" @*convert_to_number=""*@
+                                    data-val="false"
+                                    data-val-required="@Resource.BillingProviderRequirednew"
+                                    selectpicker="BatchModel.ApprovedFacilityList.BillingProviderID" name="BatchModel.ApprovedFacilityList.BillingProviderID">
+                                <option data-ng-repeat="option in BatchModel.ApprovedFacilityList" value="{{option.BillingProviderID}}">{{option.FacilityName}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                        <label class="control-label">@Resource.StartDate</label>
+                        <div class="input-group date" datepicker="BatchModel.Batch.StartDate"
+                             data-ng-dateval="BatchModel.Batch.StartDate">
+                            @Html.TextBoxFor(q => q.Batch.StartDate,
+                            new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    placeholder = Resource.StartDate,
+                                })
+                            @Html.ValidationMessageFor(q => q.Batch.StartDate)
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div><!--End form group-->
+
+                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                        <label class="control-label">@Resource.EndDate</label>
+                        <div class="input-group date" datepicker="BatchModel.Batch.EndDate" data-ng-dateval="BatchModel.Batch.EndDate"
+                             @* data-ng-mindate="DatePickerDate(ServiceCodeModel.Batch.StartDate)"*@>
+                            @Html.TextBoxFor(q => q.Batch.EndDate,
+                                new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    placeholder = Resource.EndDate,
+                                })
+                            @Html.ValidationMessageFor(q => q.Batch.EndDate)
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div><!--End form group-->
+
+                    <div class="form-group col-lg-2 col-md-3 col-sm-3 clearfix">
+                        <label class="control-label">@Resource.ServiceCode</label>
+                        <div class="groupErrorParent  transportation-dropdown">
+                            <select class="form-control input-sm groupError selectpicker" data-buttonStyle="btn-sm btn-default" multiple="multiple"
+                                    title="@Resource.SelectService" id="ServiceCodeID" @*convert_to_number=""*@
+                                    data-val="false"
+                                    selectpicker="BatchModel.ServiceCodeList.ServiceCodeID" name="BatchModel.ApprovedFacilityList.ServiceCodeID">
+                                <option data-ng-repeat="option in BatchModel.ServiceCodeList" value="{{option.ServiceCodeID}}">{{option.ServiceCode}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                        <label class="control-label">@Resource.Comment</label>
+                        <div>
+                            @Html.TextBoxFor(q => q.Batch.Comment,
+                                new
+                                {
+                                    @class = "form-control input-sm",
+                                    placeholder = Resource.Comment,
+                                    data_ng_model = "BatchModel.Batch.Comment",
+                                })
+                            @Html.ValidationMessageFor(q => q.Batch.Comment)
+
+                        </div>
+                    </div>
+
+
+                    @*form-group col-lg-1 col-md-3 col-sm-3*@
+                    @if (Common.HasPermission(Constants.Permission_Billing_Batch837))
+                    {
+                        <div class="form-group col-lg-4 col-md-3 col-sm-3 no-right-padding" data-ng-if="BatchModel.Batch.BatchTypeID==@((int)EnumBatchType.Adjustment_Void_Replace_Submission)">
+                            <label class="control-label"></label>
+                            <div>
+                                <div class="btn-group">
+                                    <button data-ng-click="SaveBatchDetails01()" class="btn btn-sm yellow-casablanca">@Resource.OldApproach</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-lg-2 col-md-3 col-sm-3 no-right-padding">
+                            <label class="control-label"></label>
+                            <div>
+                                <div class="btn-group">
+
+                                    <button data-ng-click="SaveBatchDetails()" class="btn btn-sm green-jungle">@Resource.Create</button>
+                                    <button data-ng-click="SearchBatch()" class="btn btn-sm blue cancel">@Resource.Search</button>
+                                    <button data-ng-click="ResetSearchFilter()" class="btn btn-sm dark cancel">@Resource.Reset</button>
+
+                                    @*<a href="#" data-ng-click="SearchBatch()" class="btn btn-sm grey border-grey-cascade"><i class="fa fa-save"></i></a>
+                        <a href="#" data-ng-click="ResetSearchFilter()" class="btn btn-sm grey border-grey-cascade"><i class="fa fa-remove"></i></a>*@
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+                <div class="space20">
+                    <hr />
+                </div>
+            </form>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                @if (Common.HasPermission(Constants.Permission_Billing_Batch837))
+                {
+                    <div class="btn-group" data-ng-show="BatchList.length > 0">
+                        <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                            <input id="SelectAllBatch" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                            <label for="SelectAllBatch"></label>
+                        </span>
+                    </div>
+                }
+                <div class="btn-group">
+                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                    </button>
+                </div>
+                <div class="btn-group">
+                    @Html.DropDownListFor(m => m.Batch.IsSentStatus, Model.BatchStatusFilter.ToSelectList(Convert.ToString(Model.Batch.IsSentStatus), "Name", "Value", "", ""),
+                        new
+                        {
+                            id = "IsSentStatus",
+                            data_ng_init = "BatchModel.Batch.IsSentStatus = Batch.IsSentStatus=null?'-1':BatchModel.Batch.IsSentStatus.toString()",
+                            @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                            data_ng_model = "BatchModel.Batch.IsSentStatus",
+                            data_ng_change = "SearchBatch()"
+                        })
+                </div>
+
+                @if (Common.HasPermission(Constants.Permission_Billing_Batch837))
+                {
+                    <div class="btn-group" data-ng-if="SelectedBatchIds.length > 0">
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm grey border-grey-cascade" data-toggle="dropdown" aria-expanded="false">
+                                <i class="fa fa-ellipsis-horizontal"></i>@Resource.Action
+                                <i class="fa fa-angle-down"></i>
+                            </button>
+                            <ul class="dropdown-menu">
+                                <li>
+                                    <a href="javascript:void(0)" data-ng-click="ValidateAndGenerateEdi837(true)" data-toggle="modal"><i class="fa fa-check-square-o"></i>@Resource.ValidateOnly</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" data-ng-click="DownloadOverViewFile()"><i class="fa fa-download"></i>@Resource.DownloadOverviewFile</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="javascript:void(0)" data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Hippa')" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Generate837Hippa</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Clm')" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Generate837Clm</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Csv')" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Generate837CSV</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0)" data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Txt')" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Generate837Text</a>
+                                </li>
+
+
+                                @*<li class="divider"></li>
+                                <li>
+                                    <a href="javascript:void(0);" data-ng-click="MarkasSentBatch(0,'Sent')"><i class="fa fa-send-o"></i>@Resource.MarkAsSent</a>
+                                </li>
+                                <li>
+                                    <a href="javascript:void(0);" data-ng-click="DeleteBatch()"><i class="fa fa-trash-o"></i>@Resource.DeleteBatch</a>
+                                </li>
+                                <li class="divider"></li>
+                                <li>
+                                    <a href="javascript:void(0);" data-ng-click="PaperRemitsEOBTemplate(0,'Sent')"><i class="fa fa-send-o"></i>@Resource.PaperRemitsEOBTemplate</a>
+                                </li>*@
+
+                            </ul>
+                        </div>
+                    </div>
+                }
+
+                <div class="btn-group margin-left-20PR">
+                    <div class="top pagination-sm" data-ng-show="AjaxStart">
+                        @Resource.Loading
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+
+
+                <div class="inline-block pull-right" data-ng-show="BatchList.length > 0">
+                    <div class="inline-block pull-right" data-ng-show="BatchList.length > 0">
+                        <div class="pull-right margin-left-5">
+                            <dir-pagination-controls boundary-links="true" max-size="BatchListPager.maxSize" on-page-change="BatchListPager.pageChanged(newPageNumber)" pagination-id="BatchListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="space20"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body batchCompact" style="display: block;">
+                    <div class="table-responsive tabbable-custom ">
+                        <div class="table-responsive overflow-i">
+                            <form id="frmBatchList">
+                                <table class="table table-hover table-bordered table-striped table-condensed table-checkable ">
+                                    <thead class="flip-content">
+                                        <tr>
+                                            @if (Common.HasPermission(Constants.Permission_Billing_Batch837))
+                                            {
+                                                <th class="width-15px"></th>
+                                            }
+                                            <th class="width67">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BatchListPager.sortColumn('BatchID')">
+                                                    @Resource.Batch
+                                                    <span class="sortorder" data-ng-show="BatchListPager.sortIndex === 'BatchID'" data-ng-class="{reverse:BatchListPager.reverse}"></span></a>
+                                            </th>
+                                            <th class="col-sm-4">@Resource.BatchSummary
+                                                <span class="pull-right">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="BatchListPager.sortColumn('Payor')">@Resource.Payor</a>
+                                                    <span class="sortorder" data-ng-show="BatchListPager.sortIndex === 'Payor'" data-ng-class="{reverse:BatchListPager.reverse}"></span>
+                                                    <span>|</span>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="BatchListPager.sortColumn('Type')">@Resource.Type</a>
+                                                    <span class="sortorder" data-ng-show="BatchListPager.sortIndex === 'Type'" data-ng-class="{reverse:BatchListPager.reverse}"></span>
+                                                </span>
+                                            </th>
+                                            <th class="col-sm-1">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BatchListPager.sortColumn('ClaimCounts')">@Resource.ClaimCounts</a>
+                                                <span class="sortorder" data-ng-show="BatchListPager.sortIndex === 'ClaimCounts'" data-ng-class="{reverse:BatchListPager.reverse}"></span>
+                                            </th>
+                                            <th class="col-sm-2">
+                                                <span>@Resource.ServicesSummary</span>
+                                            </th>
+                                            <th class="col-sm-3" colspan="2">
+                                                @Resource.BatchStatusSummary
+                                                <div class="pull-right btn-group">
+                                                    <a class="btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                        @Resource.Sortby
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </a>
+                                                    <ul class="dropdown-menu pull-right">
+                                                        <li>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="BatchListPager.sortColumn('GatherDate')">@Resource.GatherDate
+                                                                <span class="sortorder" data-ng-show="BatchListPager.sortIndex === 'GatherDate'" data-ng-class="{reverse:BatchListPager.reverse}"></span></a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="BatchListPager.sortColumn('GatherBy')">@Resource.GatherBy
+                                                                <span class="sortorder" data-ng-show="BatchListPager.sortIndex === 'GatherBy'" data-ng-class="{reverse:BatchListPager.reverse}"></span></a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="BatchListPager.sortColumn('SentDate')">@Resource.SentDate
+                                                                <span class="sortorder" data-ng-show="BatchListPager.sortIndex === 'SentDate'" data-ng-class="{reverse:BatchListPager.reverse}"></span></a>
+                                                        </li>
+
+                                                        <li>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="BatchListPager.sortColumn('SentBy')">@Resource.SentBy
+                                                                <span class="sortorder" data-ng-show="BatchListPager.sortIndex === 'SentBy'" data-ng-class="{reverse:BatchListPager.reverse}"></span></a>
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </th>
+                                            
+                                           
+                                            <th class="width50 text-align-center">@Resource.Action</th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in BatchList | itemsPerPage: BatchListPager.pageSize" total-items="BatchListPager.totalRecords" current-page="BatchListPager.currentPage" pagination-id="BatchListPagerID"  data-ng-attr-title="{{item.Comment}}">
+                                            @if (Common.HasPermission(Constants.Permission_Billing_Batch837))
+                                            {
+                                                <td>
+                                                    @*<div data-ng-show="!item.IsSent">*@
+                                                    <input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" data-ng-change="SelectBatch(item)" val="item.IsChecked">
+                                                    @*</div>*@
+                                                </td>
+                                            }
+                                            <td>
+                                                <span data-ng-bind="item.BatchID ? item.BatchID:'@Resource.NA'"></span>
+                                                <span class="badge badge-danger" data-ng-if="item.IsSent">Sent</span>
+                                            </td>
+                                            <td>
+                                                <div>
+                                                    <div class="BatchSummaryDiv">
+                                                        <div class="td-batch-summary">@Resource.Payor:</div>
+                                                        <div class="BatchSummaryDesc">
+                                                            &rarr;
+                                                            {{item.PayorName ? item.PayorName:'@Resource.NA'}}
+                                                        </div>
+                                                    </div>
+                                                    <div class="BatchSummaryDiv">
+                                                        <div class="td-batch-summary">@Resource.Description: </div>
+                                                        <div class="BatchSummaryDesc">
+                                                            <span>&rarr;&nbsp;&ldquo;{{ item.BatchTypeName}}<i>&rdquo;</i></span> <span class="padding-left-5">{{item.StartDate | dateformat}}<span class="padding-left-right-2">-</span>{{item.EndDate |dateformat}}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="BatchSummaryDiv">
+                                                        @*<div class="td-batch-summary">@Resource.Site:</div>*@
+                                                        <div class=""><span class="pull-left"><span class="font-weight-600">@Resource.Site:&nbsp;&rarr;</span>{{item.FacilityName ? item.FacilityName:'@Resource.NA'}}</span></div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div>
+                                                    <div class="BatchSummaryDiv">
+                                                        <div class="td-services-summary">@Resource.Gathered:</div>
+                                                        <div class="BatchServiceDesc">{{item.Gathered ? item.Gathered:'0'}}</div>
+                                                    </div>
+
+                                                    <div class="BatchSummaryDiv">
+                                                        <div class="td-services-summary">@Resource.BillingGathered:</div>
+                                                        <div class="BatchServiceDesc">{{item.BillingGathered ? item.BillingGathered:'0'}}</div>
+                                                    </div>
+                                                    @*<div>
+                                                        <div class="td-services-summary">@Resource.Cleared: </div>
+                                                        <div class="BatchServiceDesc">{{item.Cleard   ? item.Cleard:'0'}}</div>
+                                                    </div>*@
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div>
+                                                    @* <div class="BatchSummaryDiv">
+                                                        <div class="td-services-summary">@Resource.Amount:</div>
+                                                        <div class="BatchServiceDesc">{{item.Amount | currency:'$'}}</div>
+                                                    </div>*@
+                                                    <div class="BatchSummaryDiv">
+                                                        <div class="td-services-summary">@Resource.BillingAmount:</div>
+                                                        <div class="BatchServiceDesc">{{item.BillingAmount | orgcurrency}}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="td-services-summary">@Resource.ServiceSpan: </div>
+                                                        <div class="BatchServiceDesc">
+                                                            <span class="display-block">
+                                                                <span data-ng-if="item.ServiceStartDate">{{item.ServiceStartDate | dateformat }}-{{ item.ServiceEndDate | dateformat}}
+                                                                </span>
+                                                                <span data-ng-if="!item.ServiceStartDate">@Resource.NA</span>
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div>
+                                                    <div class="BatchSummaryDiv">
+                                                        <div class="td-services-summary">@Resource.GatherDate:</div>
+                                                        <div class="BatchServiceDesc">{{item.GatherDate | dateformat }}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="td-services-summary">@Resource.GatheredBy : </div>
+                                                        <div class="BatchServiceDesc">{{item.GatheredBy}}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div>
+                                                    <div class="BatchSummaryDiv">
+                                                        <div class="td-services-summary">@Resource.SentDate:</div>
+                                                        <div class="BatchServiceDesc">{{ item.SentDate ? (item.SentDate| dateformat):'@Resource.NA' }}</div>
+                                                    </div>
+                                                    <div>
+                                                        <div class="td-services-summary">@Resource.SentBy:</div>
+                                                        <div class="BatchServiceDesc">{{item.IsSentBy ? item.IsSentBy:'@Resource.NA'}}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+
+                                            
+                                            @if (Common.HasPermission(Constants.Permission_Billing_Batch837))
+                                            {
+                                                <td class="text-align-center">
+                                                    <div class="btn-group">
+                                                        <button class="btn btn-default btn-xs dropdown-toggle green-haze-stripe" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                            <b>@Resource.Action</b>
+                                                            <i class="fa fa-angle-down"></i>
+                                                        </button>
+                                                        <ul class="dropdown-menu pull-right">
+                                                            <li>
+                                                                <a href="javascript:void(0);" data-ng-click="ValidateAndGenerateEdi837(true,'',item.BatchID)" data-toggle="modal"><i class="fa fa-check-square-o"></i>@Resource.ValidateOnly</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript:void(0);" data-ng-click="DownloadOverViewFile(item.BatchID)"><i class="fa fa-download"></i>@Resource.DownloadOverviewFile</a>
+                                                            </li>
+                                                            <li class="divider"></li>
+                                                            <li>
+                                                                <a href="javascript:void(0);" data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Hippa',item.BatchID)" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Generate837Hippa</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript:void(0);" data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Clm',item.BatchID)" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Generate837Clm</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript:void(0);" data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Csv',item.BatchID)" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Generate837CSV</a>
+                                                            </li>
+                                                            <li>
+                                                                <a href="javascript:void(0);" data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Txt',item.BatchID)" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Generate837Text</a>
+                                                            </li>
+
+                                                            <li class="divider" data-ng-show="!item.IsSent"></li>
+                                                            <li data-ng-show="!item.IsSent">
+                                                                <a href="javascript:void(0);" data-ng-click="MarkasSentBatch(item.BatchID,'Sent')"><i class="fa fa-send-o"></i>@Resource.MarkAsSent</a>
+                                                                @*<a href="#" data-ng-show="item.IsSent" data-ng-click="MarkasSentBatch(item.BatchID,'UnSent')"><i class="fa fa-send-o"></i>@Resource.MarkAsUnSent</a>*@
+                                                            </li>
+                                                            @*<li class="divider"></li>*@
+                                                            <li data-ng-show="!item.IsSent">
+                                                                <a href="javascript:void(0);" data-ng-click="DeleteBatch(item.BatchID)"><i class="fa fa-trash-o"></i>@Resource.DeleteBatch</a>
+                                                            </li>
+                                                            <li data-ng-show="item.IsSent" class="divider"></li>
+                                                            <li data-ng-show="item.IsSent">
+                                                                <a href="javascript:void(0);" data-ng-click="PaperRemitsEOBTemplate(item.BatchID)"><i class="fa fa-newspaper-o"></i>@Resource.PaperRemitsEOBTemplate</a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </td>
+                                            }
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="BatchList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(BatchListPager.pageSize * BatchListPager.currentPage) - BatchListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(BatchListPager.pageSize == BatchListPager.currentPageSize) ? (BatchListPager.pageSize * BatchListPager.currentPage) :(BatchListPager.pageSize * BatchListPager.currentPage) - BatchListPager.pageSize  + BatchListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="BatchListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="BatchListPager.maxSize" on-page-change="BatchListPager.pageChanged(newPageNumber)" pagination-id="BatchListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div data-ng-if="BatchList.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="model__ValidateAndGenerateEdi837" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                @Html.Partial("Partial/_ValidateAndGenerateEdi837")
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/batch/batchmaster")
+}
+<script type="text/javascript">
+    var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Batch)';
+    var MarkAsSentConfirmationMessage = '@string.Format(@Resource.MarkAsSentBatchConfrimation, @Resource.Batch)';
+    var MarkAsSent = '@Resource.MarkAsSent';
+    var MarkAsUnSent = '@Resource.MarkAsUnSent';
+    var ValidateAndGenerateEDI837 = '@Resource.ValidateAndGenerateEDI837';
+    var ValidateBatches = '@Resource.ValidateBatches';
+    var ValidateWaitText = '@Resource.ValidateWaitText';
+</script>
+
+
+

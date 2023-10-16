@@ -1,0 +1,146 @@
+﻿@model HC_AddServiceCodeModel
+<div class="modal fade" id="addModifierModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="font-size-20">@Resource.AddModifier</span>
+                <button type="button" class="close" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <form id="frmAddModifier">
+                            <div class="col-md-12 col-md-12 no-padding">
+                                <div class="col-lg-3 col-md-4 col-sm-4">
+                                    <label class="control-label required margin-bottom-5">@Resource.ModifierCode</label>
+                                    @Html.TextBoxFor(m => m.ModifierModel.ModifierCode, new
+                                   {
+                                       @class = "form-control input-sm",
+                                       maxlength = "10",
+                                       data_ng_model = "ModifierModel.ModifierCode",
+                                       placeholder = Resource.ModifierCode
+                                   })
+                                    @Html.ValidationMessageFor(m => m.ModifierModel.ModifierCode)
+
+                                </div>
+                                <div class="col-lg-5 col-md-6 col-sm-4">
+                                    <label class="control-label required margin-bottom-5">@Resource.ModifierName</label>
+                                    @Html.TextBoxFor(m => m.ModifierModel.ModifierName, new
+                                       {
+                                           @class = "form-control input-sm",
+                                           maxlength = "100",
+                                           data_ng_model = "ModifierModel.ModifierName",
+                                           placeholder = Resource.ModifierName
+                                       })
+                                    @Html.ValidationMessageFor(m => m.ModifierModel.ModifierName)
+                                </div>
+
+                                <div class="col-lg-4 col-md-2 col-sm-4 margin-top-23">
+                                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveModifier()">@Resource.Save</button>
+                                    <button type="button" class="btn btn-sm red-mint" data-ng-click="ResetModifier()">@Resource.Cancel</button>
+                                </div>
+                            </div>
+                        </form>
+                        <hr style="display: inline-block; width: 100%;" />
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="btn-group">
+                                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                                    </button>
+                                </div>
+                                <div class="btn-group">
+                                    @Html.DropDownListFor(m => m.ModifierModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.ModifierModel.IsDeleted), "Name", "Value", "", ""),
+                                        new
+                                        {
+                                        id = "IsDeleted",
+                                        data_ng_model = "SearchModifierModel.IsDeleted",
+                                        data_ng_init = "SearchModifierModel.IsDeleted = SearchModifierModel.IsDeleted==null?'0':SearchModifierModel.IsDeleted.toString()",
+                                        @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                        data_ng_change = "GetModifierList()"
+                                        })
+                                </div>
+                                <div class="btn-group" data-ng-if="SelectedModifierIds.length > 0">
+                                    <button type="button" data-ng-click="DeleteModifier()" class="btn blue btn-sm grey border-grey-cascade">
+                                        <i class="fa fa-random margin-right-10"></i>
+                                        {{SearchModifierModel.IsDeleted==0?'@Constants.DisableSelected' :(SearchModifierModel.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="margin-bottom-5">
+                        </div>
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact" style="display: block;">
+                                        <div class="table-responsive emp_timeslotstbl scrollableTable">
+                                            <form>
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th></th>
+                                                            <th>@Resource.ModifierCode</th>
+                                                            <th>@Resource.ModifierName</th>
+                                                            <th style="text-align:center">@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td>
+                                                                <div class="btn-group margin-top-5" data-ng-show="ModifierList.length > 0">
+                                                                        <input id="SelectAllModifier" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                                        <label for="SelectAllModifier"></label>
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" data-ng-model="SearchModifierModel.ModifierCode" class="form-control input-xs" placeholder="@Resource.ModifierCode" />
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" data-ng-model="SearchModifierModel.ModifierName" class="form-control input-xs" placeholder="@Resource.ModifierName" />
+                                                            </td>
+                                                            <td class="padding-5 text-align-center">
+                                                                <button type="submit" class="btn btn-xs btn-default" data-ng-click="GetModifierList()" data-ng-tooltip="@Resource.Search">
+                                                                    <i class="fa fa-search"></i>
+                                                                </button>
+                                                                <button class="btn btn-xs btn-default" data-ng-click="Reset()" data-ng-tooltip="@Resource.Reset">
+                                                                    <i class="fa fa-refresh"></i>
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                        <tr data-ng-class="{'deleted':item.IsDeleted}" data-ng-repeat="item in ModifierList">
+                                                            <td><input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" data-ng-change="SelectModifier(item)" val="item.IsChecked"></td>
+                                                            <td>{{item.ModifierCode}}</td>
+                                                            <td>{{item.ModifierName}}</td>
+                                                            <td class="text-align-center">
+                                                                <a href="javascript:void(0);" data-ng-click="EditModifier(item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                <a href="javascript:void(0);" data-ng-show="item.IsDeleted"
+                                                                   data-ng-click="DeleteModifier(item.ModifierID,'Active')" class="btn btn-xs green ng-hide">Active</a>
+
+                                                                <a href="javascript:void(0);" data-ng-show="!item.IsDeleted"
+                                                                   data-ng-click="DeleteModifier(item.ModifierID,'Delete')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </form>
+                                            <div data-ng-if="ModifierList.length == 0">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>

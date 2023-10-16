@@ -1,0 +1,331 @@
+﻿@model HC_AddReferralModel
+@Html.Hidden("hdnSetBillingSettingModel", Common.SerializeObject(Model))
+<div class="row">
+    <div class="col-md-12">
+        @*<div class="tabbable tabbable-custom">*@
+        <div class="billing-setting-tabs employeeTabsecond">
+            <ul class="nav nav-tabs top_border" id="loanDetailTopTabs">
+                <li class="active">
+                    <a id="billings_detailsbillingsettings_CMS1500" data-target="#tab_1500" data-toggle="tab">@Resource.CMS1500</a>
+                </li>
+                @if (!SessionHelper.IsCaseManagement)
+                {
+                    <li>
+                        <a id="billings_detailsbillingsettings_UB04" data-target="#tab_UB04" data-toggle="tab">@Resource.UB04</a>
+                    </li>
+                }
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_1500">
+
+                    @{
+                        Model.ReferralBillingAuthorization.TempType = "CMS1500";
+                    }
+                    @Html.Partial("Partial/BillingSetting/_authorization", Model)
+
+                </div>
+                @if (!SessionHelper.IsCaseManagement)
+                {
+                    <div class="tab-pane" id="tab_UB04">
+                        @{
+                            Model.ReferralBillingAuthorization.TempType = "UB04";
+                        }
+                        @Html.Partial("Partial/BillingSetting/_tabUB04")
+
+                    </div>
+
+                }
+
+
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+<div id="authorizationLinkupListModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseAuthorizationLinkupListModal()">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span>@Resource.PriorAuthorizationLinkup</span>
+                </h4>
+            </div>
+            <div class="modal-body border-top border-top-grey pb-0">
+                <div class="row" data-ng-if="AuthorizationLinkupList.length > 0">
+                    <div class="col-sm-12">
+                        <div class="portlet-body" style="display: block;">
+                            <form>
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <div class="portlet-body compact">
+                                            <div class="dataTables_wrapper">
+                                                <table class="table table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th class="width-20px"></th>
+                                                            <th>
+                                                                @Resource.Caregiver
+                                                            </th>
+                                                            <th>
+                                                                @Resource.StarDate
+                                                            </th>
+                                                            <th>
+                                                                @Resource.StartTime
+                                                            </th>
+                                                            <th>
+                                                                @Resource.EndDate
+                                                            </th>
+                                                            <th>
+                                                                @Resource.EndTime
+                                                            </th>
+                                                            <th>
+                                                                @Resource.Payor
+                                                            </th>
+                                                            <th>
+                                                                @Resource.AuthorizationCode
+                                                            </th>
+                                                            <th>
+                                                                @Resource.CareType
+                                                            </th>
+                                                            <th>
+                                                                @Resource.Count
+                                                            </th>
+                                                            <th class="width-67px text-align-center">@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr data-ng-repeat="item in AuthorizationLinkupList">
+                                                            <td class="text-align-center">
+                                                                <input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" val="item.IsChecked">
+                                                            </td>
+                                                            <td>
+                                                                {{item.Employee ? item.Employee : '@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.StartDate ? (item.StartDate | orgdate) : '@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.StartTime ? (item.StartTime | orgtime) : '@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.EndDate ? (item.EndDate | orgdate) : '@Resource.NA' }}
+                                                            </td>
+                                                            <td>
+                                                                {{item.EndTime ? (item.EndTime | orgtime) : '@Resource.NA' }}
+                                                            </td>
+                                                            <td>
+                                                                {{item.PayorName ? item.PayorName:'@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.AuthorizationCode ? item.AuthorizationCode : '@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.CareType ? item.CareType:'@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.Cnt}}
+                                                            </td>
+                                                            <td class="text-align-center">
+                                                                <a href="javascript:void(0);" data-ng-click="UpdateAuthorizationLinkup(item.ScheduleIDs)" class="btn btn-xs blue">@Resource.Link</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+                <div data-ng-if="AuthorizationLinkupList.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseAuthorizationLinkupListModal()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="AuthorizationLinkupSelected()" data-ng-disabled="!AuthorizationLinkupSelectedIDs()">@Resource.LinkSelected</button>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<div id="authorizationScheduleLinkListModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseAuthorizationScheduleLinkListModal()">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span> @Resource.PriorAuthorizationLinkup</span><br />
+                    <span style=" background-color: lightblue; border-radius: 4px 4px 4px 4px; font-size: small; font-weight: 400;">Link Schedules for Prior Authorization: {{LinkAuthorization}},{{LinkServiceCode}} <span ng-if="LinkModifier != null">{{LinkModifier}}</span> </span>
+                </h4>
+            </div>
+            <div class="modal-body border-top border-top-grey pb-0">
+                <div class="employeeTabsecond">
+                    <!-- Nav tabs -->
+                    <ul id="scheduleTypes" class="nav nav-tabs tabs-left">
+                        <li class="active" id="@Constants.HashUrl_BillingSettings_AuthScheduleLink_Past">
+                            <a href="#tab_@Constants.HashUrl_BillingSettings_AuthScheduleLink_Past" data-toggle="tab">@Resource.Past</a>
+                        </li>
+                        <li id="@Constants.HashUrl_BillingSettings_AuthScheduleLink_Future">
+                            <a href="#tab_@Constants.HashUrl_BillingSettings_AuthScheduleLink_Future" data-toggle="tab">@Resource.Future</a>
+                        </li>
+                    </ul>
+
+                    <!-- Tab panes -->
+                    <div class="tab-content">
+                        <div class="tab-pane active" id="tab_@Constants.HashUrl_BillingSettings_AuthScheduleLink_Past">
+                            <!-- Past Tab Selection Details -->
+                            @*@Resource.Past @Resource.Records*@
+                        </div>
+                        <div class="tab-pane" id="tab_@Constants.HashUrl_BillingSettings_AuthScheduleLink_Future">
+                            <!-- Future Tab Selection Details -->
+                            @*@Resource.Future @Resource.Records*@
+                        </div>
+                    </div>
+                </div>
+                <!-- Any Tab Selection Details -->
+                <div class="row mt-15 mb-15">
+                    <div class="col-sm-4">
+                        <div class="input-group date date-picker pull-right"
+                             datepicker="SearchAuthorizationScheduleLinkListModel.StartDate" ng-dateval="SearchAuthorizationScheduleLinkListModel.StartDate" data-val="true"
+                             data-ng-mindate="SearchAuthorizationScheduleLinkListModel.StartMinDate"
+                             data-ng-maxdate="SearchAuthorizationScheduleLinkListModel.StartMaxDate">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.StartDate' maxlength="50" />
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="input-group date date-picker pull-right"
+                             datepicker="SearchAuthorizationScheduleLinkListModel.EndDate" ng-dateval="SearchAuthorizationScheduleLinkListModel.EndDate" data-val="true"
+                             data-ng-mindate="SearchAuthorizationScheduleLinkListModel.EndMinDate"
+                             data-ng-maxdate="SearchAuthorizationScheduleLinkListModel.EndMaxDate">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" />
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <input type="button" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-sm mr-20" data-ng-click="GetAuthorizationScheduleLinkList()" />
+                        <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-sm" data-ng-click="ResetAuthorizationScheduleLinkList()">@Resource.Reset</a>
+                    </div>
+                </div>
+                <div class="row" data-ng-if="AuthorizationScheduleLinkList.length > 0">
+                    <div class="col-sm-12">
+                        <div class="portlet-body" style="display: block;">
+                            <form>
+                                <div class="row">
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <div class="portlet-body compact">
+                                            <div class="dataTables_wrapper">
+                                                <table class="table table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th>
+                                                                @Resource.Caregiver
+                                                            </th>
+                                                            <th>
+                                                                @Resource.StarDate
+                                                            </th>
+                                                            <th>
+                                                                @Resource.StartTime
+                                                            </th>
+                                                            <th>
+                                                                @Resource.EndDate
+                                                            </th>
+                                                            <th>
+                                                                @Resource.EndTime
+                                                            </th>
+                                                            <th>
+                                                                @Resource.Payor
+                                                            </th>
+                                                            <th>
+                                                                @Resource.AuthorizationCode
+                                                            </th>
+                                                            <th>
+                                                                @Resource.CareType
+                                                            </th>
+                                                            <th class="width-67px text-align-center">@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+
+                                                    <tbody>
+                                                        <tr data-ng-repeat="item in AuthorizationScheduleLinkList">
+                                                            <td>
+                                                                {{item.Employee ? item.Employee : '@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.StartDate ? (item.StartDate | orgdate) : '@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.StartTime ? (item.StartTime | orgtime) : '@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.EndDate ? (item.EndDate | orgdate) : '@Resource.NA' }}
+                                                            </td>
+                                                            <td>
+                                                                {{item.EndTime ? (item.EndTime | orgtime) : '@Resource.NA' }}
+                                                            </td>
+                                                            <td>
+                                                                {{item.PayorName ? item.PayorName:'@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.AuthorizationCode ? item.AuthorizationCode : '@Resource.NA'}}
+                                                            </td>
+                                                            <td>
+                                                                {{item.CareType ? item.CareType:'@Resource.NA'}}
+                                                            </td>
+                                                            <td class="text-align-center">
+                                                                <a href="javascript:void(0);" data-ng-click="UpdateAuthorizationLinkup(item.ScheduleIDs, true)" class="btn btn-xs blue">@Resource.Link</a>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+                <div data-ng-if="AuthorizationScheduleLinkList.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseAuthorizationScheduleLinkListModal()">@Resource.Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

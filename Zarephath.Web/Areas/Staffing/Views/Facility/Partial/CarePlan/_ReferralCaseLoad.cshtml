@@ -1,0 +1,366 @@
+﻿@using Zarephath.Core.Models
+@model HC_AddReferralModel
+
+@{
+    string strRefereralId = Model != null && Model.Referral != null ? Model.Referral.ReferralID.ToString() : "0";
+    string permanentCaseLoad = Common.CaseLoadTypeEnum.Permanent.ToString();
+    string temporaryCaseLoad = Common.CaseLoadTypeEnum.Temporary.ToString();
+}
+@Html.Hidden("hdnRCLReferralID", strRefereralId)
+@Html.Hidden("hdnPermanentCaseLoadString", permanentCaseLoad)
+
+@if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_CaseLoad_Add))
+{
+    <div class="row">
+        <div class="col-md-10 col-sm-10 col-xs-10">
+            <div class="col-md-2 col-sm-2 col-xs-2 text-align-center">
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-3 text-align-center">
+                <a href="javascript:void(0);" class="btn btn-md green-jungle" data-ng-click="OpenRCLMasterModal('@permanentCaseLoad')">@Resource.AddPermanentCaseLoad </a>
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-3 text-align-center margin-top-5 font-size-25">
+                @Resource.Or.ToUpper()
+            </div>
+            <div class="col-md-3 col-sm-3 col-xs-3 text-align-center">
+                <a href="javascript:void(0);" class="btn btn-md green-jungle" data-ng-click="OpenRCLMasterModal('@temporaryCaseLoad')">@Resource.AddTemporaryCaseLoad </a>
+            </div>
+            <div class="col-md-2 col-sm-2 col-xs-2 text-align-center">
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+}
+<div class="row">
+    <div class="col-md-10 col-sm-10 col-xs-12">
+        <div class="inline-block pull-right" data-ng-show="ReferralCaseLoadList.length > 0">
+            <div class="pull-right margin-left-5">
+                <dir-pagination-controls boundary-links="true" max-size="ReferralCaseLoadListPager.maxSize" on-page-change="ReferralCaseLoadListPager.pageChanged(newPageNumber)" pagination-id="ReferralCaseLoadListPager"></dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div class="space20"></div>
+</div>
+<div class="row">
+    <div class="col-sm-10 col-xs-12">
+        <div class="portlet-body compact" style="display: block;">
+            <div class="table-responsive">
+
+                <table class="table table-bordered table-striped table-condensed flip-content">
+                    <thead class="flip-content">
+                        <tr>
+                            <th class="">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralCaseLoadListPager.sortColumn('EmployeeName')">@Resource.Name</a>
+                                <span class="sortorder" data-ng-show="ReferralCaseLoadListPager.sortIndex === 'EmployeeName'" data-ng-class="{reverse:ReferralCaseLoadListPager.reverse}"></span>
+                            </th>
+                            <th class="">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralCaseLoadListPager.sortColumn('CaseLoadType')">@Resource.CaseLoadType</a>
+                                <span class="sortorder" data-ng-show="ReferralCaseLoadListPager.sortIndex === 'CaseLoadType'" data-ng-class="{reverse:ReferralCaseLoadListPager.reverse}"></span>
+                            </th>
+                            <th>
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralCaseLoadListPager.sortColumn('StartDate')">@Resource.StartDate</a>
+                                <span class="sortorder" data-ng-show="ReferralCaseLoadListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:ReferralCaseLoadListPager.reverse}"></span>
+                            </th>
+                            <th>
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralCaseLoadListPager.sortColumn('EndDate')">@Resource.EndDate</a>
+                                <span class="sortorder" data-ng-show="ReferralCaseLoadListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:ReferralCaseLoadListPager.reverse}"></span>
+                            </th>
+                            <th class="width-130px col-sm-2">@Resource.Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-class="{'deleted':item.IsDeleted,'table-row-selected':item.EndDate == null}"
+                            dir-paginate="item in ReferralCaseLoadList | itemsPerPage: ReferralCaseLoadListPager.pageSize" total-items="ReferralCaseLoadListPager.totalRecords" current-page="ReferralCaseLoadListPager.currentPage" pagination-id="ReferralCaseLoadListPager">
+                            <td>{{item.EmployeeName}}</td>
+                            <td>{{item.CaseLoadType}}</td>
+                            <td>{{item.StartDate | dateformat | date:'@Resource._DateFormat'}}</td>
+                            <td>{{(item.EndDate!=null) ? (item.EndDate | date:'@Resource._DateFormat') : '@Resource.NA'}}</td>
+                            <td>
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_CaseLoad_Add))
+                                {
+                                    <a href="javascript:void(0);" class="btn btn-xs blue" data-ng-show="item.IsEditAllowed" data-ng-click="OpenTemporaryRCLMasterModal(item)">@Resource.Edit</a>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_CaseLoad_Delete))
+                                {
+                                    <a href="javascript:void(0);" class="btn btn-xs blue" data-ng-show="item.IsDeleteAllowed" data-ng-click="RemoveCaseLoad(item)">@Resource.Remove</a>
+                                }
+                                @*<a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteRCLMaster($event,item.ReferralCaseLoadID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>*@
+                                @*<a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteRCLMaster($event,item.ReferralCaseLoadID,'@Resource.Delete')" class="btn btn-xs red">@Resource.Delete</a>*@
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-10 col-xs-12" data-ng-if="ReferralCaseLoadList.length > 0">
+        <div class="col-sm-6 pull-left no-padding margin-top-5">
+            @Resource.Showing <span data-ng-bind="(ReferralCaseLoadListPager.pageSize * ReferralCaseLoadListPager.currentPage) - ReferralCaseLoadListPager.pageSize  + 1"></span>
+            &nbsp;@Resource.To <span data-ng-bind="(ReferralCaseLoadListPager.pageSize == ReferralCaseLoadListPager.currentPageSize) ? (ReferralCaseLoadListPager.pageSize * ReferralCaseLoadListPager.currentPage) :(ReferralCaseLoadListPager.pageSize * ReferralCaseLoadListPager.currentPage) - ReferralCaseLoadListPager.pageSize  + ReferralCaseLoadListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralCaseLoadListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+        </div>
+        <div class="pull-right top pagination-sm">
+            <dir-pagination-controls boundary-links="true" max-size="ReferralCaseLoadListPager.maxSize" on-page-change="ReferralCaseLoadListPager.pageChanged(newPageNumber)" pagination-id="ReferralCaseLoadListPager"></dir-pagination-controls>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-10 col-xs-12">
+        <div data-ng-if="ReferralCaseLoadList.length == 0">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger">
+                        @Html.Raw(Resource.NoRecordsFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rclMasterModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="H1" data-ng-show="RCLMaster.CaseLoadType == '@permanentCaseLoad'">@Resource.AddPermanentCaseLoad</h4>
+                <h4 class="modal-title" id="H1" data-ng-show="RCLMaster.CaseLoadType == '@temporaryCaseLoad'">@Resource.AddTemporaryCaseLoad</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <div class="">
+                            <div class="emprefsch_search">
+                                <form>
+                                    <div class="row">
+                                        <div class="form-group col-lg-4">
+                                            <label>@Resource.Employee</label>
+                                            <div class="">
+                                                <input class="form-control input-sm " placeholder='@Resource.Employee' maxlength="50" data-ng-model="SearchModel.EmployeeName" />
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-lg-4">
+                                            <label>
+                                                @Resource.Skills
+                                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.OrConditionSkillAndPreference" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                            </label>
+                                            <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                                    selectpicker="EmpRefSkillList" name="EmpRefSkillList"
+                                                    title="@Resource.AllSkills">
+                                                <option data-ng-repeat="item in Skills" value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group col-lg-4">
+                                            <label>
+                                                @Resource.Preference
+                                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.OrConditionSkillAndPreference" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                            </label>
+                                            <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                                    selectpicker="EmpRefPreferenceList" name="EmpRefPreferenceList"
+                                                    title="@Resource.AllPreferences">
+                                                <option data-ng-repeat="item in Preferences" value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                                            </select>
+                                        </div>
+
+                                        <div class="form-group col-lg-4">
+                                            <label>@Resource.MileRadius</label>
+                                            <div class="">
+                                                <input class="form-control input-sm " placeholder='@Resource.MileRadius' maxlength="5"
+                                                       dir-valid-number=""
+                                                       data-ng-model="SearchModel.MileRadius" />
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-4 col-md-4 col-sm-12 col-xs-5">
+                                            <label></label>
+                                            <div>
+                                                <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Search" data-ng-click="SearchEmpRefSchOptions()" />
+                                                <input type='button' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Reset" data-ng-click="ResetEmpRefSchOptions()" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                            <div class="dataTables_wrapper compact ng-scope">
+                                <table class="table table-advance table-bordered table-condensed tbl_reflog  table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeTSListPager.sortColumn('Employee',true)"><strong>@Resource.Employee</strong></a>
+                                                <span class="sortorder" data-ng-show="EmployeeTSListPager.sortIndex === 'Employee'" data-ng-class="{reverse:EmployeeTSListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-226px">
+                                                <div class="pull-left" data-ng-show="EmpRefSchAjaxStart">
+                                                    @*@Resource.Loading*@
+                                                    <img src="~/Assets/images/lazyload.gif" />
+                                                </div>
+                                                <div class="pull-right btn-group">
+                                                    <a class="btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                        <strong>@Resource.Sort&nbsp;<i class="fa fa-angle-down"></i></strong>
+                                                    </a>
+                                                    <ul class="multiSort dropdown-menu hold-on-click pull-right">
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="SkillsCount=0"
+                                                               data-ng-click="SkillsCount=SkillsCount+1;SkillsVal=SkillsCount%2==0?'Skills ASC':'Skills DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(SkillsVal,false,true);">
+                                                                <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(SkillsVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(SkillsVal)}} </span>&nbsp; @Resource.Skills
+                                                                <span class="sortorder" data-ng-show="SkillsCount>0" data-ng-class="{reverse: SkillsCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(SkillsVal,true,true);SkillsCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="PreferencesCount=0"
+                                                               data-ng-click="PreferencesCount=PreferencesCount+1;PreferencesVal=PreferencesCount%2==0?'Preferences ASC':'Preferences DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(PreferencesVal,false,true);">
+                                                                <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(PreferencesVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(PreferencesVal)}} </span>&nbsp; @Resource.Preferences
+                                                                <span class="sortorder" data-ng-show="PreferencesCount>0" data-ng-class="{reverse: PreferencesCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(PreferencesVal,true,true);PreferencesCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="MilesCount=0"
+                                                               data-ng-click="MilesCount=MilesCount+1;MilesVal=MilesCount%2==0?'Miles ASC':'Miles DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(MilesVal,false,true);">
+                                                                <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(MilesVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(MilesVal)}} </span>&nbsp; @Resource.Miles
+                                                                <span class="sortorder" data-ng-show="MilesCount>0" data-ng-class="{reverse: MilesCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(MilesVal,true,true);MilesCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="item in EmployeeTSList | itemsPerPage: EmployeeTSListPager.pageSize" total-items="EmployeeTSListPager.totalRecords" current-page="EmployeeTSListPager.currentPage" pagination-id="EmployeeTSListPager_ID" ng-mouseover="row = $index" ng-mouseleave="row = -1">
+                                            <td>{{item.EmployeeName}}</td>
+                                            <td data-ng-mouseover="SearchEmpRefMatchModel.EmployeeID =item.EmployeeID; SearchEmpRefMatchModel.ReferralID =SearchModel.ReferralID">
+                                                <span class="badge badge-warning badge-roundless margin-top-0 margin-bottom-0 width-52px curser-pointer"
+                                                      style="background-color: darkslateblue"
+                                                      data-ng-mouseover="SearchEmpRefMatchModel.MatchType ='@Preference.PreferenceKeyType.Skill.ToString()'"
+                                                      title="@Resource.Skills"
+                                                      item-detail-popup data-ng-url="SchEmpRefSkillsUrl" data-ng-search-model="SearchEmpRefMatchModel" data-ng-width="200"
+                                                      data-ng-template-selector="#schemprefskill-popover" data-popover-cloasble="true">
+                                                    <i class="fa fa-wrench"></i>{{item.SkillsMatchPercent}}%
+                                                </span>
+                                                <span class="badge badge-warning badge-roundless margin-top-0 margin-bottom-0 width-52px curser-pointer" style="background-color: red"
+                                                      title="@Resource.Preferences"
+                                                      data-ng-mouseover="SearchEmpRefMatchModel.MatchType ='@Preference.PreferenceKeyType.Preference.ToString()'"
+                                                      item-detail-popup data-ng-url="SchEmpRefSkillsUrl" data-ng-search-model="SearchEmpRefMatchModel" data-ng-width="200"
+                                                      data-ng-template-selector="#schemprefskill-popover" data-popover-cloasble="true">
+                                                    <i class="fa fa-clock-o"></i>{{item.PreferencesMatchPercent}}%
+                                                </span>
+                                                <span class="badge badge-warning badge-roundless margin-top-0 margin-bottom-0 width-56px" style="background-color: green" title="@Resource.Miles"><i class="fa fa-car"></i>{{item.StrDistance}}</span>
+                                            </td>
+                                            <td style="text-align: center; vertical-align: top;">
+                                                <div data-ng-show="row != $index" style="width:185px;">&nbsp;</div>
+                                                <a href="#" class="btn btn-xs btn-default" data-ng-show="row == $index && RCLMaster.CaseLoadType == '@permanentCaseLoad'" data-ng-click="SaveRCLMaster(item)" title="@Resource.AddCaseLoad">@Resource.AddPermanentCaseLoad</a>
+                                                <a href="#" class="btn btn-xs btn-default" data-ng-show="row == $index && RCLMaster.CaseLoadType != '@permanentCaseLoad'" data-ng-click="SaveRCLMaster(item)" title="@Resource.AddTemporaryCaseLoad">@Resource.AddTemporaryCaseLoad</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12" data-ng-if="EmployeeTSList.length > 0">
+                                    <div class="col-sm-4 pull-left no-padding">
+                                        @Resource.Showing <span data-ng-bind="(EmployeeTSListPager.pageSize * EmployeeTSListPager.currentPage) - EmployeeTSListPager.pageSize  + 1"></span>
+                                        &nbsp;@Resource.To <span data-ng-bind="(EmployeeTSListPager.pageSize == EmployeeTSListPager.currentPageSize) ? (EmployeeTSListPager.pageSize * EmployeeTSListPager.currentPage) :(EmployeeTSListPager.pageSize * EmployeeTSListPager.currentPage) - EmployeeTSListPager.pageSize  + EmployeeTSListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeTSListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                    </div>
+                                    <div class="pull-right top pagination-sm">
+                                        <dir-pagination-controls boundary-links="true" max-size="EmployeeTSListPager.maxSize" on-page-change="EmployeeTSListPager.pageChanged(newPageNumber)" pagination-id="EmployeeTSListPager_ID"></dir-pagination-controls>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div data-ng-if="EmployeeTSList.length == 0">
+                                <div>
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger padding-5">
+                                                @Html.Raw(Resource.NoRecordsFound)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="rclTemporaryMasterModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="H1" data-ng-hide="RCLMaster.ReferralCaseLoadID > 0">@Resource.AddTemporaryCaseLoad</h4>
+                <h4 class="modal-title" id="H1" data-ng-show="RCLMaster.ReferralCaseLoadID > 0">@Resource.UpdateTemporaryCaseLoad</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <div class="">
+                            <div class="emprefsch_search">
+                                <form id="frmAddTempCaseLoad">
+                                    <div class="row">
+                                        <div class="form-group col-lg-3 col-md-5 col-sm-5 col-xs-7">
+                                            <label class="required">@Resource.StartDate</label>
+                                            <div data-ng-show="(!(RCLMaster.ReferralCaseLoadID > 0)) || (RCLMaster.ReferralCaseLoadID > 0 && RCLMaster.AllowedToEditStartDate)">
+                                                <div class="input-group date date-picker pull-right"
+                                                     datepicker="RCLMaster.StartDate" ng-dateval="RCLMaster.StartDate" data-ng-maxdate="RCLMaster.EndDate">
+                                                    <input class="form-control input-sm dateInputMask" data-val="true"
+                                                           id="RCLMaster_StartDate" name="RCLMaster.StartDate"
+                                                           data-val-required="@Resource.StartDateRequired" placeholder='@Resource.StarDate' maxlength="10" />
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <div data-ng-show="RCLMaster.ReferralCaseLoadID > 0 && !RCLMaster.AllowedToEditStartDate">
+                                                <div class="input-group date date-picker pull-right"
+                                                     datepicker="RCLMaster.StartDate" ng-dateval="RCLMaster.StartDate" data-ng-maxdate="RCLMaster.EndDate">
+                                                    <input class="form-control input-sm dateInputMask" data-val="true" disabled="disabled"
+                                                           id="RCLMaster_StartDate1" name="RCLMaster.StartDate1"
+                                                           data-val-required="@Resource.StartDateRequired" placeholder='@Resource.StarDate' maxlength="10" />
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <span class="field-validation-valid" data-valmsg-for="RCLMaster.StartDate" data-valmsg-replace="true"></span>
+                                        </div>
+                                        @*CustomizedMinStartDate: {{RCLMaster.CustomizedMinStartDate}} StartDate: {{RCLMaster.CustomizedMinStartDate}}*@
+                                        <div class="form-group col-lg-3 col-md-5 col-sm-5 col-xs-7">
+                                            <label class="required">@Resource.EndDate</label>
+                                            <div>
+                                                <div class="input-group date date-picker pull-right"
+                                                     datepicker="RCLMaster.EndDate" ng-dateval="RCLMaster.EndDate" data-ng-mindate="RCLMaster.CustomizedMinStartDate">
+                                                    <input class="form-control input-sm dateInputMask" data-val="true"
+                                                           id="RCLMaster_EndDate" name="RCLMaster.EndDate"
+                                                           data-val-required="@Resource.EndDateRequired" placeholder='@Resource.EndDate' maxlength="10" />
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <span class="field-validation-valid" data-valmsg-for="RCLMaster.EndDate" data-valmsg-replace="true"></span>
+                                        </div>
+                                        <div class="col-lg-2 col-md-3 col-sm-12 col-xs-5">
+                                            <label></label>
+                                            <div>
+                                                <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Save" data-ng-click="SaveTemporaryCaseLoad()" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

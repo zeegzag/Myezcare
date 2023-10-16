@@ -1,0 +1,171 @@
+﻿@model HC_DayCare_ScheduleAssignmentModel
+<div class="emprefSchScreen">
+  
+    <div class="emprefpopup_right col-sm-12 ">
+
+        <div class="padding-top-10 clearfix">
+            <div class="padding-bottom-30">
+                <h5 class="font-weight-600 text-decoration-underline margin-top-0 margin-bottom-10 font-black font-size-13 font-weight-500 pull-left">@Resource.PatientOnHold</h5>
+                <a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" data-ng-click="OpenPatientHoldModal(true)">+&nbsp;@Resource.PatientHold</a>
+            </div>
+
+            <div class="col-md-12 no-padding">
+                <div>
+                </div>
+            </div>
+
+            <div class="compact" style="max-height: 200px; overflow: auto; clear: both;">
+
+                <div class="pull-left clearfix" data-ng-show="PatientUnHoldActionAjaxStart">
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+
+                <table class="table table-bordered table-striped table-condensed flip-content clearfix" data-ng-show="PatientHoldDetailList.length>0">
+                    <thead class="flip-content">
+                    <tr>
+                        <th>#</th>
+                        <th>@Resource.StartDate</th>
+                        <th>@Resource.EndDate</th>
+                        <th>@Resource.Reason</th>
+                        
+                        <th></th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr data-ng-repeat="item in PatientHoldDetailList" data-ng-class="{'bg-purple-soft font-white':item.CurrentActiveGroup}"
+                        @*data-ng-attr-title="{{item.CurrentActiveGroup?'@Resource.CurrentActivePatientHoldGroup':''}}"*@
+                        data-ng-attr-title="{{'@Resource.HoldReason : '+item.PatientOnHoldReason}}"
+                    >
+                        <td>{{$index+1}}
+                        </td>
+                        <td>{{item.StartDate | orgdate}}</td>
+                        <td>{{ item.EndDate ? (item.EndDate | orgdate): '@Resource.NA'}}</td>
+                        <td>{{item.PatientOnHoldReason}}</td>
+                        <td>
+                            <a href="javascript:void(0)" title="@Resource.PatientUnHold" data-ng-click="OpenPatientHoldModal(false,item)" class="text-decoration-none">
+                                <i class="fa fa-edit" data-ng-class="{'font-white':item.CurrentActiveGroup,'font-black':!item.CurrentActiveGroup}"></i>
+                            </a>
+                            <a href="javascript:void(0)" title="@Resource.Remove" data-ng-click="OpenPatientHoldModal(false,item,true)" class="text-decoration-none">
+                                <i class="fa fa-remove" data-ng-class="{'font-white':item.CurrentActiveGroup,'font-black':!item.CurrentActiveGroup}"></i>
+                            </a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            
+            
+            
+            <div class="row">
+                <div class="col-sm-12">
+                    <div data-ng-if="PatientHoldDetailList.length == 0">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<div id="pationOnHoldModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="ClosePatientHoldModal()">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span data-ng-show="PatientHoldDetail.PatientOnHoldAction">@Resource.PatientHold</span>
+                    <span data-ng-show="!PatientHoldDetail.PatientOnHoldAction">@Resource.PatientUnHold</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <span data-ng-show="PatientHoldDetail.PatientOnHoldAction">@Resource.PatientHoldConfirmation</span>
+                <span data-ng-show="!PatientHoldDetail.PatientOnHoldAction">@Resource.PatientUnHoldConfirmation</span>
+                <form id="modalHoldFrom">
+
+                    <div data-ng-if="!PatientHoldDetail.PatientOnHoldAction && !PatientHoldDetail.PatientUnHoldRemoveAction" class="clearfix margin-top-15">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group col-md-6 no-left-padding">
+                                <label class="control-label required">@Resource.UnHoldDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                     datepicker="PatientHoldDetail.UnHoldDate" ng-dateval="PatientHoldDetail.UnHoldDate" data-val="true"
+                                     data-ng-mindate="PatientHoldDetail.StartDate" data-ng-maxdate="PatientHoldDetail.EndDate">
+                                    <input class="form-control input-sm dateInputMask " placeholder='@Resource.UnHoldDate' maxlength="50"
+                                           name="PatientHoldDetail.UnHoldDate" id="PatientHoldDetail_UnHoldDate"
+                                           data-val-required="@Resource.UnHoldDateRequired" data-val="true" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.UnHoldDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-ng-show="PatientHoldDetail.PatientOnHoldAction" class="clearfix margin-top-15">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group col-md-6 no-left-padding">
+                                <label class="control-label required">@Resource.StartDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                     datepicker="PatientHoldDetail.StartDate" ng-dateval="PatientHoldDetail.StartDate" data-val="true">
+                                    <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50"
+                                           name="PatientHoldDetail.StartDate" id="PatientHoldDetail_EndDateStartDate"
+                                           data-val-required="@Resource.StartDateRequired" data-val="true" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.StartDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group col-md-6 no-right-padding">
+                                <label class="control-label">@Resource.EndDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                     datepicker="PatientHoldDetail.EndDate" ng-dateval="PatientHoldDetail.EndDate" data-val="true">
+                                    <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50"
+                                           name="PatientHoldDetail.EndDate" id="PatientHoldDetail_EndDate"
+                                           @*data-val-required="@Resource.EndDateRequired"*@ data-val="false" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.EndDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group clearfix">
+                                <label class="control-label required">@Resource.HoldReason</label>
+                                <textarea rows="5" class="form-control input-sm requiredStrip" data-ng-model="PatientHoldDetail.PatientOnHoldReason" maxlength="1000"
+                                          placeholder="@Resource.HoldReason" data-val="true"
+                                          data-val-required="@Resource.HoldReasonRequired"
+                                          name="PatientHoldDetail.PatientOnHoldReason" id="PatientHoldDetail_PatientOnHoldReason"></textarea>
+                                <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.PatientOnHoldReason" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="ClosePatientHoldModal()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="OnHoldUnHoldAction()">@Resource.Save</button>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+</div>

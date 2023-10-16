@@ -1,0 +1,317 @@
+﻿@model RefBXContractPageModel
+
+@Html.Hidden("hdnSetBXContractPageModel", Common.SerializeObject(Model))
+<div class="row-fluid">
+    <div class="">
+        <div class="row">
+            <div class="padding-bottom-10 col-lg-7 col-md-7 col-sm-12">
+                <div class=" no-left-padding col-lg-6 col-md-6 col-sm-12">
+                    <span class="label-italic">
+                        <b class="font-red-thunderbird">@Resource.BehaviorContracts</b>
+                    </span>
+                </div>
+                <div class="no-right-padding col-lg-6 col-md-6 col-sm-12">
+                    <span class="" data-ng-show="AjaxStart">
+                        @Resource.Loading
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </span>
+                    <a href="#NewBXContractView" data-ng-click="NewBXContractView()" class="btn btn-xs blue  pull-right" data-toggle="modal">@Resource.AddNewBXContract</a>
+                    @*<div class="top pagination-sm">
+                        <dir-pagination-controls boundary-links="true" max-size="BXContractListPager.maxSize"
+                            on-page-change="BXContractListPager.pageChanged(newPageNumber)" pagination-id="BXContractListPagerID"></dir-pagination-controls>
+                    </div>*@
+                </div>
+            </div>
+             @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+             {
+                 <div class="padding-bottom-10 col-lg-5 col-md-7 col-sm-12">
+                     <div class=" no-left-padding col-lg-12 col-md-12 col-sm-12">
+                         <span class="label-italic">
+                        <b class="font-red-thunderbird">@Resource.Suspension</b>
+                    </span>
+                         <span class="badge  badge-success font-size-12" data-ng-if="IsEligibleForSuspension">
+                        <b>@Html.Raw(Resource.EligibleSuspension)</b>
+                    </span>
+                     </div>
+
+                 </div>
+             }
+        </div>
+
+        <div class="row">
+            <div class="row-fluid  col-lg-7 col-md-7 col-sm-12">
+                @*<form action="#" class="horizontal-form">*@
+                <div class="row-fluid" data-ng-show="BXContractList.length > 0">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+
+                        <div class="portlet-body compact ">
+                            <div id="windowTable" class="dataTables_wrapper ">
+                                <table class="table table-bordered table-striped table-hover table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="width-20px">
+                                                @Resource.Hash
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BXContractListPager.sortColumn('CreatedByName')">@Resource.Staff
+                                                    <span class="sortorder" data-ng-show="BXContractListPager.sortIndex === 'CreatedByName'" data-ng-class="{reverse:BXContractListPager.reverse}"></span></a>
+
+                                            </th>
+                                            <th class="width-10px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BXContractListPager.sortColumn('WarningDate')">@Resource.WarningDate</a>
+                                                <span class="sortorder" data-ng-show="BXContractListPager.sortIndex === 'WarningDate'" data-ng-class="{reverse:BXContractListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BXContractListPager.sortColumn('WarningReason')">@Resource.WarningReason</a>
+                                                <span class="sortorder" data-ng-show="BXContractListPager.sortIndex === 'WarningReason'" data-ng-class="{reverse:BXContractListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-10px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BXContractListPager.sortColumn('CaseManagerNotifyDate')">@Resource.CMNotifiedDate</a>
+                                                <span class="sortorder" data-ng-show="BXContractListPager.sortIndex === 'CaseManagerNotifyDate'" data-ng-class="{reverse:BXContractListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BXContractListPager.sortColumn('IsActive')">@Resource.Active</a>
+                                                <span class="sortorder" data-ng-show="BXContractListPager.sortIndex === 'IsActive'" data-ng-class="{reverse:BXContractListPager.reverse}"></span>
+
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr dir-paginate="bxItem in BXContractList | itemsPerPage: BXContractListPager.pageSize" total-items="BXContractListPager.totalRecords" current-page="BXContractListPager.currentPage" pagination-id="BXContractListPagerID">
+                                            <td>{{(BXContractListPager.pageSize * BXContractListPager.currentPage) - BXContractListPager.pageSize + ($index + 1) }}</td>
+                                            <td>{{bxItem.CreatedByName}}</td>
+                                            <td>{{bxItem.WarningDate | dateformat}}</td>
+                                            <td>{{bxItem.WarningReason}}</td>
+                                            <td>{{bxItem.CaseManagerNotifyDate | dateformat}}</td>
+                                            <td>
+                                                 @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                                                 {
+                                                     <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="bxItem.IsActive" data-ng-change="UpdateBXContractStatus(bxItem)" val="bxItem.IsActive">
+                                                 }
+                                                <a class="margin-left-05" data-ng-click="OpenBXContractEditModal(bxItem)" title="Edit"><i class="fa fa-pencil"></i></a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="clearfix"></div>
+                    <div class="row">
+                        <div class="space20">
+                            <hr />
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <span>
+                                @Resource.Showing <span data-ng-bind="(BXContractListPager.pageSize * BXContractListPager.currentPage) - BXContractListPager.pageSize  + 1"></span>
+                                &nbsp;@Resource.To <span data-ng-bind="(BXContractListPager.pageSize == BXContractListPager.currentPageSize) ? (BXContractListPager.pageSize * BXContractListPager.currentPage) :(BXContractListPager.pageSize * BXContractListPager.currentPage) - BXContractListPager.pageSize  + BXContractListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="BXContractListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                <span class="padding-left-25 top pagination-sm" data-ng-show="AjaxStart">
+                                    @Resource.Loading
+                                    <img src="~/Assets/images/lazyload.gif" />
+                                </span>
+                            </span>
+
+                            <div class="pull-right top pagination-sm">
+                                <dir-pagination-controls boundary-links="true" max-size="BXContractListPager.maxSize"
+                                    on-page-change="BXContractListPager.pageChanged(newPageNumber)" pagination-id="BXContractListPagerID"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                @*</form>*@
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="BXContractList.length == 0">
+                            <span class="padding-left-25 top pagination-sm" data-ng-show="AjaxStart">
+                                @Resource.Loading
+                                <img src="~/Assets/images/lazyload.gif" />
+                            </span>
+                            <div class="row" data-ng-show="!AjaxStart">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+            {
+                <div class="row-fluid border-left border-left-blue col-lg-push-1 col-md-push-1 col-lg-4 col-md-4 col-md-12">
+
+                    <div class="no-padding col-lg-12 col-md-12 col-md-12">
+                        <form id="frmRefSuspention">
+                            <div class="frmRefSuspention">
+
+                                <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                    @*<label class="control-label">@Resource.SuspentionType</label>*@
+                                    @Html.DropDownListFor(p => p.ReferralSuspention.SuspentionType, Common.SetSuspentionTypes().ToSelectList(Model.ReferralSuspention.SuspentionType ?? "", "Name", "Value", Resource.SelectType, ""),
+                                        new
+                                        {
+                                            data_ng_model = "ReferralSuspention.SuspentionType",
+                                            data_ng_init = "ReferralSuspention.SuspentionType=ReferralSuspention.SuspentionType==''?null:ReferralSuspention.SuspentionType",
+                                            @class = "form-control input-sm",
+                                        })
+                                </div>
+
+                                <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                    @*<label class="control-label">@Resource.SuspentionLength</label>*@
+                                    @Html.DropDownListFor(p => p.ReferralSuspention.SuspentionLength, Common.SetSuspentionLength().ToSelectList(Model.ReferralSuspention.SuspentionLength.ToString() ?? "", "Name", "Value", Resource.SelectLength, ""),
+                                        new
+                                        {
+                                            convert_to_number = "",
+                                            data_ng_model = "ReferralSuspention.SuspentionLength",
+                                            data_ng_init = "ReferralSuspention.SuspentionLength=ReferralSuspention.SuspentionLength==''?null:ReferralSuspention.SuspentionLength",
+                                            @class = "form-control input-sm",
+                                        })
+                                </div>
+
+                                <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12" data-ng-if="ReferralSuspention.ReturnEligibleDate">
+                                    @*<label class="control-label">@Resource.ReturnEligibleDate</label>*@
+                                    <div class="input-group date no-focus" datepicker="ReferralSuspention.ReturnEligibleDate" ng-dateval="ReferralSuspention.ReturnEligibleDate">
+                                        @Html.TextBoxFor(m => m.ReferralSuspention.ReturnEligibleDate, new { @class = "no-focus form-control input-sm", placeholder = Resource.ReturnEligibleDate, @disabled = "disabled" })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                                    <div>
+                                        @*<div class="col-md-6 no-padding">
+                                    <a class="btn btn-sm btn-primary form-control" data-ng-click="">
+                                        @Resource.Save
+                                    </a>
+                                </div>*@
+
+                                        <div>
+                                            <div class="col-md-6 no-padding">
+                                                <button type="button" class="btn green-jungle" data-ng-click="SaveRefSuspensionWithStatus()">@Resource.Save</button>
+                                                @*<a class="btn btn-sm green-jungle form-control" data-ng-click="SaveRefSuspension()">
+                                                @Resource.Save
+                                            </a>*@
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <i><span class="font-red font-weight-600">Note:&nbsp;</span><small class="">In case of suspension & termination we will <b>Cancelled</b> all the future scheduling w/ the status of <b>Uncofirmed</b> and <b>Waiting List</b>. We'll also remove this client from all related future <b>transportation group</b>.</small></i>
+                                </div>
+
+
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12" data-ng-show="ReferralSuspention.ReferralSuspentionID>0">
+                                    <div class="space50"></div>
+                                    <div>
+                                        <span>@Resource.RemoveFromSuspensionGroup
+                                            <a class="badge badge-primary" data-ng-click="ResetRefSuspension()">@Resource.ClickHere</a>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+
+
+                </div>
+            }
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <div class="modal fade" id="NewBXContractView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>@Resource.AddNewBXContract</span></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmAddBXContractView" class="frmAddBXContractView">
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                        <label class="control-label required">@Resource.WarningDate</label>
+                                        <div class="input-group date date-picker pull-right"
+                                            datepicker="ReferralBehaviorContract.WarningDate"
+                                            ng-dateval="ReferralBehaviorContract.WarningDate">
+                                            @Html.TextBoxFor(m => m.ReferralBehaviorContract.WarningDate, new
+                                                {
+                                                    @class = "form-control input-sm no-focus",
+                                                    maxlength = "50",
+                                                    placeholder = Resource.WarningDate
+                                                })
+                                            @Html.ValidationMessageFor(m => m.ReferralBehaviorContract.WarningDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                        <label class="control-label">@Resource.CMNotifiedDate</label>
+                                        <div class="input-group date date-picker pull-right"
+                                            datepicker="ReferralBehaviorContract.CaseManagerNotifyDate"
+                                            ng-dateval="ReferralBehaviorContract.CaseManagerNotifyDate">
+                                            @Html.TextBoxFor(m => m.ReferralBehaviorContract.CaseManagerNotifyDate, new
+                                                {
+                                                    @class = "form-control input-sm no-focus",
+                                                    maxlength = "50",
+                                                    placeholder = Resource.CMNotifiedDate
+                                                })
+                                            @Html.ValidationMessageFor(m => m.ReferralBehaviorContract.CaseManagerNotifyDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <label class="control-label required">@Resource.WarningReason</label>
+                                        @Html.TextAreaFor(m => m.ReferralBehaviorContract.WarningReason,
+                                                         new
+                                                             {
+                                                                 data_ng_model = "ReferralBehaviorContract.WarningReason",
+                                                                 @class = "form-control input-sm",
+                                                                 placeholder = Resource.WarningReason,
+                                                                 @rows = "8"
+                                                                 //maxlength = 500
+                                                             })
+                                        @Html.ValidationMessageFor(m => m.ReferralBehaviorContract.WarningReason)
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                         @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                         {
+                             <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                 <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                     <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Close</button>
+                                     <button type="button" class="btn green-jungle" data-ng-click="SaveBXContract()">@Resource.Save</button>
+                                 </div>
+                             </div>
+                         }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+

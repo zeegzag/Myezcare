@@ -1,0 +1,318 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Process277CAMenuTitle);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_Process277CA;
+}
+@model AddProcess277PageModel
+
+
+
+<div data-ng-controller="Process277Controller">
+    @Html.Hidden("hdnAddProcess277Model", Common.SerializeObject(Model))
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.Process277CATitle
+
+
+
+
+            <div class="btn-group pull-right btn-group-xs btn-group-devided">
+                <a type="button" class="btn collapsed grey border-grey-cascade btn-xs" href="@Constants.BackendProcess277File" target="_blank">
+                    <i class="fa fa-sliders" aria-hidden="true"></i>&nbsp; @Resource.RunBatchService
+                </a>
+            </div>
+
+
+        </h3>
+
+
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div>
+                <div class="row">
+                    <form id="frmProcess277">
+                        <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                <label class="control-label required">@Resource.Payor</label>
+                                <div>
+                                    @Html.DropDownListFor(p => p.AddProcess277Model.PayorID, Model.PayorList.ToSelectList(Model.AddProcess277Model.PayorID.ToString() ?? "", "Name", "Value", @Resource.SelectPayor, ""), new
+                                    {
+                                        convert_to_number = "",
+                                        data_ng_model = "AddProcess277Model.PayorID",
+                                        data_ng_init = "AddProcess277Model.PayorID=AddProcess277Model.PayorID==''?null:AddProcess277Model.PayorID.toString()",
+                                        @class = "form-control input-sm"
+                                    })
+                                    @Html.ValidationMessageFor(q => q.AddProcess277Model.PayorID)
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                <label class="control-label required">@Resource.SelectFile
+                                    <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.OnlyTxtEdiDatAllowed" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                </label>
+
+                                <div>
+                                    @Html.TextBoxFor(q => q.AddProcess277Model.TempFilePath, new
+                                    {
+                                        data_ng_model = "AddProcess277Model.TempFilePath",
+                                        @class = "form-control hideErrorContent replaceErrorSource"
+                                    })
+                                    @Html.ValidationMessageFor(m => m.AddProcess277Model.TempFilePath)
+
+                                    <div class="replaceErrorDest col-lg-12 col-md-12 col-sm-12 fileUpload btn btn-sm btn-default text-align-left">
+                                        <span><i class="icon-plus"></i>&nbsp; {{AddProcess277Model.SelectFileLabel}}</span>
+                                        <div class="">
+                                            <input id="fileupload" type="file" name="files[]" class="upload" value="Browse" title="{{AddProcess277Model.SelectFileLabel}}"
+                                                   fileuploadonsubmit
+                                                   autoupload="false"
+                                                   file-uploadurl="{{UploadFile}}"
+                                                   beforesend="BeforeSend"
+                                                   aftersend="AfterSend"
+                                                   progress="Progress"
+                                                   filelist="UploadingFileList"
+                                                   filedata="FileData"
+                                                   @*onchange="loadFile(event)" *@
+                                                   onadd="OnAdd"
+                                                   submit-button-id="#process277Submit"
+                                                   onsubmitclick="Upload277FileFile"/>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                <label class="control-label">@Resource.Comment</label>
+                                <div>
+                                    @Html.TextBoxFor(q => q.AddProcess277Model.Comment, new { @class = "form-control input-sm", data_ng_model = "AddProcess277Model.Comment", maxlength = 100, placeholder = Resource.Comment })
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-2 col-md-3 col-sm-3 no-right-padding">
+                                <label class="control-label"></label>
+                                <div>
+                                    <div class="btn-group">
+                                        <button type="submit" id="process277Submit" class="btn btn-sm green-jungle" data-ng-click="Upload277File()">@Resource.Upload277File</button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="space20">
+                            <hr />
+                        </div>
+                    </form>
+                </div>
+
+                <div>
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="btn-group" data-ng-show="Process277List.length > 0">
+                                <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                                    <input id="SelectAll277Files" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                    <label for="SelectAll277Files"></label>
+                                </span>
+                            </div>
+                            <div class="btn-group">
+                                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                                </button>
+                            </div>
+
+
+                            <div class="btn-group">
+                                @Html.DropDownListFor(m => m.SearchProcess277ListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchProcess277ListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempSearchProcess277ListPage.IsDeleted",
+                                                                          data_ng_init = "TempSearchProcess277ListPage.IsDeleted = TempSearchProcess277ListPage.IsDeleted==null?'-1':TempSearchProcess277ListPage.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchProcess277Files()"
+                                                                      })
+                            </div>
+                            <div class="btn-group" data-ng-if="SelectedProcess277Ids.length > 0">
+                                <button type="button" data-ng-click="DeleteProcess277File()" class="btn blue btn-sm grey border-grey-cascade">
+                                    <i class="fa fa-random margin-right-10"></i>{{TempSearchProcess277ListPage.IsDeleted==0?'@Constants.DisableSelected' :(TempAgencyListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}</button>
+                            </div>
+
+                            <div class="btn-group margin-left-20PR">
+                                <div class="top pagination-sm" data-ng-show="AjaxStart">
+                                    @Resource.Loading
+                                    <img src="~/Assets/images/lazyload.gif" />
+                                </div>
+                            </div>
+                            <div class="inline-block pull-right" data-ng-show="Process277List.length > 0">
+                                <div class="inline-block pull-right" data-ng-show="Process277List.length > 0">
+                                    <div class="pull-right margin-left-5">
+                                        <dir-pagination-controls boundary-links="true" max-size="Process277ListPager.maxSize" on-page-change="Process277ListPager.pageChanged(newPageNumber)" pagination-id="Process277ListPagerID"></dir-pagination-controls>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="space20"></div>
+
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="portlet-body" style="display: block;">
+                                    <div class="table-responsive">
+                                        <form id="frmCaseManagerList">
+                                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                                <thead class="flip-content">
+                                                    <tr>
+                                                        <th class="width-20px"></th>
+                                                        <th class="width-80px">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process277ListPager.sortColumn('Payor')">@Resource.Payor</a>
+                                                            <span class="sortorder" data-ng-show="Process277ListPager.sortIndex === 'Payor'" data-ng-class="{reverse:Process277ListPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="col-sm-3">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process277ListPager.sortColumn('FileName')">@Resource.FileName</a>
+                                                            <span class="sortorder" data-ng-show="Process277ListPager.sortIndex === 'FileName'" data-ng-class="{reverse:Process277ListPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process277ListPager.sortColumn('FileSize')">@Resource.FileSize</a>
+                                                            <span class="sortorder" data-ng-show="Process277ListPager.sortIndex === 'FileSize'" data-ng-class="{reverse:Process277ListPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process277ListPager.sortColumn('Comment')">@Resource.Comment</a>
+                                                            <span class="sortorder" data-ng-show="Process277ListPager.sortIndex === 'Comment'" data-ng-class="{reverse:Process277ListPager.reverse}"></span>
+                                                        </th>
+
+                                                        <th class="">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process277ListPager.sortColumn('AddedBy')">@Resource.AddedBy</a>
+                                                            <span class="sortorder" data-ng-show="Process277ListPager.sortIndex === 'AddedBy'" data-ng-class="{reverse:Process277ListPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process277ListPager.sortColumn('AddedDate')">@Resource.AddedDate</a>
+                                                            <span class="sortorder" data-ng-show="Process277ListPager.sortIndex === 'AddedDate'" data-ng-class="{reverse:Process277ListPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="width120">@Resource.Status</th>
+                                                        <th class="width120">@Resource.Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+
+                                                    <tr class="compact-search-tr">
+                                                        <td></td>
+
+                                                        <td>
+                                                            @Html.DropDownListFor(p => p.SearchProcess277ListPage.PayorID, Model.PayorList.ToSelectList(Model.SearchProcess277ListPage.PayorID.ToString() ?? "", "Name", "Value", @Resource.SelectPayor, ""), new
+                                                                {
+                                                                    convert_to_number = "",
+                                                                    data_ng_model = "TempSearchProcess277ListPage.PayorID",
+                                                                    data_ng_init = "TempSearchProcess277ListPage.PayorID=TempSearchProcess277ListPage.PayorID==''?null:TempSearchProcess277ListPage.PayorID.toString()",
+                                                                    @class = "form-control input-sm",
+                                                                    data_val = "false"
+                                                                })
+                                                        </td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.SearchProcess277ListPage.FileName, new { data_ng_model = "TempSearchProcess277ListPage.FileName", @class = "form-control input-sm", placeholder = Resource.FileName, maxlength = 50 })
+                                                        </td>
+                                                        <td></td>
+                                                        <td>
+                                                            @Html.TextBoxFor(m => m.SearchProcess277ListPage.Comment, new { data_ng_model = "TempSearchProcess277ListPage.Comment", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                                        </td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td>
+                                                            <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchProcess277Files()"/>
+                                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                                        </td>
+                                                    </tr>
+
+
+                                                    <tr data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in Process277List | itemsPerPage: Process277ListPager.pageSize" total-items="Process277ListPager.totalRecords" current-page="Process277ListPager.currentPage" pagination-id="Process277ListPagerID">
+                                                        <td>
+                                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" data-ng-change="SelectProcess277File(item)" val="item.IsChecked">
+                                                        </td>
+                                                        <td>{{item.Payor}}</td>
+                                                        <td><a target="_blank" data-ng-attr-href="{{item.AWSSignedFilePath}}">{{item.FileName}}</a></td>
+                                                        <td>{{item.StrFileSize ? item.StrFileSize:'0'}}</td>
+                                                        <td>{{item.Comment ? item.Comment:'@Resource.NA'}}</td>
+                                                        <td>{{item.StrDisplayName ? item.StrDisplayName:'@Resource.NA'}}</td>
+                                                        <td>{{item.CreatedDate ? (item.CreatedDate | orgdatetime) : '@Resource.NA'}}</td>
+                                                        <td>
+                                                            <div data-ng-if="item.Upload277FileProcessStatus==@((int)EnumUpload277FileProcessStatus.Processed)">
+                                                                <span class="badge badge-success">@Resource.Processed</span>
+                                                                <a target="_blank" class="fa fa-download" title="@Resource.DownloadReadableFile" data-ng-show="item.ReadableFilePath" data-ng-attr-href="{{item.AWSReadableFilePath}}"></a>
+                                                                <a href="javascript:void(0)" class="fa fa-download" title="@Resource.DownloadReadableFile" data-ng-hide="item.ReadableFilePath" data-ng-click="Download277RedableFile(item.Edi277FileID)"></a>
+                                                            </div>
+                                                            <div data-ng-if="item.Upload277FileProcessStatus==@((int) EnumUpload277FileProcessStatus.ErrorInProcess)">
+                                                                <span class="badge badge-danger">@Resource.Failed</span>
+                                                                <a target="_blank" class="fa fa-download" title="@Resource.DownloadErrorLog" data-ng-attr-href="{{item.AWSReadableFilePath}}"></a>
+                                                            </div>
+
+                                                            <div data-ng-if="item.Upload277FileProcessStatus==@((int) EnumUpload277FileProcessStatus.UnProcessed)">
+                                                                <span class="badge">@Resource.UnProcessed</span>
+                                                            </div>
+
+                                                            <div data-ng-if="item.Upload277FileProcessStatus==@((int)EnumUpload277FileProcessStatus.Running)">
+                                                                <span class="badge badge-danger">@Resource.Running</span>
+                                                            </div>
+
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteProcess277File(item.Edi277FileID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                            <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteProcess277File(item.Edi277FileID,'@Resource.Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12" data-ng-if="Process277List.length > 0">
+                                <div class="col-sm-3 pull-left no-padding">
+                                    @Resource.Showing <span data-ng-bind="(Process277ListPager.pageSize * Process277ListPager.currentPage) - Process277ListPager.pageSize  + 1"></span>
+                                    &nbsp;@Resource.To <span data-ng-bind="(Process277ListPager.pageSize == Process277ListPager.currentPageSize) ? (Process277ListPager.pageSize * Process277ListPager.currentPage) :(Process277ListPager.pageSize * Process277ListPager.currentPage) - Process277ListPager.pageSize  + Process277ListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="Process277ListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                </div>
+                                <div class="pull-right top pagination-sm">
+                                    <dir-pagination-controls boundary-links="true" max-size="Process277ListPager.maxSize" on-page-change="Process277ListPager.pageChanged(newPageNumber)" pagination-id="Process277ListPagerID"></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div data-ng-if="Process277List.length == 0  ">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger">
+                                                @Html.Raw(Resource.NoRecordsFound)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+                </div>
+
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/batch/process277CA")
+    <script type="text/javascript">
+        var DeleteConfirmation277Message = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.EDI277CAFile)';
+        var Invalid277UploadMessage = '@Resource.Invalid277CAUploadMessage';
+        var MaximumUploadImageSizeMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage2MB))';
+        var Select277File = '@Resource.Select277CAFile';
+    </script>
+}

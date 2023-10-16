@@ -1,0 +1,95 @@
+﻿@{
+    bool isEditMode = Model != null && Convert.ToInt32 (Model.EBCategory.ID )  > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (isEditMode ? Resource.EditCategory : @Resource.AddCategory));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_CategoryAdd;
+}
+
+@model EBCategoryModel
+ 
+
+@Html.Hidden("hdnCategoryModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="AddCategoryController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditCategory : @Resource.AddCategory)
+            <small>@Resource.EnterCategoryInformation</small>
+            <input type="submit" data-ng-click="SaveCategory()" class="btn btn-sm green-jungle pull-right" value="@(isEditMode ? Resource.Update : Resource.Save)" />
+            <a href="@Constants.HC_CategoryListURL"></a>
+
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form class="form-horizontal" id="frmAddCategory">
+
+                <div class="form-group row">
+                    <div class="col-sm-12">
+
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.CategoryInformation
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Name</label>
+                                        <div class="col-md-7">
+                                  {{Model.EBCategory.Name}}
+                                            @Html.TextBoxFor(q => q.EBCategory.Name, new { @class = "form-control input-sm",  data_ng_model = "EBCategoryModel.EBCategory.Name",Value= "Model.EBCategory.Name", placeholder = @Resource.Name, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.EBCategory.Name)
+                                        </div>
+                                    </div>
+
+                                   
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 no-padding" style="display:none">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.CategoryID</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBCategory.ID , new { @class = "form-control input-sm", data_ng_model = "EBCategoryModel.EBCategory.ID", placeholder =@Resource.CategoryID, maxlength = 50 })
+                                            
+                                        </div>
+                                    </div>
+                                    <div class="form-group" style="display:none">
+                                        <label class="col-md-5 control-label">@Resource.EBCategoryID</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBCategory.EBCategoryID, new { @class = "form-control input-sm", data_ng_model = "EBCategoryModel.EBCategory.EBCategoryID", placeholder = @Resource.EBCategoryID, maxlength = 10 })
+                                             
+                                        </div>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="col-md-12 form-group no-margin no-padding">
+
+                    <input type="submit" data-ng-click="SaveCategory()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Convert.ToInt32( Model.EBCategory.ID ) > 0 ? Resource.Update : Resource.Save)" />
+
+                    <a href="@Constants.HC_CategoryListURL">
+                        <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/category/addcategory")
+ 
+       
+}

@@ -1,0 +1,229 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.InvoiceDetail);
+    Layout = "~/Views/Shared/_PrintLayout.cshtml";
+    CacheHelper _cacheHelper = new CacheHelper();
+    bool? InvoiceAddressIsIncludePatientAddress = (bool?)(ViewData["InvoiceAddressIsIncludePatientAddress"] == null ? false : ViewData["InvoiceAddressIsIncludePatientAddress"]);
+    bool? InvoiceIsIncludePatientDOB = (bool?)(ViewData["InvoiceIsIncludePatientDOB"] == null ? false : ViewData["InvoiceIsIncludePatientDOB"]);
+    bool? InvoiceAddressIsIncludePatientAddressLine1 = (bool?)(ViewData["InvoiceAddressIsIncludePatientAddressLine1"] == null ? false : ViewData["InvoiceAddressIsIncludePatientAddressLine1"]);
+    bool? InvoiceAddressIsIncludePatientAddressLine2 = (bool?)(ViewData["InvoiceAddressIsIncludePatientAddressLine2"] == null ? false : ViewData["InvoiceAddressIsIncludePatientAddressLine2"]);
+    bool? InvoiceAddressIsIncludePatientAddressZip = (bool?)(ViewData["InvoiceAddressIsIncludePatientAddressZip"] == null ? false : ViewData["InvoiceAddressIsIncludePatientAddressZip"]);
+}
+@model GetInvoiceDetail
+<div class="container border">
+    <div class="row margin-top-15 border-bottom">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="form-group col-lg-3 col-md-3 col-sm-3 ">
+                <img src="@_cacheHelper.TemplateLogo" width="200" height="40" />
+            </div>
+            <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                <b class="font-size-16">@_cacheHelper.SiteName</b><br />
+                <span class="font-size-14">@_cacheHelper.OrganizationAddress,</span><br />
+                <span class="font-size-14">@_cacheHelper.OrganizationCity, @_cacheHelper.OrganizationState @_cacheHelper.OrganizationZipcode</span><br />
+            </div>
+            <div class="form-group col-lg-3 col-md-3 col-sm-3 ">
+                <div class="text-align-right margin-bottom-5">
+                    <strong class="font-size-30" style="color:#f97500;">@Resource.Invoice</strong>
+                </div>
+                <span class="pull-right font-size-14"><strong>@Resource.InvoiceDate</strong>: @Model.InvoiceDetailModel.StrInvoiceDate</span>
+                <span class="pull-right font-size-14"><strong>Due @Resource.Date</strong>: @Model.InvoiceDetailModel.StrInvoiceDueDate</span>
+                <span class="pull-right font-size-14"><strong>@Resource.InvoiceNumber </strong>: @Model.InvoiceDetailModel.ReferralInvoiceID</span>
+            </div>
+        </div>
+    </div>
+    <div class="row margin-top-15">
+        <div class="form-group col-lg-12 col-md-12 col-sm-12">
+            @if (Model.payorSelected != null && Model.payorSelected.PayorID > 0)
+            {
+
+                <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                    <span class="font-size-16">Bill To,</span><br />
+
+                    <span class="font-size-14">@Model.payorSelected.PayorName</span><br />
+                    <span class="font-size-14">@Model.payorSelected.Address,</span><br />
+                    <span class="font-size-14">@Model.payorSelected.City, @Model.payorSelected.StateCode @Model.payorSelected.ZipCode</span><br /><br />
+                    <span class="font-size-14"><strong>@Resource.AccountNumber:</strong> @Model.InvoiceDetailModel.AHCCCSID</span>
+
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                    <div class="pull-right">
+                        @if (InvoiceAddressIsIncludePatientAddress == true)
+                        {
+                            <span class="font-size-16">Patient,</span><br />
+
+                            <span class="font-size-14">@Model.InvoiceDetailModel.ReferralName&nbsp;</span><br />
+
+                            if (InvoiceIsIncludePatientDOB == true)
+                            {
+                                <span class="font-size-14"> @(InvoiceIsIncludePatientDOB == true ? @Common.ConvertToOrgDateFormat(Model.InvoiceDetailModel.Dob) + "," : "")&nbsp;</span><br />
+                            }
+                            if (InvoiceAddressIsIncludePatientAddressLine1 == true)
+                            {
+                                <span class="font-size-14"> @(InvoiceAddressIsIncludePatientAddressLine1 == true ? Model.InvoiceDetailModel.ReferralAddress + "," : "")&nbsp;</span><br />
+                            }
+                            <span class="font-size-14">
+                                @if (InvoiceAddressIsIncludePatientAddressLine2 == true)
+                                {
+                                    @(InvoiceAddressIsIncludePatientAddressLine2 == true ? Model.InvoiceDetailModel.ReferralCity + ", " + Model.InvoiceDetailModel.ReferralState : "")
+                                }
+                            @if (InvoiceAddressIsIncludePatientAddressZip == true)
+                            {
+                                    @(InvoiceAddressIsIncludePatientAddressZip == true ? " " + Model.InvoiceDetailModel.ReferralZipCode : "")
+                            }
+
+                                &nbsp;
+                            </span><br /><br />
+
+                        }
+                    </div>
+                </div>
+                @*<table style="width:100%;width:1100px;">
+                        <tr>
+                            <td>
+                                <span class="font-size-16">Bill To,</span><br />
+
+                                <span class="font-size-14">@Model.payorSelected.PayorName</span><br />
+                                <span class="font-size-14">@Model.payorSelected.Address,</span><br />
+                                <span class="font-size-14">@Model.payorSelected.City, @Model.payorSelected.StateCode @Model.payorSelected.ZipCode</span><br /><br />
+                                <span class="font-size-14"><strong>@Resource.AccountNumber:</strong> @Model.InvoiceDetailModel.AHCCCSID</span>
+                            </td>
+                            <td style="text-align:right;">
+                                <span class="font-size-16">Patient,</span><br />
+
+                                <span class="font-size-14">@Model.InvoiceDetailModel.ReferralName</span><br />
+                                <span class="font-size-14">@Model.InvoiceDetailModel.ReferralAddress,</span><br />
+                                <span class="font-size-14">@Model.InvoiceDetailModel.ReferralCity, @Model.InvoiceDetailModel.ReferralState @Model.InvoiceDetailModel.ReferralZipCode</span><br /><br />
+
+                            </td>
+                        </tr>
+                    </table>*@
+                @*<div class="row">
+                        <div class="col-md-6 col-sm-6">
+
+                        </div>
+                        <div class="col-md-6 col-sm-6">
+
+                        </div>
+                    </div>*@
+            }
+            else
+            {
+                <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                    <span class="font-size-16">Bill To,</span><br />
+
+                    <span class="font-size-14">@Model.InvoiceDetailModel.ReferralName</span><br />
+                    @if (Model.InvoiceDetailModel.Dob != null)
+                    {
+                        <span class="font-size-14">D.O.B.@Common.ConvertToOrgDateFormat(Model.InvoiceDetailModel.Dob)</span><br />
+                    }
+                    <span class="font-size-14">@Model.InvoiceDetailModel.ReferralAddress,</span><br />
+                    <span class="font-size-14">@Model.InvoiceDetailModel.ReferralCity, @Model.InvoiceDetailModel.ReferralState @Model.InvoiceDetailModel.ReferralZipCode</span><br /><br />
+                    <span class="font-size-14"><strong>@Resource.AccountNumber:</strong> @Model.InvoiceDetailModel.AHCCCSID</span>
+                </div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                    <div class="pull-right">
+                        @if (InvoiceAddressIsIncludePatientAddress == true)
+                        {
+                            <span class="font-size-16">Patient,</span><br />
+
+                            <span class="font-size-14">@Model.InvoiceDetailModel.ReferralName&nbsp;</span><br />
+                            if (InvoiceIsIncludePatientDOB == true)
+                            {
+                                <span class="font-size-14"> @(InvoiceIsIncludePatientDOB == true ? @Common.ConvertToOrgDateFormat(Model.InvoiceDetailModel.Dob) + "," : "")&nbsp;</span><br />
+
+                            }
+                            if (InvoiceAddressIsIncludePatientAddressLine1 == true)
+                            {
+                                <span class="font-size-14"> @(InvoiceAddressIsIncludePatientAddressLine1 == true ? Model.InvoiceDetailModel.ReferralAddress + "," : "")&nbsp;</span><br />
+                            }
+
+                            <span class="font-size-14">
+                                @if (InvoiceAddressIsIncludePatientAddressLine2 == true)
+                                {
+                                    @(InvoiceAddressIsIncludePatientAddressLine2 == true ? Model.InvoiceDetailModel.ReferralCity + ", " + Model.InvoiceDetailModel.ReferralState : "")
+                                }
+                                @if (InvoiceAddressIsIncludePatientAddressZip == true)
+                                {
+                                    @(InvoiceAddressIsIncludePatientAddressZip == true ? " " + Model.InvoiceDetailModel.ReferralZipCode : "")
+                                }
+
+                                &nbsp;
+                            </span><br /><br />
+
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    @{ 
+
+
+        var orgCurrencySymbol = Common.GetOrgCurrencyFormat();
+    }
+    <div class="row border-bottom">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <table class="table table-responsive table-bordered table-condensed flip-content margin-bottom-5">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="margin-bottom-5"></div>
+                            <table class="table table-responsive table-bordered table-striped table-condensed flip-content margin-bottom-5">
+                                <thead>
+                                    <tr>
+                                        <td class="width-240px"><b>@Resource.ServiceDate</b></td>
+                                        <td><b>Service By</b></td>
+                                        <td><b>@Resource.ServiceTime</b></td>
+                                        <td><b>@Resource.Description</b></td>
+                                        <td align="right" class="width-120px"><b>@Resource.BasicRate</b></td>
+                                        <td align="right" class="width-120px"><b>@Resource.Amount</b></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (InvoiceTransactionDetailModel item in Model.InvoiceTransactionDetailModelList)
+                                    {
+                                        <tr>
+
+
+                                            <td>@Common.ConvertToOrgDateFormat(item.ServiceDate) @item.StartDate.ToString("hh:mm tt") to @item.EndDate.ToString("hh:mm tt")</td>
+                                            <td>@item.EmployeeName</td>
+                                            @*<td>{{(@Math.Floor(item.ServiceTime / 60.0) > 0 ? @Math.Floor(item.ServiceTime / 60.0) + ' @Resource.hrs ' : '') + (@item.ServiceTime % 60 > 0 ? @item.ServiceTime % 60 + ' @Resource.Mins' : '')}}</td>*@
+                                            <td> @Math.Floor(item.ServiceTime / 60.0)   @Resource.hrs  </td>
+                                            <td>Charges for the @item.CareTypeName</td>
+                                            <td align="right">@orgCurrencySymbol @item.Rate / @(item.PerUnitQuantity > 0 ? item.PerUnitQuantity + " " + Resource.Mins : Resource.Visit )</td>
+                                            <td align="right">@orgCurrencySymbol @item.Amount</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table class="table table-responsive table-bordered table-condensed flip-content margin-bottom-5">
+                                <tbody>
+                                    <tr>
+                                        <td rowspan="3">
+                                            <h5 class="margin-5"><b>Note:</b></h5>
+                                            <p class="margin-5">@_cacheHelper.InvoiceNote</p>
+                                        </td>
+                                        <td align="right" class="width-120px">@Resource.TotalAmount</td>
+                                        <td align="right" class="width-120px">@orgCurrencySymbol @Model.InvoiceDetailModel.TotalAmount</td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right">Tax <b>( @Model.InvoiceDetailModel.InvoiceTaxRate %)</b> </td>
+                                        <td align="right">@orgCurrencySymbol @Math.Round((Model.InvoiceDetailModel.TotalAmount * Model.InvoiceDetailModel.InvoiceTaxRate / 100), 2)</td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><b>@Resource.PayableAmount</b></td>
+                                        <td align="right">@orgCurrencySymbol @Model.InvoiceDetailModel.PayAmount</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

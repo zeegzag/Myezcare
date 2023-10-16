@@ -1,0 +1,3 @@
+﻿CREATE SCHEMA [CURL]
+    AUTHORIZATION [dbo];
+

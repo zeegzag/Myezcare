@@ -1,0 +1,115 @@
+﻿@{
+    CacheHelper _cacheHelper = new CacheHelper();
+    CacheHelper_MyezCare ch_MyezcareOrg = new CacheHelper_MyezCare();
+    ReleaseNote releaseNote = ch_MyezcareOrg.GetCachedData<ReleaseNote>(CacheHelperName.ReleaseNote);
+    var rnID = releaseNote == null ? -1 : releaseNote.ReleaseNoteID;
+
+    MyEzcareOrganization myezCareOrg = ch_MyezcareOrg.GetCachedData<MyEzcareOrganization>();
+
+    ////var isHomeCare = myezCareOrg == null || myezCareOrg.OrganizationType.ToLower() == MyEzcareOrganization.AgencyType.HomeCare.ToString().ToLower();
+
+    //var OrgTypes = myezCareOrg.OrganizationType.Split(',');
+
+    //if (myezCareOrg == null || OrgTypes[0].ToLower() == MyEzcareOrganization.AgencyType.HomeCare.ToString().ToLower())
+    //{
+    //    SessionHelper.IsHomeCare = true;
+    //    SessionHelper.IsDayCare = false;
+    //    SessionHelper.IsPrivateDutyCare = false;
+    //    SessionHelper.IsCaseManagement = false;
+    //}
+    //else if (OrgTypes[0].ToLower() == MyEzcareOrganization.AgencyType.DayCare.ToString().ToLower())
+    //{
+    //    SessionHelper.IsHomeCare = false;
+    //    SessionHelper.IsDayCare = true;
+    //    SessionHelper.IsPrivateDutyCare = false;
+    //    SessionHelper.IsCaseManagement = false;
+    //}
+    //else if (OrgTypes[0].ToLower() == MyEzcareOrganization.AgencyType.PrivateDutyCare.ToString().ToLower())
+    //{
+    //    SessionHelper.IsHomeCare = false;
+    //    SessionHelper.IsDayCare = false;
+    //    SessionHelper.IsPrivateDutyCare = true;
+    //    SessionHelper.IsCaseManagement = false;
+    //}
+    //else if(OrgTypes[0].ToLower() == MyEzcareOrganization.AgencyType.CaseManagement.ToString().ToLower())
+    //{
+    //    SessionHelper.IsHomeCare = false;
+    //    SessionHelper.IsDayCare = false;
+    //    SessionHelper.IsPrivateDutyCare = false;
+    //    SessionHelper.IsCaseManagement = true;
+    //}
+
+
+    //String CurrentDate = Common.GetOrgCurrentDateTime().ToString("MM/dd/yyyy");
+    //String ReleaseNote_StartDate = Common.ConvertDateToOrgTimeZone(releaseNote.StartDate).ToString("MM/dd/yyyy");
+    //String ReleaseNote_EndDate = Common.ConvertDateToOrgTimeZone(releaseNote.StartDate).ToString("MM/dd/yyyy");
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>@ViewBag.Title</title>
+    <link rel='shortcut icon' href='@_cacheHelper.FavIcon' class="favicon-logo" type='image/x-icon' />
+    @*<link href="http://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700&subset=all" rel="stylesheet" type="text/css" />*@
+    @Styles.Render("~/sitelayout/css")
+    @RenderSection("styles", required: false)
+
+    <script src="https://maps.google.com/maps/api/js?sensor=false&key=AIzaSyA_Pc8Ldr4NbtKti-rQsf5g0PVa4K9VsMs&libraries=places" type="text/javascript"></script>
+
+    <script type="text/javascript">
+         @{
+             var pageSize = _cacheHelper.PageSize > 0 ? _cacheHelper.PageSize : ConfigSettings.PageSize;
+             var siteBaseUrl = _cacheHelper.SiteBaseURL;
+        }
+
+
+        window.DeleteConfirmationMessage = '@Resource.DeleteConfirmationMessage';
+        window.PageSize = '@pageSize';//   '@pageSize';
+        window.Alert = '@Resource.Alert';
+        window.SelectedMenuItem = '@ViewBag.SelectedMenuItem';
+        window.ErrorCode_Warning = '@Constants.ErrorCode_Warning';
+
+        window.FileSize = '@ConfigSettings.FileSize';
+
+        //#region Used this Variable in Resource JS
+        window.Yes = '@Resource.Yes';
+        window.No = '@Resource.No';
+        window.Okay = '@Resource.Okay';
+        window.Save = '@Resource.Save';
+        window.Cancel = '@Resource.Cancel';
+        window.YesContinue = '@Resource.YesContinue';
+        window.UpdateRecords = '@Resource.UpdateRecords';
+        window.HardDelete = '@Resource.Delete';
+        window.SoftDelete = '@Resource.SoftDelete';
+        window.Disable = '@Resource.Disable';
+        window.Enable = '@Resource.Enable';
+        window.TypeInASearchTerm = '@Resource.TypeInASearchTerm';
+        window.ZarephathBucket = '@ConfigSettings.ZarephathBucket';
+        window.LiveSiteURL = '@siteBaseUrl';
+        window.NotificationLogo = '@_cacheHelper.FavIcon';
+        window.RN_CookieName = '@String.Format("ReleaseNote{0}{1}", rnID, _cacheHelper.Domain)';
+
+
+        window.MyezcarePdfFormsUrl = '@ConfigSettings.MyezcarePdfFormsUrl';
+        window.OrgID = '@myezCareOrg.OrganizationID';
+        window.LUserId = '@SessionHelper.LoggedInID';
+        //#endregion
+    </script>
+
+</head>
+
+@*<body class="page-header-fixed page-sidebar-closed page-sidebar-closed-hide-logo page-content-white" cz-shortcut-listen="true" data-ng-app="myApp">*@
+<body class="page-header-fixed page-sidebar-closed-hide-logo page-content-white" cz-shortcut-listen="true" data-ng-app="myApp" data-ng-controller="ParentController">
+    <span data-us-spinner="{radius:30, width:8, length: 16,scale:0.5}" style="z-index: 9999999"></span>
+    @RenderBody()
+</body>
+
+@Scripts.Render("~/assets/sitelayout/js")
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/Payment/PaymentController.js")
+@Scripts.Render("~/assets/js/viewjs/siteApp/areas/homecare/invoice/companyClientInvoiceList")
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/generalmaster/_addgeneralmastermodel")
+@RenderSection("scripts", required: false)
+
+</html>
+

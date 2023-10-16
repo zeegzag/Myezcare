@@ -1,0 +1,380 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.PCATimeSheet);
+    Layout = "~/Views/Shared/_GenerateHTMLToPDFLayout.cshtml";
+    CacheHelper _cacheHelper = new CacheHelper();
+}
+
+@model PCAModel
+
+
+@if (Model.PCADetail != null)
+{
+
+    <div class="padding-top-15" style="page-break-after: always">
+
+        <div class="clear-both padding-bottom-10px ">
+            <div class="col-sm-12 no-padding">
+                <div class="form-group col-lg-4 col-md-4 col-sm-4 no-left-padding">
+                    <img src="@_cacheHelper.TemplateLogo" width="200" height="40" />
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4 text-align-center">
+                    <strong class="font-size-18">Time Sheet</strong>
+                </div>
+                <div class="cform-group col-lg-4 col-md-4 col-sm-4 ">
+                    <span class="pull-right font-size-18"><strong>Service Date</strong>: @Model.PCADetail.ServiceDate</span>
+                </div>
+                <br class="clear-both" />
+                <hr />
+            </div>
+        </div>
+
+        <div style="clear: both;">
+
+            <div class="col-sm-12 no-padding padding-bottom-10px">
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">Beneficiary Name</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.BeneficiaryName">
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">Beneficiary ID #</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.BeneficiaryID">
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">Place of Service</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.PlaceOfService">
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">HHA/PCA Name</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.HHA_PCA_Name">
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">HHA/PCA NPI#</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.HHA_PCA_NP">
+                </div>
+            </div>
+
+
+
+        </div>
+
+        <div class="clear-both padding-top-10 portlet-body compact">
+            <table class="table table-condensed table-bordered">
+                <thead>
+                    <tr>
+                        <td colspan="3" class="font-weight-600 text-align-center font-size-18 padding-10px" style="background-color: aliceblue;">
+                            ALL TASKS MUST BE PERFORMED PER THE PLAN OF CARE FOR THE CLIENT
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="font-weight-600">Date</td>
+                        <td class="font-weight-600">@Model.PCADetail.ServiceDate</td>
+                    </tr>
+
+                    <tr>
+                        <td class="font-weight-600 ">Day of week</td>
+                        <td class="font-weight-600 ">@Model.PCADetail.DayOfWeek</td>
+                    </tr>
+
+                    <tr>
+                        <td class="font-weight-600 font-size-11">Time In:</td>
+                        <td class="font-weight-600 font-size-11">@Model.PCADetail.ClockInTime</td>
+                    </tr>
+
+                    <tr>
+                        <td class="font-weight-600 ">Time Out</td>
+                        <td class="font-weight-600 ">@Model.PCADetail.ClockOutTime</td>
+                    </tr>
+
+                    <tr>
+                        <td class="font-weight-600">Daily Total Hours</td>
+                        <td class="font-weight-600">@Model.PCADetail.TotalTime Minutes</td>
+                    </tr>
+
+                    @if (Model.PcaTaskList.Count > 0)
+                    {
+                        long allTotleTime = 0;
+                        foreach (var item in Model.PcaTaskList)
+                        {
+                            long totleTime = 0;
+                            <tr>
+                                <td colspan="2" class="text-align-center font-size-14 bg-grey-salsa">
+                                    <strong>@item.CategoryName</strong>
+                                </td>
+                            </tr>
+                            foreach (var subItem in item.SubCategory)
+                            {
+
+
+                                <tr>
+                                    <td colspan="2" class="font-weight-600">
+                                        <strong>@subItem.SubCategoryName</strong>
+                                    </td>
+                                </tr>
+
+                                foreach (var task in subItem.TaskLists)
+                                {                                    
+                                    if (task.SimpleTaskType != true)
+                                    {
+                                        totleTime = totleTime + task.ServiceTime;
+                                        //allTotleTime = allTotleTime + totleTime;
+                                        allTotleTime = allTotleTime + task.ServiceTime;
+                                    }
+
+                                    <tr>
+                                        <td>
+                                            <span>@task.VisitTaskDetail</span>
+                                        </td>
+                                        <td>
+                                            @* Start  Changed by Sagar 22 Dec 2019: if it's simpleTaks is True then Time will not display *@
+                                            @if (task.SimpleTaskType != true)
+                                            {
+                                                <span>
+
+                                                    @task.ServiceTime
+                                                </span>
+                                            }
+                                            @*End*@
+
+                                        </td>
+                                    </tr>
+                                }
+
+                            }
+
+                            <tr class="">
+                                <td class="text-align-right">
+                                    <strong>Total Time</strong>
+                                </td>
+
+                                <td class="">
+                                    <strong>@totleTime</strong>
+                                </td>
+                            </tr>
+                        }
+                        <tr>
+                            <td class="font-weight-600">
+                                Other: If other activities were provided per the POC, and were not included above,<br />
+                                a full narrative description of personal care services rendered to the rec must be completed
+                            </td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td>@Model.PCADetail.OtherActivity</td>
+                            <td>@Model.PCADetail.OtherActivityTime</td>
+                        </tr>
+                        <tr>
+                            @{
+                                long time = allTotleTime + Model.PCADetail.OtherActivityTime;
+                                var hour = time / 60;
+                                var minute = time % 60;
+                            }
+
+                            <td class="font-weight-600 text-align-right">Total Activity Time</td>
+                            <td class="font-weight-600 bg-grey-salsa">@String.Format("{0} Mins = {1} Hrs {2} Mins", time, hour, minute)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <div class="font-size-11 padding-bottom-10px line-height-14px">
+                <div class="text-align-center">
+                    <strong class="text-decoration-underline">Acknowledgments and Required Signatures</strong>
+                </div>
+                Acknowledgments and Required Signatures
+                After the caregiver has documented his/her time and activity, the recipient must draw a line through any dates and times he/she did not receive service. Review the completed time sheet for accuracy before signing. It is a federal crime for both the beneficiary and PCA to provide false information on billings for Medical Assistance payments. Your signatures verify the time and services entered above are accurate and that the services were performed as specified in the Care Plan. PCA shall attest that he/she does not work for another agency during the hours documented on timesheet.
+            </div>
+
+            @*<div style="padding-bottom: 10px; font-size: 12.5px">
+                    <span>Patient/Responsible Party Signature:
+
+                        <img src="data:image/png;base64,@Model.PCADetail.PatientSignature" width="150" height="30"/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span>Date: @Model.PCADetail.ServiceDate</span>
+                </div>
+                <div style="font-size: 12.5px">
+                    <span>PCA/HHA Signature:
+                        <img src="@Model.PCADetail.EmployeeSignature" width="150" height="30"/>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+                    <span>Date: @Model.PCADetail.ServiceDate</span>
+                </div>*@
+
+            <div class="col-sm-12 no-padding ">
+                <div class="col-sm-6 no-padding">
+                    <div class="form-group col-lg-12 col-md-12 col-sm-6 no-padding">
+                        <img src="data:image/png;base64,@Model.PCADetail.PatientSignature" width="350" height="50" />
+                    </div>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-6 no-padding clearfix">
+                        <label class="control-label">Patient/Responsible Party Signature</label>
+                        <label class="control-label padding-left-10">
+                            <strong>Date:&nbsp;</strong>
+                            <span class="text-decoration-underline">@Model.PCADetail.ServiceDate</span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 no-padding ">
+                    <div class="form-group col-lg-12 col-md-6 col-sm-6 no-padding">
+
+                        <img src="@Model.PCADetail.EmployeeSignature" width="350" height="50" />
+                    </div>
+                    <div class="form-group col-lg-12 col-md-6 col-sm-6 no-padding clearfix">
+                        <label class="control-label">PCA/HHA Signature</label>
+                        <label class="control-label padding-left-10">
+                            <strong>Date:&nbsp;</strong>
+                            <span class="text-decoration-underline">@Model.PCADetail.ServiceDate</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br class="clear-both" />
+    </div>
+
+
+    <div class="padding-top-20">
+
+        <div class="clear-both padding-bottom-10px ">
+            <div class="col-sm-12 no-padding">
+                <div class="form-group col-lg-4 col-md-4 col-sm-4 no-left-padding">
+                    <img src="@_cacheHelper.TemplateLogo" width="200" height="40" />
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4 text-align-center">
+                    <strong class="font-size-18">Time Sheet</strong>
+                </div>
+                <div class="cform-group col-lg-4 col-md-4 col-sm-4 ">
+                    <span class="pull-right font-size-18"><strong>Service Date</strong>: @Model.PCADetail.ServiceDate</span>
+                </div>
+                <br class="clear-both" />
+                <hr />
+            </div>
+        </div>
+
+
+        <div style="clear: both;">
+
+            <div class="col-sm-12 no-padding padding-bottom-10px">
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">Employee Name</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.EmployeeName">
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">Employee ID #</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.EmployeeUniqueID">
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">Date</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.ServiceDate">
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">Patient Name</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.BeneficiaryName">
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">Patient ID #</label>
+                    <input class="form-control input-xs" disabled="" type="text" value="@Model.PCADetail.BeneficiaryID">
+                </div>
+            </div>
+
+
+
+
+
+
+
+            @* <div style="padding-bottom: 10px; font-size: 12.5px">
+                    <span>Beneficiary Name:
+                    <span style="padding-right: 20px; border-bottom: 1px solid black; text-align: left;">
+                        @Model.PCADetail.BeneficiaryName
+                    </span>
+                    </span>
+
+                    <span>Beneficiary ID#:
+                     <span style="padding-right: 20px; border-bottom: 1px solid black; text-align: left;">
+                         @Model.PCADetail.BeneficiaryID
+                     </span>
+                    </span>
+                    <span>Place of Service: <span style="text-decoration: underline;">@Model.PCADetail.PlaceOfService</span></span>
+                </div>
+                <div style="padding-bottom: 10px; font-size: 12.5px; text-align: center">
+                    <span>HHA/PCA Name: <span style="text-decoration: underline;">@Model.PCADetail.HHA_PCA_Name</span></span>
+                    <span>HHA/PCA NPI#: <span style="text-decoration: underline;">@Model.PCADetail.HHA_PCA_NP</span></span>
+                </div>*@
+        </div>
+
+        <div class="clear-both padding-top-10 portlet-body compact">
+            <table class="table table-condensed table-bordered">
+                <thead>
+                    <tr>
+                        <td class="font-weight-600 text-align-center font-size-18 padding-10px" style="background-color: aliceblue;">
+                            Responses required for Hands on Assistance with following functions:
+                        </td>
+                        <td class="font-weight-600  text-align-center font-size-18 padding-10px" style="background-color: aliceblue;">
+                            @Model.PCADetail.DayOfWeek
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="">Any Redness, Open sores, or Wounds on client’s body? If Yes, did you report it to the office</td>
+                        <td class=""></td>
+                    </tr>
+
+                    @foreach (var item in Model.PcaConclusionList)
+                    {
+                        <tr class="bg-grey-salsa">
+                            <td class="font-size-14">
+                                <strong>@item.CategoryName</strong>
+                            </td>
+                            <td class=""></td>
+                        </tr>
+                        foreach (var subItem in item.SubCategory)
+                        {
+
+
+                            <tr>
+                                <td colspan="2" class="font-weight-600">
+                                    <strong>@subItem.SubCategoryName</strong>
+                                </td>
+                            </tr>
+
+                            foreach (var task in subItem.TaskLists)
+                            {
+                                <tr>
+                                    <td>
+                                        <span>@task.VisitTaskDetail</span>
+                                    </td>
+                                    <td>
+                                        <span>@task.Answer</span>
+                                    </td>
+                                </tr>
+                            }
+
+                        }
+
+
+                    }
+
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <br class="clear-both" />
+    </div>
+
+}

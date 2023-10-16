@@ -1,0 +1,85 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.DepartmentID > 0 ? Resource.EditDepartment : Resource.AddDepartment));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_DepartmentAdd;
+}
+@model Department
+@Html.Hidden("hdnDepartmentModel", Common.SerializeObject(Model))
+<div data-ng-controller="AddDepartmentController">
+    <form id="frmaddDepartmentId" class="form-horizontal">
+        <div class="page-bar">
+            <h3 class="page-title">@(Model != null && Model.DepartmentID > 0 ? Resource.EditDepartment : Resource.AddDepartment)
+                <small>@Resource.EnterDepartmentDetails</small>
+                <input type="submit" data-ng-click="SaveDepartmentDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.DepartmentID > 0 ? Resource.Update : Resource.Save)"/>
+                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/>
+            </h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="fscontainer">
+                    <div class="legend">
+                        @Resource.DepartmentDetails
+                    </div>
+
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.DepartmentName, new { @class = "col-md-3 control-label required" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(m => m.DepartmentName, new { data_ng_model = "DepartmentModel.DepartmentName", @class = "form-control input-sm", placeholder = Resource.DepartmentName, maxlength = 50 })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.DepartmentName)
+                    </div>
+                    <div class="col-md-12 form-group">
+                        @Html.LabelFor(m => m.Location, new { @class = "col-md-3 control-label required" })
+                        <div class="col-md-5">
+                            @Html.TextBoxFor(m => m.Location, new { data_ng_model = "DepartmentModel.Location", @class = "form-control input-sm", placeholder = Resource.Location, maxlength = 50 })
+                        </div>
+                        @Html.ValidationMessageFor(m => m.Location)
+                    </div>
+                    @*As per discussed with client commented below code after development*@
+                    <div data-ng-show="1==0">
+                        <div class="col-md-12 form-group">
+                            @Html.LabelFor(m => m.Address, new { @class = "col-md-3 control-label" })
+                            <div class="col-md-5">
+                                @Html.TextAreaFor(m => m.Address, new { data_ng_model = "DepartmentModel.Address", @class = "form-control input-sm", placeholder = Resource.Address, maxlength = 100 })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            @Html.LabelFor(m => m.City, new { @class = "col-md-3 control-label" })
+                            <div class="col-md-5">
+                                @Html.TextBoxFor(m => m.City, new { @class = "form-control input-sm", data_ng_model = "DepartmentModel.City", placeholder = Resource.City, maxlength = 50 })
+                            </div>
+                            @Html.ValidationMessageFor(m => m.City)
+                        </div>
+                        <div class="col-md-12 form-group">
+                            @Html.LabelFor(m => m.StateCode, new { @class = "col-md-3 control-label" })
+                            <div class="col-md-5">
+                                <select disabled class="form-control input-sm" data-ng-model="DepartmentModel.StateCode" data-ng-init="DepartmentModel.StateCode='@Constants.DefaultStateCode'">
+                                    <option value="@Constants.DefaultStateCode">@Constants.DefaultStateName</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 form-group">
+                            @Html.LabelFor(m => m.ZipCode, new { @class = "col-md-3 control-label" })
+                            <div class="col-md-5">
+                                <zipcode type="text" ng-model="DepartmentModel.ZipCode" modelid="ZipCode" />
+                            </div>
+                            @Html.ValidationMessageFor(m => m.ZipCode)
+                        </div>
+                    </div>
+                </div>
+                <div class="space15"></div>
+                <div class="col-md-12 form-group no-margin no-padding">
+                    <input type="submit" data-ng-click="SaveDepartmentDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.DepartmentID > 0 ? Resource.Update : Resource.Save)"/>
+                    <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/viewjs/siteApp/department/adddepartment")
+}

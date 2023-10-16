@@ -1,0 +1,257 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.EmployeeList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmployeeList;
+}
+@model SetEmployeeListPage
+
+@Html.Hidden("hdnSetEmployeeListPage", Common.SerializeObject(Model))
+<div data-ng-controller="EmployeeListController">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.EmployeeList &nbsp;<small>@Resource.EmployeeInformation</small>
+            <a href="{{AddEmployeeURL}}" class="letter-space btn btn-sm green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Employee</a>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @if (Common.HasPermission(Constants.Permission_Employee_AddUpdate))
+            {
+                <div class="btn-group" data-ng-show="EmployeeList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllEmployee" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllEmployee"></label>
+                    </span>
+                </div>
+            }
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchEmployeeModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchEmployeeModel.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempSearchEmployeeModel.IsDeleted",
+                                                                          data_ng_init = "TempSearchEmployeeModel.IsDeleted = TempSearchEmployeeModel.IsDeleted==null?'-1':TempSearchEmployeeModel.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchEmployee()"
+                                                                      })
+            </div>
+            @if (Common.HasPermission(Constants.Permission_Employee_AddUpdate))
+            {
+                <div class="btn-group" data-ng-if="SelectedEmployeeIds.length > 0">
+                    <button type="button" data-ng-click="DeleteEmployee()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchEmployeeModel.IsDeleted==0?'Disable Selected' :(TempSearchEmployeeModel.IsDeleted==1?'Enable Selected':'Enable/Disable - Inverse')}}</button>
+                </div>
+            }
+            <div class="inline-block pull-right" data-ng-show="EmployeeList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="EmployeeListPager.maxSize" on-page-change="EmployeeListPager.pageChanged(newPageNumber)" pagination-id="EmployeeListPager"></dir-pagination-controls>
+                </div>
+                ..........0
+
+0
+            0</div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive">
+                        <form id="frmemployeelist">
+                            <table class="table table-bordered table-striped table-condensed flip-content"> 
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.Permission_Employee_AddUpdate))
+                                        {
+                                            <th class="width-20px"></th>
+                                        }
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('Name')">@Resource.Name</a>
+                                            <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'Name'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                        </th>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('Email')">@Resource.Email</a>
+                                            <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'Email'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('DepartmentName')">@Resource.Department</a>
+                                            <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'DepartmentName'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('IsDepartmentSupervisor')">@Resource.IsSupervisor</a>
+                                            <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'IsDepartmentSupervisor'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('RoleName')">@Resource.Role</a>
+                                            <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'RoleName'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('CredentialName')">@Resource.Credential</a>
+                                            <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'CredentialName'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('Degree')">@Resource.Degree</a>
+                                            <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'Degree'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-130px" class="col-sm-2">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.Permission_Employee_AddUpdate))
+                                        {
+                                            <td></td>
+                                        }
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchEmployeeModel.Name, new { data_ng_model = "TempSearchEmployeeModel.Name", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                        </td>
+
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchEmployeeModel.Email, new { data_ng_model = "TempSearchEmployeeModel.Email", @class = "form-control input-sm", placeholder = Resource.Email, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchEmployeeModel.DepartmentID, Model.DepartmentDropdownList.ToSelectList(Model.SearchEmployeeModel.DepartmentID.ToString() ?? "", "DepartmentName", "DepartmentID", Resource.SelectDepartment, ""),
+                                                                  new
+                                                                  {
+                                                                      id = "DepartmentID",
+                                                                      data_ng_model = "TempSearchEmployeeModel.DepartmentID",
+                                                                      data_ng_init = "TempSearchEmployeeModel.DepartmentID=TempSearchEmployeeModel.DepartmentID==''?null:TempSearchEmployeeModel.DepartmentID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false,
+                                                                      convert_to_number = ""
+                                                                  })
+                                        </td>
+
+                                        <td>
+                                            @Html.DropDownListFor(m => m.SearchEmployeeModel.IsSupervisor, Model.DepartmentSupervisorStatusList.ToSelectList(Convert.ToString(Model.SearchEmployeeModel.IsSupervisor), "Name", "Value", "", ""),
+                                                                  new
+                                                                  {
+                                                                      id = "SupervisorStatus",
+                                                                      data_ng_model = "TempSearchEmployeeModel.IsSupervisor",
+                                                                      data_ng_init = "TempSearchEmployeeModel.IsSupervisor = TempSearchEmployeeModel.IsSupervisor==null?'-1':TempSearchEmployeeModel.IsSupervisor.toString()",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false,
+                                                                      convert_to_number = ""
+                                                                  })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchEmployeeModel.RoleID, Model.RoleList.ToSelectList(Model.SearchEmployeeModel.RoleID.ToString() ?? "", "RoleName", "RoleID", Resource.SelectRole, ""),
+                                                                  new
+                                                                      {
+                                                                          data_ng_model = "TempSearchEmployeeModel.RoleID",
+                                                                          data_ng_init = "TempSearchEmployeeModel.RoleID=TempSearchEmployeeModel.RoleID==''?null:TempSearchEmployeeModel.RoleID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false,
+                                                                          convert_to_number = ""
+                                                                      })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchEmployeeModel.CredentialID, Model.CredentialList.ToSelectList(Model.SearchEmployeeModel.CredentialID ?? "", "CredentialName", "CredentialID", Resource.Select, ""),
+                                                                  new
+                                                                      {
+                                                                          id = "CredentialID",
+                                                                          data_ng_model = "TempSearchEmployeeModel.CredentialID",
+                                                                          data_ng_init = "TempSearchEmployeeModel.CredentialID=TempSearchEmployeeModel.CredentialID==''?null:TempSearchEmployeeModel.CredentialID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false,
+                                                                      })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchEmployeeModel.Degree, new
+                                                {
+                                                    data_ng_model = "TempSearchEmployeeModel.Degree",
+                                                    @class = "form-control input-sm",
+                                                    placeholder = Resource.Degree,
+                                                    maxlength = 50
+                                                })
+                                        </td>
+                                        <td>
+                                            <input type="submit" value="@Resource.Search"class="btn btn-default grey btn-xs margin-left-10 float-left" data-ng-click="SearchEmployee()"/>
+                                            <a href="javascript:void(0);" class="btn btn-default grey btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':employee.IsDeleted}" dir-paginate="employee in EmployeeList | itemsPerPage: EmployeeListPager.pageSize" total-items="EmployeeListPager.totalRecords" current-page="EmployeeListPager.currentPage" pagination-id="EmployeeListPager">
+                                        @if (Common.HasPermission(Constants.Permission_Employee_AddUpdate))
+                                        {
+                                            <td>
+                                                <input type="checkbox" data-ng-if="employee.EmployeeID.toString() != LoggedInUserId" class="unicheckbox text-align-center" data-ng-model="employee.IsChecked" data-ng-change="SelectEmployee(employee)" val="employee.IsChecked"></td>
+                                        }
+                                        <td>
+                                            <a target="_blank" href="{{AddEmployeeURL+employee.EncryptedEmployeeID}}" class=""><span data-ng-bind="employee.Name"></span></a>
+                                            @*{{employee.EmployeeSignatureID}}*@
+                                            <span class="pull-right">
+                                                <span class="badge bg-purple"  title="@Resource.SignatureAvailable" data-ng-show="employee.EmployeeSignatureID!=undefined && employee.EmployeeSignatureID>0">S</span>
+                                                <span class="badge badge-success"  title="@Resource.LoggedIntoSystem" data-ng-show="employee.IsSecurityQuestionSubmitted">L</span>
+
+
+                                            </span>
+                                        </td>
+                                        <td data-ng-bind="employee.Email != null ? employee.Email : '@Resource.NA'"></td>
+                                        <td data-ng-bind="employee.DepartmentName != null ? employee.DepartmentName : '@Resource.NA'"></td>
+                                        <td data-ng-bind="employee.IsDepartmentSupervisor == 1 ? 'Yes' :'No'"></td>
+                                        <td data-ng-bind="employee.RoleName"></td>
+                                        <td data-ng-bind="employee.CredentialName != null ? employee.CredentialName : '@Resource.NA'"></td>
+                                        <td data-ng-bind="employee.Degree != null ? employee.Degree : '@Resource.NA'"></td>
+                                        <td>
+                                            @if (Common.HasPermission(Constants.Permission_Employee_AddUpdate))
+                                            {
+                                                
+                                                <a target="_blank" href="{{AddEmployeeURL+employee.EncryptedEmployeeID}}" class="btn btn-xs blue">@Resource.Edit </a>//As per discussed with jitendra removed validation to hide this button (data-ng-show="employee.EmployeeID.toString() != LoggedInUserId")
+@*<a href="javascript:void(0);" data-ng-click="DeleteEmployee(employee.EmployeeID)" data-ng-show="employee.EmployeeID.toString() != LoggedInUserId" class="btn btn-xs red">@Resource.Delete </a>*@
+                                                <a href="javascript:void(0);" data-ng-show="employee.IsDeleted && employee.EmployeeID.toString() != LoggedInUserId" data-ng-click="DeleteEmployee(employee.EmployeeID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!employee.IsDeleted && employee.EmployeeID.toString() != LoggedInUserId" data-ng-click="DeleteEmployee(employee.EmployeeID,'Disable')" class="btn btn-xs red"></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="EmployeeList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(EmployeeListPager.pageSize * EmployeeListPager.currentPage) - EmployeeListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(EmployeeListPager.pageSize == EmployeeListPager.currentPageSize) ? (EmployeeListPager.pageSize * EmployeeListPager.currentPage) :(EmployeeListPager.pageSize * EmployeeListPager.currentPage) - EmployeeListPager.pageSize  + EmployeeListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="EmployeeListPager.maxSize" on-page-change="EmployeeListPager.pageChanged(newPageNumber)" pagination-id="EmployeeListPager"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="EmployeeList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/employee/employeelist")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Employee)';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.Employee)';
+        var LoggedInID = '@SessionHelper.LoggedInID';
+        var EmployeeReferralExistMessage = '@Resource.EmployeeReferralExistMessage';
+    </script>
+}

@@ -1,0 +1,5 @@
+﻿CREATE SCHEMA [adc]
+GO
+
+CREATE SCHEMA [API]
+GO

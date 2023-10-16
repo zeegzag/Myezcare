@@ -1,0 +1,448 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Dashboard);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_Dashboard;
+    string strDate = "08-08-2018 00:56:05";
+    DateTime expDate = Convert.ToDateTime(strDate);
+}
+
+@model HC_GetDashboardModel
+
+@Html.Hidden("hdn_DashboardModel", Common.SerializeObject(Model))
+
+@if (Common.HasPermission(Constants.HC_Permission_Dashboard_AssignInternalMessage) ||
+    Common.HasPermission(Constants.HC_Permission_DashboardCard) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_EmployeeClockIn) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_EmployeeOverTime) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_PatientNew) ||
+                            //Common.HasPermission(Constants.HC_Permission_Dashboard_WebNotifications) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_PatientFullySchedule) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_ResolveAssignInternalMessage) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_PatientBirthday) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_EmployeeBirthday) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_Pending) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_Discharged) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_Transfer) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_OnHold) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_Medicaid) ||
+                            Common.HasPermission(Constants.HC_Permission_Dashboard_EmployeesAverageDelays))
+
+{
+
+    <div data-ng-controller="DashboardController">
+        <div class="dashboard-header-box">
+            <div class="row">
+                @if (DateTime.Today < @expDate)
+                {
+                    <div class="col-lg-12">
+                        <div class="alert alert-info">
+                            <span>
+                                <i class="fa fa-info-circle font-size-15"></i>
+                                This is an upgraded version of Myezcare so if you facing any issue in the system then contact to <b>support@myezcare.com</b>
+                            </span>
+                        </div>
+                    </div>
+                }
+
+                @if (SessionHelper.IsDayCare && Common.HasPermission(Constants.HC_Permission_DashboardCard_Patient_TotalSchedule))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-gr-dr">
+                            <div class="brd-outer-gr-dr" data-ng-click="ViewMoreClick('#PatientClockInOutList',PatientClockInOutListPager.totalRecords)">
+                                <p class="txt-zone">{{TotalPatientSchedule}}</p>
+                            </div>
+                            <p class="fnt-weght">Patient - Schedule</p>
+                        </div>
+                    </div>
+                }
+
+                @if (SessionHelper.IsDayCare && Common.HasPermission(Constants.HC_Permission_DashboardCard_Patient_TotalPresent))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-blu-dr">
+                            <div class="brd-outer-blu-dr" data-ng-click="ViewMoreClick('#PatientClockInOutList',PatientClockInOutListPager.totalPresent)">
+                                <p class="txt-zone">{{TotalPresent}}</p>
+                            </div>
+                            <p class="fnt-weght">Total Present</p>
+                        </div>
+                    </div>
+                }
+
+                @if (SessionHelper.IsDayCare && Common.HasPermission(Constants.HC_Permission_DashboardCard_Patient_TotalAbsent))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-red-dr">
+                            <div class="brd-outer-red-dr" data-ng-click="ViewMoreClick('#PatientClockInOutList',PatientClockInOutListPager.totalAbsent)">
+                                <p class="txt-zone">{{TotalAbsent}}</p>
+                            </div>
+                            <p class="fnt-weght">Total Absent</p>
+                        </div>
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_TotalSchedule))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-g" @*data-ng-click="ViewMoreClick('#EmpClockInOutList',EmpClockInOutListPager.totalRecords)"*@
+                             data-ng-model="EmpClockInOutListSearchModel.Status"
+                             data-ng-click="EmpClockInOutListSearchModel.Status=''==''?null:'' ; SearchEmpClockInOutList()">
+                            <div class="brd-outer-g">
+                                <p class="txt-zone">{{TotalScheduleWOStatus}}</p>
+                            </div>
+                            <p class="fnt-weght">Total Schedule</p>
+                        </div>
+                    </div>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_TotalSchedule))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-y" @*data-ng-click="ViewMoreClick('#EmpClockInOutList',EmpClockInOutListPager.inprogress)"*@
+                             data-ng-model="EmpClockInOutListSearchModel.Status"
+                             data-ng-click="EmpClockInOutListSearchModel.Status='Inprogress'==''?null:'Inprogress' ; SearchEmpClockInOutList()">
+                            <div class="brd-outer-y">
+                                <p class="txt-zone">{{InprogressWOStatus}}</p>
+                            </div>
+                            <p class="fnt-weght">Inprogress</p>
+                        </div>
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_TotalSchedule))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-r" @*data-ng-click="ViewMoreClick('#EmpClockInOutList',EmpClockInOutListPager.missedSchedule)"*@
+                             data-ng-model="EmpClockInOutListSearchModel.Status"
+                             data-ng-click="EmpClockInOutListSearchModel.Status='Missed'==''?null:'Missed' ; SearchEmpClockInOutList()">
+                            <div class="brd-outer-r">
+                                <p class="txt-zone">{{MissedScheduleWOStatus}}</p>
+                            </div>
+                            <p class="fnt-weght">Missed Schedule</p>
+                        </div>
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_TotalSchedule))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-gr" @*data-ng-click="ViewMoreClick('#EmpClockInOutList',EmpClockInOutListPager.totalComplete)"*@
+                             data-ng-model="EmpClockInOutListSearchModel.Status"
+                             data-ng-click="EmpClockInOutListSearchModel.Status='Complete'==''?null:'Complete' ; SearchEmpClockInOutList()">
+                            <div class="brd-outer-gr">
+                                <p class="txt-zone">{{TotalCompleteWOStatus}}</p>
+                            </div>
+                            <p class="fnt-weght">Complete</p>
+                        </div>
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_OverTime))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-r-pur" data-ng-click="ViewMoreClick('#EmpOverTimeList',EmpOverTimeListPager.totalRecords)">
+                            <div class="brd-outer-r-pur">
+                                <p class="txt-zone">{{EmpOverTimeListPager.totalRecords}}</p>
+                            </div>
+                            <p class="fnt-weght">Over Time</p>
+                        </div>
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_NewPatient))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-l-blu" data-ng-click="ViewMoreClick('#PatientNewList',PatientNewListPager.totalRecords)">
+                            <div class="brd-outer-l-blu">
+                                <p class="txt-zone">{{PatientNewListPager.totalRecords}}</p>
+                            </div>
+                            <p class="fnt-weght">@Resource.PatientNew</p>
+                        </div>
+                    </div>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_ActivePatientCount))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-l-blu" data-ng-click="ViewMoreClick('#PatientNewList',PatientNewListPager.totalRecords)">
+                            <div class="brd-outer-l-blu">
+                                <p class="txt-zone">{{ActivePatientListPager.totalRecords}}</p>
+                            </div>
+                            <p class="fnt-weght">@Resource.TotalPatientCount</p>
+                        </div>
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_PatientFullySchedule))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-y-ca" data-ng-click="ViewMoreClick('#PatientNotScheduleList',PatientNotScheduleListPager.totalRecords)">
+                            <div class="brd-outer-y-ca">
+                                <p class="txt-zone">{{PatientNotScheduleListPager.totalRecords}}</p>
+                            </div>
+                            <p class="fnt-weght">Not Scheduled</p>
+                        </div>
+                    </div>
+                }
+
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_AssignInternalMessage))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-blu-hk" data-ng-click="ViewMoreClick('#ReferralInternalMessageList',ReferralInternalMessageListPager.totalRecords)">
+                            <div class="brd-outer-blu-hk">
+                                <p class="txt-zone">{{ReferralInternalMessageListPager.totalRecords}}</p>
+                            </div>
+                            <p class="fnt-weght">Unread Messages</p>
+                        </div>
+                    </div>
+                }
+
+                @*@if (Common.HasPermission(Constants.HC_Permission_Dashboard_ResolveAssignInternalMessage))
+                    {
+                        <div class="col-lg-2 col-md-2 col-sm-4 col-xs-12">
+                            <div class="dashboard-stat  yellow-mint">
+                                <div class="visual">
+                                    <i class="fa fa-comments"></i>
+                                </div>
+                                <div class="details">
+                                    <div class="number">
+                                        <span data-counter="counterup">{{ReferralResolvedInternalMessageListPager.totalRecords}}</span>
+                                    </div>
+                                    <div class="desc col-sm-12">@Resource.SentInternalMessageNotification</div>
+                                </div>
+                                <a class="more" href="javascript:;" data-ng-click="ViewMoreClick('#ReferralResolvedInternalMessageList',ReferralResolvedInternalMessageListPager.totalRecords)">
+                                    @Resource.ViewMore
+
+                                    <i class="m-icon-swapright m-icon-white"></i>
+                                </a>
+                            </div>
+                        </div>
+                    }*@
+
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_ApprovalPendingForVisits))
+                {
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-y-mnt">
+                            <a class="text-decoration-none color-black" href="@string.Format("{0}{1}", Constants.HC_ReportEmployeeVisitListURL, "/pending")" target="_blank">
+                                <div class="brd-outer-y-mnt">
+                                    <p class="txt-zone">{{PendingBypassVisitCount}}</p>
+                                </div>
+                                <p class="fnt-weght">Pending Time Sheet</p>
+                            </a>
+                        </div>
+                    </div>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_PriorAuthExpiring))
+                {
+
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-g-dr">
+                            <div class="brd-outer-g-dr" data-ng-click="ViewMoreClick('#PriorAuthExpiringList',PriorAuthExpiringListPager.totalRecords)">
+                                <p class="txt-zone">{{PriorAuthExpiringListPager.totalRecords}}</p>
+                            </div>
+                            <p class="fnt-weght">Prior Auth. Expiring</p>
+                        </div>
+                    </div>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_PriorAuthExpired))
+                {
+
+                    <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                        <div class="brd-pdd-r">
+                            <div class="brd-outer-r" data-ng-click="ViewMoreClick('#PriorAuthExpiredList',PriorAuthExpiredListPager.totalRecords)">
+                                <p class="txt-zone">{{PriorAuthExpiredListPager.totalRecords}}</p>
+                            </div>
+                            <p class="fnt-weght">Prior Auth. Expired</p>
+                        </div>
+                    </div>
+                }
+                @*@if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Patient_TotalPayor))
+                    {
+                        <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg">
+                                <div class="brd-outer-blu-lg">
+                                    <p class="txt-zone">{{TotalPayor}}</p>
+                                </div>
+                                <p class="fnt-weght">Total Payor</p>
+                            </div>
+                        </div>
+                    }
+
+                    @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Patient_PayorList))
+                    {
+                        <div class="col-lg-2 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25" data-ng-repeat="item in GetPayor">
+                            <div class="brd-pdd-blu-dr">
+                                <div class="brd-outer-blu-dr">
+                                    <p class="txt-zone">{{item.PayorCount}}</p>
+                                </div>
+                                <p class="fnt-weght">{{item.PayorName}}</p>
+                            </div>
+                        </div>
+                        }*@
+            </div>
+            <hr />
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="dashborad_block">
+            <div class="row">
+
+                @*@if (Common.HasPermission(Constants.HC_Permission_Dashboard_EmployeesAverageDelays))
+                    {
+                        <div class="col-md-6 col-md-6">
+                            @Html.Partial("_Partial/_EmpTimeStatics")
+                        </div>
+                    }*@
+
+                <div class="mb-20 pst-fix">
+                    <a href="" title="Notification" data-ng-click="NotificationEditModel()" class="notification" style="text-decoration: none;">
+                        <i class="fa fa-angle-left bg-shadding"></i>
+                    </a>
+                </div>
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_EmployeeClockIn))
+                {
+                    <div class="col-sm-12 emp_blg_lft">
+                        @Html.Partial("_Partial/_EmpClockInOutList")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_AssignInternalMessage))
+                {
+                    <div class="col-sm-12 col-md-12">
+                        @Html.Partial("_Partial/_ReferralInternalMessageList")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_ResolveAssignInternalMessage))
+                {
+                    <div class="col-sm-12 col-md-12">
+                        @Html.Partial("_Partial/_ResolvedReferralInternalMessageList")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_EmployeeOverTime))
+                {
+                    <div class="col-sm-6 emp_blg_rgt">
+                        @Html.Partial("_Partial/_EmpOverTimeList")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_PatientBirthday) || Common.HasPermission(Constants.HC_Permission_Dashboard_EmployeeBirthday))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PatientBirthdays")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_PatientNew))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PatientNew")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_PatientFullySchedule))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PatientNotSchedule")
+                    </div>
+                }
+
+                @if (SessionHelper.IsDayCare &&
+                    (Common.HasPermission(Constants.HC_Permission_DashboardCard_Patient_TotalSchedule) ||
+                    Common.HasPermission(Constants.HC_Permission_DashboardCard_Patient_TotalAbsent) ||
+                    Common.HasPermission(Constants.HC_Permission_DashboardCard_Patient_TotalPresent))
+                    )
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PatientClockInOutList")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_Pending))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PatientPending")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_Discharged))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PatientDischarged")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_Transfer))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PatientTransfer")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_OnHold))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PatientOnHold")
+                    </div>
+                }
+
+                @*@if (Common.HasPermission(Constants.HC_Permission_Dashboard_Patient_Medicaid))
+                    {
+                        <div class="col-sm-6 col-md-6">
+                            @Html.Partial("_Partial/_PatientMedicaid")
+                        </div>
+                    }*@
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_PriorAuthExpiring))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PriorAuthExp")
+                    </div>
+                }
+
+                @if (Common.HasPermission(Constants.HC_Permission_DashboardCard_Emp_PriorAuthExpiring))
+                {
+                    <div class="col-sm-6 col-md-6">
+                        @Html.Partial("_Partial/_PriorAuthExpired")
+                    </div>
+                }
+
+            </div>
+            <div class="clearfix"></div>
+        </div>
+
+    </div>
+
+
+    @section Scripts{
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/dashboard")
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/scheduleassignmentInHome01")
+        <script>
+        var Reply = '@Resource.Reply';
+        var ResolvedComment = '@Resource.ResolvedComment';
+        </script>
+    }
+}
+
+
+@section styles
+{
+    <style>
+        /*.dashborad_block .col-sm-6 {
+            width: 49.5%;
+            float: none;
+            display: inline-block;
+            box-sizing: border-box;
+            vertical-align: top;
+        }*/
+    </style>
+}
+<div data-ng-controller="ScheduleAssignmentController">
+    @Html.Partial("/Areas/HomeCare/Views/Schedule/Partial/01/_NoteModalAction.cshtml")
+
+</div>
+
+@Html.Partial("~/Areas/HomeCare/Views/Shared/_VisitReasonActionModal.cshtml")
+

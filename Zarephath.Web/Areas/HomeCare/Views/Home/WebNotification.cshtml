@@ -1,0 +1,134 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Notification);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.Notification;
+}
+@model SetWebNotificationListPage
+@Html.Hidden("hdnSetWebNotificationListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="NotificationController">
+    <div id="WebNotificationsList" class="row">
+        <div class="col-md-12">
+            <div class="portlet box">
+                <div class="portlet-title">
+                    <div class="caption header-font-size-14 uppercase">
+                        Web Notifications
+                        <div class="pull-right padding-left-25" data-ng-show="WebNotificationsListAjaxStart">
+                            <img src="~/Assets/images/lazyload.gif" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="portlet-body table_font-size-12">
+                    <div class="row border-bottom border-bottom-default">
+
+                        <div class="col-sm-2 col-lg-2 col-md-2 col-xs-2 form-group padding-right-15 width-106px">
+                            <select id="MySelect" class="form-control btn-sm width-100px" ng-model="WebNotificationDeleted" ng-change="SearchWebNotification()">
+                                <option value="-1">All Records</option>
+                                <option value="0" selected>Active</option>
+                                <option value="1">Deleted</option>
+                            </select>
+                        </div>
+
+                        <div class="col-sm-6 col-lg-6 col-md-6 col-xs-6 display-flex form-group" data-ng-if="WebNotificationsList.length > 0">
+                            <button type="button" class="btn btn-default" data-ng-click="MarkSelectedAsRead(true)">
+                                @Resource.MarkAsRead
+                            </button> &nbsp;
+                            <button type="button" class="btn btn-default" data-ng-click="MarkSelectedAsRead(false)">
+                                @Resource.MarkAsUnRead
+                            </button> &nbsp;
+                            <button type="button" class="btn btn-default" data-ng-click="DeleteWebNotification()">
+                                @Resource.MarkAsDelete
+                            </button>
+                        </div>
+                        <div class="col-sm-4 col-lg-4 col-md-4 col-xs-4 pull-right padding-right-5">
+                            <dir-pagination-controls boundary-links="true" on-page-change="WebNotificationsListPager.pageChanged(newPageNumber)" pagination-id="WebNotificationsListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                    <table class="table table-bordered table-striped table-condensed flip-content">
+                        <thead>
+                            <tr class="font-weight-600">
+                                <td>
+                                    <div class="btn-group" data-ng-show="WebNotificationsList.length > 0">
+                                        <input id="SelectAllNotifications" class="unicheckbox" type="checkbox"
+                                               data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                        <label for="SelectAllNotifications"></label>
+                                    </div>
+
+                                </td>
+                                <td>Message</td>
+                                <td>IsRead</td>
+                                <td>Created Date</td>
+                                <td>Action</td>
+                            </tr>
+                        </thead>
+
+                        <tbody dir-paginate="item in WebNotificationsList | itemsPerPage: WebNotificationsListPager.pageSize" total-items="WebNotificationsListPager.totalRecords" current-page="WebNotificationsListPager.currentPage" pagination-id="WebNotificationsListPagerID">
+                            <tr data-ng-if="WebNotificationsList.length > 0">
+                                <td>
+                                    <input id="chk-item-{{$index}}" class="uniformControls" type="checkbox"
+                                           data-uniform-value="item.IsSelected"
+                                           data-ng-model="item.IsSelected"
+                                           data-ng-checked="item.IsSelected"
+                                           data-ng-disabled="item.IsRead" />
+                                </td>
+                                <td class="{{item.IsRead ? '' : 'bold'}}">{{item.Message}}</td>
+                                <td>{{item.IsRead == 1? 'Yes' : 'No'}}</td>
+                                <td>{{item.CreatedDate}}</td>
+                                <td>
+                                    <button data-ng-show="!item.IsDeleted" type="button" class="btn btn-xs red" data-ng-click="DeleteWebNotification(item.WebNotificationID)">
+                                        <i class="fa fa-trash"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+
+                    <div class="row">
+                        <div class="col-sm-12" data-ng-if="WebNotificationsList.length > 0">
+                            <div class="col-sm-6 pull-left no-left-padding"
+                                 data-ng-hide="WebNotificationsListPager.currentPage==1 && (WebNotificationsListPager.currentPageSize < WebNotificationsListPager.pageSize)">
+                                @Resource.Showing <span data-ng-bind="(WebNotificationsListPager.pageSize * WebNotificationsListPager.currentPage) -WebNotificationsListPager.pageSize  + 1"></span>
+                                &nbsp;@Resource.To <span data-ng-bind="(WebNotificationsListPager.pageSize == WebNotificationsListPager.currentPageSize) ? (WebNotificationsListPager.pageSize * WebNotificationsListPager.currentPage) :(WebNotificationsListPager.pageSize * WebNotificationsListPager.currentPage) - WebNotificationsListPager.pageSize  + WebNotificationsListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="WebNotificationsListPager.totalRecords"></span>&nbsp;@Resource.Records
+                            </div>
+                            <div class="pull-right">
+                                <dir-pagination-controls boundary-links="true" on-page-change="WebNotificationsListPager.pageChanged(newPageNumber)" pagination-id="WebNotificationsListPagerID"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div data-ng-if="WebNotificationsList.length == 0">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-danger">
+                                            @Html.Raw(Resource.NoRecordsFound)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <br class="clearfix" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/Home/Notification")
+    <script>
+        var Reply = '@Resource.Reply';
+        var ResolvedComment = '@Resource.ResolvedComment';
+
+        $(function () {
+            var temp = "0";
+            $("#MySelect").val(temp);
+        });
+    </script>
+}

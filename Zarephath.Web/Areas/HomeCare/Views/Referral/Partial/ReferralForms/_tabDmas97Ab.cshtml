@@ -1,0 +1,1150 @@
+﻿
+<script src="~/Assets/js/sitejs/signature.js"></script>
+@model DmasModel
+@Html.Hidden("hdnDmas97AbModel", Common.SerializeObject(Model))
+<div data-ng-controller="Dmas97AbListController">
+    <!----------------------DMAS 97 LIST-------------------------------------->
+    <div data-ng-if="IsShow==true">
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="btn-group">
+                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                    </button>
+                </div>
+
+                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_DMAS97_Add))
+                {
+                    <div class="btn-group padding-left-15 pull-right">
+                        <button type="button" class="btn btn-primary btn-sm pull-right" data-ng-click="AddDmas97()"><i class="fa fa-plus">&nbsp;&nbsp;</i>DMAS-97</button>
+                    </div>
+                }
+
+            </div>
+            <div class="space20"></div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="p-dmas-97-ortlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-400px text-align-center">
+                                            <a class="anchor_color" href="javascript:void(0);">ID</a>
+                                        </th>
+                                        <th class="width-400px text-align-center">
+                                            <a class="anchor_color" href="javascript:void(0);">CREATED BY</a>
+                                        </th>
+                                        <th class="width-400px text-align-center">CREATED DATE</th>
+                                        <th class="width-400px text-align-center">ACTION</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-ng-repeat="item in DMAS97ABList">
+                                    <tr>
+                                        <td class="text-align-center">{{item.Dmas97ID}}</td>
+                                        <td class="text-align-center">{{item.EmployeeName}}</td>
+                                        <td class="text-align-center">{{item.CreatedDate}}</td>
+                                        <td class="text-align-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_DMAS97_Add))
+                                            {
+                                                <a data-ng-click="AddDmas97(item)" class="btn btn-xs blue" title="Edit"><i class="fa fa-edit"></i></a>
+                                                <a data-ng-click="DeleteDmas97Ab(item)" class="btn btn-xs red" title="Delete"><i class="fa fa-trash"></i></a>
+                                            }
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_DMAS97_Delete))
+                                            {
+                                                <a data-ng-click="DeleteDmas97Ab(item)" class="btn btn-xs red" title="Delete"><i class="fa fa-trash"></i></a>
+                                            }
+                                            <a href="@Constants.Generate_Dmas97_Pdf{{item.Dmas97ID}}" class="btn btn-xs green-jungle" title="Print Pdf"><i class="fa fa-print"></i></a>
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_DMAS97_Add))
+                                            {
+                                                <a data-ng-click="Clone(item)" class="btn btn-xs blue-dark" title="Clone"><i class="fa fa-clone"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.Form)';
+        </script>
+    </div>
+
+    <!----------------------DMAS 97 LIST-------------------------------------->
+    <!----------------------DMAS 97 ADD-------------------------------------->
+
+    <div data-ng-if="IsShow==false">
+
+        <input type="hidden" data-ng-model="DmasModel.Dmas97AbModel.Dmas97ID" />
+        <form id="briggsForm" name="briggsForm" class="ng-pristine ng-valid ng-valid-maxlength ng-valid-pattern ng-valid-email">
+
+            <div id="page_1">
+                <div class="text-center margin-top-20">AGENCY OR CONSUMER DIRECTION PROVIDER PLAN OF CARE</div>
+                <div class="row container margin-left-10 margin-top-10 dmas-97-s1 border-all-cover">
+                    <div class="col-12 col-sm-4 col-md-4 col-lg-4 dmas-97-s2">
+                        <nobr><input type="radio" name="51" data-ng-model="DmasModel.Dmas97AbModel.Services" value="Agency"> Agency-Directed</nobr> Services
+                    </div>
+                    <div class="col-12 col-sm-4 col-md-4 col-lg-4 dmas-97-s2">
+                        <nobr><input type="radio" name="51" data-ng-model="DmasModel.Dmas97AbModel.Services" value="Consumer"> Consumer-Directed</nobr> Services
+                    </div>
+
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                        <label class="control-label dmas-97-s6">Assessment Date:</label>
+                        <div class="input-group date dmas-97-s3"
+                             datepicker="DmasModel.Dmas97AbModel.CurrentDate"
+                             data-ng-dateval="DmasModel.Dmas97AbModel.CurrentDate"
+                             data-ng-mindate="CurrentDate">
+
+                            <input type="text" id="date1" class="input-sm dateInputMask dmas-97-s4" />
+                        </div>
+                    </div>
+
+                </div>
+                <table cellpadding="0" cellspacing="0" class="t0 margin-left-94">
+                    <tbody>
+                        <tr>
+                            <td class="tr-dmas-97-4 td-dmas-97--dmas-97-22"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-4 td-dmas-97--dmas-97-8"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-4 td-dmas-97--dmas-97-23"><p class="p-dmas-97-1 ft-dmas-97-4">Participant: <input type="text" name="" class="txtbx1-dmas-97" style="width: 163px;" data-ng-model="DmasModel.DmasReferral.PatientName"></p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td colspan="3"><p class="p-dmas-97-2 ft-dmas-97-4">Medicaid ID#: 
+                                                <select data-ng-model="DmasModel.Dmas97AbModel.MedicaidID" data-val="true" style="width:175px" >
+                                                    <option value="" selected>Select</option>
+                                                    <option data-ng-repeat="item in DmasModel.DmasPayorList" value="{{item.BeneficiaryNumber}}">{{item.BeneficiaryNumber}}</option>
+                                                </select>
+                                 </p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-3 td-dmas-97--dmas-97-22"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-3 td-dmas-97--dmas-97-8"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-3 td-dmas-97--dmas-97-23"><p class="p-dmas-97-1 ft-dmas-97-4">Provider: <input type="text" name="" class="txtbx1-dmas-97" data-ng-model="DmasModel.OrganizationalModel.SiteName"></p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td colspan="2" class="padding-left-25"><p class="p-dmas-97-3 ft-dmas-97-4">Provider ID#: <input type="text" name="" class="txtbx1-dmas-97" data-ng-model="DmasModel.DmasReferral.NPI"></p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <table class="t0" style="margin-left:62px;" border="1px solid black">
+                    <tbody>
+                        <tr>
+                            <th style="width: 240px;padding: 4px;" ">Categories/Tasks</th>
+                            <th class="text-align-center">Monday </th>
+                            <th class="text-align-center">Tuesday </th>
+                            <th class="text-align-center">Wednesday </th>
+                            <th class="text-align-center">Thursday </th>
+                            <th class="text-align-center">Friday </th>
+                            <th class="text-align-center">Saturday </th>
+                            <th class="text-align-center">Sunday </th>
+                        </tr>
+                        <tr>
+                            <td style="text-align:left">1. ADL’s </td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Bathing </td>
+                            <td><input type="text" name="" class="txtbx ADLMon" id="BathMon" data-ng-model="DmasModel.Dmas97AbModel.BathMon"></td>
+                            <td><input type="text" name="" class="txtbx ADLTue" id="BathTue" data-ng-model="DmasModel.Dmas97AbModel.BathTue"></td>
+                            <td><input type="text" name="" class="txtbx ADLWed" id="BathWed" data-ng-model="DmasModel.Dmas97AbModel.BathWed"></td>
+                            <td><input type="text" name="" class="txtbx ADLThu" id="BathThu" data-ng-model="DmasModel.Dmas97AbModel.BathThu"></td>
+                            <td><input type="text" name="" class="txtbx ADLFri" id="BathFri" data-ng-model="DmasModel.Dmas97AbModel.BathFri"></td>
+                            <td><input type="text" name="" class="txtbx ADLSat" id="BathSat" data-ng-model="DmasModel.Dmas97AbModel.BathSat"></td>
+                            <td><input type="text" name="" class="txtbx ADLSun" id="BathSun" data-ng-model="DmasModel.Dmas97AbModel.BathSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Dressing </td>
+                            <td><input type="text" name="" class="txtbx ADLMon" id="DresMon" data-ng-model="DmasModel.Dmas97AbModel.DresMon"></td>
+                            <td><input type="text" name="" class="txtbx ADLTue" id="DresTue" data-ng-model="DmasModel.Dmas97AbModel.DresTue"></td>
+                            <td><input type="text" name="" class="txtbx ADLWed" id="DresWed" data-ng-model="DmasModel.Dmas97AbModel.DresWed"></td>
+                            <td><input type="text" name="" class="txtbx ADLThu" id="DresThu" data-ng-model="DmasModel.Dmas97AbModel.DresThu"></td>
+                            <td><input type="text" name="" class="txtbx ADLFri" id="DresFri" data-ng-model="DmasModel.Dmas97AbModel.DresFri"></td>
+                            <td><input type="text" name="" class="txtbx ADLSat" id="DresSat" data-ng-model="DmasModel.Dmas97AbModel.DresSat"></td>
+                            <td><input type="text" name="" class="txtbx ADLSun" id="DresSun" data-ng-model="DmasModel.Dmas97AbModel.DresSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Toileting </td>
+                            <td><input type="text" name="" class="txtbx ADLMon" id="ToilMon" data-ng-model="DmasModel.Dmas97AbModel.ToilMon"></td>
+                            <td><input type="text" name="" class="txtbx ADLTue" id="ToilTue" data-ng-model="DmasModel.Dmas97AbModel.ToilTue"></td>
+                            <td><input type="text" name="" class="txtbx ADLWed" id="ToilWed" data-ng-model="DmasModel.Dmas97AbModel.ToilWed"></td>
+                            <td><input type="text" name="" class="txtbx ADLThu" id="ToilThu" data-ng-model="DmasModel.Dmas97AbModel.ToilThu"></td>
+                            <td><input type="text" name="" class="txtbx ADLFri" id="ToilFri" data-ng-model="DmasModel.Dmas97AbModel.ToilFri"></td>
+                            <td><input type="text" name="" class="txtbx ADLSat" id="ToilSat" data-ng-model="DmasModel.Dmas97AbModel.ToilSat"></td>
+                            <td><input type="text" name="" class="txtbx ADLSun" id="ToilSun" data-ng-model="DmasModel.Dmas97AbModel.ToilSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Transfer </td>
+                            <td><input type="text" name="" class="txtbx ADLMon" id="TranMon" data-ng-model="DmasModel.Dmas97AbModel.TranMon"></td>
+                            <td><input type="text" name="" class="txtbx ADLTue" id="TranTue" data-ng-model="DmasModel.Dmas97AbModel.TranTue"></td>
+                            <td><input type="text" name="" class="txtbx ADLWed" id="TranWed" data-ng-model="DmasModel.Dmas97AbModel.TranWed"></td>
+                            <td><input type="text" name="" class="txtbx ADLThu" id="TranThu" data-ng-model="DmasModel.Dmas97AbModel.TranThu"></td>
+                            <td><input type="text" name="" class="txtbx ADLFri" id="TranFri" data-ng-model="DmasModel.Dmas97AbModel.TranFri"></td>
+                            <td><input type="text" name="" class="txtbx ADLSat" id="TranSat" data-ng-model="DmasModel.Dmas97AbModel.TranSat"></td>
+                            <td><input type="text" name="" class="txtbx ADLSun" id="TranSun" data-ng-model="DmasModel.Dmas97AbModel.TranSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Assist Eating</td>
+                            <td><input type="text" name="" class="txtbx ADLMon" id="AssiEatMon" data-ng-model="DmasModel.Dmas97AbModel.AssiEatMon"></td>
+                            <td><input type="text" name="" class="txtbx ADLTue" id="AssiEatTue" data-ng-model="DmasModel.Dmas97AbModel.AssiEatTue"></td>
+                            <td><input type="text" name="" class="txtbx ADLWed" id="AssiEatWed" data-ng-model="DmasModel.Dmas97AbModel.AssiEatWed"></td>
+                            <td><input type="text" name="" class="txtbx ADLThu" id="AssiEatThu" data-ng-model="DmasModel.Dmas97AbModel.AssiEatThu"></td>
+                            <td><input type="text" name="" class="txtbx ADLFri" id="AssiEatFri" data-ng-model="DmasModel.Dmas97AbModel.AssiEatFri"></td>
+                            <td><input type="text" name="" class="txtbx ADLSat" id="AssiEatSat" data-ng-model="DmasModel.Dmas97AbModel.AssiEatSat"></td>
+                            <td><input type="text" name="" class="txtbx ADLSun" id="AssiEatSun" data-ng-model="DmasModel.Dmas97AbModel.AssiEatSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Assist Ambulate</td>
+                            <td><input type="text" name="" class="txtbx ADLMon" id="AssiAmbMon" data-ng-model="DmasModel.Dmas97AbModel.AssiAmbMon"></td>
+                            <td><input type="text" name="" class="txtbx ADLTue" id="AssiAmbTue" data-ng-model="DmasModel.Dmas97AbModel.AssiAmbTue"></td>
+                            <td><input type="text" name="" class="txtbx ADLWed" id="AssiAmbWed" data-ng-model="DmasModel.Dmas97AbModel.AssiAmbWed"></td>
+                            <td><input type="text" name="" class="txtbx ADLThu" id="AssiAmbThu" data-ng-model="DmasModel.Dmas97AbModel.AssiAmbThu"></td>
+                            <td><input type="text" name="" class="txtbx ADLFri" id="AssiAmbFri" data-ng-model="DmasModel.Dmas97AbModel.AssiAmbFri"></td>
+                            <td><input type="text" name="" class="txtbx ADLSat" id="AssiAmbSat" data-ng-model="DmasModel.Dmas97AbModel.AssiAmbSat"></td>
+                            <td><input type="text" name="" class="txtbx ADLSun" id="AssiAmbSun" data-ng-model="DmasModel.Dmas97AbModel.AssiAmbSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Turn/Change Position</td>
+                            <td><input type="text" name="" class="txtbx ADLMon" id="TurnMon" data-ng-model="DmasModel.Dmas97AbModel.TurnMon"></td>
+                            <td><input type="text" name="" class="txtbx ADLTue" id="TurnTue" data-ng-model="DmasModel.Dmas97AbModel.TurnTue"></td>
+                            <td><input type="text" name="" class="txtbx ADLWed" id="TurnWed" data-ng-model="DmasModel.Dmas97AbModel.TurnWed"></td>
+                            <td><input type="text" name="" class="txtbx ADLThu" id="TurnThu" data-ng-model="DmasModel.Dmas97AbModel.TurnThu"></td>
+                            <td><input type="text" name="" class="txtbx ADLFri" id="TurnFri" data-ng-model="DmasModel.Dmas97AbModel.TurnFri"></td>
+                            <td><input type="text" name="" class="txtbx ADLSat" id="TurnSat" data-ng-model="DmasModel.Dmas97AbModel.TurnSat"></td>
+                            <td><input type="text" name="" class="txtbx ADLSun" id="TurnSun" data-ng-model="DmasModel.Dmas97AbModel.TurnSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Grooming</td>
+                            <td><input type="text" name="" class="txtbx ADLMon" id="GrooMon" data-ng-model="DmasModel.Dmas97AbModel.GrooMon"></td>
+                            <td><input type="text" name="" class="txtbx ADLTue" id="GrooTue" data-ng-model="DmasModel.Dmas97AbModel.GrooTue"></td>
+                            <td><input type="text" name="" class="txtbx ADLWed" id="GrooWed" data-ng-model="DmasModel.Dmas97AbModel.GrooWed"></td>
+                            <td><input type="text" name="" class="txtbx ADLThu" id="GrooThu" data-ng-model="DmasModel.Dmas97AbModel.GrooThu"></td>
+                            <td><input type="text" name="" class="txtbx ADLFri" id="GrooFri" data-ng-model="DmasModel.Dmas97AbModel.GrooFri"></td>
+                            <td><input type="text" name="" class="txtbx ADLSat" id="GrooSat" data-ng-model="DmasModel.Dmas97AbModel.GrooSat"></td>
+                            <td><input type="text" name="" class="txtbx ADLSun" id="GrooSun" data-ng-model="DmasModel.Dmas97AbModel.GrooSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px bg-color-lavender">Total ADL Time</td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="ADLTimeMon" data-ng-model="DmasModel.Dmas97AbModel.ADLTimeMon"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="ADLTimeTue" data-ng-model="DmasModel.Dmas97AbModel.ADLTimeTue"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="ADLTimeWed" data-ng-model="DmasModel.Dmas97AbModel.ADLTimeWed"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="ADLTimeThu" data-ng-model="DmasModel.Dmas97AbModel.ADLTimeThu"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="ADLTimeFri" data-ng-model="DmasModel.Dmas97AbModel.ADLTimeFri"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="ADLTimeSat" data-ng-model="DmasModel.Dmas97AbModel.ADLTimeSat"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="ADLTimeSun" data-ng-model="DmasModel.Dmas97AbModel.ADLTimeSun"></td>
+                        </tr>
+                        <tr>
+                            <th class="width-240px">2. Special Maintenanc</th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Vital Signs  </td>
+                            <td><input type="text" name="" class="txtbx Special" id="VitaMon" data-ng-model="DmasModel.Dmas97AbModel.VitaMon"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="VitaTue" data-ng-model="DmasModel.Dmas97AbModel.VitaTue"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="VitaWed" data-ng-model="DmasModel.Dmas97AbModel.VitaWed"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="VitaThu" data-ng-model="DmasModel.Dmas97AbModel.VitaThu"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="VitaFri" data-ng-model="DmasModel.Dmas97AbModel.VitaFri"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="VitaSat" data-ng-model="DmasModel.Dmas97AbModel.VitaSat"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="VitaSun" data-ng-model="DmasModel.Dmas97AbModel.VitaSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px bg-color-lavender">Supervise Meds </td>
+                            <td><input type="text" name="" class="txtbx Special" id="SupeMon" data-ng-model="DmasModel.Dmas97AbModel.SupeMon"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="SupeTue" data-ng-model="DmasModel.Dmas97AbModel.SupeTue"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="SupeWed" data-ng-model="DmasModel.Dmas97AbModel.SupeWed"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="SupeThu" data-ng-model="DmasModel.Dmas97AbModel.SupeThu"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="SupeFri" data-ng-model="DmasModel.Dmas97AbModel.SupeFri"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="SupeSat" data-ng-model="DmasModel.Dmas97AbModel.SupeSat"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="SupeSun" data-ng-model="DmasModel.Dmas97AbModel.SupeSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">*Range of Motion </td>
+                            <td><input type="text" name="" class="txtbx Special" id="RangMon" data-ng-model="DmasModel.Dmas97AbModel.RangMon"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="RangTue" data-ng-model="DmasModel.Dmas97AbModel.RangTue"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="RangWed" data-ng-model="DmasModel.Dmas97AbModel.RangWed"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="RangThu" data-ng-model="DmasModel.Dmas97AbModel.RangThu"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="RangFri" data-ng-model="DmasModel.Dmas97AbModel.RangFri"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="RangSat" data-ng-model="DmasModel.Dmas97AbModel.RangSat"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="RangSun" data-ng-model="DmasModel.Dmas97AbModel.RangSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">*Wound Care </td>
+                            <td><input type="text" name="" class="txtbx Special" id="WounMon" data-ng-model="DmasModel.Dmas97AbModel.WounMon"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="WounTue" data-ng-model="DmasModel.Dmas97AbModel.WounTue"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="WounWed" data-ng-model="DmasModel.Dmas97AbModel.WounWed"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="WounThu" data-ng-model="DmasModel.Dmas97AbModel.WounThu"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="WounFri" data-ng-model="DmasModel.Dmas97AbModel.WounFri"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="WounSat" data-ng-model="DmasModel.Dmas97AbModel.WounSat"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="WounSun" data-ng-model="DmasModel.Dmas97AbModel.WounSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">*Bowel/Bladder Program</td>
+                            <td><input type="text" name="" class="txtbx Special" id="BoweMon" data-ng-model="DmasModel.Dmas97AbModel.BoweMon"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="BoweTue" data-ng-model="DmasModel.Dmas97AbModel.BoweTue"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="BoweWed" data-ng-model="DmasModel.Dmas97AbModel.BoweWed"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="BoweThu" data-ng-model="DmasModel.Dmas97AbModel.BoweThu"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="BoweFri" data-ng-model="DmasModel.Dmas97AbModel.BoweFri"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="BoweSat" data-ng-model="DmasModel.Dmas97AbModel.BoweSat"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="BoweSun" data-ng-model="DmasModel.Dmas97AbModel.BoweSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">*MD order required</td>
+                            <td><input type="text" name="" class="txtbx Special" id="MDorMon" data-ng-model="DmasModel.Dmas97AbModel.MDorMon"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="MDorTue" data-ng-model="DmasModel.Dmas97AbModel.MDorTue"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="MDorWed" data-ng-model="DmasModel.Dmas97AbModel.MDorWed"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="MDorThu" data-ng-model="DmasModel.Dmas97AbModel.MDorThu"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="MDorFri" data-ng-model="DmasModel.Dmas97AbModel.MDorFri"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="MDorSat" data-ng-model="DmasModel.Dmas97AbModel.MDorSat"></td>
+                            <td><input type="text" name="" class="txtbx Special" id="MDorSun" data-ng-model="DmasModel.Dmas97AbModel.MDorSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px bg-color-lavender">Total Maint. Time</td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="TmtiMon" data-ng-model="DmasModel.Dmas97AbModel.TmtiMon"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="TmtiTue" data-ng-model="DmasModel.Dmas97AbModel.TmtiTue"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="TmtiWed" data-ng-model="DmasModel.Dmas97AbModel.TmtiWed"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="TmtiThu" data-ng-model="DmasModel.Dmas97AbModel.TmtiThu"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="TmtiFri" data-ng-model="DmasModel.Dmas97AbModel.TmtiFri"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="TmtiSat" data-ng-model="DmasModel.Dmas97AbModel.TmtiSat"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="TmtiSun" data-ng-model="DmasModel.Dmas97AbModel.TmtiSun"></td>
+                        </tr>
+                        <tr>
+                            <th class="text-align-left">3. Supervision Time</th>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="SuperTimeMon"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="SuperTimeTue"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="SuperTimeWed"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="SuperTimeThu"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="SuperTimeFri"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="SuperTimeSat"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="SuperTimeSun"></td>
+                        </tr>
+                        <tr>
+                            <th>4. IADLS </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                            <th> </th>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Meal Preparation </td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MealMon" data-ng-model="DmasModel.Dmas97AbModel.MealMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MealTue" data-ng-model="DmasModel.Dmas97AbModel.MealTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MealWed" data-ng-model="DmasModel.Dmas97AbModel.MealWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MealThu" data-ng-model="DmasModel.Dmas97AbModel.MealThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MealFri" data-ng-model="DmasModel.Dmas97AbModel.MealFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MealSat" data-ng-model="DmasModel.Dmas97AbModel.MealSat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MealSun" data-ng-model="DmasModel.Dmas97AbModel.MealSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Clean Kitchen </td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CleaMon" data-ng-model="DmasModel.Dmas97AbModel.CleaMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CleaTue" data-ng-model="DmasModel.Dmas97AbModel.CleaTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CleaWed" data-ng-model="DmasModel.Dmas97AbModel.CleaWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CleaThu" data-ng-model="DmasModel.Dmas97AbModel.CleaThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CleaFri" data-ng-model="DmasModel.Dmas97AbModel.CleaFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CleaSat" data-ng-model="DmasModel.Dmas97AbModel.CleaSat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CleaSun" data-ng-model="DmasModel.Dmas97AbModel.CleaSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Make/Change Beds </td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MakeMon" data-ng-model="DmasModel.Dmas97AbModel.MakeMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MakeTue" data-ng-model="DmasModel.Dmas97AbModel.MakeTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MakeWed" data-ng-model="DmasModel.Dmas97AbModel.MakeWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MakeThu" data-ng-model="DmasModel.Dmas97AbModel.MakeThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MakeFri" data-ng-model="DmasModel.Dmas97AbModel.MakeFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MakeSat" data-ng-model="DmasModel.Dmas97AbModel.MakeSat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MakeSun" data-ng-model="DmasModel.Dmas97AbModel.MakeSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Clean Areas Used by Participant </td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CaupMon" data-ng-model="DmasModel.Dmas97AbModel.CaupMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CaupTue" data-ng-model="DmasModel.Dmas97AbModel.CaupTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CaupWed" data-ng-model="DmasModel.Dmas97AbModel.CaupWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CaupThu" data-ng-model="DmasModel.Dmas97AbModel.CaupThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CaupFri" data-ng-model="DmasModel.Dmas97AbModel.CaupFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CaupSat" data-ng-model="DmasModel.Dmas97AbModel.CaupSat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="CaupSun" data-ng-model="DmasModel.Dmas97AbModel.CaupSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Shop/List Supplies</td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="ShopMon" data-ng-model="DmasModel.Dmas97AbModel.ShopMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="ShopTue" data-ng-model="DmasModel.Dmas97AbModel.ShopTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="ShopWed" data-ng-model="DmasModel.Dmas97AbModel.ShopWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="ShopThu" data-ng-model="DmasModel.Dmas97AbModel.ShopThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="ShopFri" data-ng-model="DmasModel.Dmas97AbModel.ShopFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="ShopSat" data-ng-model="DmasModel.Dmas97AbModel.ShopSat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="ShopSun" data-ng-model="DmasModel.Dmas97AbModel.ShopSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Laundry </td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="LaunMon" data-ng-model="DmasModel.Dmas97AbModel.LaunMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="LaunTue" data-ng-model="DmasModel.Dmas97AbModel.LaunTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="LaunWed" data-ng-model="DmasModel.Dmas97AbModel.LaunWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="LaunThu" data-ng-model="DmasModel.Dmas97AbModel.LaunThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="LaunFri" data-ng-model="DmasModel.Dmas97AbModel.LaunFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="LaunSat" data-ng-model="DmasModel.Dmas97AbModel.LaunSat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="LaunSun" data-ng-model="DmasModel.Dmas97AbModel.LaunSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">(CD only) Money Management </td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MoneyMon" data-ng-model="DmasModel.Dmas97AbModel.MoneyMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MoneyTue" data-ng-model="DmasModel.Dmas97AbModel.MoneyTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MoneyWed" data-ng-model="DmasModel.Dmas97AbModel.MoneyWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MoneyThu" data-ng-model="DmasModel.Dmas97AbModel.MoneyThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MoneyFri" data-ng-model="DmasModel.Dmas97AbModel.MoneyFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MoneySat" data-ng-model="DmasModel.Dmas97AbModel.MoneySat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MoneySun" data-ng-model="DmasModel.Dmas97AbModel.MoneySun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px">Medical Appointments</td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MedicMon" data-ng-model="DmasModel.Dmas97AbModel.MedicMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MedicTue" data-ng-model="DmasModel.Dmas97AbModel.MedicTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MedicWed" data-ng-model="DmasModel.Dmas97AbModel.MedicWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MedicThu" data-ng-model="DmasModel.Dmas97AbModel.MedicThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MedicFri" data-ng-model="DmasModel.Dmas97AbModel.MedicFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MedicSat" data-ng-model="DmasModel.Dmas97AbModel.MedicSat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="MedicSun" data-ng-model="DmasModel.Dmas97AbModel.MedicSun"></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:right;padding-right:3px;">Work/School/Social</td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="WorkMon" data-ng-model="DmasModel.Dmas97AbModel.WorkMon"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="WorkTue" data-ng-model="DmasModel.Dmas97AbModel.WorkTue"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="WorkWed" data-ng-model="DmasModel.Dmas97AbModel.WorkWed"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="WorkThu" data-ng-model="DmasModel.Dmas97AbModel.WorkThu"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="WorkFri" data-ng-model="DmasModel.Dmas97AbModel.WorkFri"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="WorkSat" data-ng-model="DmasModel.Dmas97AbModel.WorkSat"></td>
+                            <td><input type="text" name="" class="txtbx IADLS" id="WorkSun" data-ng-model="DmasModel.Dmas97AbModel.WorkSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-right padding-right-3px bg-color-lavender">Total IADLS Time:</td>
+                            <td> <input type="text" class="txtbx" disabled="" id="IadlTimeMon" data-ng-model="DmasModel.Dmas97AbModel.IadlTimeMon"></td>
+                            <td> <input type="text" class="txtbx" disabled="" id="IadlTimeTue" data-ng-model="DmasModel.Dmas97AbModel.IadlTimeTue"></td>
+                            <td> <input type="text" class="txtbx" disabled="" id="IadlTimeWed" data-ng-model="DmasModel.Dmas97AbModel.IadlTimeWed"></td>
+                            <td> <input type="text" class="txtbx" disabled="" id="IadlTimeThu" data-ng-model="DmasModel.Dmas97AbModel.IadlTimeThu"></td>
+                            <td> <input type="text" class="txtbx" disabled="" id="IadlTimeFri" data-ng-model="DmasModel.Dmas97AbModel.IadlTimeFri"></td>
+                            <td> <input type="text" class="txtbx" disabled="" id="IadlTimeSat" data-ng-model="DmasModel.Dmas97AbModel.IadlTimeSat"></td>
+                            <td> <input type="text" class="txtbx" disabled="" id="IadlTimeSun" data-ng-model="DmasModel.Dmas97AbModel.IadlTimeSun"></td>
+                        </tr>
+                        <tr>
+                            <td class="text-align-left bg-color-lavender">TOTAL DAILY TIME:</td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="DailyTimeMon" data-ng-model="DmasModel.Dmas97AbModel.DailyTimeMon"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="DailyTimeTue" data-ng-model="DmasModel.Dmas97AbModel.DailyTimeTue"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="DailyTimeWed" data-ng-model="DmasModel.Dmas97AbModel.DailyTimeWed"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="DailyTimeThu" data-ng-model="DmasModel.Dmas97AbModel.DailyTimeThu"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="DailyTimeFri" data-ng-model="DmasModel.Dmas97AbModel.DailyTimeFri"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="DailyTimeSat" data-ng-model="DmasModel.Dmas97AbModel.DailyTimeSat"></td>
+                            <td class="bg-color-lavender"><input type="text" class="txtbx" disabled="" id="DailyTimeSun" data-ng-model="DmasModel.Dmas97AbModel.DailyTimeSun"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <p class="text-center ft-dmas-97-18 margin-top-5">This Section Must Be Completed in its Entirety for Agency &amp; <nobr>Consumer-Directed</nobr> Services</p>
+
+                <table cellpadding="0" cellspacing="0" class="t1" style="margin-left:97px;">
+                    <tbody>
+                        <tr>
+                            <td colspan="6" class="p-dmas-97-39 ft7 border-all"><span class="ft-dmas-97-15"> Composite ADL Score</span><span class="ft-dmas-97-16"> = </span>(The sum of the ADL ratings that describe this participant)</td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-7 td-dmas-97--dmas-97-46 border-left"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td colspan="2" class="tr-dmas-97-7 td-dmas-97--dmas-97-47"><p class="p-dmas-97-40 ft20">BATHING SCORE</p></td>
+                            <td class="tr-dmas-97-7 td-dmas-97--dmas-97-48"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-7 td-dmas-97--dmas-97-49"><p class="p-dmas-97-41 ft20">TRANSFERRING SCORE</p></td>
+                            <td class="tr-dmas-97-7 td-dmas-97--dmas-97-50 border-right"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-8 td-dmas-97--dmas-97-51 border-left"><p class="p-dmas-97-7 ft18">Bathes without help or with MH only</p></td>
+                            <td class="tr-dmas-97-8 td-dmas-97--dmas-97-23"><p class="p-dmas-97-42 ft18"><input type="radio" name="44" data-ng-model="DmasModel.Dmas97AbModel.BathingScore" value="BathingScore1"></p></td>
+                            <td colspan="2" class="tr-dmas-97-8 td-dmas-97--dmas-97-52"><p class="p-dmas-97-43 ft18">Transfers without help or with MH only</p></td>
+                            <td class="tr-dmas-97-8 td-dmas-97--dmas-97-50 border-right"><p class="p-dmas-97-44 ft18"><input type="radio" name="45" data-ng-model="DmasModel.Dmas97AbModel.TransferScore" value="TransferScore1"></p></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97--dmas-97-51" style="border-left: 1px solid"><p class="p-dmas-97-7 ft-dmas-97-19">Bathes with HH or with HH &amp; MH</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97--dmas-97-23"><p class="p-dmas-97-42 ft-dmas-97-19"><input type="radio" name="44" data-ng-model="DmasModel.Dmas97AbModel.BathingScore" value="BathingScore2"></p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97--dmas-97-52"><p class="p-dmas-97-43 ft-dmas-97-19">Transfers w/ HH or w/HH &amp; MH</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97--dmas-97-53" style="border-right: 1px solid"><p class="p-dmas-97-45 ft-dmas-97-19"><input type="radio" name="45" data-ng-model="DmasModel.Dmas97AbModel.TransferScore" value="TransferScore2"></p></td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-9 td-dmas-97--dmas-97-46 border-left"><p class="p-dmas-97-7 ft-dmas-97-19">Is bathed</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-54"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-23"><p class="p-dmas-97-42 ft-dmas-97-19"><input type="radio" name="44" data-ng-model="DmasModel.Dmas97AbModel.BathingScore" value="BathingScore3"></p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-52"><p class="p-dmas-97-43 ft-dmas-97-19">Is transferred or does not transfer</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-53"><p class="p-dmas-97-45 ft-dmas-97-19"><input type="radio" name="45" data-ng-model="DmasModel.Dmas97AbModel.TransferScore" value="TransferScore3"></p></td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-9 td-dmas-97-46"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-47"><p class="p-dmas-97-46 ft20">DRESSING SCORE</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-48"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-49"><p class="p-dmas-97-47 ft20">EATING SCORE</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-53"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-51"><p class="p-dmas-97-7 ft-dmas-97-19">Dress without help or with MH only</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-23"><p class="p-dmas-97-42 ft-dmas-97-19"><input type="radio" name="46" data-ng-model="DmasModel.Dmas97AbModel.DressingScore" value="DressingScore1"></p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-52"><p class="p-dmas-97-43 ft-dmas-97-19">Eats without help or with MH only</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-53"><p class="p-dmas-97-45 ft-dmas-97-19"><input type="radio" name="47" data-ng-model="DmasModel.Dmas97AbModel.EatingScore" value="EatingScore1"></p></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-51"><p class="p-dmas-97-7 ft-dmas-97-19">Dresses with HH or with HH &amp; MH</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-23"><p class="p-dmas-97-42 ft-dmas-97-19"><input type="radio" name="46" data-ng-model="DmasModel.Dmas97AbModel.DressingScore" value="DressingScore2"></p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-52"><p class="p-dmas-97-43 ft-dmas-97-19">Eats with HH or HH &amp; MH</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-53"><p class="p-dmas-97-45 ft-dmas-97-19"><input type="radio" name="47" data-ng-model="DmasModel.Dmas97AbModel.EatingScore" value="EatingScore2"></p></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-51"><p class="p-dmas-97-7 ft-dmas-97-19">Is dressed or does not dress</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-23"><p class="p-dmas-97-42 ft-dmas-97-19"><input type="radio" name="46" data-ng-model="DmasModel.Dmas97AbModel.DressingScore" value="DressingScore3"></p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-52"><p class="p-dmas-97-43 ft-dmas-97-19">Is fed: spoon/tube/etc.</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-53"><p class="p-dmas-97-45 ft-dmas-97-19"><input type="radio" name="47" data-ng-model="DmasModel.Dmas97AbModel.EatingScore" value="EatingScore3"></p></td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-9 td-dmas-97-46"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-47"><p class="p-dmas-97-46 ft20">AMBULATION SCORE</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-48"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-49"><p class="p-dmas-97-48 ft20">CONTINENCY SCORE</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-53"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-51"><p class="p-dmas-97-7 ft-dmas-97-19">Walks/Wheels without help w/MH only</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-23"><p class="p-dmas-97-42 ft-dmas-97-19"><input type="radio" name="48" data-ng-model="DmasModel.Dmas97AbModel.AmbulationScore" value="AmbulationScore1"></p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-52"><p class="p-dmas-97-43 ft-dmas-97-19">Continent/incontinent &lt; wkly self care of internal</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-53"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-51"><p class="p-dmas-97-7 ft-dmas-97-19">Walks/Wheels w/ HH or HH &amp; MH</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-23"><p class="p-dmas-97-42 ft-dmas-97-19"><input type="radio" name="48" data-ng-model="DmasModel.Dmas97AbModel.AmbulationScore" value="AmbulationScore2"></p></td>
+                            <td colspan="2" class="tr-dmas-97-9 td-dmas-97-52"><p class="p-dmas-97-43 ft-dmas-97-19">/external devices</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97-53"><p class="p-dmas-97-45 ft-dmas-97-19"><input type="radio" name="49" data-ng-model="DmasModel.Dmas97AbModel.ContinencyScore" value="ContinencyScore1"></p></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-10 td-dmas-97-55"><p class="p-dmas-97-7 ft16">Totally dependent for mobility</p></td>
+                            <td class="tr-dmas-97-10 td-dmas-97-14"><p class="p-dmas-97-42 ft16"><input type="radio" name="48" data-ng-model="DmasModel.Dmas97AbModel.AmbulationScore" value="AmbulationScore3"></p></td>
+                            <td colspan="2" class="tr-dmas-97-10 td-dmas-97-56"><p class="p-dmas-97-43 ft16">Incontinent weekly or &gt; Not self care</p></td>
+                            <td class="tr-dmas-97-10 td-dmas-97-57"><p class="p-dmas-97-45 ft16"><input type="radio" name="49" data-ng-model="DmasModel.Dmas97AbModel.ContinencyScore" value="ContinencyScore2"></p></td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-1 td-dmas-97-58"><p class="p-dmas-97-7 ft22"><span class="ft-dmas-97-10">L</span>EVEL OF <span class="ft-dmas-97-10">C</span>ARE</p></td>
+                            <td class="tr-dmas-97-11 td-dmas-97-59"><p class="p-dmas-97-49 ft-dmas-97-7"><span class="ft-dmas-97-23"><input type="radio" name="r1" data-ng-model="DmasModel.Dmas97AbModel.LevelOfCare" value="A"> </span><span class="ft-dmas-97-24">A </span>(Score 0 - 6)</p></td>
+                            <td class="tr-dmas-97-11 td-dmas-97-60"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-11 td-dmas-97-61"><p class="p-dmas-97-49 ft-dmas-97-7"><span class="ft-dmas-97-25"><input type="radio" name="r1" data-ng-model="DmasModel.Dmas97AbModel.LevelOfCare" value="B"> </span><span class="ft-dmas-97-24">B </span>(Score 7 - 12)</p></td>
+                            <td colspan="2" class="tr-dmas-97-11 td-dmas-97-62"><p class="p-dmas-97-49 ft-dmas-97-7"><span class="ft-dmas-97-25"><input type="radio" name="r1" data-ng-model="DmasModel.Dmas97AbModel.LevelOfCare" value="C"> </span><span class="ft-dmas-97-24">C </span>(Score 9 + wounds, tube feedings, etc.)</p></td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-9 td-dmas-97-58"><p class="p-dmas-97-7 ft26">(LOC)</p></td>
+                            <td colspan="2" class="tr-dmas-97-0 td-dmas-97-63"><p class="p-dmas-97-49 ft-dmas-97-7">Maximum Hours of 25/Week</p></td>
+                            <td class="tr-dmas-97-0 td-dmas-97-64"><p class="p-dmas-97-49 ft-dmas-97-7">Maximum Hours 30/Week</p></td>
+                            <td class="tr-dmas-97-0 td-dmas-97--dmas-97-49"><p class="p-dmas-97-49 ft-dmas-97-7">Maximum Hours 35/Week</p></td>
+                            <td class="tr-dmas-97-9 td-dmas-97--dmas-97-53 border-right"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-12 td-dmas-97--dmas-97-58 border-bottom border-right border-left"><p class="p-dmas-97-1 ft27">&nbsp;</p></td>
+                            <td class="tr-dmas-97-12 td-dmas-97--dmas-97-58 border-bottom" style="border-bottom:1px solid;"><p class="p-dmas-97-1 ft27">&nbsp;</p></td>
+                            <td class="tr-dmas-97-12 td-dmas-97--dmas-97-58 border-bottom border-right"><p class="p-dmas-97-1 ft27">&nbsp;</p></td>
+                            <td class="tr-dmas-97-12 td-dmas-97--dmas-97-58 border-bottom"><p class="p-dmas-97-1 ft27">&nbsp;</p></td>
+                            <td colspan="2" class="tr-dmas-97-12 td-dmas-97--dmas-97-58 border-bottom border-right border-left"><p class="p-dmas-97-1 ft27">&nbsp;</p></td>
+                    </tbody>
+                </table>
+                <p class="p-dmas-97-50 ft-dmas-97-7">Page <span class="ft-dmas-97-29">1 </span>of <span class="ft-dmas-97-29">2 - </span><nobr>DMAS-97A/B</nobr> - Revised 04/2019</p>
+            </div>
+
+            <div id="page_2">
+                <table cellpadding="0" cellspacing="0" class="t2">
+                    <tbody>
+                        <tr>
+                            <td class="tr-dmas-97-4 td-dmas-97--dmas-97-67"><p class="p-dmas-97-1 ft29">Participant: <input type="text" name="" data-ng-model="DmasModel.DmasReferral.PatientName" class="txtbx1-dmas-97" style="width: 342px; height:17px"></p></td>
+                            <td class="tr-dmas-97-5 td-dmas-97--dmas-97-68"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-4 td-dmas-97--dmas-97-69"><p class="p-dmas-97-51 ft29">Medicaid ID#: 
+                                  <select data-ng-model="DmasModel.Dmas97AbModel.MedicaidID" data-val="true" style="width:175px">
+                                      <option value="" selected>Select</option>
+                                      <option data-ng-repeat="item in DmasModel.DmasPayorList" value="{{item.BeneficiaryNumber}}">{{item.BeneficiaryNumber}}</option>
+                                  </select>
+                                  </p></td>
+                        </tr>
+                        <tr>
+                            <td class="tr-dmas-97-0 td-dmas-97--dmas-97-67"><p class="p-dmas-97-1 ft29">Provider: <input type="text" name="" data-ng-model="DmasModel.OrganizationalModel.SiteName" class="txtbx1-dmas-97" style="width: 360px; height:17px"></p></td>
+                            <td class="tr-dmas-97-0 td-dmas-97--dmas-97-70"><p class="p-dmas-97-1 ft-dmas-97-2">&nbsp;</p></td>
+                            <td class="tr-dmas-97-0 td-dmas-97--dmas-97-69"><p class="p-dmas-97-52 ft29">Provider ID#: <input type="text" name="" data-ng-model="DmasModel.DmasReferral.NPI" class="txtbx1-dmas-97" style="width: 207px; height:17px"></p></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p class="p-dmas-97-53 ft-dmas-97-7">Initial Plan of Care hours must be <nobr>pre-authorized</nobr> &amp; should not exceed the maximum for the specified LOC category.</p>
+                <p class="p-dmas-97-54 ft-dmas-97-7">Documentation must support the amount of hours provided to the participant.</p>
+
+                <table cellpadding="0" cellspacing="0" class="t3">
+                    <tbody>
+                        <tr>
+                            <td colspan="2" class="tr-dmas-97-14 td-dmas-97--dmas-97-71"><p class="p-dmas-97-7 ft-dmas-97-7">Reason Plan of Care Submitted:</p></td>
+                            <td> <p class="p-dmas-97-1 ft-dmas-97-7 padding-left-50"><span class="ft-dmas-97-25"><input type="radio" name="chk" data-ng-model="DmasModel.Dmas97AbModel.ReasonPlan" value="NewA"> </span>New Admission</p></td>
+                            <td colspan="2" class="tr-dmas-97-14 td-dmas-97--dmas-97-73"><p class="p-dmas-97-40 ft-dmas-97-7" style="padding-left:0px;"><span class="ft-dmas-97-25"><input type="radio" name="chk" data-ng-model="DmasModel.Dmas97AbModel.ReasonPlan" value="InHrsUp"> ↑ </span>In Hours</p></td>
+                            <td colspan="3" class="tr-dmas-97-14 td-dmas-97--dmas-97-74"><p class="p-dmas-97-1 ft-dmas-97-7"><span class="ft-dmas-97-25"><input type="radio" name="chk" data-ng-model="DmasModel.Dmas97AbModel.ReasonPlan" value="InHrsDown"> ↓ </span>In Hours</p></td>
+                            <td class="tr-dmas-97-14 td-dmas-97--dmas-97-75"><p class="p-dmas-97-55 ft-dmas-97-7"><span class="ft-dmas-97-25"><input type="radio" name="chk" data-ng-model="DmasModel.Dmas97AbModel.ReasonPlan" value="TotalWeekHrs"> </span>Transfer</p></td>
+                            <td></td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="tr-dmas-97-1 td-dmas-97--dmas-97-76"><p class="p-dmas-97-7 ft-dmas-97-7">Reason for change/additional instructions for the aide: </p></td>
+                            <td colspan="7"><input type="text" class="txtbx1-dmas-97 width-395px" data-ng-model="DmasModel.Dmas97AbModel.ReasonForChange"></td>
+                        </tr>
+                        <tr></tr>
+                        <tr>
+                            <td colspan="3" class="tr-dmas-97-14 td-dmas-97--dmas-97-76"><p class="p-dmas-97-7 ft-dmas-97-7">Required Backup Plan (Person’s name, relation and phone #) for Services: &nbsp;</p></td>
+                            <td colspan="7"><input type="text" class="txtbx1-dmas-97 width-395px" data-ng-model="DmasModel.Dmas97AbModel.ReqBackupPlan"></td>
+                        </tr>
+
+                        <tr>
+                            <td class="tr-dmas-97-16 td-dmas-97--dmas-97-24"><p class="p-dmas-97-7 ft-dmas-97-7">Plan of Care Effective Date: &nbsp;</p></td>
+                            <td colspan="2">
+                                <div class="input-group date"
+                                     datepicker="DmasModel.Dmas97AbModel.PCDate"
+                                     data-ng-dateval="DmasModel.Dmas97AbModel.PCDate"
+                                     data-ng-mindate="CurrentDate">
+                                    <input type="text" id="date2" class="txtbx1-dmas-97 dateInputMask height-17px width-160px" />
+                                </div>
+                            </td>
+                            <td colspan="2" class="tr-dmas-97-16 td-dmas-97--dmas-97-24"><p class="p-dmas-97-7 ft-dmas-97-7 text-align-right">Total Weekly Hours: </p></td>
+                            <td colspan="5" class="tr-dmas-97-16 td-dmas-97--dmas-97-24"><input type="text" name="" data-ng-model="DmasModel.Dmas97AbModel.TotalWeeklyHours" class="txtbx1-dmas-97"></td>
+
+                        </tr>
+
+                        <tr>
+                            <td colspan="10"></td>
+                        </tr>
+
+                        <tr>
+                            <td><p class="p-dmas-97-7 ft-dmas-97-7"><p>Participant / Primary</p>Caregiver Signature:</p></td>
+                            <td colspan="2" name="signature_container" id="signature_container">
+                                <div class="pf-signature-view" data-toggle="modal" data-target="#signatureModal1" style="height:45px;width:170px; border:1px solid">
+                                    <img class="pf-img-init" id="saveSignature" data-ng-src={{DmasModel.Dmas97AbModel.Sign}} style="height:45px;width:170px;border:1px solid" />
+                                </div>
+                            </td>
+                            <td colspan="2"><p class="p-dmas-97-7 ft-dmas-97-7 text-align-right">Date: </p></td>
+                            <td colspan="5">
+                                <div class="input-group date"
+                                     datepicker="DmasModel.Dmas97AbModel.SignDate"
+                                     data-ng-dateval="DmasModel.Dmas97AbModel.SignDate"
+                                     data-ng-mindate="CurrentDate">
+                                    <input type="text" id="date3" class="txtbx1-dmas-97 dateInputMask" />
+                                </div>
+                            </td>
+                        </tr>
+
+                        <tr>
+                            <td colspan="10" class="tr-dmas-97-4 td-dmas-97--dmas-97-71"><p class="p-dmas-97-7 ft-dmas-97-7"></p></td>
+                        </tr>
+
+                        <tr>
+                            <td class="tr-dmas-97-4 td-dmas-97--dmas-97-71"><p class="p-dmas-97-7 ft-dmas-97-7">RN, LPN or SF</p><p class="p-dmas-97-7 ft-dmas-97-7">Signature:</p></td>
+                            <td colspan="2" class="tr7" name="signature_container" id="signature_container">
+                                <p></p>
+                                <div class="pf-signature-view" data-toggle="modal" data-target="#signatureModal2" style="height:45px;width:170px; border:1px solid">
+                                    <img class="pf-img-init" id="saveSignature1" data-ng-src={{DmasModel.Dmas97AbModel.RNSign}} style="height:45px;width:170px; border:1px solid">
+                                </div><p></p>
+                            </td>
+                            <td colspan="2"><p class="p-dmas-97-7 ft-dmas-97-7 text-align-right">Date: </p></td>
+                            <td colspan="5">
+                                <div class="input-group date"
+                                     datepicker="DmasModel.Dmas97AbModel.RNSignDate"
+                                     data-ng-dateval="DmasModel.Dmas97AbModel.RNSignDate"
+                                     data-ng-mindate="CurrentDate">
+                                    <input type="text" id="date4" class="txtbx1-dmas-97 dateInputMask" />
+                                </div>
+                            </td>
+                        </tr>
+
+                    </tbody>
+                </table>
+
+                <p class="p-dmas-97-57 ft-dmas-97-3 dmas-97-s5">Instructions for the <nobr>DMAS-97A/B</nobr></p>
+
+                <div class="margin-left-20">
+                    <p class="p-dmas-97-58 ft-dmas-97-10">Provider Notification to Participant</p>
+                    <p class="p-dmas-97-59 ft-dmas-97-7">This Plan of Care has been revised based on your current needs and available support. If you agree with the changes, no action is required on your part. If you do not agree with the changes, please contact the RN Supervisor who has signed the plan of care to discuss the reason that you disagree with the change.</p>
+                    <p class="p-dmas-97-60 ft-dmas-97-7" datepicker="DmasModel.Dmas97AbModel.Date"
+                       data-ng-dateval="DmasModel.Dmas97AbModel.Date"
+                       data-ng-mindate="CurrentDate">If the provider agency is unwilling or unable to change the information, and you still disagree, you have the right to an appeal by notifying, in writing, The Client Appeals Division, The Department of Medical Assistance Services, 600 East Broad Street, Suite 1300, Richmond, Virginia 23219. The request for an appeal must be filed within thirty (30) days of the time you receive this notification. If you file a request for an appeal before the effective date of this action, <b>
+                        <input type="text" class="txtbx border-all-cover" id="date5" placeholder="mm/dd/yy"></b> (enter effective date), services may continue</p>
+                    <p class="p-dmas-97-58 ft-dmas-97-7">unchanged during the appeal process.</p>
+                    <p class="p-dmas-97-61 ft-dmas-97-10">Category/Tasks</p>
+                    <p class="p-dmas-97-62 ft-dmas-97-7">Place a check mark for each task and put the total time for each category, for each day. Writing the amount of time for each task to the nearest 15 minutes is not necessary, but it greatly assists in the review of authorization requests.</p>
+                    <p class="p-dmas-97-63 ft-dmas-97-10">Level of Care Determination for Maximum Weekly Hours</p>
+                    <p class="p-dmas-97-64 ft-dmas-97-7">Enter a score for each activity of daily living (ADL) based on the participant’s current functioning. Sum each ADL rating &amp; enter the composite score under the appropriate category: A, B, or C. The amount of time allocated under <span class="ft-dmas-97-31">TOTAL DAILY TIME </span>to complete all tasks <span class="ft-dmas-97-32">MUST NOT EXCEED</span> the maximum weekly hours for the specified LOC of A, B, or C. Service Authorization (SA) must be obtained prior to initiating a change outside the authorized LOC category.</p>
+                    <p class="p-dmas-97-65 ft-dmas-97-10">Provider Notification to Participant</p>
+                    <p class="p-dmas-97-66 ft-dmas-97-7">Any time the RN Supervisor or Services Facilitator (SF) changes the plan of care that results in a change in the total number of weekly hours, the RN or SF must complete the entire front section of this form. If the change the agency is making does not require SA approval, the RN Supervisor or SF is required to enter the effective date on the Provider Agency Participant Notification Section which gives the participant their right to appeal. The participant should get a copy of both the front and back of the form.</p>
+                    <p class="p-dmas-97-65 ft-dmas-97-10">SA Contractor Notification to Participant</p>
+                    <p class="p-dmas-97-67 ft-dmas-97-7">If the changes to the Plan of Care require SA approval, the entire front portion of this form and the <nobr>DMAS-98</nobr> must be completed and forwarded to the SA contractor for approval. If supervision is requested, attach the Request for Supervision form <nobr>(DMAS-100).</nobr> Once received by the SA contractor, the SA analyst will review the care plan and indicate whether the request is pended, approved, or denied. The participant will receive by mail the decision letter from the SA Contractor.</p>
+                    <p class="p-dmas-97-68 ft-dmas-97-10">Participant / Caregiver Signature</p>
+                    <p class="p-dmas-97-69 ft-dmas-97-7">The participant’s signature is necessary on the original plan of care and decreases to the hours of care. It is not needed if the hours increase in a new plan of care. The provider may substitute the signature with documentation in the participant’s record that shows acceptance of the plan of care.</p>
+                    <p class="p-dmas-97-70 ft-dmas-97-7">Page <span class="ft-dmas-97-29">2 </span>of <span class="ft-dmas-97-29">2 - </span><nobr>DMAS-97A/B</nobr> - <span id="datetime"></span></p>
+                    <p></p>
+                </div>
+
+            </div>
+
+            <div class="margin-top-20 margin-left-33per">
+                <button type="submit" data-ng-click="SaveDmas97()" class="btn btn-sm green-jungle">Save</button>
+                <button class="btn btn-sm red" data-ng-click="Cancel()" type="reset">Cancel</button>
+            </div>
+
+            <div id="signatureModal1" class="modal margin-top-19" role="dialog" style="display: none;padding-top:50px">
+                <div class="p-dmas-97-f-signature-alignment-helper">
+                    <div class="modal-dialog pf-signature-center-align" role="document">
+                        <div class="modal-content pf-modal-canvass-wrapper">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Signature</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="canvas">
+                                    <canvas class="roundCorners" id="newSignature" style="position: relative; margin: 0; padding: 0; border: 1px solid #c4caac;z-index:9999"></canvas>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="pull-left">
+                                    <button type="button" class="btn btn-info" onclick="signatureClear()">Clear</button>
+                                </div>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="signatureSave()">Save</button>
+                                <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                                <script>signatureCapture();</script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="signatureModal2" class="modal" role="dialog" style="display: none;padding-top:50px">
+                <div class="p-dmas-97-f-signature-alignment-helper">
+                    <div class="modal-dialog pf-signature-center-align" role="document">
+                        <div class="modal-content pf-modal-canvass-wrapper">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Signature</h5>
+                                <button type="button" class="close" data-dismiss="modal">
+                                    <span aria-hidden="true">×</span>
+                                </button>
+                            </div>
+                            <div class="modal-body">
+                                <div id="canvas">
+                                    <canvas class="roundCorners" id="newSignature1" style="position: relative; margin: 0; padding: 0; border: 1px solid #c4caac;z-index:9999"></canvas>
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <div class="pull-left">
+                                    <button type="button" class="btn btn-info" onclick="signatureClear1()">Clear</button>
+                                </div>
+                                <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="signatureSave1()">Save</button>
+                                <button type="button" class="btn btn-info" data-dismiss="modal">Close</button>
+                                <script>signatureCapture1();</script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </form>
+
+        <div ng-init="callBack()"></div>
+
+        <script>
+            $('.ADLMon').change(function () {
+                var scope = angular.element("#BathMon").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var BathMon = model.BathMon || 0;
+                var DresMon = model.DresMon || 0;
+                var ToilMon = model.ToilMon || 0;
+                var TranMon = model.TranMon || 0;
+                var AssiEatMon = model.AssiEatMon || 0;
+                var AssiAmbMon = model.AssiAmbMon || 0;
+                var TurnMon = model.TurnMon || 0;
+                var GrooMon = model.GrooMon || 0;
+                var ADLTimeMon = (+BathMon + +DresMon + +ToilMon + +TranMon + +AssiEatMon + +AssiAmbMon + +TurnMon + +GrooMon);
+                model.ADLTimeMon = ADLTimeMon;
+            });
+            $('.ADLTue').change(function () {
+                var scope = angular.element("#BathTue").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var BathTue = model.BathTue || 0;
+                var DresTue = model.DresTue || 0;
+                var ToilTue = model.ToilTue || 0;
+                var TranTue = model.TranTue || 0;
+                var AssiEatTue = model.AssiEatTue || 0;
+                var AssiAmbTue = model.AssiAmbTue || 0;
+                var TurnTue = model.TurnTue || 0;
+                var GrooTue = model.GrooTue || 0;
+                var ADLTimeTue = (+BathTue + +DresTue + +ToilTue + +TranTue + +AssiEatTue + +AssiAmbTue + +TurnTue + +GrooTue);
+                model.ADLTimeTue = ADLTimeTue;
+            });
+            $('.ADLWed').change(function () {
+                var scope = angular.element("#BathWed").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var BathWed = model.BathWed || 0;
+                var DresWed = model.DresWed || 0;
+                var ToilWed = model.ToilWed || 0;
+                var TranWed = model.TranWed || 0;
+                var AssiEatWed = model.AssiEatWed || 0;
+                var AssiAmbWed = model.AssiAmbWed || 0;
+                var TurnWed = model.TurnWed || 0;
+                var GrooWed = model.GrooWed || 0;
+                var ADLTimeWed = (+BathWed + +DresWed + +ToilWed + +TranWed + +AssiEatWed + +AssiAmbWed + +TurnWed + +GrooWed);
+                model.ADLTimeWed = ADLTimeWed;
+            });
+            $('.ADLThu').change(function () {
+
+                var scope = angular.element("#BathThu").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var BathThu = model.BathThu || 0;
+                var DresThu = model.DresThu || 0;
+                var ToilThu = model.ToilThu || 0;
+                var TranThu = model.TranThu || 0;
+                var AssiEatThu = model.AssiEatThu || 0;
+                var AssiAmbThu = model.AssiAmbThu || 0;
+                var TurnThu = model.TurnThu || 0;
+                var GrooThu = model.GrooThu || 0;
+                var ADLTimeThu = (+BathThu + +DresThu + +ToilThu + +TranThu + +AssiEatThu + +AssiAmbThu + +TurnThu + +GrooThu);
+                model.ADLTimeThu = ADLTimeThu;
+
+            });
+            $('.ADLFri').change(function () {
+                var scope = angular.element("#BathFri").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var BathFri = model.BathFri || 0;
+                var DresFri = model.DresFri || 0;
+                var ToilFri = model.ToilFri || 0;
+                var TranFri = model.TranFri || 0;
+                var AssiEatFri = model.AssiEatFri || 0;
+                var AssiAmbFri = model.AssiAmbFri || 0;
+                var TurnFri = model.TurnFri || 0;
+                var GrooFri = model.GrooFri || 0;
+                var ADLTimeFri = (+BathFri + +DresFri + +ToilFri + +TranFri + +AssiEatFri + +AssiAmbFri + +TurnFri + +GrooFri);
+                model.ADLTimeFri = ADLTimeFri;
+            });
+            $('.ADLSat').change(function () {
+                var scope = angular.element("#BathSat").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var BathSat = model.BathSat || 0;
+                var DresSat = model.DresSat || 0;
+                var ToilSat = model.ToilSat || 0;
+                var TranSat = model.TranSat || 0;
+                var AssiEatSat = model.AssiEatSat || 0;
+                var AssiAmbSat = model.AssiAmbSat || 0;
+                var TurnSat = model.TurnSat || 0;
+                var GrooSat = model.GrooSat || 0;
+                var ADLTimeSat = (+BathSat + +DresSat + +ToilSat + +TranSat + +AssiEatSat + +AssiAmbSat + +TurnSat + +GrooSat);
+                model.ADLTimeSat = ADLTimeSat;
+            });
+            $('.ADLSun').change(function () {
+                var scope = angular.element("#BathSun").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var BathSun = model.BathSun || 0;
+                var DresSun = model.DresSun || 0;
+                var ToilSun = model.ToilSun || 0;
+                var TranSun = model.TranSun || 0;
+                var AssiEatSun = model.AssiEatSun || 0;
+                var AssiAmbSun = model.AssiAmbSun || 0;
+                var TurnSun = model.TurnSun || 0;
+                var GrooSun = model.GrooSun || 0;
+                var ADLTimeSun = (+BathSun + +DresSun + +ToilSun + +TranSun + +AssiEatSun + +AssiAmbSun + +TurnSun + +GrooSun);
+                model.ADLTimeSun = ADLTimeSun;
+            });
+
+            $('.Special').change(function () {
+                var scope = angular.element("#VitaMon").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var VitaMon = model.VitaMon || 0;
+                var SupeMon = model.SupeMon || 0;
+                var RangMon = model.RangMon || 0;
+                var WounMon = model.WounMon || 0;
+                var BoweMon = model.BoweMon || 0;
+                var MDorMon = model.MDorMon || 0;
+                var TmtiMon = (+VitaMon + +SupeMon + +RangMon + +WounMon + +BoweMon + +MDorMon);
+                model.TmtiMon = TmtiMon;
+            });
+            $('.Special').change(function () {
+                var scope = angular.element("#VitaTue").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var VitaTue = model.VitaTue || 0;
+                var SupeTue = model.SupeTue || 0;
+                var RangTue = model.RangTue || 0;
+                var WounTue = model.WounTue || 0;
+                var BoweTue = model.BoweTue || 0;
+                var MDorTue = model.MDorTue || 0;
+                var TmtiTue = (+VitaTue + +SupeTue + +RangTue + +WounTue + +BoweTue + +MDorTue);
+                model.TmtiTue = TmtiTue;
+            });
+            $('.Special').change(function () {
+                var scope = angular.element("#VitaWed").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var VitaWed = model.VitaWed || 0;
+                var SupeWed = model.SupeWed || 0;
+                var RangWed = model.RangWed || 0;
+                var WounWed = model.WounWed || 0;
+                var BoweWed = model.BoweWed || 0;
+                var MDorWed = model.MDorWed || 0;
+                var TmtiWed = (+VitaWed + +SupeWed + +RangWed + +WounWed + +BoweWed + +MDorWed);
+                model.TmtiWed = TmtiWed;
+            });
+            $('.Special').change(function () {
+                var scope = angular.element("#VitaThu").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var VitaThu = model.VitaThu || 0;
+                var SupeThu = model.SupeThu || 0;
+                var RangThu = model.RangThu || 0;
+                var WounThu = model.WounThu || 0;
+                var BoweThu = model.BoweThu || 0;
+                var MDorThu = model.MDorThu || 0;
+                var TmtiThu = (+VitaThu + +SupeThu + +RangThu + +WounThu + +BoweThu + +MDorThu);
+                model.TmtiThu = TmtiThu;
+            });
+            $('.Special').change(function () {
+                var scope = angular.element("#VitaFri").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var VitaFri = model.VitaFri || 0;
+                var SupeFri = model.SupeFri || 0;
+                var RangFri = model.RangFri || 0;
+                var WounFri = model.WounFri || 0;
+                var BoweFri = model.BoweFri || 0;
+                var MDorFri = model.MDorFri || 0;
+                var TmtiFri = (+VitaFri + +SupeFri + +RangFri + +WounFri + +BoweFri + +MDorFri);
+                model.TmtiFri = TmtiFri;
+            });
+            $('.Special').change(function () {
+                var scope = angular.element("#VitaSat").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var VitaSat = model.VitaSat || 0;
+                var SupeSat = model.SupeSat || 0;
+                var RangSat = model.RangSat || 0;
+                var WounSat = model.WounSat || 0;
+                var BoweSat = model.BoweSat || 0;
+                var MDorSat = model.MDorSat || 0;
+                var TmtiSat = (+VitaSat + +SupeSat + +RangSat + +WounSat + +BoweSat + +MDorSat);
+                model.TmtiSat = TmtiSat;
+            });
+            $('.Special').change(function () {
+                var scope = angular.element("#VitaSun").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var VitaSun = model.VitaSun || 0;
+                var SupeSun = model.SupeSun || 0;
+                var RangSun = model.RangSun || 0;
+                var WounSun = model.WounSun || 0;
+                var BoweSun = model.BoweSun || 0;
+                var MDorSun = model.MDorSun || 0;
+                var TmtiSun = (+VitaSun + +SupeSun + +RangSun + +WounSun + +BoweSun + +MDorSun);
+                model.TmtiSun = TmtiSun;
+            });
+
+            $('.IADLS').change(function () {
+                var scope = angular.element("#MealMon").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var MealMon = model.MealMon || 0;
+                var CleaMon = model.CleaMon || 0;
+                var MakeMon = model.MakeMon || 0;
+                var CaupMon = model.CaupMon || 0;
+                var ShopMon = model.ShopMon || 0;
+                var LaunMon = model.LaunMon || 0;
+                var MoneyMon = model.MoneyMon || 0;
+                var MedicMon = model.MedicMon || 0;
+                var IadlTimeMon = (+MealMon + +CleaMon + +MakeMon + +CaupMon + +ShopMon + +LaunMon + +MoneyMon + + MedicMon);
+                model.IadlTimeMon = IadlTimeMon;
+            });
+            $('.IADLS').change(function () {
+
+                var scope = angular.element("#MealTue").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var MealTue = model.MealTue || 0;
+                var CleaTue = model.CleaTue || 0;
+                var MakeTue = model.MakeTue || 0;
+                var CaupTue = model.CaupTue || 0;
+                var ShopTue = model.ShopTue || 0;
+                var LaunTue = model.LaunTue || 0;
+                var MoneyTue = model.MoneyTue || 0;
+                var MedicTue = model.MedicTue || 0;
+                var IadlTimeTue = (+MealTue + +CleaTue + +MakeTue + +CaupTue + +ShopTue + +LaunTue + +MoneyTue + + MedicTue);
+                model.IadlTimeTue = IadlTimeTue;
+            });
+            $('.IADLS').change(function () {
+
+                var scope = angular.element("#MealWed").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var MealWed = model.MealWed || 0;
+                var CleaWed = model.CleaWed || 0;
+                var MakeWed = model.MakeWed || 0;
+                var CaupWed = model.CaupWed || 0;
+                var ShopWed = model.ShopWed || 0;
+                var LaunWed = model.LaunWed || 0;
+                var MoneyWed = model.MoneyWed || 0;
+                var MedicWed = model.MedicWed || 0;
+                var IadlTimeWed = (+MealWed + +CleaWed + +MakeWed + +CaupWed + +ShopWed + +LaunWed + +MoneyWed + + MedicWed);
+                model.IadlTimeWed = IadlTimeWed;
+            });
+            $('.IADLS').change(function () {
+
+                var scope = angular.element("#MealThu").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var MealThu = model.MealThu || 0;
+                var CleaThu = model.CleaThu || 0;
+                var MakeThu = model.MakeThu || 0;
+                var CaupThu = model.CaupThu || 0;
+                var ShopThu = model.ShopThu || 0;
+                var LaunThu = model.LaunThu || 0;
+                var MoneyThu = model.MoneyThu || 0;
+                var MedicThu = model.MedicThu || 0;
+                var IadlTimeThu = (+MealThu + +CleaThu + +MakeThu + +CaupThu + +ShopThu + +LaunThu + +MoneyThu + + MedicThu);
+                model.IadlTimeThu = IadlTimeThu;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#MealFri").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var MealFri = model.MealFri || 0;
+                var CleaFri = model.CleaFri || 0;
+                var MakeFri = model.MakeFri || 0;
+                var CaupFri = model.CaupFri || 0;
+                var ShopFri = model.ShopFri || 0;
+                var LaunFri = model.LaunFri || 0;
+                var MoneyFri = model.MoneyFri || 0;
+                var MedicFri = model.MedicFri || 0;
+                var IadlTimeFri = (+MealFri + +CleaFri + +MakeFri + +CaupFri + +ShopFri + +LaunFri + +MoneyFri + + MedicFri);
+                model.IadlTimeFri = IadlTimeFri;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#MealSat").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var MealSat = model.MealSat || 0;
+                var CleaSat = model.CleaSat || 0;
+                var MakeSat = model.MakeSat || 0;
+                var CaupSat = model.CaupSat || 0;
+                var ShopSat = model.ShopSat || 0;
+                var LaunSat = model.LaunSat || 0;
+                var MoneySat = model.MoneySat || 0;
+                var MedicSat = model.MedicSat || 0;
+                var IadlTimeSat = (+MealSat + +CleaSat + +MakeSat + +CaupSat + +ShopSat + +LaunSat + +MoneySat + + MedicSat);
+                model.IadlTimeSat = IadlTimeSat;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#MealSun").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var MealSun = model.MealSun || 0;
+                var CleaSun = model.CleaSun || 0;
+                var MakeSun = model.MakeSun || 0;
+                var CaupSun = model.CaupSun || 0;
+                var ShopSun = model.ShopSun || 0;
+                var LaunSun = model.LaunSun || 0;
+                var MoneySun = model.MoneySun || 0;
+                var MedicSun = model.MedicSun || 0;
+                var IadlTimeSun = (+MealSun + +CleaSun + +MakeSun + +CaupSun + +ShopSun + +LaunSun + +MoneySun + + MedicSun);
+                model.IadlTimeSun = IadlTimeSun;
+            });
+
+            $('.IADLS').change(function () {
+                var scope = angular.element("#ADLTimeMon").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var ADLTimeMon = model.ADLTimeMon || 0;
+                var TmtiMon = model.TmtiMon || 0;
+                var IadlTimeMon = model.IadlTimeMon || 0;
+                var DailyTimeMon = (+ADLTimeMon + +TmtiMon + +IadlTimeMon);
+                model.DailyTimeMon = DailyTimeMon;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#ADLTimeTue").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var ADLTimeTue = model.ADLTimeTue || 0;
+                var TmtiTue = model.TmtiTue || 0;
+                var IadlTimeTue = model.IadlTimeTue || 0;
+                var DailyTimeTue = (+ADLTimeTue + +TmtiTue + +IadlTimeTue);
+                model.DailyTimeTue = DailyTimeTue;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#ADLTimeWed").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var ADLTimeWed = model.ADLTimeWed || 0;
+                var TmtiWed = model.TmtiWed || 0;
+                var IadlTimeWed = model.IadlTimeWed || 0;
+                var DailyTimeWed = (+ADLTimeWed + +TmtiWed + +IadlTimeWed);
+                model.DailyTimeWed = DailyTimeWed;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#ADLTimeThu").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var ADLTimeThu = model.ADLTimeThu || 0;
+                var TmtiThu = model.TmtiThu || 0;
+                var IadlTimeThu = model.IadlTimeThu || 0;
+                var DailyTimeThu = (+ADLTimeThu + +TmtiThu + +IadlTimeThu);
+                model.DailyTimeThu = DailyTimeThu;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#ADLTimeFri").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var ADLTimeFri = model.ADLTimeFri || 0;
+                var TmtiFri = model.TmtiFri || 0;
+                var IadlTimeFri = model.IadlTimeFri || 0;
+                var DailyTimeFri = (+ADLTimeFri + +TmtiFri + +IadlTimeFri);
+                model.DailyTimeFri = DailyTimeFri;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#ADLTimeSat").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var ADLTimeSat = model.ADLTimeSat || 0;
+                var TmtiSat = model.TmtiSat || 0;
+                var IadlTimeSat = model.IadlTimeSat || 0;
+                var DailyTimeSat = (+ADLTimeSat + +TmtiSat + +IadlTimeSat);
+                model.DailyTimeSat = DailyTimeSat;
+            });
+            $('.IADLS').change(function () {
+                var scope = angular.element("#ADLTimeSun").scope();
+                var model = scope.DmasModel.Dmas97AbModel;
+                var ADLTimeSun = model.ADLTimeSun || 0;
+                var TmtiSun = model.TmtiSun || 0;
+                var IadlTimeSun = model.IadlTimeSun || 0;
+                var DailyTimeSun = (+ADLTimeSun + +TmtiSun + +IadlTimeSun);
+                model.DailyTimeSun = DailyTimeSun;
+            });
+
+        </script>
+    </div>
+
+    <!----------------------DMAS 97 ADD-------------------------------------->
+
+
+    
+</div>
+
+
+
+
+
+
+

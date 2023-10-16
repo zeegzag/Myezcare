@@ -1,0 +1,1191 @@
+﻿@using Zarephath.Core.Models
+@model HC_AddReferralModel
+<link href="~/Assets/css/sitecss/bootstrap-editable.css" rel="stylesheet" />
+
+@Html.Hidden("hdnSetReferralTaskMappingModel", Common.SerializeObject(Model))
+
+<style>
+    .holder {
+        width: auto;
+        display: inline-block;
+    }
+
+    .holder img {
+        width: 30%; /* Will shrink image to 30% of its original width */
+        height: auto;
+    }
+
+    .alert {
+        padding: 7px;
+        background-color: #f44336;
+        color: white;
+        opacity: 1;
+        transition: opacity 0.6s;
+        margin-bottom: 15px;
+    }
+
+        .alert.success {
+            background-color: #04AA6D;
+        }
+
+        .alert.info {
+            background-color: #2196F3;
+        }
+
+        .alert.warning {
+            background-color: #ff9800;
+        }
+
+    .closebtn {
+        margin-left: 15px;
+        color: white;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .closebtn:hover {
+            color: black;
+        }
+
+    .toggle {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 62px;
+        height: 32px;
+        display: inline-block;
+        position: relative;
+        border-radius: 50px;
+        overflow: hidden;
+        outline: none;
+        border: none;
+        cursor: pointer;
+        background-color: #26C281;
+        transition: background-color ease 0.3s;
+        border: none !important;
+    }
+
+        .toggle:before {
+            content: "Old New";
+            display: block;
+            position: absolute;
+            z-index: 2;
+            width: 28px;
+            height: 28px;
+            background: #fff;
+            left: 2px;
+            top: 2px;
+            border-radius: 50%;
+            font: 8px/28px Helvetica;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-indent: -22px;
+            word-spacing: 37px;
+            color: #fff;
+            text-shadow: -1px -1px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            transition: all cubic-bezier(0.3, 1.5, 0.7, 1) 0.3s;
+            border: none !important;
+        }
+
+        .toggle:checked {
+            background-color: #707070;
+            border: none !important;
+        }
+
+            .toggle:checked:before {
+                left: 32px;
+                border: none !important;
+            }
+    .list-tbl {
+        margin-left: 15px;
+        width: 97%;
+        border-collapse: collapse;
+        border: 1px #ccc solid;
+        overflow: scroll;
+    }
+
+    .list-tbl th {
+        background-color: navy;
+        color: white;
+        height: 30px;
+    }
+
+    td {
+        border: 1px #ccc solid;
+    }
+
+    .list-tbl td {
+        border: 1px #fff solid;
+    }
+
+    .list-tbl th {
+        border: 1px #fff solid;
+        text-align: center
+    }
+    table#demotable {
+        margin-left: 15px;
+        /*width: 97%;*/
+        border-collapse: collapse;
+        border: 1px #ccc solid;
+        overflow: scroll;
+    }
+
+    #demotable th {
+        background-color: navy;
+        color: white;
+        height: 30px;
+    }
+
+    td {
+        border: 1px #ccc solid;
+    }
+
+    table#demotable td {
+        border: 1px #fff solid;
+        text-align: center
+    }
+
+    table#demotable th {
+        border: 1px #fff solid;
+        text-align: center
+    }
+    .list-tbl td {
+        padding: 16px;
+        text-align: justify-all;
+    }
+</style>
+
+<div class="row">
+
+    <div class="col-md-12 col-sm-12">
+        <div class="col-md-3 no-padding margin-bottom-10">
+            @*@Html.DropDownList("VisitTaskType", Common.VisitTaskType().ToSelectList("", "Name", "Value", @Resource.All, ""),
+                new
+                {   data_ng_model = "SearchVisitTask.VisitTaskType",
+                    data_ng_init = "SearchVisitTask.VisitTaskType=SearchVisitTask.VisitTaskType==''?'':SearchVisitTask.VisitTaskType",
+                    @class = "form-control input-xs",
+                    data_ng_change= "SearchVisitTasks()"
+                })*@
+
+            <table width="97%">
+                <tr>
+                    <td style="border:none !important; padding-right:10px">
+                        <select style="width: 120px; font-size: 12px;" class="form-control" data-ng-model="SearchVisitTask.VisitTaskType"
+                                data-ng-init="SearchVisitTask.VisitTaskType=SearchVisitTask.VisitTaskType==null?'Task':SearchVisitTask.VisitTaskType"
+                                data-ng-change="VisitTypeChange()">
+
+                            <option value="@Resource.Task">@Resource.Task</option>
+                            <option value="@Resource.Conclusion">@Resource.Conclusion</option>
+                        </select>
+                    </td>
+                    <td style="border: none !important; padding-right: 10px">
+                        <select @*data-ng-show="!toggle"*@ style="width: 120px; font-size:12px;" class="form-control" title="CareType" ng-model="SearchVisitTask.CareTypeID" data-ng-init="SearchVisitTask.CareTypeID=SearchVisitTask.CareTypeID==null?'':SearchVisitTask.CareTypeID" ng-options="option.CareTypeID as option.CareType for option in CaretypeList" data-ng-change="CareTypeChange()">
+                            <option value="">CareType</option>
+                        </select>
+                    </td>
+                    <td style="border: none !important; padding-right: 10px">
+                        <div class="btn-group padding-left-15 pull-right">
+                            <a ng-click="OpenShowGoalModal();" class="btn btn-sm green-jungle letter-space pull-right">
+                                <i class="fa fa-plus">&nbsp;&nbsp;</i>Goal
+                            </a>
+                        </div>
+                    </td>
+                    <td style="border: none !important; padding-right: 10px;">
+
+                        <div class="btn-group padding-left-15 pull-right" style="margin-top:10px">
+                            <a ng-click="GetTaskMapReport('PrintPDFRefTaskMapping')" class="btn btn-sm green-jungle letter-space pull-right">
+                                <i class="fa fa-file-pdf-o">&nbsp;&nbsp;</i>Print care plan
+                            </a>
+
+                            <div class="col-md-2 no-padding margin-bottom-10">
+
+                                <div data-ng-show="IsvisibleReport" @*data-ng-repeat="reportItem in ReportData"*@ id="PrintPDFRefTaskMapping">
+
+                                    <table style="width:100%; font-family: Arial, Helvetica, sans-serif; font-size:12px">
+                                        <tr>
+                                            <td style="border-bottom: solid 2px #000">
+                                                <div class="holder">
+                                                    <img ng-src="{{ReportData[0]}}" />
+                                                </div>
+                                            </td>
+                                            <td style="border-bottom: solid 2px #000">
+                                                <span>{{ReportData[1]}}</span> @*Orgaddress*@
+                                            </td>
+                                            <td style="border-bottom: solid 2px #000; text-align:right">
+
+                                                <div style="font-size:15px"><b>Plan of Care Report</b></div>
+                                                <div>Print Date : <span id="current_date"></span></div>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <div><b style="font-size: 15px">{{ReportData[2]}}</b></div>
+                                                <div style="font-size: 14px">{{ReportData[4]}}</div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #808080; padding: 7px; text-align:center" colspan="3">
+                                                <span style="color:#fff; padding:7px;"><b>ABOUT</b></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3" style="padding:8px">
+                                                {{ReportData[3]}}
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #808080; padding: 7px; text-align:center" colspan="3">
+                                                <span style="color: #fff; padding: 7px; padding:7px"><b>MEDICATIONS</b></span>
+                                            </td>
+                                        </tr>
+
+                                        <tr>
+                                            <td colspan="3" style="background-color:#F8F8FF">
+                                                <table style="width:100%; font-family
+    :Arial, Helvetica, sans-serif; font-size:12px">
+                                                    <tr>
+                                                        <td>MEDICATION</td>
+                                                        <td>DOSAGE</td>
+                                                        <td>AMOUNT</td>
+                                                        <td>ROUTE</td>
+                                                        <td>FREQ.</td>
+                                                        <td>TIME</td>
+                                                        <td>GIVEN FOR</td>
+                                                        <td>PRECAUTIONS</td>
+                                                        <td>INSTRUCTIONS</td>
+                                                    </tr>
+
+                                                    <tr data-ng-repeat="meditem in MedicationData">
+                                                        <td style="border:solid 1px #fff">{{meditem.MedicationName}}</td>
+                                                        <td style="border:solid 1px #fff">{{meditem.Dose}}</td>
+                                                        <td style="border:solid 1px #fff">{{meditem.Amount}}</td>
+                                                        <td style="border:solid 1px #fff">{{meditem.Route}}</td>
+                                                        <td style="border:solid 1px #fff">{{meditem.Frequency}}</td>
+                                                        <td style="border:solid 1px #fff">{{meditem.Time}}</td>
+                                                        <td style="border:solid 1px #fff">{{meditem.GivenFor}}</td>
+                                                        <td style="border:solid 1px #fff">{{meditem.Precautions}}</td>
+                                                        <td style="border:solid 1px #fff">{{meditem.PatientInstructions}}</td>
+                                                    </tr>
+
+                                                </table>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #808080; padding: 7px; text-align:center" colspan="3">
+                                                <span style="color: #fff; padding: 7px;"><b>SERVICE PLAN</b></span>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+
+                                                <div data-ng-repeat="spitem in uniqueMainTaskDetail">
+                                                    <br />
+                                                    <b> {{spitem.VisitTaskCategoryName}}</b>
+                                                    <div style="visibility:hidden; height:1px !important"> {{GetSPTaskDetail(spitem.VisitTaskCategoryID)}}</div>
+
+                                                    <span data-ng-if="SubTaskDetail.length>0" data-ng-repeat="spsubitem in SubTaskDetail">
+                                                        {{spsubitem.VisitTaskDetail+','}}
+                                                    </span>
+
+                                                </div>
+
+                                            </td>
+
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #808080; padding: 7px; text-align: center" colspan="3">
+                                                <span style="color: #fff; padding: 7px;"><b></b>SCHEDULE INFORMATION</b></span>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <table style="background-color:#F8F8FF; width:100%; font-family
+    :Arial, Helvetica, sans-serif; font-size:12px">
+                                                    <tr>
+                                                        <td>SUN</td>
+                                                        <td>MON</td>
+                                                        <td>TUE</td>
+                                                        <td>WED</td>
+                                                        <td>THU</td>
+                                                        <td>FRI</td>
+                                                        <td>SAT</td>
+                                                    </tr>
+                                                </table>
+                                                <table style="width:100%; font-family
+    :Arial, Helvetica, sans-serif; font-size:12px">
+                                                    <tr>
+                                                        <td>Frequency:</td>
+                                                        <td style="text-align:right">Duration: See Schedule Snapshot</td>
+
+                                                    </tr>
+                                                    <tr>
+                                                        <td>Times: See Schedule Snapshot</td>
+                                                        <td style="text-align:right">Total Hours Per Week:</td>
+                                                    </tr>
+                                                </table>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #808080; padding: 7px; text-align:center" colspan="3">
+                                                <span style="color: #fff; padding: 7px;"><b>TASK CODES</b></span>
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <div>
+                                                    <b><u> {{TaskCodes1Detail[0].Day}}</u></b><br />
+                                                    <span data-ng-repeat="taskcodeitem in TaskCodes1Detail">
+                                                        <span>{{taskcodeitem.VisitTaskDetail+','}}</span>
+                                                    </span>
+
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <div>
+                                                    <b><u> {{TaskCodes2Detail[0].Day}}</u></b><br />
+                                                    <span data-ng-repeat="taskcodeitem in TaskCodes2Detail">
+                                                        <span>{{taskcodeitem.VisitTaskDetail+','}}</span>
+                                                    </span>
+
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <div>
+                                                    <b><u> {{TaskCodes3Detail[0].Day}}</u></b><br />
+                                                    <span data-ng-repeat="taskcodeitem in TaskCodes3Detail">
+                                                        <span>{{taskcodeitem.VisitTaskDetail+','}}</span>
+                                                    </span>
+
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <div>
+                                                    <b><u> {{TaskCodes4Detail[0].Day}}</u></b><br />
+                                                    <span data-ng-repeat="taskcodeitem in TaskCodes4Detail">
+                                                        <span>{{taskcodeitem.VisitTaskDetail+','}}</span>
+                                                    </span>
+
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <div>
+                                                    <b><u> {{TaskCodes5Detail[0].Day}}</u></b><br />
+                                                    <span data-ng-repeat="taskcodeitem in TaskCodes5Detail">
+                                                        <span>{{taskcodeitem.VisitTaskDetail+','}}</span>
+                                                    </span>
+
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <div>
+                                                    <b><u> {{TaskCodes6Detail[0].Day}}</u></b><br />
+                                                    <span data-ng-repeat="taskcodeitem in TaskCodes6Detail">
+                                                        <span>{{taskcodeitem.VisitTaskDetail+','}}</span>
+                                                    </span>
+
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="3">
+                                                <div>
+                                                    <b><u> {{TaskCodes7Detail[0].Day}}</u></b><br />
+                                                    <span data-ng-repeat="taskcodeitem in TaskCodes7Detail">
+                                                        <span>{{taskcodeitem.VisitTaskDetail+','}}</span>
+                                                    </span>
+
+                                                </div>
+
+
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td style="background-color: #808080; padding: 7px; text-align: center" colspan="3">
+                                                <span style="color: #fff; padding: 7px;"><b>GOALS</b></span>
+
+                                            </td>
+
+
+                                        </tr>
+                                        <tr >
+                                            <td colspan="3">
+                                                <p data-ng-repeat="goal in ReportData[5]">
+                                                    {{goal.Goal}}
+                                                </p>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+
+                            </div>
+                        </div>
+                    </td>
+
+                    <td style="border:none !important; width:90%;"></td>
+                    @*<td style="border:none !important; ">
+                        <input class="toggle" style="border:none !important" type="checkbox" ng-click="ToggleView($event)" />
+                    </td>*@
+                </tr>
+            </table>
+        </div>
+        <div class="col-md-1"></div>
+
+    </div>
+    <div class="newview" data-ng-if="parentList.length > 0" data-ng-repeat="currentparentList in parentList">
+        <br /><br />
+              <h4 class="caption margin-bottom-0 margin-top-5" data-ng-if="currentparentList.parentList.length > 0">
+                  <button type="button" class="btn btn-link collapsed" data-toggle="collapse" data-ng-attr-data-target="{{'#ParentList' + currentparentList.parentList[0].CareTypeID}}">
+                    <i style="font-size:11px;" class="fa fa-plus"></i> 
+                  </button>
+                  <span>{{currentparentList.CareType}}</span>
+              </h4>
+        <div class="row" data-ng-if="currentparentList.parentList.length > 0">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive collapse" style="overflow-x :initial !important" id="{{'ParentList' + currentparentList.parentList[0].CareTypeID}}">
+
+                        <table id="demotable">
+                            <thead>
+
+                                <tr data-ng-if="currentparentList.parentList.length>0" style="width:100%; padding-left: 15px; right: 15px; font-size:11px;">
+                                    <th style="width: 5%;">Def.</th>
+                                    <th style="width: 200px;">Activities / Days</th>
+                                    <th style="width: 10.5%;">Freq. DD</th>
+                                    <th style="width: 6.5%;">All</th>
+                                    <th style="width: 6.5%;">Mon</th>
+                                    <th style="width: 6.5%;">Tue</th>
+                                    <th style="width: 6.5%;">Wed</th>
+                                    <th style="width: 6.5%;">Thu</th>
+                                    <th style="width: 6.5%;">Fri</th>
+                                    <th style="width: 6.5%;">Sat</th>
+                                    <th style="width: 6.5%;">Sun</th>
+                                    <th style="width: 75px;">Comment</th>
+                                </tr>
+                            </thead>
+                            <tbody @*data-ng-if="parentList.length > 0"*@ @*dir-paginate="cat in parentList | itemsPerPage: VisitTaskListPager.pageSize " total-items="VisitTaskListPager.totalRecords" current-page="VisitTaskListPager.currentPage" pagination-id="VisitTaskListPagerID"*@>
+                                <tr data-ng-if="currentparentList.parentList.length==0">
+                                    <td style="padding-top:20px; border-color:#fff !important">No records found!</td>
+                                </tr>
+
+                                <tr id="p" data-ng-if="currentparentList.parentList.length > 0" data-ng-repeat="cat in currentparentList.parentList">
+                                    @*<span data-ng-if="cat.VisitTaskType=='Task'">*@ {{cat.VisitTaskCategoryName}}{{cat.ParentCategoryLevel}}@*</span>*@
+                                    <td style="width: 15px; height: 30px; text-align: left; border-left: 1px #ccc solid; border-right: 1px #ccc solid; border-bottom: 1px #ccc solid " data-ng-if="cat.VisitTaskCategoryType !== 'Sub'" colspan="12">
+                                        <div style="visibility:hidden; height:1px !important"> {{MatchingSubTasks(cat.VisitTaskID,cat.VisitTaskCategoryID, cat.CareTypeID)}} </div>
+
+
+                                        <table>
+                                            <tr data-ng-if="cat.VisitTaskType=='Task'">
+                                                @*btn btn-link collapsed*@
+
+                                                <td style="padding-left:25px; text-align: left; padding-top:5px; padding-bottom:5px;">
+                                                    @*<span style="padding-left:5px;" class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle pull-left"
+                                                        data-toggle="collapse" data-ng-attr-data-target="{{'#VisitTaskDetails-'+cat.VisitTaskID }}"></span>*@
+
+
+
+                                                    <button @*data-ng-if="subCount!=0"*@ type="button" class="btn btn-link collapsed" data-toggle="collapse" data-ng-attr-data-target="{{'#VisitTaskDetails-'+cat.VisitTaskID }}"><i style="font-size:11px;" class="fa fa-plus"></i> </button>
+
+                                                    <span style="font-size:11px;" title="@Resource.Category">{{cat.VisitTaskCategoryName!=null?cat.VisitTaskCategoryName:'nil'}}</span>
+                                                </td>
+                                                <td>
+                                                    <span style="font-size: 11px; width: 15px " class="badge badge-secondary">{{subCount}}</span>
+                                                </td>
+                                            </tr>
+                                        </table>
+
+
+
+
+                                        <div>
+
+
+                                            @*<table style="width:100%">
+                                                <tr data-ng-if="childList.length > 0 && cat.VisitTaskCategoryID==child.ParentCategoryLevel && child.VisitTaskCategoryType=='Sub'" data-ng-repeat="child in childList" style="background-color:#ccc" data-ng-attr-id="{{'VisitTaskDetails-'+cat.VisitTaskID }}" class="collapse collapseDestination">
+                                                    <td>
+                                                        <span style="visibility:hidden">{{isChecked(child.VisitTaskID,child.VisitTaskCategoryID,cat.VisitTaskCategoryID)}}</span>
+                                                    </td>
+                                                </tr>*@
+
+                                            <div @*data-ng-if="childList.length > 0 && cat.VisitTaskCategoryID==child.ParentCategoryLevel && child.VisitTaskCategoryType=='Sub'"*@ @*data-ng-repeat="child in childList "*@ style="background-color: #F7F7F7">
+                                                <div>
+                                                    <table width="100%" data-ng-if="cat.VisitTaskType=='Conclusion'" data-ng-repeat="cat1 in ConclusionList">
+
+                                                        <tr @*data-ng-repeat="cat1 in TaskDetail"*@>
+                                                            <td style="width: 5%">
+                                                                <input type="checkbox" id="{{'IsDef_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}" ng-checked="cat1.IsDefault" /> @*ng-disabled="cat1.IsDefault || !cat1.IsDefault">*@
+                                                            </td>
+                                                            <td style="width: 200px; text-align: left; padding-left: 20px; padding-right: 20px; padding-top: 10px; padding-bottom: 10px; ">
+
+                                                                <span style="width: 200px; text-align: left; font-size: 11px; " title="@Resource.SubCategory">@*{{cat1.VisitTaskCategoryName!=null?cat1.VisitTaskCategoryName:''}}&nbsp;&rarr;&nbsp;*@{{cat1.VisitTaskDetail}}</span>
+
+                                                                @*{{item.VisitTaskDetail}}*@
+                                                            </td>
+
+                                                            <td style="width:10.6%">
+                                                                @*{{'selected:'+cat1.Frequency}}*@
+                                                                <select style="background-color:#fff;" class="form-control input-sm" id="{{'freq_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}"
+                                                                        ng-model="cat1.Frequency" data-ng-init="cat1.Frequency==''?null:cat1.Frequency.toString()"
+                                                                        data-ng-change="FrequencyChange(cat1,cat1.Frequency)" @*selectedEvents[$index+'_'+cat1.VisitTaskCategoryID*@
+                                                                        ng-options="option.Name as option.Name for option in TaskFrequencyCodeList @*track by option.Value*@">
+                                                                    <option value=''>Select</option>
+                                                                </select>
+
+                                                                @*{{ selectedEvents[$index+'_'+cat1.VisitTaskCategoryID] }}*@
+
+
+
+                                                                @*<span class="field-validation-error" data-valmsg-for="TaskModel.Frequency" data-valmsg-replace="true"></span>*@
+                                                            </td>
+                                                            @*<div style="visibility:hidden; height:1px !important" data-ng-repeat="day in TaskMappedDays">*@
+                                                            <td style="width: 6.5%">
+                                                                @*{{SelectedDay1}}-{{SelectedDay2}}-{{SelectedDay3}}-{{SelectedDay4}}-{{SelectedDay5}}-{{SelectedDay6}}-{{SelectedDay7}}-{{SelectedAllDay}}*@
+                                                                <input type="checkbox" ng-click="SelectAllForms(cat1,cat1,$event)" id="{{'1234567_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(cat1,$event)" @*data-ng-model="day.Checked"*@ @*name="day"*@ @*data-ng-model="SelectedDay1" data-ng-change="SelectForm(cat1,$event)"*@ @*data-ng-checked="SelectedDay1"*@ @*ng-checked="isChecked(cat1.VisitTaskID,cat1.VisitTaskCategoryID,cat1.VisitTaskCategoryID)"*@ id="{{'1_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(cat1,$event)" @*data-ng-model="day.Checked"*@ @*name="day"*@ @*data-ng-model="SelectedDay2" data-ng-change="SelectForm(cat1,$event)"*@ @*data-ng-checked="SelectedDay2"*@ @*val="cat1.IsChecked"*@ @*data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(cat1.VisitTaskID,cat1.VisitTaskCategoryID,cat1.VisitTaskCategoryID)"*@ id="{{'2_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(cat1,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay3" data-ng-change="SelectForm(cat1,$event)"*@ @*data-ng-checked="SelectedDay3"*@ @*val="cat1.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(cat1.VisitTaskID,cat1.VisitTaskCategoryID,cat1.VisitTaskCategoryID)"*@ id="{{'3_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(cat1,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay4" data-ng-change="SelectForm(cat1,$event)"*@ @*data-ng-checked="SelectedDay4"*@ @*val="cat1.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(cat1.VisitTaskID,cat1.VisitTaskCategoryID,cat1.VisitTaskCategoryID)"*@ id="{{'4_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(cat1,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay5" data-ng-change="SelectForm(cat1,$event)"*@ @*data-ng-checked="SelectedDay5"*@ @*val="cat1.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(cat1.VisitTaskID,cat1.VisitTaskCategoryID,cat1.VisitTaskCategoryID)"*@ id="{{'5_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(cat1,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay6" data-ng-change="SelectForm(cat1,$event)"*@ @*data-ng-checked="SelectedDay6"*@ @*val="cat1.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(cat1.VisitTaskID,cat1.VisitTaskCategoryID,cat1.VisitTaskCategoryID)"*@ id="{{'6_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width:6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(cat1,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay7" data-ng-change="SelectForm(cat1,$event)"*@ @*data-ng-checked="SelectedDay7"*@ @*val="cat1.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(cat1.VisitTaskID,cat1.VisitTaskCategoryID,cat1.VisitTaskCategoryID)"*@ id="{{'7_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width:75px">
+                                                                @*<textarea style="width:100%"></textarea>*@
+                                                                <textarea style="width:100%" id="{{'Comment_'+cat1.VisitTaskCategoryID+cat1.CareTypeID+cat1.VisitTaskID}}" data-ng-model="cat1.Comment" data-ng-init="cat1.Comment==null?'':SelectedComment" font-size:11px" placeholder=""> </textarea>
+
+                                                            </td>
+                                                        </tr>
+                                                    </table>
+                                                    @*display:table-row"*@
+                                                    <table data-ng-if="cat.VisitTaskType=='Task'" style="width:100%" data-ng-attr-id="{{'VisitTaskDetails-'+cat.VisitTaskID }}" class="collapse collapseDestination">
+                                                        @*&& cat.VisitTaskCategoryID==sub.ParentCategoryLevel && sub.VisitTaskCategoryType=='Sub'*@ @*data-ng-repeat="sub in Sub"*@
+                                                        @*display: table-row;*@
+                                                        <tr style="background-color: #F7F7F7" @*data-ng-attr-id="{{'VisitTaskDetails-'+cat.VisitTaskID }}" class="collapse collapseDestination"*@ data-ng-if="Sub.length > 0" data-ng-repeat="sub in Sub">
+                                                            <td style="width: 5%">
+                                                                <input type="checkbox" id="{{'IsDef_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}" ng-checked="sub.IsDefault" /> @*ng-disabled="sub.IsDefault || !sub.IsDefault">*@
+                                                            </td>
+                                                            <td style="width: 200px; text-align: left; padding-left: 20px; padding-right: 20px; padding-top: 10px; padding-bottom: 10px; ">
+
+                                                                <span style="width: 200px; text-align: left; font-size: 11px; " title="@Resource.SubCategory">@*{{sub.VisitTaskCategoryName!=null?sub.VisitTaskCategoryName:''}}&nbsp;&rarr;&nbsp;*@{{sub.VisitTaskDetail}}</span>
+
+                                                                @*{{item.VisitTaskDetail}}*@
+                                                            </td>
+                                                            <td data-ng-if="cat.VisitTaskType=='Conclusion'" style="width: 200px; text-align: left; padding-left: 20px; padding-right: 20px; padding-top: 10px; padding-bottom: 10px; ">
+
+                                                                <span style="width: 200px; text-align: left; font-size: 11px; " title="@Resource.SubCategory">@*{{sub.VisitTaskCategoryName!=null?sub.VisitTaskCategoryName:''}}&nbsp;&rarr;&nbsp;*@{{sub.VisitTaskDetail}}</span>
+
+                                                                @*{{item.VisitTaskDetail}}*@
+                                                            </td>
+
+                                                            <td style="width:10.6%">
+                                                                @*{{'selected:'+sub.Frequency}}*@
+                                                                <select style="background-color:#fff;" class="form-control input-sm" id="{{'freq_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}"
+                                                                        ng-model="sub.Frequency" data-ng-init="sub.Frequency==''?null:sub.Frequency.toString()"
+                                                                        data-ng-change="FrequencyChange(sub,sub.Frequency)" @*selectedEvents[$index+'_'+sub.VisitTaskCategoryID*@
+                                                                        ng-options="option.Name as option.Name for option in TaskFrequencyCodeList @*track by option.Value*@">
+                                                                    <option value=''>Select</option>
+                                                                </select>
+
+                                                                @*{{ selectedEvents[$index+'_'+sub.VisitTaskCategoryID] }}*@
+
+
+
+                                                                @*<span class="field-validation-error" data-valmsg-for="TaskModel.Frequency" data-valmsg-replace="true"></span>*@
+                                                            </td>
+                                                            @*<div style="visibility:hidden; height:1px !important" data-ng-repeat="day in TaskMappedDays">*@
+                                                            <td style="width: 6.5%">
+                                                                @*{{SelectedDay1}}-{{SelectedDay2}}-{{SelectedDay3}}-{{SelectedDay4}}-{{SelectedDay5}}-{{SelectedDay6}}-{{SelectedDay7}}-{{SelectedAllDay}}*@
+                                                                <input type="checkbox" ng-click="SelectAllForms(cat,sub,$event)" id="{{'1234567_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="day.Checked"*@ @*name="day"*@ @*data-ng-model="SelectedDay1" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay1"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,cat.VisitTaskCategoryID)"*@ id="{{'1_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="day.Checked"*@ @*name="day"*@ @*data-ng-model="SelectedDay2" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay2"*@ @*val="sub.IsChecked"*@ @*data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,cat.VisitTaskCategoryID)"*@ id="{{'2_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay3" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay3"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,cat.VisitTaskCategoryID)"*@ id="{{'3_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay4" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay4"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,cat.VisitTaskCategoryID)"*@ id="{{'4_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay5" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay5"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,cat.VisitTaskCategoryID)"*@ id="{{'5_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay6" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay6"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,cat.VisitTaskCategoryID)"*@ id="{{'6_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width:6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay7" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay7"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,cat.VisitTaskCategoryID)"*@ id="{{'7_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width:75px">
+                                                                @*<textarea style="width:100%"></textarea>*@
+                                                                <textarea style="width:100%" id="{{'Comment_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}" data-ng-model="sub.Comment" data-ng-init="sub.Comment==null?'':SelectedComment" font-size:11px" placeholder=""> </textarea>
+
+                                                            </td>
+                                                            @*</div>*@
+                                                        </tr>
+                                                        <tr style="background-color: #F7F7F7" @*data-ng-attr-id="{{'VisitTaskDetails-'+sub.VisitTaskID }}" class="collapse collapseDestination"*@ data-ng-if="Sub.length==0" data-ng-repeat="sub in TaskWithoutSubList">
+                                                            <td style="width: 5%">
+                                                                <input type="checkbox" id="{{'IsDef_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}" ng-checked="sub.IsDefault" /> @*ng-disabled="sub.IsDefault || !sub.IsDefault">*@
+                                                            </td>
+                                                            <td style="width: 200px; text-align: left; padding-left: 20px; padding-right: 20px; padding-top: 10px; padding-bottom: 10px; ">
+
+                                                                <span style="width: 200px; text-align: left; font-size: 11px; " title="@Resource.SubCategory">@*{{sub.VisitTaskCategoryName!=null?sub.VisitTaskCategoryName:''}}&nbsp;&rarr;&nbsp;*@{{sub.VisitTaskDetail}}</span>
+
+                                                                @*{{item.VisitTaskDetail}}*@
+                                                            </td>
+                                                            <td data-ng-if="sub.VisitTaskType=='Conclusion'" style="width: 200px; text-align: left; padding-left: 20px; padding-right: 20px; padding-top: 10px; padding-bottom: 10px; ">
+
+                                                                <span style="width: 200px; text-align: left; font-size: 11px; " title="@Resource.SubCategory">@*{{sub.VisitTaskCategoryName!=null?sub.VisitTaskCategoryName:''}}&nbsp;&rarr;&nbsp;*@{{sub.VisitTaskDetail}}</span>
+
+                                                                @*{{item.VisitTaskDetail}}*@
+                                                            </td>
+
+                                                            <td style="width:10.6%">
+                                                                @*{{'selected:'+sub.Frequency}}*@
+                                                                <select style="background-color:#fff;" class="form-control input-sm" id="{{'freq_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}"
+                                                                        ng-model="sub.Frequency" data-ng-init="sub.Frequency==''?null:sub.Frequency.toString()"
+                                                                        data-ng-change="FrequencyChange(sub,sub.Frequency)" @*selectedEvents[$index+'_'+sub.VisitTaskCategoryID*@
+                                                                        ng-options="option.Name as option.Name for option in TaskFrequencyCodeList @*track by option.Value*@">
+                                                                    <option value=''>Select</option>
+                                                                </select>
+
+                                                                @*{{ selectedEvents[$index+'_'+sub.VisitTaskCategoryID] }}*@
+
+
+
+                                                                @*<span class="field-validation-error" data-valmsg-for="TaskModel.Frequency" data-valmsg-replace="true"></span>*@
+                                                            </td>
+                                                            @*<div style="visibility:hidden; height:1px !important" data-ng-repeat="day in TaskMappedDays">*@
+                                                            <td style="width: 6.5%">
+                                                                @*{{SelectedDay1}}-{{SelectedDay2}}-{{SelectedDay3}}-{{SelectedDay4}}-{{SelectedDay5}}-{{SelectedDay6}}-{{SelectedDay7}}-{{SelectedAllDay}}*@
+                                                                <input type="checkbox" ng-click="SelectAllForms(cat,sub,$event)" id="{{'1234567_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="day.Checked"*@ @*name="day"*@ @*data-ng-model="SelectedDay1" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay1"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,sub.VisitTaskCategoryID)"*@ id="{{'1_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="day.Checked"*@ @*name="day"*@ @*data-ng-model="SelectedDay2" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay2"*@ @*val="sub.IsChecked"*@ @*data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,sub.VisitTaskCategoryID)"*@ id="{{'2_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay3" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay3"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,sub.VisitTaskCategoryID)"*@ id="{{'3_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay4" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay4"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,sub.VisitTaskCategoryID)"*@ id="{{'4_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay5" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay5"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,sub.VisitTaskCategoryID)"*@ id="{{'5_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width: 6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay6" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay6"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,sub.VisitTaskCategoryID)"*@ id="{{'6_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width:6.5%">
+                                                                <input type="checkbox" ng-click="SelectForm(sub,$event)" @*data-ng-model="CheckMe"*@ @*name="day"*@ @*data-ng-model="SelectedDay7" data-ng-change="SelectForm(sub,$event)"*@ @*data-ng-checked="SelectedDay7"*@ @*val="sub.IsChecked" data-ng-checked="checkedStatus"*@ @*ng-checked="isChecked(sub.VisitTaskID,sub.VisitTaskCategoryID,sub.VisitTaskCategoryID)"*@ id="{{'7_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}">
+                                                            </td>
+                                                            <td style="width:75px">
+                                                                @*<textarea style="width:100%"></textarea>*@
+                                                                <textarea style="width:100%" id="{{'Comment_'+sub.VisitTaskCategoryID+sub.CareTypeID+sub.VisitTaskID}}" data-ng-model="sub.Comment" data-ng-init="sub.Comment==null?'':SelectedComment" font-size:11px" placeholder=""> </textarea>
+
+                                                            </td>
+                                                            @*</div>*@
+                                                        </tr>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+
+
+                                            @*</table>*@
+                                        </div>
+
+                                    </td>
+
+
+                                </tr>
+
+
+
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+<div id="ShowGoalModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" data-ng-click="CloseShowGoalModal()" class="close">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span>Goals</span>
+                </h4>                
+            </div>
+            <div class="modal-body">
+                <div class="row" data-ng-if="Goals.length > 0">
+                    <div class="col-sm-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            <div class="table-responsive" style="overflow-x :initial !important">
+                                
+                                <button style="margin-left:16px" type="button" ng-if="BulkDeleteGoalArray.length > 1" class="btn btn-sm btn-danger red" data-ng-click="BulkDeleteGoals()"><i class="fa fa-trash-o"></i> @Resource.Delete</button>
+                                <table class="list-tbl" id="CarePlanGoalList">
+                                    <thead>
+                                        <tr style="width:100%; padding-left: 15px; right: 15px; font-size:11px;">
+                                            <th style="width: 50px;"></th>
+                                            <th style="width: 500px;">Goal</th>
+                                            <th style="width: 105px;">Active</th>
+                                            <th style="width: 105px;">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="data in Goals">
+                                            <td style="width: 50px" align="center">
+                                                <input type="checkbox" ng-change="ShowHideBulkDeleteButton(data.GoalID);" data-ng-model="data.IsDeleted" id="{{'GoalBulkDel' + data.GoalID}}">
+                                            </td>
+                                            <td style="width: 500px;">
+                                                {{data.Goal}}
+                                            </td>
+                                            <td style="width: 105px" align="center">
+                                                <input type="checkbox" ng-change="UpdateGoalIsActiveIsDeletedFlag(data.IsActive,data.IsDeleted, data.GoalID);" data-ng-model="data.IsActive" id="{{'GoalIDIsActive' + data.GoalID}}">
+                                            </td>
+                                            <td style="width: 105px">
+                                                <div class="btn-group">
+                                                    <button class="btn btn-default btn-xs dropdown-toggle green-haze-stripe" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                        <b>@Resource.Action</b>
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu pull-right">
+                                                        <li>
+                                                            <a href="javascript:;" data-ng-click="LoadGoal(data);"><i class="fa fa-edit"></i> @Resource.Edit</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:;" data-ng-click="UpdateGoalIsActiveIsDeletedFlag(data.IsActive, true, data.GoalID);"><i class="fa fa-trash-o"></i> @Resource.Delete</a>
+                                                        </li>
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseShowGoalModal()">@Resource.Close</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" ng-click="OpenAddGoalModal()"">@Resource.Add</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<div id="AddGoalModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseAddGoalModal()">&times;</button>
+
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span>Add Goal</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form id="modalAddGoalForm">
+                    <div class="clearfix margin-top-15">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group clearfix">
+                                <label class="control-label required">Goal</label>
+                                <textarea rows="5" class="form-control input-sm" data-ng-model="Goal.Goal" maxlength="1000"
+                                          placeholder="Goal" data-val="true"
+                                          data-val-required="@Resource.ReasonRequired"
+                                          name="RemoveScheduleDetail.Notes" id="RemoveScheduleDetail_Notes">
+
+                                      </textarea>
+                                <span class="field-validation-valid" data-valmsg-for="RemoveScheduleDetail_Notes" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseAddGoalModal()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="AddGoalForReferral(Goal.GoalID)">@Resource.Save</button>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<div class="oldview" data-ng-show="toggle && (!IsDefaultCaretype || !IsDefaultTasktype)">
+    <div class="alert warning">
+        <span class="closebtn">&times;</span>
+        <strong>Warning!</strong> Old view will be deprecated within 20-30 days!.
+    </div>
+
+    <div class="col-sm-6">
+        <form id="#frmRefVisitTask">
+            <div class="portlet-body compact" style="display: block;">
+                <div>
+                    <table class="table table-bordered table-striped table-condensed flip-content enlarg_tbl">
+                        <thead class="">
+                            <tr>
+                                <th></th>
+                                <th class="col-sm-7">
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('TaskDetail')">{{SearchVisitTask.VisitTaskType}}</a>
+                                    <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'TaskDetail'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                </th>
+                                <th class="col-sm-3">
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('CareType')">@Resource.CareType</a>
+                                    <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'CareType'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <div class="col-sm-12 no-left-padding">
+                                        <input type="text" class="input-xs form-control" data-ng-model="SearchVisitTask.VisitTaskDetail" placeholder="{{SearchVisitTask.VisitTaskType}}" />
+                                    </div>
+                                    @*<div class="col-sm-4 no-right-padding">
+                                            @Html.DropDownList("VisitTaskType", Common.VisitTaskType().ToSelectList("", "Name", "Value", @Resource.All, ""),
+                                                 new
+                                                 {
+                                                     data_ng_model = "SearchVisitTask.VisitTaskType",
+                                                     data_ng_init = "SearchVisitTask.VisitTaskType=SearchVisitTask.VisitTaskType==''?'':SearchVisitTask.VisitTaskType",
+                                                     @class = "form-control input-xs",
+
+                                                 })
+                                        </div>*@
+
+                                </td>
+                                <td>
+                                    <div class="col-sm-12 no-left-padding no-right-padding">
+                                        @*<select class="form-control input-xs" data-ng-model="CareTypeID" data-ng-change="SearchVisitTasks()" title="CareType">
+                                            <option value="">Select CareType</option>
+                                            <option data-ng-repeat="option in CaretypeList" value="{{option.CareTypeID}}">{{option.CareType}}</option>
+                                        </select>*@
+                                    </div>
+                                </td>
+                                <td></td>
+                                <td class="cursor-pointer">
+                                    <button type="submit" data-ng-click="SearchVisitTasks()" class="btn btn-default btn-xs"><i class="fa fa-search-plus"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td colspan="4">
+                                    <a class="badge badge-success" data-ng-click="SelectAllForms(true)">@Resource.SelectAll</a>
+                                    <a class="badge badge-danger" data-ng-click="SelectAllForms(false)">@Resource.DeselectAll</a>
+                                </td>
+
+                            </tr>
+
+                            <tr dir-paginate="item in VisitTaskList | itemsPerPage: VisitTaskListPager.pageSize " total-items="VisitTaskListPager.totalRecords" current-page="VisitTaskListPager.currentPage" pagination-id="VisitTaskListPagerID">
+                                <td>
+                                    <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectForm(item)" val="item.IsChecked">
+                                </td>
+                                <td>
+                                    <div class="font-weight-600">
+                                        <span title="@Resource.Category">{{item.ParentCategoryName!=null?item.ParentCategoryName:''}}</span>
+                                        <span title="@Resource.SubCategory">{{item.VisitTaskCategoryName!=null? ' > ' + item.VisitTaskCategoryName:''}}</span>
+                                    </div>
+                                    <div>
+                                        {{item.VisitTaskDetail}}
+                                        <span data-ng-if="item.MinimumTimeRequired>0" class="pull-right"><u>{{item.MinimumTimeRequired}} &nbsp;@Resource.Mins</u></span>
+                                    </div>
+                                </td>
+                                <td title="{{item.CareType}}" class="text-align-center"><span class="badge badge-default">{{item.CareType ? item.CareType : '@Resource.NA'}}</span></td>
+                                <td title="{{item.VisitTaskType}}" class="text-align-center"><span class="badge badge-default">{{item.VisitTaskType=='@VisitTask.TaskType.Task'?'T':'C'}}</span></td>
+                                <td class="text-align-center font-size-16 cursor-pointer padding-top-7">
+                                    @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Add))
+                                    {
+                                    <i class="fa fa-plus-square-o " data-ng-click="AddReferralTaskMapping(item)" title="@Resource.Add"></i>}
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </form>
+        @*<div class="col-sm-12" data-ng-if="ReferralInternalMessageList.length > 0">
+                <div class="pull-left col-sm-3 no-padding">
+                    @Resource.Showing <span data-ng-bind="(ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) -ReferralInternalMessageListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(ReferralInternalMessageListPager.pageSize == ReferralInternalMessageListPager.currentPageSize) ? (ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) :(ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) - ReferralInternalMessageListPager.pageSize  + ReferralInternalMessageListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralInternalMessageListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                </div>
+                <div class="pull-right top">
+                    <dir-pagination-controls boundary-links="true" on-page-change="ReferralInternalMessageListPager.pageChanged(newPageNumber)" pagination-id="ReferralInternalMessageListPagerID"></dir-pagination-controls>
+                </div>
+            </div>*@
+    </div>
+
+
+    <div class="col-sm-1">
+        <div class="arrowWidth text-align-center padding-top-200px">
+            <button class="btn btn-default clearfix bg-color-blue position-relative left-minus-13px" data-ng-click="MoveFromTaskFormToMappedForm()">
+                <span class="font-size-12 padding-12px">Add</span>
+            </button>
+            <br />
+            <br />
+            <button class="btn btn-default clearfix bg-color-blue position-relative left-minus-13px" data-ng-click="MoveFromMappedFormToTaskForm()">
+                <span class="font-size-12">Remove</span>
+            </button>
+        </div>
+
+    </div>
+
+    <div class="col-sm-5" style="padding: 0px 18px 0px 0px;" data-ng-if="SearchVisitTask.VisitTaskType=='@Resource.Task'">
+        <div class="portlet-body compact" style="display: block;">
+            <div>
+                <table class="table table-bordered table-striped table-condensed flip-content enlarg_tbl">
+                    <thead class="">
+                        <tr>
+                            <td></td>
+                            <th class="col-sm-9">@Resource.Mapped @Resource.Task</th>
+                            <th>@Resource.CareType</th>
+                            <th>@Resource.RequiredQ</th>
+                            <th class="width-50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <a class="badge badge-success" data-ng-click="SelectAllMappedForms(true)">@Resource.SelectAll</a>
+                                <a class="badge badge-danger" data-ng-click="SelectAllMappedForms(false)">@Resource.DeselectAll</a>
+                            </td>
+                        </tr>
+                        <tr data-ng-repeat="item in PatientTaskList | orderBy: '-VisitTaskID'">
+                            <td>
+                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectForm(item)" val="item.IsChecked">
+                            </td>
+                            <td>
+                                <div class="font-weight-600">
+                                    <span title="@Resource.Category">{{item.ParentCategoryName!=null?item.ParentCategoryName:''}}</span>
+                                    <span title="@Resource.SubCategory">{{item.VisitTaskCategoryName!=null? ' > ' + item.VisitTaskCategoryName:''}}</span>
+                                </div>
+                                <div>
+                                    {{item.VisitTaskDetail}}
+                                </div>
+                            </td>
+                            <td class="text-align-center" title="{{item.CareType}}"> <span class="badge badge-default ng-binding">{{item.CareType ? item.CareType : '@Resource.NA'}}</span></td>
+                            <td class="text-align-center">
+                                {{item.IsRequired ? 'Yes' : 'No' }}
+                                @*<input type="checkbox" id="{{'#ReferralRadio-'+item.ReferralTaskMappingID }}"
+                                    class="uniformControls"
+                                    data-uniform-value="item.IsRequired"
+                                    data-ng-model="item.IsRequired"
+                                    data-ng-change="OnTaskChecked(item)" />*@
+
+                            </td>
+                            @*<td class="cursor-pointer text-align-center font-size-16" data-ng-click="DeleteRefTaskMapping(item,'task')">
+
+                                </td>*@
+                            <td class="font-size-16">
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Add))
+                                {
+                                <a href="javascript:void(0);" class="cursor-pointer" data-ng-click="OpenTaskCommentModal(item)" title="@Resource.AddDetail"><i class="fa fa-plus"></i></a>}
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Delete))
+                                {
+                                <i class="fa fa-trash-o font-red cursor-pointer" data-ng-click="DeleteRefTaskMapping(item,'task')" title="@Resource.Delete"></i>}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-5" data-ng-if="SearchVisitTask.VisitTaskType=='@Resource.Conclusion'">
+        <div class="portlet-body compact" style="display: block;">
+            <div>
+                <table class="table table-bordered table-striped table-condensed flip-content enlarg_tbl">
+                    <thead class="">
+                        <tr>
+                            <th></th>
+                            <th class="col-sm-9">@Resource.Mapped @Resource.Conclusion</th>
+                            <th>@Resource.CareType</th>
+                            <th>@Resource.RequiredQ</th>
+                            <th class="width-50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <a class="badge badge-success" data-ng-click="SelectAllConclusionMappedForms(true)">@Resource.SelectAll</a>
+                                <a class="badge badge-danger" data-ng-click="SelectAllConclusionMappedForms(false)">@Resource.DeselectAll</a>
+                            </td>
+                        </tr>
+                        <tr data-ng-repeat="item in PatientConclusionList | orderBy: '-VisitTaskID'">
+                            <td>
+                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectForm(item)" val="item.IsChecked">
+                            </td>
+                            <td>
+                                <div class="font-weight-600">
+                                    <span title="@Resource.Category">{{item.ParentCategoryName!=null?item.ParentCategoryName:''}}</span>
+                                    <span title="@Resource.SubCategory">{{item.VisitTaskCategoryName!=null? ' > ' + item.VisitTaskCategoryName:''}}</span>
+                                </div>
+                                <div>
+                                    {{item.VisitTaskDetail}}
+                                </div>
+                            </td>
+                            <td title="{{item.CareType}}" class="text-align-center"><span class="badge badge-default">{{item.CareType ? item.CareType : '@Resource.NA'}}</span></td>
+                            <td class="text-align-center">
+                                <input type="checkbox" id="{{'#ReferralRadio-'+item.ReferralTaskMappingID }}"
+                                       class="uniformControls"
+                                       data-uniform-value="item.IsRequired"
+                                       data-ng-model="item.IsRequired"
+                                       data-ng-change="OnTaskChecked(item)" />
+
+                            </td>
+                            <td class="font-size-16">
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Add))
+                                {
+                                <a href="javascript:void(0);" class="cursor-pointer" data-ng-click="OpenTaskCommentModal(item)" title="@Resource.AddDetail"><i class="fa fa-plus"></i></a>}
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Delete))
+                                {
+                                <i class="fa fa-trash-o font-red cursor-pointer" title="@Resource.Delete" data-ng-click="DeleteRefTaskMapping(item)"></i>}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+@*<div class="clearfix col-lg-12">
+        <hr />
+        <button class="btn green-jungle pull-right" data-ng-click="SaveTaskFormDetails()">@Resource.Save</button>
+    </div>*@
+<div class="modal fade" id="TaskCommentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <a class="text-decoration-none sbold uppercase ng-binding">
+                        <span>@Resource.TaskDetails</span>
+                    </a>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form id="addTaskCommentFrm">
+                    <div class="form-group">
+                        <label class="control-label">@Resource.Frequency</label>
+                        @*<input class="form-control input-sm" data-ng-model="TaskModel.Frequency" placeholder="@Resource.Frequency"
+                            data-val="true" data-val-required="@Resource.FrequencyRequired" id="TaskModel_Frequency" name="TaskModel.Frequency"/>*@
+                        <select class="form-control input-sm" data-ng-model="TaskModel.Frequency" data-ng-options="item.Name as item.Name for item in TaskFrequencyCodeList"
+                                data-val="true" data-val-required="@Resource.FrequencyRequired" id="TaskModel_Frequency" name="TaskModel.Frequency">
+                            <option value="">@Resource.Select</option>
+                        </select>
+                        <span class="field-validation-error" data-valmsg-for="TaskModel.Frequency" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">@Resource.Comment</label>
+                        <textarea class="form-control input-sm" data-ng-model="TaskModel.Comment" placeholder="@Resource.Comment"
+                                  data-val="true" data-val-required="@Resource.CommentRequired" id="TaskModel_Comment" name="TaskModel.Comment"></textarea>
+                        <span class="field-validation-error" data-valmsg-for="TaskModel.Comment" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="btn-group">
+                        <a class="letter-space btn btn-sm green-jungle" data-ng-click="SaveTaskDetail()">@Resource.Save</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*Print PDF*@
+
+
+
+
+<script>
+    var close = document.getElementsByClassName("closebtn");
+    var i;
+
+    for (i = 0; i < close.length; i++) {
+        close[i].onclick = function () {
+            var div = this.parentElement;
+            div.style.opacity = "0";
+            setTimeout(function () { div.style.display = "none"; }, 600);
+        }
+    }
+
+    date = new Date();
+    year = date.getFullYear();
+    month = date.getMonth() + 1;
+    day = date.getDate();
+    document.getElementById("current_date").innerHTML = month + "/" + day + "/" + year;
+
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/Assets/js/taskmapping/bootstrap.min.js")
+    @Scripts.Render("~/Assets/js/taskmapping/myscript.js")
+
+}

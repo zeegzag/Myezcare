@@ -1,0 +1,207 @@
+﻿@model ReportModel
+@Html.Hidden("hdnSetBXContractStatusModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptBXContractStatusController">
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon  ribbon-color-default uppercase">@Resource.BehaviorContractTracking</div>
+        <p class="ribbon-content">
+            @Resource.BehaviorContractDetail
+        </p>
+        <hr />
+        <div>
+            <a class="btn btn-sm blue pull-right" href="#model__SearchRptBehaviorContractTracking" data-toggle="modal">@Resource.GenerateReport</a>
+        </div>
+        <br />
+    </div>
+
+    <div class="modal fade" id="model__SearchRptBehaviorContractTracking" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.BehaviorContractTracking, Resource.SearchParameter)</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmSearchRptClientStatus">
+                                <div class="col-md-12 no-padding">
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.BehaviorContractStatus</label>
+                                        @Html.DropDownListFor(p => p.SearchBXContractStatusReport.BXContractStatus, Model.BXContractStatusList.ToSelectList(Model.SearchBXContractStatusReport.BXContractStatus.ToString() ?? "", "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "BXContractStatus",
+                                                                      data_ng_model = "SearchBXContractStatusReport.BXContractStatus",
+                                                                      data_ng_init = "SearchBXContractStatusReport.BXContractStatus = SearchBXContractStatusReport.BXContractStatus==null?'-1':SearchBXContractStatusReport.BXContractStatus.toString()",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.WarningStartDate</label>
+                                        <div datepicker="SearchBXContractStatusReport.WarningStartDate" ng-dateval="SearchBXContractStatusReport.WarningStartDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchBXContractStatusReport.WarningStartDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.WarningStartDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.WarningEndDate</label>
+                                        <div datepicker="SearchBXContractStatusReport.WarningEndDate" ng-dateval="SearchBXContractStatusReport.WarningEndDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchBXContractStatusReport.WarningEndDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.WarningEndDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Status</label>
+                                        @Html.DropDownListFor(p => p.SearchBXContractStatusReport.ReferralStatusID, Model.ReferralStatuses.ToSelectList(Model.SearchBXContractStatusReport.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", Resource.SelectStatus, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "ReferralStatusID",
+                                                                      data_ng_model = "SearchBXContractStatusReport.ReferralStatusID",
+                                                                      data_ng_init = "SearchBXContractStatusReport.ReferralStatusID=SearchBXContractStatusReport.ReferralStatusID==''?null:SearchBXContractStatusReport.ReferralStatusID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Name</label>
+                                        @Html.TextBoxFor(m => m.SearchBXContractStatusReport.ClientName, new
+                                            {
+                                                data_ng_model = "SearchBXContractStatusReport.ClientName",
+                                                @class = "form-control input-sm",
+                                                placeholder = Resource.Name,
+                                                maxlength = 50
+                                            })
+                                    </div>
+
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Region</label>
+                                        @Html.DropDownListFor(m => m.SearchBXContractStatusReport.RegionID, Model.Region.ToSelectList(Convert.ToString(Model.SearchBXContractStatusReport.RegionID), "RegionName", "RegionID", Resource.SelectRegion, ""), new
+                                            {
+                                                id = "RegionID",
+                                                data_ng_model = "SearchBXContractStatusReport.RegionID",
+                                                data_ng_init = "SearchBXContractStatusReport.RegionID=SearchBXContractStatusReport.RegionID==''?null:SearchBXContractStatusReport.RegionID",
+                                                @class = "form-control input-sm",
+                                                convert_to_number = ""
+
+                                            })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.ReferralStartDate</label>
+                                        <div datepicker="SearchBXContractStatusReport.StartDate" ng-dateval="SearchBXContractStatusReport.StartDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchBXContractStatusReport.StartDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ReferralStartDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.ReferralEndDate</label>
+                                        <div datepicker="SearchBXContractStatusReport.EndDate" ng-dateval="SearchBXContractStatusReport.EndDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchBXContractStatusReport.EndDate,
+                                                             new
+                                                                 {
+                                                                     //data_ng_model = "SearchReportModel.EndDate",
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ReferralEndDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Payor</label>
+                                        @Html.DropDownListFor(p => p.SearchBXContractStatusReport.PayorID, Model.Payors.ToSelectList(Model.SearchBXContractStatusReport.PayorID.ToString() ?? "", "PayorName", "PayorID", Resource.SelectPayor, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "PayorID",
+                                                                      data_ng_model = "SearchBXContractStatusReport.PayorID",
+                                                                      data_ng_init = "SearchBXContractStatusReport.PayorID=SearchBXContractStatusReport.PayorID==''?null:SearchBXContractStatusReport.PayorID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Agency</label>
+                                        @Html.DropDownListFor(p => p.SearchBXContractStatusReport.AgencyID, Model.Agencies.ToSelectList(Model.SearchBXContractStatusReport.AgencyID.ToString() ?? "", "NickName", "AgencyID", Resource.SelectAgency, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "AgencyID",
+                                                                      data_ng_model = "SearchBXContractStatusReport.AgencyID",
+                                                                      data_ng_init = "SearchBXContractStatusReport.AgencyID=SearchBXContractStatusReport.AgencyID==''?null:SearchBXContractStatusReport.AgencyID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Service</label>
+                                        @Html.DropDownListFor(m => m.SearchBXContractStatusReport.ServiceID, Model.Services.ToSelectList(Convert.ToString(Model.SearchBXContractStatusReport.ServiceID), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      id = "ServiceID",
+                                                                      data_ng_model = "SearchBXContractStatusReport.ServiceID",
+                                                                      data_ng_init = "SearchBXContractStatusReport.ServiceID = SearchBXContractStatusReport.ServiceID==null?'-1':SearchBXContractStatusReport.ServiceID.toString()",
+                                                                      @class = "form-control input-sm"
+                                                                  })
+                                    </div>
+
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+                                    
+                                     <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="BCAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                             <span class="padding-left-5"><img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetSearchFilter()" data-dismiss="modal">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm blue"  id="btnBCDownload" data-loading-text="@Resource.DownloadingInProgress" data-ng-click="DownloadBXContractStatusReport('#btnBCDownload')">@Resource.Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,462 @@
+﻿@{
+    CacheHelper _cacheHelper = new CacheHelper();
+}
+@model HC_AddReferralModel
+@Html.Hidden("hdnSetAddReferralModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="MIFFormController">
+    <div class="row">
+        <div class="col-md-10">
+            <div class="col-md-12 margin-bottom-10">
+                <a href="javascript:void(0);" class="btn btn-xs green-jungle pull-right" data-ng-click="OpenMIFForm()">
+                    <i class="fa fa-plus">&nbsp;&nbsp;</i> Add MIF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-10">
+            <div class="col-md-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div>
+                        <table class="table table-bordered table-striped table-condensed flip-content">
+                            <thead class="">
+                                <tr>
+                                    <th class="col-lg-6">
+                                        <span>Form Name</span>
+                                    </th>
+                                    <th class="">
+                                        <span>@Resource.AddedBy</span>
+                                    </th>
+                                    <th class="width-100px">
+                                        <span>@Resource.AddedDate</span>
+                                    </th>
+                                    <th class="width-155px">@Resource.Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="item in MIFFormList">
+                                    <td>{{item.FormName}}</td>
+                                    <td>{{item.CreatedByName}}</td>
+                                    <td>{{item.CreatedDate|orgdate}}</td>
+                                    <td>
+                                        <span>
+                                            <a href="@Constants.HC_GenerateMIFPdfURL{{item.EncryptedMIFFormID}}" class="btn btn-xs blue">
+                                                @Resource.Print
+                                            </a>
+                                        </span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-10">
+            <div class="col-md-12">
+                <div data-ng-if="MIFFormList.length == 0" class="ng-scope">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(@Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade modal-scroll" id="model_MIFForm" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <form id="frmModelOM">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                        <h4 class="modal-title text-center"><strong>Member Information Form</strong></h4>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="container">
+                                <div class="col-lg-10 col-md-10 col-sm-10 no-padding">
+                                    <div class="row col-md-10">
+                                        <div class="col-md-12 text-align-center" style="padding-bottom:20px !important">
+                                            <span>@_cacheHelper.MIF_Appendix</span><br />
+                                            <div style="padding-bottom: 20px;"><b>MIF</b></div>
+                                            <span><b>SOURCE Member Information Form</b></span>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-radio-inline">
+                                        <div class="col-md-6">
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="P_T_CM" class="uniformControls" data-ng-model="MIFDetail.FromWhoToWho" data-uniform-value="MIFDetail.FromWhoToWho" value="Provider to Case Manager" /> Provider to Case Manager
+                                            </label>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="P_T_CM" class="uniformControls" data-ng-model="MIFDetail.FromWhoToWho" data-uniform-value="MIFDetail.FromWhoToWho" value="Case Manager to Provider" /> Case Manager to Provider
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-radio-inline">
+                                        <div class="col-md-6" style="margin-top:10px !important;margin-right: 5px !important;margin-left: 7px !important;">
+                                            <label class="mt-radio mt-radio-outline" style="margin-left: -7px !important;">
+                                                <input type="radio" name="MIFFormType" class="uniformControls" data-ng-model="MIFDetail.Type" data-uniform-value="MIFDetail.Type" value="Initial" /> Initial
+                                            </label>
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="MIFFormType" class="uniformControls" data-ng-model="MIFDetail.Type" data-uniform-value="MIFDetail.Type" value="Change" /> Change
+                                            </label>
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="MIFFormType" class="uniformControls" data-ng-model="MIFDetail.Type" data-uniform-value="MIFDetail.Type" value="Discharge" /> Discharge
+                                            </label>
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="MIFFormType" class="uniformControls" data-ng-model="MIFDetail.Type" data-uniform-value="MIFDetail.Type" value="FYI" /> FYI
+                                            </label>
+                                        </div>
+                                        <div class="col-md-5" style="margin-top:10px !important;">
+                                            <span>Response required?</span>
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="Response_Required" class="uniformControls" data-ng-model="MIFDetail.IsResponseRequired" data-uniform-value="MIFDetail.IsResponseRequired" value="true" /> YES
+                                            </label>
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="Response_Required" class="uniformControls" data-ng-model="MIFDetail.IsResponseRequired" data-uniform-value="MIFDetail.IsResponseRequired" value="false" /> NO
+                                            </label>
+                                        </div>
+                                    </div>
+                                    @*<div class="row">
+                                            <strong class="col-sm-2" style="margin-top: 20px;margin-left: 5px;">Provider Name</strong>
+                                            <div class="col-sm-7 form-group form-md-line-input" style="margin-top: 20px;">
+                                                <input type="text" class="form-control input-sm height-19px"/>
+                                            </div>
+                                        </div>*@
+                                    <div class="row" style="margin-top: 20px;">
+                                        <strong class="col-sm-2" style="margin-left: 2px;">Member Name</strong>
+                                        <div class="col-sm-4 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" data-ng-model="ReferralModel.Referral.FullName" disabled />
+                                        </div>
+                                        <strong style="float: left;">Medicaid No</strong>
+                                        <div class="col-sm-2 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" style="width:165px !important" data-ng-model="ReferralModel.Referral.CISNumber" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-3"><strong>Service type</strong></div>
+                                        <div class="col-sm-8 mt-check-inline" style="padding-left: 28px;">
+                                            <label class="mt-check mt-check-outline" style="padding-right:10px">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ServiceType_AHD" data-uniform-value="MIFDetail.ServiceType_AHD" /> AHD
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="padding-right:10px">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ServiceType_ALS" data-uniform-value="MIFDetail.ServiceType_ALS" /> ALS
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="padding-right:10px">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ServiceType_ERS" data-uniform-value="MIFDetail.ServiceType_ERS" /> ERS
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="padding-right:10px">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ServiceType_HDM" data-uniform-value="MIFDetail.ServiceType_HDM" /> HDM
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="padding-right:10px">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ServiceType_HDS" data-uniform-value="MIFDetail.ServiceType_HDS" /> HDS
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="padding-right:10px">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ServiceType_PSS" data-uniform-value="MIFDetail.ServiceType_PSS" /> PSS
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="padding-right:10px">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ServiceType_EPS" data-uniform-value="MIFDetail.ServiceType_EPS" /> EPS
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-2">
+                                            <strong>Initial Service offered?</strong>
+                                        </div>
+                                        <div class="col-sm-2" style="padding-left: 0px;">
+                                            <select data-ng-options="item.Value as item.Name for item in ReferralModel.PrivateRoomList" data-ng-model="MIFDetail.IsInitialServiceOffered" class="form-control input-xs">
+                                                <option value="">@Resource.Select</option>
+                                            </select>
+                                        </div>
+                                        <strong style="float: left;" data-ng-if="MIFDetail.IsInitialServiceOffered == 'false'">No – Reason</strong>
+                                        <div class="col-sm-4 form-group form-md-line-input" data-ng-if="MIFDetail.IsInitialServiceOffered == 'false'">
+                                            <input type="text" class="form-control input-sm height-19px" style="width:303px !important" data-ng-model="MIFDetail.InitialServiceNoReason" />
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;" data-ng-if="MIFDetail.IsInitialServiceOffered == 'true'">
+                                        <div class="col-sm-4">
+                                            <strong>YES, Date services initiated</strong>
+                                        </div>
+                                        <div class="col-sm-3 form-group form-md-line-input">
+                                            <div class="col-sm-12 input-group date pull-left" datepicker="MIFDetail.InitialServiceDate" data-ng-dateval="MIFDetail.InitialServiceDate">
+                                                <input type="text" class="form-control input-sm height-19px dateInputMask" placeholder="@Constants.GlobalDateFormat" />
+                                                <span class="input-group-addon no-padding"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;" data-ng-if="MIFDetail.IsInitialServiceOffered == 'true'">
+                                        <div class="col-sm-3">
+                                            <strong>Frequency/Units</strong>
+                                        </div>
+                                        <div class="col-sm-7 form-group form-md-line-input">
+                                            <select data-ng-options="item.Value as item.Name for item in ReferralModel.PatientFrequencyCode" data-ng-model="MIFDetail.InitialServiceFrequencyID" class="form-control input-xs"
+                                                    data-ng-init="MIFDetail.InitialServiceFrequencyID=MIFDetail.InitialServiceFrequencyID==0?ReferralModel.Referral.FrequencyCodeID:MIFDetail.InitialServiceFrequencyID" disabled>
+                                                <option value="">@Resource.Select</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="row margin-top-20">
+                                        <div class="col-md-6 text-align-left">
+                                            <p style="font-weight:bold; margin:0 0 10px 0;">Change/FYI</p>
+                                            <label class="mt-check mt-check-outline">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_RecommendationForChange" data-uniform-value="MIFDetail.ChangeFYI_RecommendationForChange" /> Recommendation for change in service
+                                            </label>
+                                            <label class="mt-check mt-check-outline">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_ChangeInHealthFuncStatus" data-uniform-value="MIFDetail.ChangeFYI_ChangeInHealthFuncStatus" /> Change in mbr’s. Health/functional status
+
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="width:100%;">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_Hospitalization" data-uniform-value="MIFDetail.ChangeFYI_Hospitalization" /> Hospitalization
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="width:100%;">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_ServiceNotDelivered" data-uniform-value="MIFDetail.ChangeFYI_ServiceNotDelivered" /> Service not delivered
+                                            </label>
+                                        </div>
+                                        <div class="col-md-5 text-align-left pull-right" style="padding-top: 20px">
+                                            <label class="mt-check mt-check-outline">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_ChangeInFrequencyByCM" data-uniform-value="MIFDetail.ChangeFYI_ChangeInFrequencyByCM" /> Change in frequency/units by case manager
+                                            </label>
+                                            <label class="mt-check mt-check-outline">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_ChangeInPhysician" data-uniform-value="MIFDetail.ChangeFYI_ChangeInPhysician" /> Change of physician/CM
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="width:100%;">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_Other" data-uniform-value="MIFDetail.ChangeFYI_Other" /> Other
+                                            </label>
+                                            <label class="mt-check mt-check-outline" style="width:100%;">
+                                                <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_FYI" data-uniform-value="MIFDetail.ChangeFYI_FYI" /> FYI
+                                            </label>
+                                        </div>
+                                    </div>
+
+
+                                    @*<div class="row" style="margin-top: 20px;">
+                                            <div class="col-md-5 text-align-center">
+
+                                            </div>
+                                            <div class="col-md-5 text-align-center">
+                                                <strong>Change/FYI</strong>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-check-inline">
+                                            <div class="col-sm-5">
+                                                <label class="mt-check mt-check-outline">
+                                                    <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_RecommendationForChange" value="true" /> Recommendation for change in service
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <label class="mt-check mt-check-outline">
+                                                    <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_ChangeInFrequencyByCM" value="true" /> Change in frequency/units by case manager
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-check-inline">
+                                            <div class="col-sm-5">
+                                                <label class="mt-check mt-check-outline">
+                                                    <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_ChangeInHealthFuncStatus" value="true" /> Change in mbr’s. Health/functional status
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <label class="mt-check mt-check-outline">
+                                                    <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_ChangeInPhysician" value="true"/> Change of physician/CM
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-check-inline">
+                                            <div class="col-sm-5">
+                                                <label class="mt-check mt-check-outline">
+                                                    <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_Hospitalization" value="true" /> Hospitalization
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <label class="mt-check mt-check-outline">
+                                                    <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_Other" value="true" /> Other
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="row mt-check-inline">
+                                            <div class="col-sm-5">
+                                                <label class="mt-check mt-check-outline">
+                                                    <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_ServiceNotDelivered" value="true" /> Service not delivered
+                                                </label>
+                                            </div>
+                                            <div class="col-sm-5">
+                                                <label class="mt-check mt-check-outline">
+                                                    <input type="checkbox" class="uniformControls" data-ng-model="MIFDetail.ChangeFYI_FYI" value="true" /> FYI
+                                                </label>
+                                            </div>
+                                        </div>*@
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-2">
+                                            <strong>Explanation</strong>
+                                        </div>
+                                        <div class="col-sm-7 form-group form-md-line-input">
+                                            <div class="form-md-line-input form-row-seperated">
+                                                <textarea class="form-control input-sm" rows="3" data-ng-model="MIFDetail.Explanation"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-2">
+                                            <strong>Effective date of change</strong>
+                                        </div>
+                                        <div class="col-sm-3 form-group form-md-line-input">
+                                            <div class="col-sm-12 input-group date  pull-left" datepicker="MIFDetail.EffectiveDateOfChange" data-ng-dateval="MIFDetail.EffectiveDateOfChange">
+                                                <input type="text" class="form-control input-sm height-19px dateInputMask" placeholder="@Constants.GlobalDateFormat" />
+                                                <span class="input-group-addon no-padding"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-10 text-align-center" style="padding-top:20px !important">
+                                            <span><strong>Discharge</strong></span>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-2">
+                                            <strong>Discharge Reason</strong>
+                                        </div>
+                                        <div class="col-sm-6 form-group form-md-line-input">
+                                            <div class="form-md-line-input form-row-seperated">
+                                                <textarea class="form-control input-sm" rows="3" data-ng-model="MIFDetail.DischargeReason"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-2">
+                                            <strong>Date of Discharge</strong>
+                                        </div>
+                                        <div class="col-sm-3 form-group form-md-line-input">
+                                            <div class="col-sm-12 input-group date  pull-left" datepicker="MIFDetail.DateOfDischarge" data-ng-dateval="MIFDetail.DateOfDischarge">
+                                                <input type="text" class="form-control input-sm height-19px dateInputMask" placeholder="@Constants.GlobalDateFormat" />
+                                                <span class="input-group-addon no-padding"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-2">
+                                            <strong>COMMENTS</strong>
+                                        </div>
+                                        <div class="col-sm-7 form-group form-md-line-input">
+                                            <div class="form-md-line-input form-row-seperated">
+                                                <textarea class="form-control input-sm" rows="3" data-ng-model="MIFDetail.Comments"></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-3">
+                                            <strong>Prior Authorization Dates</strong>
+                                        </div>
+                                        <div class="col-sm-2 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" data-ng-model="MIFDetail.PriorAuthorizationDateFrom" disabled />
+                                        </div>
+                                        <div class="col-sm-1 text-align-center">To</div>
+                                        <div class="col-sm-2 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" data-ng-model="MIFDetail.PriorAuthorizationDateTo" disabled />
+                                        </div>
+                                        <div class="col-sm-1"><strong>PA #</strong></div>
+                                        <div class="col-sm-2 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" data-ng-model="MIFDetail.PriorAuthorizationNo" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-1"><strong>Signature</strong></div>
+                                        <div class="col-sm-4 form-group form-md-line-input" style="border:1px solid" data-ng-show="MIFDetail.TempSignaturePath">
+                                            <img class="img-responsive signature-image" id="imgDisplay" src=""
+                                                 data-ng-show="MIFDetail.TempSignaturePath != NULL || MIFDetail.TempSignaturePath != ''"
+                                                 data-ng-src="{{MIFDetail.TempSignaturePath}}" />
+                                        </div>
+                                        <div class="col-sm-1 form-group form-md-line-input">
+                                            <button class="btn btn-sm" data-ng-click="OpenClientSignModel()">Add</button>
+                                        </div>
+                                        <div class="col-sm-1"><strong>Date</strong></div>
+                                        <div class="col-sm-2 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-1" style="text-align: left;"><strong>Title</strong></div>
+                                        <div class="col-sm-5 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" disabled />
+                                        </div>
+                                        <div class="col-sm-1"><strong>Phone</strong></div>
+                                        <div class="col-sm-2 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="row" style="margin-top: 20px;">
+                                        <div class="col-sm-1"><strong>Signature</strong></div>
+                                        <div class="col-sm-5 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" disabled />
+                                        </div>
+                                        <div class="col-sm-1"><strong>Date</strong></div>
+                                        <div class="col-sm-2 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-1" style="text-align: left;"><strong>Title</strong></div>
+                                        <div class="col-sm-5 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" disabled />
+                                        </div>
+                                        <div class="col-sm-1"><strong>Phone</strong></div>
+                                        <div class="col-sm-2 form-group form-md-line-input">
+                                            <input type="text" class="form-control input-sm height-19px" disabled />
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            @_cacheHelper.MIF_Description
+                                            <br />
+                                            @_cacheHelper.MIF_Revision
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-sm btn-warning pull-left" data-ng-click="SaveMIFDetail(true)">@Resource.SaveAndPrint</button>
+                        <button class="btn btn-sm red" data-dismiss="modal">@Resource.Cancel</button>
+                        <button class="btn btn-sm green-jungle" data-ng-click="SaveMIFDetail()">@Resource.Save</button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal fade" id="SignatureModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none; margin-top: 0px;" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="font-size-20">Signature</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="CloseSignModel()"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container" style="width:570px;height:210px;">
+                        <signature-pad accept="accept" clear="clear" style="border:1px solid" height="220" width="568" dataurl="dataurl"></signature-pad>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-png" data-ng-click="SaveSignatureImage()">Save</button>
+                    <button id="clear" data-ng-click="ClearSignatureImage()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,41 @@
+﻿CREATE TABLE [dbo].[ReferralActivityList](
+	[ReferralActivityListId] [bigint] IDENTITY(1,1) NOT NULL,
+	[ReferralActivityMasterId] INT,
+	[ReferralActivityCategoryId] [bigint] NULL,
+	[Day1] [bit] NULL,
+	[Day2] [bit] NULL,
+	[Day3] [bit] NULL,
+	[Day4] [bit] NULL,
+	[Day5] [bit] NULL,
+	[Day6] [bit] NULL,
+	[Day7] [bit] NULL,
+	[Day8] [bit] NULL,
+	[Day9] [bit] NULL,
+	[Day10] [bit] NULL,
+	[Day11] [bit] NULL,
+	[Day12] [bit] NULL,
+	[Day13] [bit] NULL,
+	[Day14] [bit] NULL,
+	[Day15] [bit] NULL,
+	[Day16] [bit] NULL,
+	[Day17] [bit] NULL,
+	[Day18] [bit] NULL,
+	[Day19] [bit] NULL,
+	[Day20] [bit] NULL,
+	[Day21] [bit] NULL,
+	[Day22] [bit] NULL,
+	[Day23] [bit] NULL,
+	[Day24] [bit] NULL,
+	[Day25] [bit] NULL,
+	[Day26] [bit] NULL,
+	[Day27] [bit] NULL,
+	[Day28] [bit] NULL,
+	[Day29] [bit] NULL,
+	[Day30] [bit] NULL,
+	[Day31] [bit] NULL,
+PRIMARY KEY CLUSTERED 
+(
+	[ReferralActivityListId] ASC
+)WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]
+) ON [PRIMARY]
+GO

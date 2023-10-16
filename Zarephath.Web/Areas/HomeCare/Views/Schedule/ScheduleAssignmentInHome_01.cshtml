@@ -1,0 +1,538 @@
+﻿@{
+    bool IsAttandancePage = ViewBag.IsAttandancePage ?? false;
+
+    if (!IsAttandancePage)
+    {
+        ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Assignment);
+        ViewBag.SelectedMenuItem = Resource.SMI_ScheduleAssignment;
+    }
+    else
+    {
+        ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.AttendanceMaster);
+        ViewBag.SelectedMenuItem = Resource.SMI_AttendanceMaster;
+    }
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model HC_ScheduleAssignmentModel01
+
+
+
+
+@section Styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/schedule/scheduleassignmentinhome")
+    <style>
+        /*.page-content-wrapper .page-content
+        {
+            padding: 13px 15px 10px 15px;
+        }*/
+        .progressbar {
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .proggress {
+            height: 2px !important;
+        }
+
+        .percentCount {
+            position: absolute !important;
+            right: 0 !important;
+            top: -26px !important;
+            font-size: 11px !important;
+            margin-top: 7px;
+        }
+
+        .lineProgressbar {
+            display: inline-block;
+            width: 100%;
+            float: left;
+        }
+
+        .webui-popover.in {
+            z-index: 10050 !important;
+        }
+
+        .input-color {
+            width: 10px;
+            height: 10px;
+            display: inline-block;
+            background-color: #ccc;
+            margin-left: 5px;
+        }
+    </style>
+
+}
+@Html.Hidden("hdnScheduleAssignment", Common.SerializeObject(Model))
+<div data-ng-controller="ScheduleAssignmentController" id="ScheduleAssignment" style="margin-top: -10px">
+
+    <div class="row">
+
+        <div class="col-lg-4 col-md-4 col-sm-12" ng-show="ShowEmployeeList">
+            @*  <button type="button" class="btn collapsed grey border-grey-cascade btn-xs margin-bottom-10" data-toggle="collapse" data-target="#filter-panel">
+                    <i class="fa fa-sliders" aria-hidden="true"></i>&nbsp; @Resource.AllFilters
+                </button>*@
+
+
+            <div>
+                <form>
+                    <div id="filter-panel" class="filter-panel collapse in row">
+                        <div class="form-group col-lg-6 col-md-6 col-sm-6 no-right-padding">
+                            @*<label class="control-label">@Resource.Name</label>*@
+                            <div class="">
+                                @Html.TextBoxFor(q => q.SearchSchEmployeeModel.Name, new
+                                {
+                                    @class = "form-control input-sm",
+                                    data_ng_model = "TempSearchSchEmployeeModel.Name",
+                                    placeholder = @Resource.Name,
+                                    maxlength = 50
+                                })
+                            </div>
+                        </div>
+
+                        @* <div class="form-group col-lg-3 col-md-3 col-sm-3 no-right-padding">
+                                <div class="">
+                                    @Html.DropDownListFor(p => p.SearchSchEmployeeModel.FrequencyCodeID,
+                                        Model.FrequencyCodes.ToSelectList(Model.SearchSchEmployeeModel.FrequencyCodeID.ToString() ?? "", "Code", "FrequencyCodeID", @Resource.AllFrequencies, ""),
+                                        new
+                                        {
+                                            data_ng_model = "TempSearchSchEmployeeModel.FrequencyCodeID",
+                                            data_ng_init = "TempSearchSchEmployeeModel.FrequencyCodeID=TempSearchSchEmployeeModel.FrequencyCodeID==''?null:TempSearchSchEmployeeModel.FrequencyCodeID.toString()",
+                                            @class = "form-control input-sm ignorevalidation",
+                                            @data_val = "false"
+                                        })
+                                    @Html.ValidationMessageFor(q => q.SearchSchEmployeeModel.FrequencyCodeID)
+                                </div>
+                            </div>*@
+
+                        <div class="form-group col-lg-6 col-md-6 col-sm-6 no-right-padding">
+                            <div class="">
+                                @* @Html.DropDownListFor(p => p.SearchSchEmployeeModel.SkillId,
+                                        Model.Skills.ToSelectList(Model.SearchSchEmployeeModel.SkillId.ToString() ?? "", "PreferenceName", "PreferenceID", @Resource.AllSkills, ""),
+                                        new
+                                        {
+                                            data_ng_model = "TempSearchSchEmployeeModel.SkillId",
+                                            data_ng_init = "TempSearchSchEmployeeModel.SkillId=TempSearchSchEmployeeModel.SkillId==''?null:TempSearchSchEmployeeModel.SkillId.toString()",
+                                            @class = "form-control input-sm ignorevalidation",
+                                            @data_val = "false"
+                                        })
+                                    @Html.ValidationMessageFor(q => q.SearchSchEmployeeModel.SkillId)*@
+
+
+                                <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                        selectpicker="EmpSkillList" name="EmployeeSkillList"
+                                        title="@Resource.AllSkills">
+                                    <option data-ng-repeat="item in Skills" value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                                </select>
+
+                            </div>
+                        </div>
+
+                        <div class="form-group col-lg-6 col-md-6 col-sm-6 no-right-padding ">
+                            <div class="">
+                                @*@Html.DropDownListFor(p => p.SearchSchEmployeeModel.PreferenceId,
+                                        Model.Preference.ToSelectList(Model.SearchSchEmployeeModel.PreferenceId.ToString() ?? "", "PreferenceName", "PreferenceID", @Resource.AllPreferences, ""),
+                                        new
+                                        {
+                                            data_ng_model = "TempSearchSchEmployeeModel.PreferenceId",
+                                            data_ng_init = "TempSearchSchEmployeeModel.PreferenceId=TempSearchSchEmployeeModel.PreferenceId==''?null:TempSearchSchEmployeeModel.PreferenceId.toString()",
+                                            @class = "form-control input-sm ignorevalidation",
+                                            @data_val = "false"
+                                        })
+                                    @Html.ValidationMessageFor(q => q.SearchSchEmployeeModel.SkillId)*@
+
+                                <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                        selectpicker="EmpPreferenceList" name="EmployeePreferenceList"
+                                        title="@Resource.AllPreferences">
+                                    <option data-ng-repeat="item in Preference" value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-lg-4 col-md-4 col-sm-4 no-right-padding">
+                            <button class="btn btn-sm blue" data-ng-click="SearchSchEmployee()">@Resource.Search</button>
+                        </div>
+                        <div>
+                            <button type="button" class="btn grey border-grey-cascade btn-sm margin-right-05 pull-right" data-ng-click="Refresh()">
+                                <i class="fa fa-refresh" aria-hidden="true"></i>
+                            </button>
+                        </div>
+
+
+                        <hr class="clearfix">
+                    </div>
+                </form>
+            </div>
+
+
+
+
+
+
+            <div class="row">
+                <div class="row padding-left-right-10">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="portlet-body compact">
+
+                            <div id="windowTable" class="windowTable dataTables_wrapper external-events-group schedule-assignment-list table-scrollable" style="margin-top: 0px !important; max-height: 580px;">
+                                <table class="table schAssignment_table table-advance table-bordered table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="width-10px"></th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="SchEmployeeListPager.sortColumn('Name',true)">@Resource.Employee</a>
+                                                <span class="sortorder" data-ng-show="SchEmployeeListPager.sortIndex === 'Name'" data-ng-class="{reverse:SchEmployeeListPager.reverse}"></span>
+                                                <div class="pull-right top pagination-sm" data-ng-show="AjaxStart">
+                                                    @*@Resource.Loading*@
+                                                    <img src="~/Assets/images/lazyload.gif" />
+                                                </div>
+                                            </th>
+
+
+                                            <th class="width-10px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="SchEmployeeListPager.sortColumn('NewUsedHrs',true)">@Html.Raw(Resource.UsedBRHrs)</a>
+                                                <span class="sortorder" data-ng-show="SchEmployeeListPager.sortIndex === 'NewUsedHrs'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                            </th>
+
+                                            <th class="width-10px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="SchEmployeeListPager.sortColumn('NewAllocatedHrs',true)">@Html.Raw(Resource.AllocBRHrs)</a>
+                                                <span class="sortorder" data-ng-show="SchEmployeeListPager.sortIndex === 'NewAllocatedHrs'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-10px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="SchEmployeeListPager.sortColumn('NewRemainingHrs',true)">@Html.Raw(Resource.RemainBRHrs)</a>
+                                                <span class="sortorder" data-ng-show="SchEmployeeListPager.sortIndex === 'NewRemainingHrs'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-25px"></th>
+                                        </tr>
+                                    </thead>
+
+                                    <tbody data-ng-repeat="item in SchEmployeeList">
+                                        <tr>
+                                            <td>
+                                                <input type="checkbox" id="{{'#ReferralRadio-'+item.EmployeeID }}" name="group1"
+                                                       class="margin-left-right-3 uniformControls" title="@Resource.PatientEmpFilter"
+                                                       data-uniform-value="item.IsChecked"
+                                                       data-ng-model="item.IsChecked"
+                                                       data-ng-change="OnEmployeeSelection(item.IsChecked,item.EmployeeID )" />
+
+                                            </td>
+
+                                            <td data-ng-class="{'bg-red':item.NewRemainingHrs==0}" data-ng-mouseover="SearchSchEmployeeModel.EmployeeID =item.EmployeeID">
+                                                <a data-ng-class="{' font-white':item.NewRemainingHrs==0}" class="text-decoration-none font-size-14 webpop" item-detail-popup
+                                                   data-ng-url="SchEmployeeDetailUrl" data-ng-search-model="SearchSchEmployeeModel" data-ng-callback="SearchPatient"
+                                                   data-ng-template-selector="#schemployeedetail-popover" data-popover-cloasble="true" data-ng-header="@Resource.ClientDetail">{{item.EmployeeName}}</a>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="pull-right margin-right-05" title="Remaining Hours">{{item.NewUsedHrs ?item.NewUsedHrs:'0'}}</span>
+
+                                            </td>
+
+                                            <td>
+
+                                                <span class="pull-right margin-right-05" title="Remaining Hours">{{item.NewAllocatedHrs ?item.NewAllocatedHrs:'0'}}</span>
+                                            </td>
+
+                                            <td>
+                                                <span class="pull-right margin-right-05" title="Remaining Hours">{{item.NewRemainingHrs ?item.NewRemainingHrs:'0'}}</span>
+                                            </td>
+
+
+                                            <td>
+                                                <div class="external-event dragRef" calender-dropper="item" data-ng-click="CollapseSourceClick()">
+                                                    <a href="#" class="" title="@Resource.ScheduleClient"><i class="glyphicon glyphicon-move"></i></a>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+
+                                    </tbody>
+
+                                </table>
+
+                            </div>
+                            <div class="space10">
+                                <hr />
+                            </div>
+                            <div class="row">
+
+                                <div class="col-sm-12 " data-ng-if="SchEmployeeList.length > 0">
+                                    <span>
+                                        @Resource.Showing <span data-ng-bind="SchEmployeeList.length "></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="SchEmployeeListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                        <span class="pull-right top pagination-sm" data-ng-show="AjaxStart">
+                                            @Resource.Loading
+                                            <img src="~/Assets/images/lazyload.gif" />
+                                        </span>
+                                    </span>
+                                    <button class="btn btn-xs margin-left-20 yellow-gold-stripe border-default border-grey-gallery" data-ng-click="LoadMoreSchEmployee()" data-ng-show="!AjaxStart">@Resource.LoadMore</button>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div data-ng-if="SchEmployeeList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger" data-ng-show="!AjaxStart">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                                <div class="pull-right top pagination-sm" data-ng-show="AjaxStart">
+                                                    @Resource.Loading
+                                                    <img src="~/Assets/images/lazyload.gif" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="col-sm-12 no-left-padding" ng-class="{'col-lg-8 col-md-88 ': ShowEmployeeList }">
+            <!--<div class="portlet light portlet-fit  calendar">-->
+            @*<div class="portlet light portlet-fit" style="min-height: 700px; overflow-y: visible; overflow-x: hidden">*@
+            <div class="portlet light portlet-fit">
+                <div class="col-sm-12 no-padding">
+                    <div class="col-lg-12">
+                        <div>
+                            <form id="frmScheduleSearch">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-12 no-left-padding">
+                                            <div class="btn-group">
+                                                <span class="btn blue btn-sm grey border-grey-cascade padding-left-4">
+                                                    <input class="uniformControls" type="checkbox"
+                                                           data-ng-model="IsALLPatientChecked"
+                                                           data-uniform-value="IsAllPatientChecked"
+                                                           data-ng-change="OnAllScheduleSearch(IsALLPatientChecked,true)">
+                                                    <label>All Patients</label>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-12 no-left-padding">
+                                            <div class="input-group date date-picker pull-right"
+                                                 datepicker="ScheduleSearchModel.StartDate" ng-dateval="ScheduleSearchModel.StartDate" data-val="true">
+                                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" />
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+
+
+                                        @*<div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                                <div class="input-group date date-picker pull-right"
+                                                    datepicker="ScheduleSearchModel.EndDate" ng-dateval="ScheduleSearchModel.EndDate" data-ng-mindate="ScheduleSearchModel.StartDate">
+                                                    <input class="form-control input-sm dateInputMask" maxlength="50" />
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>*@
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-12 no-left-padding">
+                                            @Html.DropDownListFor(m => m.ScheduleSearchModel.ServiceTypeID, Model.ServiceType.ToSelectList(Convert.ToString(Model.ScheduleSearchModel.ServiceTypeID), "ServiceTypeName", "ServiceTypeID", Resource.ServiceType, ""),
+                                                                      new
+                                                                      {
+                                                                          id = "ServiceTypeID",
+                                                                          data_ng_model = "ScheduleSearchModel.ServiceTypeID",
+                                                                          data_ng_init = "ScheduleSearchModel.ServiceTypeID = ScheduleSearchModel.ServiceTypeID==null?'':ScheduleSearchModel.ServiceTypeID.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                      })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-4 col-md-4 col-sm-12 no-left-padding">
+                                    <input class="form-control input-sm filterEmp" placeholder='@Resource.SearchPatient' data-ng-model="ScheduleSearchModel.ReferralName" data-ng-change="setFilter()" maxlength="50" />
+                                </div>
+
+                                <div class="form-group col-lg-4 col-md-2 col-sm-2 no-left-padding">
+                                    <select class="form-control input-sm "
+                                            data-ng-init="ScheduleSearchModel.SchStatus=(ScheduleSearchModel.SchStatus==null || ScheduleSearchModel.SchStatus=='')?'2':ScheduleSearchModel.SchStatus"
+                                            data-ng-model="ScheduleSearchModel.SchStatus"
+                                            id="ScheduleSearchModelSchStatus"
+                                            name="ScheduleSearchModelSchStatus"
+                                            convert-to-number="">
+                                        <option value="-1">All Patients</option>
+                                        <option value="1">Fully Scheduled Patients</option>
+                                        <option value="2">Partially Scheduled Patients</option>
+                                    </select>
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-4 col-sm-12 no-left-padding">
+                                    <button class="btn btn-sm blue CreateCalender" data-ng-click="SeachAndGenerateCalenders(true)">@Resource.Search</button>
+                                </div>
+                                <div class="col-sm-1">
+                                    <button type="button" class="btn btn-default border-grey-cascade margin-right-05 btn-sm pull-right" data-ng-click="ViewSchEmpoyeeList()" title="@Resource.ResizeCalender">
+                                        <i class="fa " data-ng-class="{'fa-expand':ShowEmployeeList,'fa-compress':!ShowEmployeeList}"
+                                           aria-hidden="true"></i>
+                                    </button>
+                                </div>
+                            </form>
+
+
+
+                            @*<button type="button" class="btn btn-default border-grey-cascade margin-right-05 btn-sm pull-right" data-ng-click="CalenderRefresh()"  title="@Resource.Refresh">
+                                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                                </button>*@
+                        </div>
+                        <hr class="clear-both" />
+                    </div>
+                    @*<div ng-click="printToCart('CalenderPrint')">
+                            <i class="font-red-soft fa fa-file-pdf-o" style="font-size: 25px;padding-left: 675px"></i>
+                        </div>*@
+                    <div class="col-lg-12 scheduleLists">
+                        <label class="mt-5"><span class="input-color" style="background-color:rgb(106, 168, 79)"></span> Confirmed</label>
+                        <label class="mt-5"><span class="input-color" style="background-color:#e7505a"></span> Not Scheduled</label>
+                        <label class="mt-5"><span class="input-color" style="background-color:#00BCD4"></span> Is Denied</label>
+                        <label class="mt-5"><span class="input-color" style="background-color:#D3D3D3"></span> Completed</label>
+                        <label class="mt-5"><span class="input-color" style="background-color:#007fff"></span> On hold</label>
+                        <label class="mt-5"><span class="input-color" style="background-color:#FFFF99"></span> Approval Required</label>
+                        <label class="mt-5"><span class="input-color" style="background-color: #ff6a00"></span> Virtual Visits</label>
+
+                        <button type="button" class="btn btn-primary btn-sm pull-right mb-10 fc-RefreshBtn-button fc-corner-right" ng-click="printToCart('CalenderPrint')" title="Print PDF">
+                            Print PDF
+                        </button>
+                    </div>
+
+                </div>
+
+                <div id="print-content-assignment">
+                    @*<div class="col-sm-12 schedule-calendar-assignment-list" >*@
+                    <div class="col-sm-12">
+                        @*<div id='calendar'></div>*@
+                        <div class="margin-bottom-15 sclenders" data-ng-repeat="calenderItem in CalendarList" id="CalenderPrint">
+
+                            <div data-ng-scalender="calenderItem" class="has-toolbar customCalender" data-ng-show="ShowCalenders"
+                                 data-ng-startdate="ScheduleSearchModel.StartDate"
+                                 data-ng-get-event-list="GetScheduleList"
+                                 data-ng-resourcelist="GetResourcesList"
+                                 data-ng-resourcename="ResourceColumns"
+                                 data-ng-on-drop="OnEventDrop"
+                                 data-ng-on-event-change="OnEventChange"
+                                 data-ng-on-event-render="EventRender"
+                                 data-ng-on-resource-render="ResourceRender"
+                                 data-ng-refresh="CalenderRefresh"
+                                 data-ng-showloader="ShowCalenderLoader"
+                                 data-ng-weekstartday="@Common.GetCalWeekStartDay()"
+                                 @*
+                                 data-ng-on-event-order="EventOrder"
+                                 data-ng-on-day-render="DayRender"
+                                 ng-after-all-event-render="AllEventRender"
+                                 data-ng-startdate="SelectedWeekObj.StartDate"
+                                 data-ng-hiddendays="SelectedWeekObj.WeekDaysToHide"*@>
+                            </div>
+                        </div>
+
+                        <div class="calender_loader" data-ng-show="ShowCalenderLoaderFlag">
+                            <div class="calender_loadertitle">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @Html.Partial("Partial/01/_EmpRefSchDetailPopover")
+
+    @Html.Partial("Partial/01/_NoteModalAction")
+
+    @Html.Partial("~/Areas/HomeCare/Views/Shared/_VisitReasonActionModal.cshtml")
+</div>
+
+
+@*<script id="clientcountAtLocations-popover" type="text/ng-template">
+        @Html.Partial("Partial/_ClientCountAtLocationsPopover")
+    </script>
+
+
+    <script id="facilitydetailpopover" type="text/ng-template">
+        @Html.Partial("Partial/_FacilityDetailPopover")
+    </script>*@
+
+
+
+<script id="empReource" type="text/ng-template">
+    <span>
+        <span class="text-decoration-none font-size-12">{{DataModel.resourceObj.ReferralName}}</span>
+
+
+        @*<span style="padding: 8px;float: left;" data-ng-style="{'background-color':DataModel.resourceObj.eventColor}"></span>*@
+        <span style="float: left;">
+            <input type="checkbox" class="uniformControls" id="IsScheduleSearch{{DataModel.resourceObj.ReferralID}}"
+                   data-ng-model="DataModel.resourceObj.IsPatientChecked"
+                   data-uniform-value="DataModel.resourceObj.IsPatientChecked"
+                   data-ng-change="DataModel.resourceObj.OnScheduleSearch(DataModel.resourceObj)" />
+        </span>
+
+        @*<span data-ng-click="DataModel.resourceObj.EmpRefSchModal()"><i class="fa fa-calendar cursor-pointer"></i></span>*@
+        <span style="cursor: pointer;float: right;padding-right: 35px;color: #338ecf;font-weight: 600;"
+              data-ng-click="DataModel.resourceObj.OpenEmpRefSchModal(DataModel.resourceObj.ReferralID)">
+            @*<i class="fa fa-calendar"></i>*@ Bulk Schedule
+        </span>
+
+        <span class='prg lineProgressbar' data-reamininghours="{{DataModel.resourceObj.NewRemainingHours}}"
+              data-totalhours="{{DataModel.resourceObj.NewAllocatedHrs}}" data-usedhours="{{DataModel.resourceObj.NewUsedHrs}}">
+
+        </span>
+    </span>
+</script>
+
+
+
+
+
+
+
+<script id="schemployeedetail-popover" type="text/ng-template">
+    @Html.Partial("Partial/01/_EmployeeDetailPopover")
+</script>
+<script id="calendereventmarker" type="text/ng-template">
+    @Html.Partial("Partial/01/_CalenderEventMarker")
+</script>
+<script id="eventdetailpopover" type="text/ng-template">
+    @Html.Partial("Partial/01/_EventDetailPopover")
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/scheduleassignmentInHome01")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/emprefschoptions")
+
+    @Scripts.Render("~/Assets/js/viewjs/siteApp/Areas/HomeCare/Shared/_VisitReasonActionModal.js")
+
+    <script src="/Assets/js/sitejs/freewall.js"></script>
+    <script type="text/javascript">
+        var DeleteConfirmationMessageForSchedule = '@string.Format(@Resource.DeleteConfirmationMessage, "Schedule Master")';
+        var DeleteConfirmationMessageFromFacility = '@string.Format(@Resource.DeleteConfirmationMessageFromFacility)';
+        var ScheduleStartEndDateBetweenWeekStartEndDate = '@string.Format(@Resource.ScheduleStartEndDateBetweenWeekStartEndDate)';
+        var ScheduleStartEndDateMustSevenDay = '@string.Format(@Resource.ScheduleStartEndDateMustSevenDay)';
+
+        var CancelStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Cancelled)';
+        var UnconfirmedStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Unconfirmed)';
+        var ConfirmedStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Confirmed)';
+
+        var AlreadyRescheduleConfirm = '@Resource.AlreadyRescheduleConfirm';
+        var ScheduleBatchServiceConfirmation = '@Resource.ScheduleBatchServiceConfirmation';
+        var RescheduleConfirm = '@Resource.RescheduleConfirm';
+
+        var TransportationAssignmentRemoveAction = @Constants.TransportationAssignmentRemoveAction;
+        var TransportationAssignmentKeepAction = @Constants.TransportationAssignmentKeepAction;
+
+        var TransportationAssignmentConfirmationTitle = '@Resource.TransportationAssignmentConfirmationTitle';
+        var TransportationAssignmentConfirmationMessage = '@Resource.TransportationAssignmentConfirmationMessage';
+        var RemoveAssignedTransportion = '@Resource.RemoveAssignedTransportion';
+        var KeepTransportion = '@Resource.KeepTransportion';
+        var IsAttandancePage = @(IsAttandancePage ? "true" : "false");
+        var UnassignSchedule = '@Resource.UnassignSchedule';
+
+        var PatientHoldConfirmation = '@Resource.PatientHoldConfirmation';
+        var PatientUnHoldConfirmation = '@Resource.PatientUnHoldConfirmation';
+
+        var PatientHold = '@Resource.PatientHold';
+        var PatientUnHold = '@Resource.PatientUnHold';
+
+
+    </script>
+}

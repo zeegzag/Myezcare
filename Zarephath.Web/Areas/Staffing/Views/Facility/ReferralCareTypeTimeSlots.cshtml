@@ -1,0 +1,268 @@
+﻿@{
+    ViewBag.Title = Resource.PatientSchedule;
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_TimeSlotFrequency;
+}
+@model RefCareTypeSlotsModel
+
+@Html.Hidden("hdnCareTypeRTSModel", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="ReferralCareTypeTimeSlotsController">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+
+            <div class="row">
+                @if (!Model.IsPartial)
+                {
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12 form-inline">
+
+
+                        <button type="button" id="prev" class="btn grey border-grey-cascade btn-sm" title="Previous" data-ng-click="prevOption()">
+                            <i class="fa fa-backward"></i>
+                        </button>
+
+
+                        <select class="form-control input-sm"
+                                data-ng-init="TempSearchCTSchedule.ReferralID=TempSearchCTSchedule.ReferralID==''?null:TempSearchCTSchedule.ReferralID.toString()"
+                                data-ng-model="TempSearchCTSchedule.ReferralID"
+                                data-ng-change="SearchCTScheduleList()" disabled="@(Model.IsPartial == true @*&& Model.SearchRTSMaster.ReferralID > 0*@)">
+                            <option value="">@Resource.SelectPatient</option>
+                            <option data-ng-repeat="option in RCTSModel.ReferralList" value="{{option.Value}}">{{option.Name}}</option>
+                        </select>
+
+                        <button type="button" id="next" class="btn grey border-grey-cascade btn-sm" title="Next" data-ng-click="nextOption()">
+                            <i class="fa fa-forward"></i>
+                        </button>
+
+
+                        <button type="button" class="btn grey border-grey-cascade btn-sm margin-right-05 margin-left-20"
+                                data-ng-click="RefreshRTSMaster()" title="@Resource.Refresh">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                        </button>
+
+                    </div>
+                }
+
+                <div class="col-sm-12 no-padding">
+                    @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_Frequency_Add)))
+                    {
+                        <div data-ng-if="TempSearchCTSchedule.ReferralID>0">
+                            <form id="frmCareTypeSlot">
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label required">@Resource.CareType</label>
+                                    @Html.DropDownListFor(p => p.AddTimeSlots.CareTypeID, Model.CareTypeList.ToSelectList("", "Name", "Value", @Resource.Select, ""),
+                            new
+                            {
+                                data_ng_model = "AddTimeSlots.CareTypeID",
+                                data_ng_init = "AddTimeSlots.CareTypeID=AddTimeSlots.CareTypeID==''?null:AddTimeSlots.CareTypeID",
+                                @class = "form-control input-sm requiredStrip",
+                                data_ng_change = "OnUserTypeChange(AddTimeSlots.CareTypeID)",
+                                convert_to_number = ""
+                            })
+                                    @Html.ValidationMessageFor(q => q.AddTimeSlots.CareTypeID)
+                                </div>
+                                <div class="form-group col-lg-1 col-md-1 col-sm-1">
+                                    <label class="control-label required">@Resource.Count</label>
+                                    @Html.TextBoxFor(p => p.AddTimeSlots.Count,
+                            new
+                            {
+                                data_ng_model = "AddTimeSlots.Count",
+                                @class = "form-control input-sm",
+                                @placeholder = Resource.Count,
+                                @maxlength = 3
+                            })
+                                    @Html.ValidationMessageFor(q => q.AddTimeSlots.Count)
+                                </div>
+                                <div class="form-group col-lg-1 col-md-1 col-sm-1 width-10percent">
+                                    <label class="control-label required">@Resource.Frequency</label>
+                                    @Html.DropDownListFor(p => p.AddTimeSlots.Frequency, Common.SetCareTypeFrequencyList().ToSelectList("", "Name", "Value", @Resource.Select, ""),
+                            new
+                            {
+                                data_ng_model = "AddTimeSlots.Frequency",
+                                data_ng_init = "AddTimeSlots.Frequency=AddTimeSlots.Frequency==''?null:AddTimeSlots.Frequency",
+                                @class = "form-control input-sm",
+                                data_ng_change = "SetFrequencyName()",
+                                convert_to_number = ""
+                            })
+                                    @Html.ValidationMessageFor(q => q.AddTimeSlots.Frequency)
+                                </div>
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label required ">@Resource.StarDate</label>
+                                    <div class="input-group date date-picker pull-right"
+                                        datepicker="AddTimeSlots.StartDate" ng-dateval="AddTimeSlots.StartDate" data-ng-maxdate="AddTimeSlots.EndDate">
+                                        @Html.TextBoxFor(m => m.AddTimeSlots.StartDate, new
+                            {
+                                @class = "form-control input-sm dateInputMask",
+                                maxlength = "50",
+                                placeholder = Resource.DateFormat
+                            })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        @Html.ValidationMessageFor(m => m.AddTimeSlots.StartDate)
+                                    </div>
+                                </div>
+                                <div class="col-lg-2 col-md-2 col-sm-2 margin-top-25 no-right-padding">
+                                    <input type="radio" class="radio radio-inline timeslot-radio" data-ng-model="IsEndDateAvailable" data-ng-value="false" data-ng-change="resetEndDate()" /><span>@Resource.NoEndDate</span><br />
+                                    <input type="radio" class="radio radio-inline timeslot-radio" data-ng-model="IsEndDateAvailable" data-ng-value="true" data-ng-change="resetEndDate()" /><span class="margin-right-15">@Resource.EndBy</span>
+                                </div>
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2" data-ng-if="IsEndDateAvailable">
+                                    <label class="control-label required">@Resource.EndDate</label>
+
+                                    <div class="input-group date date-picker pull-right"
+                                        datepicker="AddTimeSlots.EndDate" ng-dateval="AddTimeSlots.EndDate">
+                                        @Html.TextBoxFor(m => m.AddTimeSlots.EndDate, new
+                            {
+                                @class = "form-control input-sm dateInputMask",
+                                maxlength = "50",
+                                placeholder = Resource.DateFormat
+                            })
+                                        @Html.ValidationMessageFor(m => m.AddTimeSlots.EndDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-1 col-md-1 col-sm-2 no-padding width-10percent">
+                                    <label class="control-label"></label>
+                                    <div>
+                                        <button type="submit" data-ng-click="SaveCareTypeSlot()" class="btn btn-sm green-jungle">@Resource.Save</button>
+                                        <a href="javascript:void(0);" data-ng-click="Cancel()" class="btn btn-sm red-mint">@Resource.Cancel</a>
+                                    </div>
+                                </div>
+
+                            </form>
+
+                            <div class="col-lg-12 col-md-12 col-sm-12" data-ng-if="AddTimeSlots.Count!=null && AddTimeSlots.Frequency!=null && AddTimeSlots.StartDate">
+                                <span class="bg-gray-color">
+                                    <b class="font-red-thunderbird">@Resource.NoteLabel</b>
+                                    <span data-ng-if="AddTimeSlots.Frequency!=1 && AddTimeSlots.EndDate">{{AddTimeSlots.Count}} times in a {{FrequencyName}} between {{AddTimeSlots.StartDate}} to {{AddTimeSlots.EndDate}}
+                                    </span>
+                                    <span data-ng-if="AddTimeSlots.Frequency!=1 && (AddTimeSlots.EndDate=='' || AddTimeSlots.EndDate==null)">{{AddTimeSlots.Count}} times in a {{FrequencyName}} starting from {{AddTimeSlots.StartDate}}
+                                    </span>
+                                    <span data-ng-if="AddTimeSlots.Frequency==1 && AddTimeSlots.EndDate">{{AddTimeSlots.Count}} time/s between {{AddTimeSlots.StartDate}} to {{AddTimeSlots.EndDate}}
+                                    </span>
+                                    <span data-ng-if="AddTimeSlots.Frequency==1 && (AddTimeSlots.EndDate=='' || AddTimeSlots.EndDate==null)">{{AddTimeSlots.Count}} time/s starting from {{AddTimeSlots.StartDate}}
+                                    </span>
+                                </span>
+                            </div>
+
+                            <div class="space1"></div>
+                            <hr />
+                            <div class="space1"></div>
+                        </div>
+                    }
+
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+
+                        <div class="inline-block pull-right" data-ng-show="CTScheduleList.length > 0">
+                            <div class="pull-right margin-left-5">
+                                <dir-pagination-controls boundary-links="true" max-size="CTScheduleListPager.maxSize" on-page-change="CTScheduleListPager.pageChanged(newPageNumber)" pagination-id="CTScheduleListPager"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space20"></div>
+
+                    <div class="col-sm-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            <div class="table-responsive">
+
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="CTScheduleListPager.sortColumn('Name')">@Resource.Name</a>
+                                                <span class="sortorder" data-ng-show="CTScheduleListPager.sortIndex === 'Name'" data-ng-class="{reverse:CTScheduleListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="CTScheduleListPager.sortColumn('CareTypeName')">@Resource.CareType</a>
+                                                <span class="sortorder" data-ng-show="CTScheduleListPager.sortIndex === 'CareTypeName'" data-ng-class="{reverse:CTScheduleListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="CTScheduleListPager.sortColumn('Count')">@Resource.Count</a>
+                                                <span class="sortorder" data-ng-show="CTScheduleListPager.sortIndex === 'Count'" data-ng-class="{reverse:CTScheduleListPager.reverse}"></span>
+                                            </th>
+                                            <th>@Resource.Frequency</th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="CTScheduleListPager.sortColumn('StartDate')">@Resource.StartDate</a>
+                                                <span class="sortorder" data-ng-show="CTScheduleListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:CTScheduleListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="CTScheduleListPager.sortColumn('EndDate')">@Resource.EndDate</a>
+                                                <span class="sortorder" data-ng-show="CTScheduleListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:CTScheduleListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-130px col-sm-2">@Resource.Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr @*data-ng-class="{'deleted':item.IsDeleted,'table-row-selected':SearchRTSDetail.ReferralTimeSlotMasterID==item.ReferralTimeSlotMasterID}"*@
+                                dir-paginate="item in CTScheduleList | itemsPerPage: CTScheduleListPager.pageSize" total-items="CTScheduleListPager.totalRecords" current-page="CTScheduleListPager.currentPage" pagination-id="CTScheduleListPager">
+                                            <td>{{item.Name != null ? item.Name : '@Resource.NA'}}</td>
+                                            <td>{{item.CareTypeName}}</td>
+                                            <td>{{item.NumOfTime}}</td>
+                                            <td>{{item.FrequencyValue}}</td>
+                                            <td>{{item.StartDate | date:'@Resource._DateFormat'}}</td>
+                                            <td>{{(item.EndDate!=null) ? (item.EndDate | date:'@Resource._DateFormat') : '@Resource.NA'}}</td>
+                                            <td>
+                                                @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_Frequency_Add)))
+                                                {
+                                                    <a href="javascript:void(0);" data-ng-click="EditCareTypeSchedule(item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                }
+@*<a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteRTSMaster($event,item.ReferralTimeSlotMasterID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>*@
+@*<a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteRTSMaster($event,item.ReferralTimeSlotMasterID,'@Resource.Delete')" class="btn btn-xs red">@Resource.Delete</a>*@
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12" data-ng-if="CTScheduleList.length > 0">
+                        <div class="col-sm-6 pull-left no-padding margin-top-5">
+                            @Resource.Showing <span data-ng-bind="(CTScheduleListPager.pageSize * CTScheduleListPager.currentPage) - CTScheduleListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(CTScheduleListPager.pageSize == CTScheduleListPager.currentPageSize) ? (CTScheduleListPager.pageSize * CTScheduleListPager.currentPage) :(CTScheduleListPager.pageSize * CTScheduleListPager.currentPage) - CTScheduleListPager.pageSize  + CTScheduleListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="CTScheduleListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                        </div>
+                        <div class="pull-right top pagination-sm">
+                            <dir-pagination-controls boundary-links="true" max-size="CTScheduleListPager.maxSize" on-page-change="CTScheduleListPager.pageChanged(newPageNumber)" pagination-id="CTScheduleListPager"></dir-pagination-controls>
+                        </div>
+                    </div>
+
+
+                    <div class="col-sm-12">
+                        <div data-ng-if="CTScheduleList.length == 0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @if (!Model.IsPartial)
+    {
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/referral/referralcaretypetimeslots")
+        <script type="text/javascript">
+            var RefFutureSchDeleteConfirmation = '@Resource.RefFutureSchDeleteConfirmation';
+            var RefFutureSchDeleteConfirmationMaster = '@Resource.RefFutureSchDeleteConfirmationMaster';
+            var TimeSlotForceUpdateConfirmation = '@Resource.ReferralTimeSlotForceUpdateConfirmation';
+        </script>
+    }
+
+}
+
+
+

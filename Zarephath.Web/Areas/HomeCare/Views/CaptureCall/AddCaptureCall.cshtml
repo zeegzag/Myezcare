@@ -1,0 +1,336 @@
+﻿@{
+    bool isEditMode = Model != null && Model.CaptureCall.Id > 0;
+    //ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (isEditMode ? Resource.EditCaptureCall : @Resource.AddCaptureCall));
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    //Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    //ViewBag.SelectedMenuItem = Resource.SMI_CaptureCallAdd;
+}
+@model CaptureCallModel
+
+@Html.Hidden("hdnCaptureCallModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="AddCaptureCallController">
+    <form class="form-horizontal padding-left" id="frmAddCaptureCall">
+        <div class="row ">
+            <div class="capturecall">
+                <div class="breadcrumb">
+                    <a href="#" id="New" class="new">New referral</a>
+                    @if (Model.CaptureCall.Status == "Waitlisted" || Model.CaptureCall.Status == "Converted")
+                    {
+                        <a href="#" id="Waitlist" class="waitlist">Waitlist</a>
+                    }
+                    else
+                    {
+                        <a href="#" id="Waitlist" class="">Waitlisted</a>
+                    }
+                    @if (Model.CaptureCall.Status == "Converted")
+                    {
+                        <a href="#" id="Complete" class="waitlist">Complete</a>
+                    }
+                    else
+                    {
+                        <a href="#" id="Complete">Complete</a>
+                    }
+                </div>
+
+
+            </div>
+
+
+        </div>
+        <div class="row">
+            @if (isEditMode)
+            {
+            <div class="capthead"><strong>Created By :</strong> {{CaptureCallModel.CaptureCall.CreatedByName}} &nbsp; <strong>Created Date :</strong>{{CaptureCallModel.CaptureCall.CreatedDate | date}}</div>
+            }
+
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label required">@Resource.FirstName</label>
+                @Html.TextBoxFor(q => q.CaptureCall.FirstName, new { @class = "form-control input-sm", data_ng_model = "CaptureCallModel.CaptureCall.FirstName", placeholder = @Resource.FirstName, maxlength = 50 })
+                @Html.ValidationMessageFor(q => q.CaptureCall.FirstName)
+            </div>
+
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label required">@Resource.LastName</label>
+                @Html.TextBoxFor(q => q.CaptureCall.LastName, new { @class = "form-control input-sm", data_ng_model = "CaptureCallModel.CaptureCall.LastName", placeholder = @Resource.LastName, maxlength = 50 })
+                @Html.ValidationMessageFor(q => q.CaptureCall.LastName)
+            </div>
+
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.Email</label>
+                @Html.TextBoxFor(q => q.CaptureCall.Email, new { @class = "form-control input-sm", data_ng_model = "CaptureCallModel.CaptureCall.Email", placeholder = @Resource.Email, maxlength = 50 })
+                @Html.ValidationMessageFor(q => q.CaptureCall.Email)
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label required">@Resource.Phone</label>
+                @Html.TextBoxFor(q => q.CaptureCall.Contact, new { @class = "form-control input-sm requiredStrip", data_ng_model = "CaptureCallModel.CaptureCall.Contact", placeholder = @Resource.Contact, maxlength = 10 })
+                @Html.ValidationMessageFor(q => q.CaptureCall.Contact)
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.Address</label>
+                @Html.TextBoxFor(q => q.CaptureCall.Address,
+                                                 new
+                                                 {
+                                                     @class = "form-control input-sm address-autocomplete",
+                                                     data_ng_model = "CaptureCallModel.CaptureCall.Address",
+                                                     placeholder = @Resource.Address,
+                                                     maxlength = 100,
+                                                 })
+                @*@Html.ValidationMessageFor(q => q.CaptureCall.Address)*@
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.City</label>
+                @Html.TextBoxFor(q => q.CaptureCall.City,
+                                                 new
+                                                 {
+                                                     @class = "form-control input-sm city-autocomplete",
+                                                     data_ng_model = "CaptureCallModel.CaptureCall.City",
+                                                     placeholder = @Resource.City,
+                                                     maxlength = 50,
+                                                 })
+                @*@Html.ValidationMessageFor(q => q.CaptureCall.City)*@
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.State</label>
+                @Html.DropDownListFor(p => p.CaptureCall.StateCode, Model.StateList.ToSelectList(Model.CaptureCall.StateCode ?? "", "StateName", "StateCode", @Resource.Select, ""),
+                                            new
+                                            {
+                                                data_ng_model = "CaptureCallModel.CaptureCall.StateCode",
+                                                data_ng_init = "CaptureCallModel.CaptureCall.StateCode=CaptureCallModel.CaptureCall.StateCode==''?null:CaptureCallModel.CaptureCall.StateCode",
+                                                @class = "form-control input-sm state-autocomplete",
+
+                                            })
+                @*@Html.ValidationMessageFor(q => q.CaptureCall.StateCode)*@
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.ZipCode</label>
+                @Html.TextBoxFor(q => q.CaptureCall.ZipCode, new
+           {
+               @class = "form-control input-sm zipcode-autocomplete",
+               data_ng_model = "CaptureCallModel.CaptureCall.ZipCode",
+               maxlength = Resource.ZipCodemaxlength,
+               placeholder = Resource.ZipCodePlaceholder,
+               dir_valid_number = ""
+           })
+                @Html.ValidationMessageFor(q => q.CaptureCall.ZipCode)
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.RelatedWithPatient</label>
+                <div class="field-box">
+                    <select class="form-control input-sm" multiple title="Select Patient Name"
+                            data-val="true" selectpicker="CaptureCallModel.CaptureCall.RelatedWithPatient" name="CaptureCallModel.CaptureCall.RelatedWithPatient">
+                        <option data-ng-repeat="option in CaptureCallModel.PatientList" value="{{option.ReferralID}}">{{option.ReferralName}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label required">@Resource.Date</label>
+                <div class="input-group date" datepicker="CaptureCallModel.CaptureCall.InquiryDate" data-ng-dateval="CaptureCallModel.CaptureCall.InquiryDate"
+                     data-ng-maxdate="CurrentDate" id="date">
+                    <input class="form-control input-sm validateElement dateInputMask requiredStrip" data-ng-model="CaptureCallModel.CaptureCall.InquiryDate" data-val="true"
+                           placeholder="@Resource.Date" id="InquiryDate" maxlength="10" name="CaptureCallModel.CaptureCall.InquiryDate" data-error-Count="CaptureCallErrorCount.AddCaptureCall"
+                           type="text" required>
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.CallType</label>
+                @Html.DropDownListFor(p => p.CaptureCall.CallType, Model.CallType.ToSelectList(Model.CaptureCall.CallType ?? "", "Name", "Value", @Resource.Select, ""),
+                                           new
+                                           {
+                                               data_ng_model = "CaptureCallModel.CaptureCall.CallType",
+                                               data_ng_init = "CaptureCallModel.CaptureCall.CallType=CaptureCallModel.CaptureCall.CallType==''?null:CaptureCallModel.CaptureCall.CallType",
+                                               @class = "form-control input-sm",
+
+                                           })
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.Status</label>
+                @Html.DropDownListFor(p => p.CaptureCall.Status, Model.CRMStatusList.ToSelectList(Model.CaptureCall.Status ?? "", "Name", "Name", @Resource.Select, ""),
+                                         new
+                                         {
+                                             data_ng_model = "CaptureCallModel.CaptureCall.Status",
+                                             data_ng_init = "CaptureCallModel.CaptureCall.Status=CaptureCallModel.CaptureCall.Status==''?null:CaptureCallModel.CaptureCall.Status",
+                                             @class = "form-control input-sm",
+                                             data_ng_change = "ConvertToReferral(CaptureCallModel.CaptureCall,'Convert')",
+                                             //data_ng_disabled = "CaptureCallModel.CaptureCall.Status=='Converted'",
+
+                                         })
+                @*<select class="form-control input-sm" data- ng-model="CaptureCallModel.CaptureCall.Status">
+                        <option selected="selected" value="0">@Resource.Select</option>
+                        <option value="1">Converted</option>
+                        <option value="2">Waitlisted</option>
+                        <option value="3">Closed </option>
+                    </select>*@
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label class="control-label required">CallLog\@Resource.Notes</label>
+                @Html.TextAreaFor(q => q.CaptureCall.Notes, new { @class = "form-control input-sm Notes", data_ng_model = "CaptureCallModel.CaptureCall.Notes", placeholder = @Resource.Notes, maxlength = 1000 })
+                @Html.ValidationMessageFor(q => q.CaptureCall.Notes)
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.RoleName</label>
+                <select class="form-control input-sm" multiple="multiple" title="@Resource.RoleName"
+                        data-val="true" selectpicker="CaptureCallModel.CaptureCall.RoleIds" name="CaptureCallModel.CaptureCall.RoleIds" data-ng-change="GetReferralEmployee(option.RoleID)" data-ng-model="CaptureCallModel.CaptureCall.RoleIds">
+                    <option data-ng-repeat="option in CaptureCallModel.RoleList" value="{{option.RoleID}}">{{option.RoleName}}</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+
+                <label class="control-label">@Resource.VisibleTo</label>
+
+                <select class="form-control input-sm" title="@Resource.VisibleTo"
+                        data-val="true" data-ng-model="CaptureCallModel.CaptureCall.EmployeesIDs" name="CaptureCallModel.CaptureCall.EmployeesIDs">
+                    <option data-ng-repeat="option in EmployeeList" value="{{option.EmployeeID}}">{{option.LastName}} {{option.FirstName}}</option>
+                </select>
+            </div>
+            <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                <label class="control-label">@Resource.Group</label>
+                <select class="form-control input-sm" multiple="multiple" title="@Resource.Group"
+                        data-val="true" selectpicker="CaptureCallModel.CaptureCall.GroupIDs" name="CaptureCallModel.CaptureCall.GroupIDs" data-ng-model="CaptureCallModel.CaptureCall.GroupIDs">
+                    <option data-ng-repeat="option in CaptureCallModel.ReferralGroupList" value="{{option.Value}}">{{option.Name}}</option>
+                </select>
+            </div>
+            @if (Common.HasPermission(Constants.HC_Permission_ReferralTrackingAttachForm))
+            {
+                if (!isEditMode || Model.CaptureCall.OrbeonID == null)
+                {
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4 padding-right">
+                        <button class="btn btn-xs btn-primary pull-left ng-scope" data-ng-click="UploadForm()" autocomplete="autocomplete_off_hack_xfr4!k"><i class="icon-plus"></i>&nbsp;  Attach Form</button>
+                    </div>
+                }
+            }
+        </div>
+        <div class="row">
+            <div class="col-md-12 form-group no-margin no-padding">
+                @if (Common.HasPermission(Constants.HC_Permission_ReferralTrackingAdd))
+                {
+                    <input type="submit" data-ng-click="SaveCaptureCall()" class="btn btn-sm green-jungle pull-right margin-right-20" value="@(Model != null && Model.CaptureCall.Id > 0 ? Resource.Update : Resource.Save)" />
+                }
+                <a>
+                    <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" data-ng-click="Cancel()" value="@Resource.Reset" />
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <div class="modal fade" id="addFormModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <a class="text-decoration-none sbold uppercase ng-binding">
+                            @Resource.AddForm
+                        </a>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="center-block text-align-center">
+                        @*<div class="col-md-5">
+                                <div class="fileUpload btn btn-sm blue">
+                                    <span>Upload Scanned Document</span>
+                                    <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                           fileupload
+                                           file-uploadurl="{{UploadFile}}"
+                                           beforesend="BeforeSend"
+                                           aftersend="AfterSend"
+                                           progress="Progress"
+                                           data-primary-id="ReferralID"
+                                           data-extra-value="ComplianceID"
+                                           filelist="UploadingFileList"
+                                           multiple="" />
+                                </div>
+                                <div class="margin-top-2">You can upload images, pdf, documents and text files.</div>
+                            </div>
+                            <div class="col-md-2 padding-left-0 padding-right-0">
+                                <span class="margin-left-10 margin-right-10">OR</span>
+                            </div>*@
+                        <div class="col-md-5">
+                            <button class="btn btn-sm green-jungle" style="width: 175px;" data-ng-click="OpenMapFormModel(true)">Fill New Form</button>
+                            <div class="margin-top-2">
+                                This will open form. <a data-ng-click="OpenMapFormModel(true)">Click here</a> to see all forms.
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="mapFormModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <a class="text-decoration-none sbold uppercase ng-binding">
+                            @Resource.SelectForm
+                        </a>
+                    </h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="table-responsive tabbable-custom form-table-overflow">
+
+                        <table class="table table-bordered table-striped table-condensed flip-content">
+                            <thead class="flip-content">
+                                <tr>
+                                    <th class="width-min-107px">
+                                        @Resource.FormNumber
+                                    </th>
+                                    <th>
+                                        @Resource.FormName
+                                    </th>
+                                    <th class="width-10px">@Resource.Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="compact-search-tr">
+                                    <td colspan="2">
+                                        <input class="form-control input-sm" placeholder="Search by Form Number, Name or Tags" data-ng-model="frmSearch" />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr data-ng-repeat="form in OrganizationFormList | filter: frmSearch">
+                                    <td>{{ form.Name }}</td>
+                                    <td>
+                                        <a data-ng-click="OpenNewHtmlForm(form)">{{ form.FormLongName }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0);" data-ng-if="!IsBindToFrame" data-ng-click="SelectForm(form)" class="btn btn-xs blue">@Resource.Select</a>
+                                        <a href="javascript:void(0);" data-ng-if="IsBindToFrame" data-ng-click="SelectForm1(form)" class="btn btn-xs blue">@Resource.Select</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="ConvertReferral_fixedAside" class="asideBar-right fixed convertrefer">
+        <div class="listContentinner">
+            <div class="Subcloseasidebar" data-ng-click="ConvertReferralEditModelClosed()"><i class="fa fa-close"></i></div>
+            <iframe id="ConvertReferral_fixedAsidelDDLBindIFrame" style="/*width:138% !important*/;position:absolute; top:2%;  bottom:0px; right:0px; width:100%; min-height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/capturecall/addcapturecall.js")
+<script type="text/javascript">
+        var EnableDisableConfirmationMessage = '@string.Format("Are you sure convert to referral")';
+       // var ReferralScheduleDelete = GetHtmlString('@Resource.ReferralScheduleDelete');
+
+</script>
+}

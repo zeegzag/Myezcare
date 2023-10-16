@@ -1,0 +1,111 @@
+﻿<div class="row " data-ng-show="commonDetailPopover.event.scheduleModel.UsedInScheduling">
+    <div class="col-sm-12">
+        <h4 class="caption">
+
+            <span class="font-green sbold uppercase">{{commonDetailPopover.event.scheduleModel.FacilityName}}</span>
+            <span class="font-weight-500 font-size-14" data-ng-if="commonDetailPopover.event.scheduleModel.FacilityNPI">( @Resource.NPI#: {{commonDetailPopover.event.scheduleModel.FacilityNPI}})
+            </span>
+            <a href="#" data-ng-click="commonDetailPopover.updateScheduleStatus(commonDetailPopover.calendarObj,commonDetailPopover.event,popOverFunctions)"
+               title="@Resource.EditSchedule" class="pull-right badge {{commonDetailPopover.event.scheduleModel.ScheduleStatusName | removeSpaces}}">{{commonDetailPopover.event.scheduleModel.ScheduleStatusName}}
+            </a>
+
+            <span class="badge label label-important label-mini text-align-right" data-ng-hide="!commonDetailPopover.event.scheduleModel.IsRefrralDeleted" data-ng-class="">Disabled</span>
+        </h4>
+        <div>
+
+            <div class="col-md-12 margin-bottom-5 no-padding">
+                <strong>@Resource.Patient : </strong><span>{{commonDetailPopover.event.scheduleModel.ReferralName}}</span>
+            </div>
+
+            <div class="col-md-12 margin-bottom-5 no-padding">
+                <div data-ng-if="commonDetailPopover.event.scheduleModel.Email"><i class="fa fa-envelope"></i><strong>&nbsp;:&nbsp;</strong><span>{{commonDetailPopover.event.scheduleModel.Email}}</span></div>
+            </div>
+
+            <div class="col-md-12 margin-bottom-5 no-padding">
+                <span class="col-md-6 no-padding"><strong>@Resource.StartTime : </strong><span>{{commonDetailPopover.event.scheduleModel.StartDate | orgdatetime}} </span></span>
+                <span class="col-md-6 no-padding"><strong>@Resource.ClockInTime : </strong>
+                                                  <span data-ng-if="commonDetailPopover.event.scheduleModel.ClockInTime !== '0001-01-01T00:00:00'">{{commonDetailPopover.event.scheduleModel.ClockInTime | orgdatetime}} </span>
+                </span>
+            </div>
+            <div class="col-md-12 margin-bottom-5 no-padding">
+                <span class="col-md-6 no-padding"><strong>@Resource.EndTime : &nbsp;&nbsp;</strong><span>{{commonDetailPopover.event.scheduleModel.EndDate | orgdatetime}} </span></span>
+                <span class="col-md-6 no-padding"><strong>@Resource.ClockOutTime : &nbsp;&nbsp;</strong>
+                                                  <span data-ng-if="commonDetailPopover.event.scheduleModel.ClockOutTime !== '0001-01-01T00:00:00'">{{commonDetailPopover.event.scheduleModel.ClockOutTime | orgdatetime}} </span>
+                </span>
+            </div>
+
+
+
+            <div class="col-md-12 margin-bottom-5 no-padding" data-ng-if="commonDetailPopover.event.scheduleModel.ScheduleComment">
+                <strong>@Resource.Comment : </strong><span>{{commonDetailPopover.event.scheduleModel.ScheduleComment}}</span>
+            </div>
+
+
+
+            <div class="col-md-12 margin-bottom-5 no-padding">
+
+                @*  <input type="radio" name="PatientAttendance" data-ng-value="true"
+                       data-ng-model="commonDetailPopover.event.scheduleModel.IsPatientAttendedSchedule"
+                     data-ng-change="commonDetailPopover.SavePatientAttendance(commonDetailPopover.calendarObj,commonDetailPopover.event)"/> @Resource.Present
+
+                <input type="radio" data-ng-bind="PatientAttendance" data-ng-value="false"
+                       data-ng-model="!commonDetailPopover.event.scheduleModel.IsPatientAttendedSchedule" 
+                    data-ng-change="commonDetailPopover.SavePatientAttendance(commonDetailPopover.calendarObj,commonDetailPopover.event)"/> @Resource.Absent*@
+
+
+
+                <div class="mt-checkbox-inline">
+                    <span><b>@Resource.Attendence: </b></span>
+                    <label class="mt-checkbox mt-checkbox-outline margin-right-10"
+                           data-ng-click="commonDetailPopover.TogglePatientAttendedSchedule(commonDetailPopover.calendarObj, commonDetailPopover.event, 'p')">
+                        <input data-ng-model="commonDetailPopover.event.scheduleModel.TempIsPatientAttendedSchedule"
+                               class="uniformControls" data-uniform-value="commonDetailPopover.event.scheduleModel.TempIsPatientAttendedSchedule"
+                               data-ng-true-value="true" data-ng-false-value="false"
+                               type="checkbox" /><span>@Resource.Present</span>
+                    </label>
+                    <label class="mt-checkbox mt-checkbox-outline"
+                            data-ng-click="commonDetailPopover.TogglePatientAttendedSchedule(commonDetailPopover.calendarObj, commonDetailPopover.event, 'a')">
+                        <input data-ng-model="commonDetailPopover.event.scheduleModel.TempIsPatientAttendedSchedule"
+                                class="uniformControls" data-uniform-value="commonDetailPopover.event.scheduleModel.TempIsPatientAttendedSchedule==null?  commonDetailPopover.event.scheduleModel.TempIsPatientAttendedSchedule: !commonDetailPopover.event.scheduleModel.TempIsPatientAttendedSchedule"
+                                data-ng-true-value="false" data-ng-false-value="true"
+                                type="checkbox" /><span>@Resource.Absent</span>
+                    </label>
+
+                    <i class="fa fa-question-circle font-size-15" data-ng-if="commonDetailPopover.event.scheduleModel.IsPatientAttendedSchedule==false && commonDetailPopover.event.scheduleModel.AbsentReason!=null"
+                        title="{{commonDetailPopover.event.scheduleModel.AbsentReason}}"></i>
+
+                    <a href="javascript:void(0)" title="@Resource.UpdateAbsentReason" data-ng-if="commonDetailPopover.event.scheduleModel.IsPatientAttendedSchedule==false"
+                        data-ng-click="commonDetailPopover.PatientAttendanceActionModal(commonDetailPopover.calendarObj,commonDetailPopover.event)">
+                        <i class="fa fa-plus-circle font-size-15"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12 no-padding" style="padding-top: 10px !important; " data-ng-if="commonDetailPopover.event.isPastEvent==false && commonDetailPopover.event.scheduleModel.ClockInTime == '0001-01-01T00:00:00' && commonDetailPopover.event.scheduleModel.ClockOutTime == '0001-01-01T00:00:00'">
+
+            <a href="javascript:void(0);" data-ng-click="commonDetailPopover.removeEvent(commonDetailPopover.calendarObj,commonDetailPopover.event,popOverFunctions)"
+                class="btn btn-xs red pull-right"><i class="glyphicon glyphicon-trash font-size-10"></i>&nbsp;@Resource.Delete</a>
+
+            @* <div class="external-event pull-right margin-right-10" calender-dropper="commonDetailPopover">
+            <a href="#" class="btn btn-xs blue pull-righ" title="Schedule Client"><i class="glyphicon glyphicon-move"></i>@Resource.Drag&nbsp;</a>
+        </div>*@
+
+            <a href="javascript:void(0);" data-ng-click="commonDetailPopover.ReplaceSchedule(commonDetailPopover.calendarObj,commonDetailPopover.event)"
+               title="@Resource.Replace" class="pull-right margin-right-10 btn btn-xs font-white blue">
+                <i class="glyphicon glyphicon-adjust font-size-10"></i>&nbsp;@Resource.Replace
+            </a>
+            <a href="javascript:void(0);" data-ng-click="commonDetailPopover.NoteModalAction(commonDetailPopover.calendarObj,commonDetailPopover.event)"
+               title="@Resource.Note" class="pull-right margin-right-10 btn btn-xs font-white green">
+                <i class="glyphicon glyphicon-book font-size-10"></i>&nbsp;@Resource.Note
+            </a>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="row" data-ng-show="!commonDetailPopover.event.scheduleModel.UsedInScheduling">
+    <div class=" col-sm-12">
+        <b>@Resource.Notes :</b> {{commonDetailPopover.event.scheduleModel.ScheduleComment}}
+    </div>
+</div>

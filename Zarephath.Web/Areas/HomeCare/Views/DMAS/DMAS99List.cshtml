@@ -1,0 +1,103 @@
+﻿@{
+    ViewBag.Title = "Dmas-99 List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
+@model Dmas99ListPage
+@Html.Hidden("hdnSetDmas99ListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="Dmas99ListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            List of DMAS-99 Form
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+
+            <div class="btn-group padding-left-15">
+                <a href="@Constants.HC_Dmas99" class="btn btn-sm letter-space green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.DMAS_99</a>
+            </div>
+
+        </div>
+        <div class="space20"></div>
+    </div>
+
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content responsive">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-400px text-align-center">
+                                            <a class="anchor_color" href="javascript:void(0);">ID</a>
+                                        </th>
+                                        <th class="width-400px text-align-center">
+                                            <a class="anchor_color" href="javascript:void(0);">CREATED BY</a>
+                                        </th>
+                                        <th class="width-400px text-align-center">CREATED DATE</th>
+                                        <th class="width-400px text-align-center">ACTION</th>
+                                    </tr>
+                                </thead>
+
+                                <tbody data-ng-repeat="item in Dmas99List">
+                                    <tr>
+                                        <td class="text-align-center">{{item.Dmas99ID}}</td>
+                                        <td class="text-align-center">{{item.EmployeeName}}</td>
+                                        <td class="text-align-center">{{item.CreatedDate | date:"shortDate"   }}</td>
+                                        <td class="text-align-center">
+                                            <a href="@Constants.HC_Dmas99{{item.Dmas99ID}}" class="btn btn-xs blue" title="Edit"><i class="fa fa-edit"></i></a>
+                                            <a data-ng-click="DeleteDmas99(item)" class="btn btn-xs red" title="Delete"><i class="fa fa-trash"></i></a>
+                                            <a href="@Constants.Generate_Dmas99_Pdf{{item.Dmas99ID}}" class="btn btn-xs green-jungle" title="Print Pdf"><i class="fa fa-print"></i></a>
+                                            <a data-ng-click="Clone(item)" class="btn btn-xs blue-dark" title="Clone"><i class="fa fa-clone"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
+
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="Dmas97AbList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+@section Scripts{
+    @Scripts.Render("~/Assets/js/viewjs/siteApp/Areas/HomeCare/dmas/dmas99List.js")
+    <script type="text/javascript">
+         var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.DMAS_99)';
+    </script>
+}

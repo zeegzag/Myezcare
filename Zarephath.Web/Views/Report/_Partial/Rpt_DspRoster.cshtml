@@ -1,0 +1,180 @@
+﻿@model ReportModel
+@Html.Hidden("hdnSetDspRosterModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptDspRosterController">
+
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon ribbon-color-default uppercase">@Resource.DspRosterReport</div>
+        <p class="ribbon-content">
+            @Resource.DspRosterDetail
+        </p>
+        <hr />
+        <div>
+            <a class="btn btn-sm blue-madison pull-right" href="#model__SearchRptDspRoster" data-toggle="modal">@Resource.GenerateReport</a>
+        </div>
+        <br />
+    </div>
+
+    <div class="modal fade" id="model__SearchRptDspRoster" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.DspRosterReport, Resource.SearchParameter)</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmSearchRptDspRoster">
+
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Agency</label>
+                                        @Html.DropDownListFor(p => p.SearchDspRosterModel.AgencyID, Model.Agencies.ToSelectList(Model.SearchReportModel.AgencyID.ToString() ?? "", "NickName", "AgencyID", Resource.SelectAgency, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "AgencyID",
+                                                                      data_ng_model = "SearchDspRosterModel.AgencyID",
+                                                                      data_ng_init = "SearchDspRosterModel.AgencyID=SearchDspRosterModel.AgencyID==''?null:SearchDspRosterModel.AgencyID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Payor</label>
+                                        @Html.DropDownListFor(p => p.SearchDspRosterModel.PayorID, Model.Payors.ToSelectList(Model.SearchDspRosterModel.PayorID.ToString() ?? "", "PayorName", "PayorID", Resource.SelectPayor, ""),
+                                            new
+                                            {
+                                                convert_to_number = "",
+                                                id = "PayorID",
+                                                data_ng_model = "SearchDspRosterModel.PayorID",
+                                                data_ng_init = "SearchDspRosterModel.PayorID=SearchDspRosterModel.PayorID==''?null:SearchDspRosterModel.PayorID",
+                                                @class = "form-control input-sm",
+                                                data_val = false
+                                            })
+                                    </div>
+
+                                    @*<div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Status</label>
+                                        @Html.DropDownListFor(p => p.SearchDspRosterModel.ReferralStatusID, Model.ReferralStatuses.ToSelectList(Model.SearchDspRosterModel.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", Resource.SelectStatus, ""),
+                                            new
+                                            {
+                                                convert_to_number = "",
+                                                id = "ReferralStatusID",
+                                                data_ng_model = "SearchDspRosterModel.ReferralStatusID",
+                                                data_ng_init = "SearchDspRosterModel.ReferralStatusID=SearchDspRosterModel.ReferralStatusID==''?null:SearchDspRosterModel.ReferralStatusID",
+                                                @class = "form-control input-sm",
+                                                data_val = false
+                                            })
+                                    </div>*@
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class=" control-label">@Resource.Status</label>
+                                        <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                            selectpicker="SearchDspRosterModel.ReferralStatusIDs" name="SearchDspRosterModel.ReferralStatusIDs"
+                                            title="Status">
+                                            <option data-ng-repeat="option in ReferralStatuseModel" value="{{option.ReferralStatusID}}">{{option.Status}}</option>
+                                        </select>
+
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label  ">@Resource.ReferralStartDate</label>
+                                        <div datepicker="SearchDspRosterModel.StartDate" data-ng-dateval="SearchDspRosterModel.ReferralStartDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchDspRosterModel.ReferralStartDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ReferralStartDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.ReferralEndDate</label>
+                                        <div datepicker="SearchDspRosterModel.ReferralEndDate" data-ng-dateval="SearchDspRosterModel.ReferralEndDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchDspRosterModel.ReferralEndDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ReferralEndDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.ServiceStartDate</label>
+                                        <div datepicker="SearchDspRosterModel.ServiceStartDate" data-ng-dateval="SearchDspRosterModel.ServiceStartDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchDspRosterModel.ServiceStartDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ServiceStartDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label  ">@Resource.ServiceEndDate</label>
+                                        <div datepicker="SearchDspRosterModel.ServiceEndDate" data-ng-dateval="SearchDspRosterModel.ServiceEndDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchDspRosterModel.ServiceEndDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ServiceEndDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6" style="display: none">
+                                        <label class="control-label">@Resource.EnableDisableClient</label>
+                                        @Html.DropDownListFor(m => m.SearchDspRosterModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchDspRosterModel.IsDeleted), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      id = "IsDeleted",
+                                                                      data_ng_model = "SearchDspRosterModel.IsDeleted",
+                                                                      data_ng_init = "SearchDspRosterModel.IsDeleted = SearchDspRosterModel.IsDeleted==null?'-1':SearchDspRosterModel.IsDeleted.toString()",
+                                                                      @class = "form-control input-sm"
+
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="DSPAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                            <span class="padding-left-5">
+                                                <img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetSearchFilter()" data-dismiss="modal">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm blue" id="btnDSPDownload" data-loading-text="@Resource.DownloadingInProgress"  data-ng-click="DownloadDspRosterReport('#btnDSPDownload')">@Resource.Download</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

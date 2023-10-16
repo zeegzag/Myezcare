@@ -1,0 +1,1428 @@
+﻿﻿<!-- BEGIN SIDEBAR -->
+<div class="page-sidebar-wrapper bar">
+    <!-- BEGIN SIDEBAR -->
+    <div class="page-sidebar navbar-collapse collapse ">
+        <ul class="page-sidebar-menu  page-header-fixed page-sidebar-menu-closed" data-keep-expanded="false" data-auto-scroll="false" data-slide-speed="200" style="padding-top: 20px">
+            <!-- DOC: To remove the sidebar toggler from the sidebar you just need to completely remove the below "sidebar-toggler-wrapper" LI element -->
+            <li class="sidebar-toggler-wrapper hide">
+                <!-- BEGIN SIDEBAR TOGGLER BUTTON -->
+                <div class="sidebar-toggler"></div>
+                <!-- END SIDEBAR TOGGLER BUTTON -->
+            </li>
+            <!-- DOC: To remove the search box from the sidebar you just need to completely remove the below "sidebar-search-wrapper" LI element -->
+            <li class="nav-item start" data-selectmenu="@Resource.SMI_Dashboard">
+                <a href="@Constants.HCDashboardURL" class="nav-link nav-toggle">
+                    <i class="icon-home"></i>
+                    <span class="title">@Resource.Dashboard</span>
+                    @*<span class="arrow"></span>*@
+                </a>
+            </li>
+            <li class="heading">
+                <h3 class="uppercase">@Resource.Features</h3>
+            </li>
+            @if (!SessionHelper.IsEmployeeLogin)
+            {
+                <li class="nav-item" data-selectmenu="@Resource.SMI_PatientTimeSheet">
+                    <a href="@Constants.HC_PatientTimeSheetURL" class="nav-link nav-toggle">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <span class="title">@Resource.PatientTimeSheet</span>
+                    </a>
+                </li>
+                <li class="nav-item" data-selectmenu="@Resource.SMI_InvoiceList">
+                    <a href="@Constants.HC_InvoiceListURL" class="nav-link nav-toggle">
+                        <i class="fa fa-file" aria-hidden="true"></i>
+                        <span class="title">@Resource.Invoices</span>
+                    </a>
+                </li>
+            }
+
+            @if (SessionHelper.IsEmployeeLogin &&
+     (
+        Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate)
+        || Common.HasPermission(Constants.HC_Permission_Employee_List)
+        || Common.HasPermission(Constants.HC_Permission_Employee_Calendar)
+        || Common.HasPermission(Constants.HC_Permission_Employee_Schedule)
+        || Common.HasPermission(Constants.HC_Permission_Employee_PTO)
+    ))
+            {
+                <li class="nav-item">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-users"></i>
+                        <span class="title">@Resource.Employee</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu">
+                        @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeAdd">
+                                <a href="@Constants.HCAddEmployeeURL" class="nav-link">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="title">@Resource.Add</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Employee_List))
+                        {
+
+                            <li class="nav-item">
+                                <a href="@Constants.HC_EmployeeListURL" class="nav-link" data-selectmenu="@Resource.SMI_EmployeeList">
+                                    <i class="fa fa-list"></i>
+                                    <span class="title">@Resource.List</span>
+                                </a>
+                            </li>
+
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Employee_Calendar))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmpCalenderModel">
+                                <a href="@Constants.HC_EmployeeCalenderURL" class="nav-link ">
+                                    <i class="fa fa-calendar-plus-o"></i>
+                                    <span class="title">@Resource.Calender</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Employee_Schedule))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeTimeSlots">
+                                <a href="@Constants.HC_EmployeeTimeSlotsURL" class="nav-link ">
+                                    <i class="fa fa-clock-o"></i>
+                                    <span class="title">@Resource.Schedule</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Employee_PTO))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeDayOff">
+                                <a href="@Constants.HC_EmployeeDayOffURL" class="nav-link ">
+                                    <i class="fa fa-toggle-off"></i>
+                                    <span class="title">@Resource.PTO</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if (Common.HasPermission(Constants.HC_Permission_ReferralTracking) || Common.HasPermission(Constants.HC_Permission_ReferralTrackingAdd) || Common.HasPermission(Constants.HC_Permission_ReferralTrackingList))
+            {
+                <li class="nav-item">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-user"></i>
+                        <span class="title">Prospects</span>
+                        <span class="arrow"></span><span beta-tag></span>
+                    </a>
+                    <ul class="sub-menu">
+                        @if (Common.HasPermission(Constants.HC_Permission_ReferralTrackingAdd))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_CaseManagerAdd">
+                                <a href="@Constants.AddCaptureCallUrl" class="nav-link">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="title">@Resource.Add</span>@*<span beta-tag></span>*@
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_ReferralTrackingList))
+                        {
+                            <li class="nav-item">
+                                <a href="@Constants.CaptureCallListUrl" class="nav-link" data-selectmenu="@Resource.SMI_CaseManagerList">
+                                    <i class="fa fa-list"></i>
+                                    <span class="title">@Resource.List</span>@*<span beta-tag></span>*@
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (SessionHelper.IsEmployeeLogin && !SessionHelper.IsStaffing &&
+     (
+        Common.HasPermission(Constants.HC_Permission_Patient_AddUpdate)
+        || Common.HasPermission(Constants.HC_Permission_Patient_List)
+        || Common.HasPermission(Constants.HC_Permission_Patient_Calendar)
+        || Common.HasPermission(Constants.HC_Permission_Patient_Schedule)
+    ))
+            {
+                <li class="nav-item">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-user"></i>
+                        @*<span class="title">@Resource.PatientIntake</span>*@
+                        <span class="title">Client</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+                        @if (Common.HasPermission(Constants.HC_Permission_Patient_AddUpdate))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ReferralAdd">
+                                <a href="@Constants.HC_AddReferral" class="nav-link ">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="title">@Resource.Add</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Patient_List))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ReferralList">
+                                <a href="@Constants.HC_ListReferral" class="nav-link ">
+                                    <i class="fa fa-list"></i>
+                                    <span class="title">@Resource.List</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Patient_Calendar))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_RefCalenderModel">
+                                <a href="@Constants.HC_ReferralCalenderURL" class="nav-link ">
+                                    <i class="fa fa-calendar-minus-o"></i>
+                                    <span class="title">@Resource.Calender</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Patient_Schedule))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_PatientTimeSlots">
+                                <a href="@Constants.HC_ReferralTimeSlotsURL" class="nav-link ">
+                                    <i class="fa fa-clock-o"></i>
+                                    <span class="title">@Resource.Schedule</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Patient_Schedule) && SessionHelper.IsCaseManagement)
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_TimeSlotFrequency">
+                                <a href="@Constants.HC_ReferralCareTypeTimeSlotsURL" class="nav-link ">
+                                    <i class="fa fa-clock-o"></i>
+                                    <span class="title">@Resource.TimeSlotFrequency</span>
+                                </a>
+                            </li>
+                        }
+                        @*@if (Common.HasPermission(Constants.Permission_GroupNote) && !SessionHelper.IsRAL && !SessionHelper.IsCaseManagement)
+                    {
+                        <li class="nav-item" data-selectmenu="@Resource.SMI_AddGroupNote">
+                            <a href="@Constants.AddGroupNote" class="nav-link">
+                                <i class="fa fa-plus"></i>
+                                <span class="title">@Resource.GroupNote</span>
+                            </a>
+                        </li>
+                    }*@
+                    </ul>
+                </li>
+            }
+            @if (SessionHelper.IsStaffing)
+            {
+                <li class="nav-item" id="liFacility">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-user"></i>
+                        <span class="title">Facility</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+
+                        <li class="nav-item">
+                            <a href="@Constants.ST_AddAgencyURL" class="nav-link ">
+                                <i class="fa fa-plus"></i>
+                                <span class="title">@Resource.Add</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="@Constants.ST_ListAgencyURL" class="nav-link ">
+                                <i class="fa fa-list"></i>
+                                <span class="title">@Resource.List</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            }
+            @if (SessionHelper.IsEmployeeLogin &&
+    (Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleMaster)
+    || Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleLog)
+    || Common.HasPermission(Constants.HC_Permission_Schedule_PendingSchedule)
+    || Common.HasPermission(Constants.HC_Permission_Schedule_VirtualVisits)
+    ))
+            {
+                <li class="nav-item ">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-calendar" aria-hidden="true"></i>
+                        <span class="title">@Resource.Scheduling</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleMaster) && SessionHelper.IsHomeCare)
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ScheduleAssignment">
+                                <a href="@Constants.HC_ScheduleAssignmentInHome01URL" class="nav-link ">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                    <span class="title">@Resource.ScheduleMaster</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Nurse_Scheduler))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ScheduleAssignment">
+                                <a href="@Constants.HC_NurseSchedulerURL" class="nav-link ">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                    <span class="title">@Resource.NurseScheduler</span><span beta-tag></span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleMaster) && SessionHelper.IsDayCare)
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ScheduleAssignment">
+                                <a href="@Constants.HC_ScheduleAssignmentDayCareURL" class="nav-link ">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                    <span class="title">@Resource.ScheduleMaster</span>
+                                </a>
+                            </li>
+                        }
+
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleMaster) && SessionHelper.IsPrivateDutyCare)
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ScheduleAssignment">
+                                <a href="@Constants.HC_ScheduleAssignmentPrivateDutyURL" class="nav-link ">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                    <span class="title">@Resource.ScheduleMaster</span>
+                                </a>
+                            </li>
+                        }
+
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleMaster) && SessionHelper.IsCaseManagement)
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ScheduleAssignment">
+                                <a href="@Constants.HC_ScheduleAssignmentCaseManagementURL" class="nav-link ">
+                                    <i class="fa fa-calendar-check-o"></i>
+                                    <span class="title">@Resource.ScheduleMaster</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleLog) && (SessionHelper.IsHomeCare || SessionHelper.IsPrivateDutyCare))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ScheduleMaster">
+                                <a href="@Constants.HC_ScheduleMasterURL" class="nav-link ">
+                                    <i class="fa fa-table"></i>
+                                    <span class="title">@Resource.ScheduleLog</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleLog) && SessionHelper.IsDayCare)
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ScheduleMaster">
+                                <a href="@Constants.HC_DayCare_ScheduleMasterURL" class="nav-link ">
+                                    <i class="fa fa-table"></i>
+                                    <span class="title">@Resource.ScheduleLog</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_ScheduleLog) && Common.IsOrgHasAggregator())
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ScheduleAggregatorLogs">
+                                <a href="@Constants.HC_ScheduleAggregatorLogsURL" class="nav-link ">
+                                    <i class="fa fa-table"></i>
+                                    <span class="title">@Resource.ScheduleAggregatorLogsList</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_PendingSchedule))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_PendingSchedules">
+                                <a href="@Constants.HC_PendingSchedulesURL" class="nav-link ">
+                                    <i class="fa fa-table"></i>
+                                    <span class="title">@Resource.PendingSchedules</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_VirtualVisits))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_VirtualVisits">
+                                <a href="@Constants.HC_VirtualVisitsURL" class="nav-link ">
+                                    <i class="fa fa-video-camera"></i>
+                                    <span class="title">@Resource.VirtualVisits</span><span beta-tag></span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Schedule_EmployeeVisit))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeVisit">
+                                <a href="@Constants.HC_EmployeeVisitsURL" class="nav-link ">
+                                    <i class="fa fa-home"></i>
+                                    <span class="title">@Resource.EmployeeVisit</span><span beta-tag></span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if (SessionHelper.IsEmployeeLogin &&
+        (Common.HasPermission(Constants.HC_Permission_TransportContact_AddUpdate) || Common.HasPermission(Constants.HC_Permission_TransportContact_List)
+        || Common.HasPermission(Constants.HC_Permission_Vehicle_AddUpdate) || Common.HasPermission(Constants.HC_Permission_Vehicle_List)
+        ))
+                {
+            <li class="nav-item">
+                <a href="javascript:;" class="nav-link nav-toggle">
+                    <i class="fa fa-truck"></i>
+                    <span class="title">@Resource.FleetManagement</span>
+                    <span class="arrow"></span>
+                    <span class="arrow"></span><span beta-tag></span>
+                </a>
+                <ul class="sub-menu" style="display: none;">
+                    @if (Common.HasPermission(Constants.HC_Permission_TransportContact_AddUpdate) || Common.HasPermission(Constants.HC_Permission_TransportContact_List))
+                    {
+                        <li class="nav-item">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="fa fa-envelope"></i>
+                                <span class="title">@Resource.Contacts</span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                @if (Common.HasPermission(Constants.HC_Permission_TransportContact_AddUpdate))
+                                {
+
+                                    <li class="nav-item" data-selectmenu="@Resource.SMI_TransportContactAdd">
+                                        <a href="@Constants.HC_TransportContactAddPageURL" class="nav-link">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="title">@Resource.Add</span>
+                                        </a>
+                                    </li>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_TransportContact_List))
+                                {
+                                    <li class="nav-item">
+                                        <a href="@Constants.HC_TransportContactListPageURL" class="nav-link" data-selectmenu="@Resource.SMI_TransportContactList">
+                                            <i class="fa fa-list"></i>
+                                            <span class="title">@Resource.List</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+
+                    @if (Common.HasPermission(Constants.HC_Permission_TransportVehicle_AddUpdate) || Common.HasPermission(Constants.HC_Permission_TransportVehicle_List))
+                    {
+                        <li class="nav-item">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="fa fa-car"></i>
+                                <span class="title">@Resource.Vehicles</span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                @if (Common.HasPermission(Constants.HC_Permission_TransportVehicle_AddUpdate))
+                                {
+
+                                    <li class="nav-item" data-selectmenu="@Resource.SMI_VehicleAdd">
+                                        <a href="@Constants.HC_VehicleAddPageURL" class="nav-link TransportServiceItem">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="title">@Resource.Add</span>
+                                        </a>
+                                    </li>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_TransportVehicle_List))
+                                {
+                                    <li class="nav-item">
+                                        <a href="@Constants.HC_VehicleListPageURL" class="nav-link TransportServiceItem" data-selectmenu="@Resource.SMI_VehicleList">
+                                            <i class="fa fa-list"></i>
+                                            <span class="title">@Resource.List</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }
+                    @if (Common.HasPermission(Constants.HC_Permission_TransportService_AddUpdate) || Common.HasPermission(Constants.HC_Permission_TransportService_List))
+                    {
+                        <li class="nav-item" data-selectmenu="@Resource.SMI_VehicleAdd">
+                            <a href="@Constants.HC_TransportAssignmentURL" class="nav-link TransportServiceItem">
+                                <i class="fa fa-plus"></i>
+                                <span class="title">@Resource.TransportationAssignment</span>
+                            </a>
+                        </li>
+                    }
+                    @if (Common.HasPermission(Constants.HC_Permission_TransportGroupService_AddUpdate) || Common.HasPermission(Constants.HC_Permission_TransportGroupService_List))
+                    {
+                        <li class="nav-item" data-selectmenu="@Resource.SMI_VehicleAdd">
+                            <a href="@Constants.HC_AssignTransportGroupAddPageURL" class="nav-link TransportServiceItem">
+                                <i class="fa fa-plus"></i>
+                                <span class="title">@Resource.TransportationGroups</span>
+                            </a>
+                        </li>
+                    }
+                </ul>
+            </li>
+            }
+            @if (SessionHelper.IsEmployeeLogin &&
+(Common.HasPermission(Constants.HC_Permission_EmployeeVisitReports) ||
+Common.HasPermission(Constants.HC_Permission_EmployeeBillingReports) || Common.HasPermission(Constants.HC_Permission_SSRS_Reports)))
+            {
+                <li class="nav-item ">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <span class="title">@Resource.TimeSheet</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+                        @if (Common.HasPermission(Constants.HC_Permission_EmployeeBillingReports))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeBillingReport">
+                                <a href="@Constants.HC_EmployeeBillingReportURL" class="nav-link nav-toggle">
+                                    <i class="fa fa-area-chart" aria-hidden="true"></i>
+                                    <span class="title">@Resource.EmployeeBillingReport</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_EmployeeVisitReports))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeVisitReports">
+                                <a href="@Constants.HC_ReportEmployeeVisitListURL" class="nav-link nav-toggle">
+                                    <i class="fa fa-pie-chart" aria-hidden="true"></i>
+                                    <span class="title">@Resource.EmployeeVisitReports</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_NurseSignature))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_NurseSignature">
+                                <a href="@Constants.HC_ReportNurseSignatureURL" class="nav-link nav-toggle">
+                                    <i class="fa fa-pie-chart" aria-hidden="true"></i>
+                                    <span class="title">@Resource.NurseSignature</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_GroupTimesheet))
+                        {
+                            <li class="nav-item" data-selectmenu="@Constants.HC_ReportGroupTimesheetListURL">
+                                <a href="@Constants.HC_ReportGroupTimesheetListURL" class="nav-link nav-toggle">
+                                    <i class="fa fa-group" aria-hidden="true"></i>
+                                    <span class="title">Bulk Timesheet</span>
+                                    <span beta-tag></span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_GroupTimesheet))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_GroupTimesheetReports">
+                                <a href="@Constants.HC_ReportReferralActivityURL " class="nav-link nav-toggle">
+                                    <i class="fa fa-group" aria-hidden="true"></i>
+                                    <span class="title">Activity Log</span>
+                                    @*<span beta-tag></span>*@
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if (SessionHelper.IsEmployeeLogin &&
+    (Common.HasPermission(Constants.HC_Permission_Billing_Batch837)
+    || Common.HasPermission(Constants.HC_Permission_Billing_Upload835)
+    || Common.HasPermission(Constants.HC_Permission_Billing_EDIFileLogs)
+    || Common.HasPermission(Constants.HC_Permission_Billing_EDI270_271)))
+            {
+                <li class="nav-item  ">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-file-text-o" aria-hidden="true"></i>
+                        <span class="title">@Resource.ClaimProcessing</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+                        @if (Common.HasPermission(Constants.HC_Permission_Billing_Batch837))
+                        {
+                            <li class="nav-item" data-selectmenu="ManageClaims">
+                                <a href="@Constants.HC_ManageClaims" class="nav-link ">
+                                    <i class="fa fa-cogs"></i>
+                                    <span class="title">Manage Claims</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Billing_ARAgingReport))
+                        {
+
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ARAgingReport">
+                                <a href="@Constants.HC_ARAgingReport" class="nav-link ">
+                                    <i class="fa fa-cogs"></i>
+                                    <span class="title">@Resource.ARAgingReport</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Billing_Batch837))
+                        {
+
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_Batch837">
+                                <a href="@Constants.HC_BatchMaster" class="nav-link ">
+                                    <i class="fa fa-cogs"></i>
+                                    <span class="title">@Resource.Batch837</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Billing_Upload835))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-bank"></i>
+                                    <span class="title">@Resource.ViewERAPayments </span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    <li class="nav-item" data-selectmenu="@Resource.SMI_Upload835">
+                                        <a href="@Constants.HC_Upload835" class="nav-link ">
+                                            <i class="fa fa-upload"></i>
+                                            <span class="title">@Resource.Upload835</span>
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" data-selectmenu="@Resource.SMI_LatestERA">
+                                        <a href="@Constants.HC_LatestERA" class="nav-link ">
+                                            <i class="fa fa-download"></i>
+                                            <span class="title">@Resource.LatestERA</span>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </li>
+
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Billing_Reconcile835))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_Reconcile835">
+                                <a href="@Constants.HC_Reconcile835" class="nav-link ">
+                                    <i class="fa fa-upload"></i>
+                                    <span class="title">Reconcile 835/EOB</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Billing_EDIFileLogs))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EdiFileLogList">
+                                <a href="@Constants.HC_EdiFileLogs" class="nav-link ">
+                                    <i class="fa fa-list"></i>
+                                    <span class="title">@Resource.EdiFileLogs</span>
+                                </a>
+                            </li>
+                        }
+                        @if (SessionHelper.IsEmployeeLogin &&
+(Common.HasPermission(Constants.HC_Permission_Invoice) || Common.HasPermission(Constants.HC_Permission_InvoiceList)))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_InvoiceList">
+                                <a href="@Constants.HC_InvoiceListURL" class="nav-link nav-toggle">
+                                    <i class="fa fa-files-o" aria-hidden="true"></i>
+                                    <span class="title">@Resource.Invoice</span>
+                                </a>
+                            </li>
+                        }
+                        @*@if (Common.HasPermission(Constants.HC_Permission_Billing_EDI270_271))
+        {
+            <li class="nav-item" data-selectmenu="@Resource.SMI_Process270_271">
+                <a href="@Constants.HC_Process270_271" class="nav-link ">
+                    <i class="fa fa fa-forumbee"></i>
+                    <span class="title">@Resource.Process270_271MenuTitle</span>
+                </a>
+            </li>
+        }*@
+
+                        @*@if (Common.HasPermission(Constants.Permission_Billing_Reconcile835))
+        {*@
+                        @* <li class="nav-item" data-selectmenu="@Resource.SMI_Reconcile835">
+            <a href="@Constants.HC_Reconcile835" class="nav-link ">
+                <i class="fa fa-crosshairs"></i>
+                <span class="title">@Resource.Reconcile835Menu</span>
+            </a>
+        </li>*@
+                        @*}*@
+
+
+
+
+                        @*@if (Common.HasPermission(Constants.Permission_Billing_Upload835))
+        {
+            <li class="nav-item" data-selectmenu="@Resource.SMI_Upload835">
+                <a href="@Constants.Upload835" class="nav-link ">
+                    <i class="fa fa-upload"></i>
+                    <span class="title">@Resource.Upload835</span>
+                </a>
+            </li>
+        }
+        @if (Common.HasPermission(Constants.Permission_Billing_Reconcile835))
+        {
+            <li class="nav-item" data-selectmenu="@Resource.SMI_Reconcile835">
+                <a href="@Constants.Reconcile835" class="nav-link ">
+                    <i class="fa fa-crosshairs"></i>
+                    <span class="title">@Resource.Reconcile835Menu</span>
+                </a>
+            </li>
+        }
+
+
+
+        @if (Common.HasPermission(Constants.Permission_Billing_EDI270_271))
+        {
+            <li class="nav-item" data-selectmenu="@Resource.SMI_Process270_271">
+                <a href="@Constants.Process270_271" class="nav-link ">
+                    <i class="fa fa fa-forumbee"></i>
+                    <span class="title">@Resource.Process270_271MenuTitle</span>
+                </a>
+            </li>
+        }
+        @if (Common.HasPermission(Constants.Permission_Billing_EDI277CA))
+        {
+            <li class="nav-item" data-selectmenu="@Resource.SMI_Process277CA">
+                <a href="@Constants.Process277CA" class="nav-link ">
+                    <i class="fa fa fa-forumbee"></i>
+                    <span class="title">@Resource.Process277CAMenuTitle</span>
+                </a>
+            </li>
+        }
+
+        @if (Common.HasPermission(Constants.Permission_ChangeServiceCode))
+        {
+
+                <li class="nav-item" data-selectmenu="@Resource.SMI_ChangeServiceCode">
+                    <a href="@Constants.ChangeServiceCode" class="nav-link ">
+                        <i class="fa fa-code-fork"></i>
+                        <span class="title">@Resource.ChangeServiceCode</span>
+                    </a>
+                </li>
+            }*@
+                    </ul>
+                </li>
+            }
+            @if (SessionHelper.IsEmployeeLogin &&
+    (Common.HasPermission(Constants.HC_Permission_Message_ReceivedMessage)
+    || Common.HasPermission(Constants.HC_Permission_Message_SentMessage)
+    || Common.HasPermission(Constants.HC_Permission_Message_GroupSMS)))
+            {
+                <li class="nav-item ">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-envelope" aria-hidden="true"></i>
+                        <span class="title">@Resource.MessagesLbl</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+                        @if (Common.HasPermission(Constants.HC_Permission_Message_ReceivedMessage))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_ReceivedIM">
+                                <a href="@Constants.HC_ReceviedImURL" class="nav-link ">
+                                    <i class="fa fa-recycle"></i>
+                                    <span class="title">@Resource.ReceivedIM</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Message_SentMessage))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_SentIM">
+                                <a href="@Constants.HC_SentImURL" class="nav-link ">
+                                    <i class="fa fa-send-o"></i>
+                                    <span class="title">@Resource.SentIM</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Message_GroupSMS))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_GroupSMS">
+                                <a href="@Constants.HC_GroupSMSURL" class="nav-link ">
+                                    <i class="fa fa-envelope-o"></i>
+                                    <span class="title">@Resource.GroupSMS</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Message_BroadcastNotifications))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_BroadcastNotifications">
+                                <a href="@Constants.HC_BroadcastNotificationURL" class="nav-link ">
+                                    <i class="fa fa-envelope-o"></i>
+                                    <span class="title">@Resource.BroadcastNotifications</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+            @if (SessionHelper.IsEmployeeLogin &&
+(Common.HasPermission(Constants.HC_Permission_EmployeeVisitReports) ||
+Common.HasPermission(Constants.HC_Permission_EmployeeBillingReports) || Common.HasPermission(Constants.HC_Permission_SSRS_Reports)))
+            {
+                <li class="nav-item ">
+                    <a href="@Constants.HC_ReportURL" class="nav-link nav-toggle">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <span class="title">@Resource.Reports</span>
+                    </a>
+
+                </li>
+            }
+            @*@if (SessionHelper.IsEmployeeLogin &&
+        (Common.HasPermission(Constants.HC_Permission_Invoice) || Common.HasPermission(Constants.HC_Permission_InvoiceList)))
+                  {
+                      <li class="nav-item" data-selectmenu="@Resource.SMI_InvoiceList">
+                          <a href="@Constants.HC_InvoiceListURL" class="nav-link nav-toggle">
+                              <i class="fa fa-files-o" aria-hidden="true"></i>
+                              <span class="title">@Resource.Invoice</span>
+                          </a>
+                      </li>
+                  }*@
+
+
+            @if (SessionHelper.IsEmployeeLogin &&
+  (Common.HasPermission(Constants.HC_Permission_Invoice) || Common.HasPermission(Constants.HC_Permission_InvoiceList)))
+            {
+                <li class="nav-item" data-selectmenu="@Resource.SMI_InvoiceList">
+                    <a href="@Constants.HC_InvoiceListURL" class="nav-link nav-toggle">
+                        <i class="fa fa-files-o" aria-hidden="true"></i>
+                        <span class="title">@Resource.Invoice</span>
+                    </a>
+                </li>
+            }
+            @if (SessionHelper.IsEmployeeLogin &&
+(Common.HasPermission(Constants.HC_Permission_Employee_Attendance) ||
+Common.HasPermission(Constants.HC_Permission_Employee_Attendance_Clockinout) || Common.HasPermission(Constants.HC_Permission_Employee_Attendance_Calender)))
+            {
+                <li class="nav-item ">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-sign-in" aria-hidden="true"></i>
+                        <span class="title">@Resource.Attendance</span>
+                        <span class="arrow"></span><span beta-tag></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+                        @if (Common.HasPermission(Constants.HC_Permission_Employee_Attendance_Clockinout))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeAttendanceClockinout">
+                                <a href="@Constants.HC_EmployeeAttendanceClockinoutURL" class="nav-link nav-toggle">
+                                    <i class="fa fa-clock-o" aria-hidden="true"></i>
+                                    <span class="title">@Resource.EmployeeAttendanceClockinout</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Employee_Attendance_Calender))
+                        {
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeAttendanceCalender">
+                                <a href="@Constants.HC_EmployeeAttendanceCalenderURL" class="nav-link nav-toggle">
+                                    <i class="fa fa-calendar-o" aria-hidden="true"></i>
+                                    <span class="title">@Resource.EmployeeAttendanceCalender</span>
+                                </a>
+                            </li>
+                        }
+
+                    </ul>
+                </li>
+            }
+
+
+            @if (SessionHelper.IsEmployeeLogin &&
+    (Common.HasPermission(Constants.HC_Permission_DxCode_AddUpdate) || Common.HasPermission(Constants.HC_Permission_DxCode_List)
+    || Common.HasPermission(Constants.HC_Permission_FacilityHouse_AddUpdate) || Common.HasPermission(Constants.HC_Permission_FacilityHouse_List)
+    || Common.HasPermission(Constants.HC_Permission_GeneralMaster_AddUpdate) || Common.HasPermission(Constants.HC_Permission_GeneralMaster_List)
+    || Common.HasPermission(Constants.HC_Permission_Compliance_AddUpdate) || Common.HasPermission(Constants.HC_Permission_Compliance_List)
+    || Common.HasPermission(Constants.HC_Permission_Payor_AddUpdate) || Common.HasPermission(Constants.HC_Permission_Payor_List)
+    || Common.HasPermission(Constants.HC_Permission_Physician_AddUpdate) || Common.HasPermission(Constants.HC_Permission_Physician_List)
+    || Common.HasPermission(Constants.HC_Permission_EBCategory_AddUpdate) || Common.HasPermission(Constants.HC_Permission_EBCategory_List)
+    || Common.HasPermission(Constants.HC_Permission_PreferenceSkill_AddUpdate) || Common.HasPermission(Constants.HC_Permission_PreferenceSkill_List)
+    || Common.HasPermission(Constants.HC_Permission_ServiceCode_AddUpdate) || Common.HasPermission(Constants.HC_Permission_ServiceCode_List)
+    || Common.HasPermission(Constants.HC_Permission_VisitTask_AddUpdate) || Common.HasPermission(Constants.HC_Permission_VisitTask_List)
+    || Common.HasPermission(Constants.HC_Permission_Agency_AddUpdate) || Common.HasPermission(Constants.HC_Permission_Agency_List)
+    ))
+            {
+                <li class="nav-item">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="icon-settings"></i>
+                        <span class="title">@Resource.Masters</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+
+                        @if (Common.HasPermission(Constants.HC_Permission_Agency_AddUpdate) || Common.HasPermission(Constants.HC_Permission_Agency_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-bank"></i>
+                                    <span class="title">@Resource.Agency</span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.HC_Permission_Agency_AddUpdate))
+                                    {
+
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_AgencyAdd">
+                                            <a href="@Constants.HC_AgencyAddPageURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.HC_Permission_Agency_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.HC_AgencyListPageURL" class="nav-link" data-selectmenu="@Resource.SMI_AgencyList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+                        @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate) || Common.HasPermission(Constants.Permission_CaseManager_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-file-word-o"></i>
+                                    <span class="title">@Resource.CaseManager</span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate))
+                                    {
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_CaseManagerAdd">
+                                            <a href="@Constants.AddCaseManagerURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.Permission_CaseManager_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.CaseManagerListURL" class="nav-link" data-selectmenu="@Resource.SMI_CaseManagerList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_AddUpdate) || Common.HasPermission(Constants.HC_Permission_FacilityHouse_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-bank"></i>
+                                    <span class="title">@Resource.FacilityHouse</span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_AddUpdate))
+                                    {
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_FacilityHouseAdd">
+                                            <a href="@Constants.HC_AddFacilityHouseURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.HC_FacilityHouseListURL" class="nav-link" data-selectmenu="@Resource.SMI_FacilityHouseList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+
+                        @if (Common.HasPermission(Constants.HC_Permission_Compliance_AddUpdate) ||
+Common.HasPermission(Constants.HC_Permission_Compliance_List))
+                        {
+                            <li>
+                                <a href="@Constants.HC_ComplianceDetail" class="nav-link" data-selectmenu="@Resource.SMI_ComplianceDetail">
+                                    <i class="fa fa-dedent"></i>
+                                    <span class="title">@Resource.DocumentCategorization</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_DxCode_AddUpdate) || Common.HasPermission(Constants.HC_Permission_DxCode_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-tasks"></i>
+                                    <span class="title">@Resource.DXCode </span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.HC_Permission_DxCode_AddUpdate))
+                                    {
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_DxCodeAdd">
+                                            <a href="@Constants.HC_AddDXCodeURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.HC_Permission_DxCode_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.HC_DXCodeListURL" class="nav-link" data-selectmenu="@Resource.SMI_DxCodeList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @*@if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_AddUpdate) || Common.HasPermission(Constants.HC_Permission_FacilityHouse_List))
+                    {
+                        <li class="nav-item">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="fa fa-bank"></i>
+                                <span class="title">@Resource.FacilityHouse</span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_AddUpdate))
+                                {
+                                    <li class="nav-item" data-selectmenu="@Resource.SMI_FacilityHouseAdd">
+                                        <a href="@Constants.HC_AddFacilityHouseURL" class="nav-link">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="title">@Resource.Add</span>
+                                        </a>
+                                    </li>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_List))
+                                {
+                                    <li class="nav-item">
+                                        <a href="@Constants.HC_FacilityHouseListURL" class="nav-link" data-selectmenu="@Resource.SMI_FacilityHouseList">
+                                            <i class="fa fa-list"></i>
+                                            <span class="title">@Resource.List</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                    }*@
+
+                        @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_AddUpdate) ||
+Common.HasPermission(Constants.HC_Permission_GeneralMaster_List))
+                        {
+                            <li>
+                                <a href="@Constants.HC_GeneralMasterDetail" class="nav-link" data-selectmenu="@Resource.SMI_GeneralMaster">
+                                    <i class="fa fa-anchor"></i>
+                                    <span class="title">@Resource.GeneralMaster</span>
+                                </a>
+                            </li>
+                        }
+
+                        @if (Common.HasPermission(Constants.HC_Permission_Organization_Preference))
+                        {
+                            <li>
+                                <a href="@Constants.HC_Organization_Preference" class="nav-link" data-selectmenu="@Resource.SMI_Organization_Preference">
+                                    <i class="fa fa-code-fork"></i>
+                                    <span class="title">@Resource.Organization_Preference</span>
+                                </a>
+                            </li>
+                        }
+
+
+
+                        @if (Common.HasPermission(Constants.HC_Permission_OrganizationFormMasters))
+                        {
+                            <li>
+                                <a href="@Constants.HC_OrganizationForms" class="nav-link" data-selectmenu="@Resource.SMI_OrganizationForms">
+                                    <i class="fa fa-code-fork"></i>
+                                    <span class="title">@Resource.OrganizationForms</span>
+                                </a>
+                            </li>
+                        }
+                        <li>
+                            <a href="@Constants.HC_OrganizationForms" class="nav-link" data-selectmenu="@Resource.SMI_OrganizationForms">
+                                <i class="fa fa-code-fork"></i>
+                                <span class="title">@Resource.OrganizationForms</span>
+                            </a>
+                        </li>
+                        @if (Common.HasPermission(Constants.HC_Permission_Payor_AddUpdate) || Common.HasPermission(Constants.HC_Permission_Payor_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-money"></i>
+                                    <span class="title">@Resource.Payor </span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.HC_Permission_Payor_AddUpdate))
+                                    {
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_PayorAdd">
+                                            <a href="@Constants.HC_AddPayorURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.HC_Permission_Payor_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.HC_GetPayorList" class="nav-link" data-selectmenu="@Resource.SMI_PayorList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Physician_AddUpdate) || Common.HasPermission(Constants.HC_Permission_Physician_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-stethoscope"></i>
+                                    <span class="title">@Resource.Physician</span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.HC_Permission_Physician_AddUpdate))
+                                    {
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_PhysicianAdd">
+                                            <a href="@Constants.HC_AddPhysicianURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.HC_Permission_Physician_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.HC_PhysicianListURL" class="nav-link" data-selectmenu="@Resource.SMI_PhysicianList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_AddUpdate) || Common.HasPermission(Constants.HC_Permission_PreferenceSkill_List))
+                        {
+
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-smile-o"></i>
+                                    <span class="title">@Resource.PreferenceSkill</span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_AddUpdate))
+                                    {
+
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_PreferenceAdd">
+                                            <a href="@Constants.AddPreferenceURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.PreferenceListURL" class="nav-link" data-selectmenu="@Resource.SMI_PreferenceList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_ServiceCode_AddUpdate) || Common.HasPermission(Constants.HC_Permission_ServiceCode_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-futbol-o"></i>
+                                    <span class="title">@Resource.ServiceCode </span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.HC_Permission_ServiceCode_AddUpdate))
+                                    {
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_ServiceCodeAdd">
+                                            <a href="@Constants.HC_AddServiceCodeURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.HC_Permission_ServiceCode_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.HC_GetServiceCodeList" class="nav-link" data-selectmenu="@Resource.SMI_ServiceCodeList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_VisitTask_AddUpdate) || Common.HasPermission(Constants.HC_Permission_VisitTask_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-question"></i>
+                                    <span class="title">@Resource.VisitTask</span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.HC_Permission_VisitTask_AddUpdate))
+                                    {
+
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_VisitTaskAdd">
+                                            <a href="@Constants.AddVisitTaskURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.HC_Permission_VisitTask_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.VisitTaskListURL" class="nav-link" data-selectmenu="@Resource.SMI_VisitTaskList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+                        <li class="nav-item" style="display:none;">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="fa fa-stethoscope"></i>
+                                <span class="title">@Resource.Category</span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                @if (Common.HasPermission(Constants.HC_Permission_EBCategory_AddUpdate))
+                                {
+                                    <li class="nav-item" data-selectmenu="@Resource.SMI_PhysicianAdd">
+                                        <a href="@Constants.HC_AddCategoryURL" class="nav-link">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="title">@Resource.Add</span>
+                                        </a>
+                                    </li>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_EBCategory_List))
+                                {
+                                    <li class="nav-item">
+                                        <a href="@Constants.CategryListURL" class="nav-link" data-selectmenu="@Resource.SMI_PhysicianList">
+                                            <i class="fa fa-list"></i>
+                                            <span class="title">@Resource.List</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+
+                        <li class="nav-item" style="display:none;">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="fa fa-stethoscope"></i>
+                                <span class="title">@Resource.Markets</span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                @if (Common.HasPermission(Constants.HC_Permission_EBMarket_AddUpdate))
+                                {
+                                    <li class="nav-item" data-selectmenu="@Resource.SMI_MarketAdd">
+                                        <a href="@Constants.HC_AddEBMarketsURL" class="nav-link">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="title">@Resource.Add</span>
+                                        </a>
+                                    </li>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_EBMarket_List))
+                                {
+                                    <li class="nav-item">
+                                        <a href="@Constants.EBMarketsListURL" class="nav-link" data-selectmenu="@Resource.SMI_MarketList">
+                                            <i class="fa fa-list"></i>
+                                            <span class="title">@Resource.List</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+
+                        <li class="nav-item" style="display:none;">
+                            <a href="javascript:;" class="nav-link nav-toggle">
+                                <i class="fa fa-stethoscope"></i>
+                                <span class="title">@Resource.Form</span>
+                                <span class="arrow"></span>
+                            </a>
+                            <ul class="sub-menu">
+                                @if (Common.HasPermission(Constants.HC_Permission_EForm_AddUpdate))
+                                {
+                                    <li class="nav-item" data-selectmenu="@Resource.SMI_FormsAdd">
+                                        <a href="@Constants.HC_AddEBFormsURL" class="nav-link">
+                                            <i class="fa fa-plus"></i>
+                                            <span class="title">@Resource.Add</span>
+                                        </a>
+                                    </li>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_EBForm_List))
+                                {
+                                    <li class="nav-item">
+                                        <a href="@Constants.EBFormsListURL" class="nav-link" data-selectmenu="@Resource.SMI_FormsList">
+                                            <i class="fa fa-list"></i>
+                                            <span class="title">@Resource.List</span>
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
+                        </li>
+                        @if (Common.HasPermission(Constants.Permission_NoteSentence_AddUpdate) || Common.HasPermission(Constants.Permission_NoteSentence_List))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-file-word-o"></i>
+                                    <span class="title">@Resource.NoteSentence</span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.Permission_NoteSentence_AddUpdate))
+                                    {
+
+                                        <li class="nav-item" data-selectmenu="@Resource.SMI_NoteSentenceAdd">
+                                            <a href="@Constants.AddNoteSentenceURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.Permission_NoteSentence_List))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.NoteSentenceListURL" class="nav-link" data-selectmenu="@Resource.SMI_NoteSentenceList">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+                        }
+
+
+                        @if (Common.HasPermission(Constants.HC_Permission_EmailTEmplate) || Common.HasPermission(Constants.Permission_EmailTemplateList) || Common.HasPermission(Constants.Permission_AddEmailTemplate))
+                        {
+                            <li class="nav-item">
+                                <a href="javascript:;" class="nav-link nav-toggle">
+                                    <i class="fa fa-envelope"></i>
+                                    <span class="title">@Resource.EmailTemplate</span>
+                                    <span class="arrow"></span>
+                                </a>
+                                <ul class="sub-menu">
+                                    @if (Common.HasPermission(Constants.Permission_AddEmailTemplate))
+                                    {
+                                        <li class="nav-item" data-selectmenu="">
+                                            <a href="@Constants.AddEmailTemplateURL" class="nav-link">
+                                                <i class="fa fa-plus"></i>
+                                                <span class="title">@Resource.Add</span>
+                                            </a>
+                                        </li>
+                                    }
+                                    @if (Common.HasPermission(Constants.Permission_EmailTemplateList))
+                                    {
+                                        <li class="nav-item">
+                                            <a href="@Constants.EmailTemplateListURL" class="nav-link" data-selectmenu="">
+                                                <i class="fa fa-list"></i>
+                                                <span class="title">@Resource.List</span>
+                                            </a>
+                                        </li>
+                                    }
+                                </ul>
+                            </li>
+
+                        }
+
+
+
+
+
+
+
+                        @*@if (Common.HasPermission(Constants.Permission_GroupNote) && !SessionHelper.IsHomeCare && !SessionHelper.IsRAL && !SessionHelper.IsCaseManagement)
+                    {
+                        <li class="nav-item" data-selectmenu="@Resource.SMI_AddGroupNote">
+                            <a href="@Constants.AddGroupNote" class="nav-link">
+                                <i class="fa fa-plus"></i>
+                                <span class="title">@Resource.GroupNote</span>
+                            </a>
+                        </li>
+                    }*@
+                        @*<li class="nav-item">
+                        <a href="javascript:;" class="nav-link nav-toggle">
+                            <i class="fa fa-file-word-o"></i>
+                            <span class="title">Capture Call</span>
+                            <span class="arrow"></span>
+                        </a>
+                        <ul class="sub-menu">
+                            <li class="nav-item" data-selectmenu="@Resource.SMI_CaseManagerAdd">
+                                <a href="@Constants.AddCaptureCallUrl" class="nav-link">
+                                    <i class="fa fa-plus"></i>
+                                    <span class="title">@Resource.Add</span>
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="@Constants.CaptureCallListUrl" class="nav-link" data-selectmenu="@Resource.SMI_CaseManagerList">
+                                    <i class="fa fa-list"></i>
+                                    <span class="title">@Resource.List</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>*@
+                        @if (Common.HasPermission(Constants.HC_Permission_Notification_Configuration))
+                        {
+                            <li>
+                                <a href="@Constants.HC_NotificationConfigurationURL" class="nav-link" data-selectmenu="@Resource.SMI_NotificationConfiguration">
+                                    <i class="fa fa-commenting-o"></i>
+                                    <span class="title">@Resource.NotificationConfig</span>
+                                </a>
+                            </li>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Notification_Configuration))
+                        {
+                            <li>
+                                <a href="@Constants.HC_VirtualVistTermsAndConditions" class="nav-link" data-selectmenu="@Resource.SMI_NotificationConfiguration">
+                                    <i class="fa fa-commenting-o"></i>
+                                    <span class="title">@Resource.VirtualVisitTermsAndConditions</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </li>
+            }
+
+            @if (Request.Url.Authority == "localhost:51285" || Request.Url.Authority == "test.myezcare.com")
+            {
+                <li class="nav-item ">
+                    <a href="javascript:;" class="nav-link nav-toggle">
+                        <i class="fa fa-bar-chart" aria-hidden="true"></i>
+                        <span class="title">UI KIT</span>
+                        <span class="arrow"></span>
+                    </a>
+                    <ul class="sub-menu" style="display: none;">
+                        <li class="nav-item" data-selectmenu="@Resource.SMI_EmployeeBillingReport">
+                            <a href="@Constants.UIKITURL" class="nav-link nav-toggle">
+                                <i class="fa fa-area-chart" aria-hidden="true"></i>
+                                <span class="title">UI Kit</span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </li>
+            }
+            <!--Added new option to show facility details-->
+
+        </ul>
+        <!-- END SIDEBAR MENU -->
+        <!-- END SIDEBAR MENU -->
+    </div>
+    <!-- END SIDEBAR -->
+</div>
+<!-- END SIDEBAR -->
+@if (SessionHelper.DomainName.ToLower() != "emoha")
+{
+    <!--Start of Tawk.to Script-->
+    <script type="text/javascript">
+        var Tawk_API = Tawk_API || {}, Tawk_LoadStart = new Date();
+        (function () {
+            var s1 = document.createElement("script"), s0 = document.getElementsByTagName("script")[0];
+            s1.async = true;
+            s1.src = 'https://embed.tawk.to/5e9f666e69e9320caac5fd19/default';
+            s1.charset = 'UTF-8';
+            s1.setAttribute('crossorigin', '*');
+            s0.parentNode.insertBefore(s1, s0);
+        })();
+    </script>
+    <!--End of Tawk.to Script-->
+}

@@ -1,0 +1,173 @@
+﻿@model InvoiceViewModel
+@Html.Hidden("hdnSetCompanyInvoiceListPage", Common.SerializeObject(Model))
+<div data-ng-controller="CompanyInvoiceListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.InvoiceList
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+
+            <div class="btn-group">
+                <button id="refreshBtn" class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="inline-block pull-right" data-ng-show="InvoiceList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="InvoiceListPager.maxSize" on-page-change="InvoiceListPager.pageChanged(newPageNumber)" pagination-id="InvoiceListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+
+
+                                        <th style="text-align: center;">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('PatientName')">Invoice Number</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th style="text-align: center;">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('PatientName')">Invoice Date</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+
+                                        <th style="text-align: center;">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceDate')">Due Date@*@Resource.*@</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceDate'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th style="text-align: center;">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceAmount')">@Resource.InvoiceAmount</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceAmount'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th style="text-align: center;">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('PaidAmount')">@Resource.PaidAmount</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'PaidAmount'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th style="text-align: center;">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceStatus')">@Resource.InvoiceStatus</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceStatus'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-155px" style="text-align: center;">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @*<tr class="compact-search-tr">
+
+                                            <td class="text-align-center"></td>
+                                            <td>@Html.TextBoxFor(m => m.InvoiceAmount, new { data_ng_model = "InvoiceModel.invoice_number", @class = "form-control input-sm", placeholder = "Invoice Number", maxlength = 20 })</td>
+
+                                            <td>
+                                                <div class="input-group date date-picker pull-right"
+                                                     datepicker="InvoiceModel.InvoiceDate" ng-dateval="InvoiceModel.InvoiceDate">
+                                                    @Html.TextBoxFor(m => m.InvoiceDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask",
+                                                   maxlength = "50",
+                                                   id = "InvoiceDatePicker",
+                                                   placeholder = Resource.DateFormat
+                                               })
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </td>
+
+                                            <td>
+                                                <div class="input-group date date-picker pull-right"
+                                                     datepicker="InvoiceModel.DueDate" ng-dateval="InvoiceModel.DueDate">
+                                                    @Html.TextBoxFor(m => m.DueDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask",
+                                                   maxlength = "50",
+                                                   id = "InvoiceDatePicker",
+                                                   placeholder = Resource.DateFormat,
+
+                                               })
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.InvoiceAmount, new { data_ng_model = "InvoiceModel.InvoiceAmount", @class = "form-control input-sm", placeholder = Resource.InvoiceAmount, maxlength = 20 })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.PaidAmount, new { data_ng_model = "InvoiceModel.PaidAmount", @class = "form-control input-sm", placeholder = Resource.PaidAmount, maxlength = 100 })
+                                            </td>
+                                            <td>
+                                                <select class="form-control input-sm" data-ng-model="InvoiceModel.IsPaid1" id="InvoiceStatusId" name="InvoiceStatus" placeholder="Invoice Status">
+                                                    <option value="" selected>Select</option>
+                                                    <option value="6">Paid</option>
+                                                    <option value="2">Un-Paid</option>
+                                                </select>
+                                            </td>
+                                            <td class="text-align-center">
+                                                <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchInvoice(InvoiceModel)" />
+                                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                            </td>
+                                        </tr>*@
+                                    <tr dir-paginate="item in InvoiceList | orderBy:'invoice_date':true |filter:InvoiceModel.IsPaid1| itemsPerPage: InvoiceListPager.pageSize" total-items="InvoiceListPager.totalRecords" current-page="InvoiceListPager.currentPage" pagination-id="InvoiceListPager_ID">
+
+                                        <td style="text-align: center;">{{item.invoice_number}}</td>
+                                        <td style="text-align: center;">{{item.invoice_date}}</td>
+
+                                        <td style="text-align: center;">{{item.DueDate}}</td>
+                                        <td style="text-align: center;">${{item.amount ==null|| item.amount =="" ?"0":item.amount}}</td>
+                                        <td style="text-align: center;">${{item.amount==null|| item.amount =="" ?"0":item.amount}}</td>
+                                        <td style="text-align: center;">{{item.invoice_status_id === '4'?"Paid":"Un-Paid"}}</td>
+                                        <td class="text-align-center">
+                                            <a data-ng-show="item.invoice_status_id !== '4'" data-ng-click="OpenInvoice(item.invoicepath)" class="btn btn-xs btn-success red-mint" style="width:102px">@Resource.PayNow</a>
+                                            @*<a data-ng-show="item.invoice_status_id !== '4'" data-ng-click="OpenInvoiceforPayment(item.invoice_number,item.amount,item.client_id)" class="btn btn-xs btn-success red-mint" style="width:102px">@Resource.PayNow</a>*@
+                                            <a data-ng-show="item.invoice_status_id === '4'" data-ng-click="OpenInvoice(item.invoicepath)" class="btn btn-xs btn-success green-jungle" style="width:102px">@Resource.View</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div>{{InvoicePDF.Data}}</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="InvoiceList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="InvoiceList.length "></span>
+                    &nbsp;@Resource.To <span data-ng-bind="InvoiceList.length "></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="InvoiceListPager.maxSize" on-page-change="InvoiceListPager.pageChanged(newPageNumber)" pagination-id="InvoiceListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="InvoiceList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@*@section Scripts{
+        @Scripts.Render("~/assets/js/viewjs/siteApp/areas/homecare/invoice/companyClientInvoiceList")
+
+        <script type="text/javascript">
+            //var DeleteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Invoice)';
+            //var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Invoice)';
+        </script>
+    }*@

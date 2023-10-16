@@ -1,0 +1,67 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, "Cancellation");
+    bool isLoggedIn = SessionHelper.LoggedInID > 0;
+    Layout = "~/views/shared/_loginlayout.cshtml";
+    CacheHelper _cacheHelper = new CacheHelper();    
+}
+
+@model CancelEmailDetailModel
+
+@Html.Hidden("hndScheduleMasterModelCancelPage", Common.SerializeObject(Model))
+
+<div class="row" data-ng-controller="ScheduleEmailController">
+    <form class="form-horizontal" id="frmEmailCancellation" data-ng-if="IsShow">
+
+        <div>
+            <h3 class="page-title no-padding">@Resource.CancellationReason</h3>
+        </div>
+        <div class="space1"></div>
+        <hr />
+        <div class="space1"></div>
+        <div class="col-lg-12">
+            <div class="">
+                <div class="">
+                    <div class="padding-15">
+                        <div class="form-group">
+                            <div class="col-md-12 ">
+                                @Html.TextAreaFor(q => q.ScheduleMaster.CancelReason, new { @class = "form-control input-sm cancel-reason-height", data_ng_model = "ScheduleEmailModel.ScheduleMaster.CancelReason", placeholder = @Resource.CancellationReason, maxlength = 500, row = "5" })
+                                @Html.ValidationMessageFor(q => q.ScheduleMaster.CancelReason)
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-md-12">
+                                <div style="padding-left: 112px">
+                                    <input type="button" data-ng-click="UpdateScheduleEmailDetails()" class="btn btn-sm btn red pull-left" value="Skip and Continue" />
+                                </div>
+                                <div>
+                                    <input type="button" data-ng-click="UpdateScheduleEmailDetails()" class="btn btn-sm green-jungle pull-right" value="@Resource.Submit" />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="row" data-ng-if="!IsShow">
+        <div class="col-lg-12">
+            <div>
+                <h4 class="m-t-none m-b">{{NotificationModel.Title}}</h4>
+                <hr />
+                <p class="margin-top-10">{{NotificationModel.Message}}</p>
+            </div>
+        </div>
+        <div class="col-md-12 text-align-center">
+            <hr />
+            <p class="margin-top-15 text-align-center">
+                You can contact us on <a class="margin-bottom-5" href="mailto:@_cacheHelper.SupportEmail">@Resource.ContactSupport</a>
+            </p>
+            <a href="/"><span class="btn btn-primary text-center">@Resource.BackToHomePage</span></a>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/schedule/scheduleemailcancellation")
+}

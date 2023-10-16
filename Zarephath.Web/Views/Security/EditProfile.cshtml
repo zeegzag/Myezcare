@@ -1,0 +1,296 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.EditProfile);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EditProfile;
+}
+
+@model EditProfileModel
+
+@Html.Hidden("hdnEditProfileModel", Common.SerializeObject(Model))
+
+@if (Model != null)
+{
+    <div data-ng-controller="EditProfileController">
+        <form class="form-horizontal" id="frmEditProfile">
+            <div class="page-bar headerBar">
+                <h3 class="page-title">@Resource.EditProfile</h3>
+                @*<small>@Resource.EditProfileInformation</small>*@
+                <span class="edit-head-btns">
+                    <input type="submit" data-ng-click="Save()" class="letter-space btn btn-sm green-jungle pull-right" data-ng-disabled="IsFileUploading" value="@Resource.Save" />
+                    <a href="@Constants.HCDashboardURL" class="letter-space btn btn-sm red-mint pull-right margin-right-10">@Resource.Cancel</a>
+                </span>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div class="fscontainer">
+                                <div class="legend">
+                                    My Profile
+                                </div>
+                                <div class="col-sm-3 no-padding">
+                                    @*<img id="avatar" class="profile-picture" alt="Alex's Avatar" src="https://encrypted-tbn0.gstatic.com/images?q=tbn%3AANd9GcRlW3r9_qcfU-6M9Qf9witE-skyTNjkbHqCfgWscQC6H96Vv-IX&usqp=CAU">*@
+                                    @if (Model.Employee.ProfileImagePath != null)
+                                    {
+                                        <div class="profileImg">
+                                            <div class="profileImgbox">
+                                                <img id="avatar" class="profile-picture" alt="Alex's Avatar" src="@Model.Employee.ProfileImageAccessPath">
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="profileImg">
+                                            <div class="profileImgboxChar">
+                                                @Html.Raw(Model.Employee.EmployeeName.Substring(0, 1).ToUpper())
+                                            </div>
+                                        </div>
+                                    }
+                                    <div style="margin-top: 10px;padding-left: 40px;">
+                                        <div class="col-md-12 col-sm-12 col-xs-12">
+                                            <div class="field">
+                                                <div class="field-box">
+                                                    <div class="">
+                                                        <div class="btn-group btn-block text-center">
+                                                            <div data-ng-if="!IsFileUploading" class="fileUpload btn btn-xs btn-primary margin-right-0">
+                                                                <span><i class="icon-plus"></i>&nbsp; Upload Profile Image</span>
+                                                                <div>
+                                                                    <div class="">
+                                                                        <input id="ProfileImageUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                                               fileupload
+                                                                               file-uploadurl="{{UploadProfileImage}}"
+                                                                               beforesend="ProfileImageBeforeSend"
+                                                                               aftersend="ProfileImageAfterSend"
+                                                                               progress="ProfileImageProgress"
+                                                                               filelist="UploadingFileList"
+                                                                               onchange="loadFile(event)"
+                                                                               limitmultifileuploads="1" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="font-sm col-md-12 no-padding margin-top-10">
+                                                            <b class="font-red-thunderbird">@Resource.NoteLabel</b><i>@Html.Raw(Resource.SignatureImageNote)</i>
+                                                        </div>
+                                                        <div class="col-md-12 no-padding margin-top-20">
+                                                            <div class="col-sm-12 no-padding" data-ng-repeat="filedata in UploadingFileList">
+                                                                <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4 no-padding">
+                                    <div class="col-sm-12">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label required">@Resource.FirstName</label>
+                                            <div class="col-md-8">
+                                                @Html.TextBoxFor(q => q.Employee.FirstName, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.FirstName", maxlength = 50, placeholder = Resource.FirstName })
+                                                @Html.ValidationMessageFor(q => q.Employee.FirstName)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label">@Resource.MiddleName</label>
+                                            <div class="col-md-8">
+                                                @Html.TextBoxFor(q => q.Employee.MiddleName, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.MiddleName", maxlength = 50, placeholder = Resource.MiddleName })
+                                                @Html.ValidationMessageFor(q => q.Employee.MiddleName)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label required">@Resource.LastName</label>
+                                            <div class="col-md-8">
+                                                @Html.TextBoxFor(q => q.Employee.LastName, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.LastName", maxlength = 50, placeholder = Resource.LastName })
+                                                @Html.ValidationMessageFor(q => q.Employee.LastName)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label required">@Resource.Email</label>
+                                            <div class="col-md-8">
+                                                @Html.TextBoxFor(q => q.Employee.Email, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.Email", maxlength = 50, placeholder = Resource.Email })
+                                                @Html.ValidationMessageFor(q => q.Employee.Email)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label required">@Resource.WorkPhone</label>
+                                            <div class="col-md-8">
+                                                @Html.TextBoxFor(q => q.Employee.PhoneWork, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.PhoneWork", maxlength = 20, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                                @Html.ValidationMessageFor(q => q.Employee.PhoneWork)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label required">@Resource.HomePhone</label>
+                                            <div class="col-md-8">
+                                                @Html.TextBoxFor(q => q.Employee.PhoneHome, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.PhoneHome", maxlength = 20, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                                @Html.ValidationMessageFor(q => q.Employee.PhoneHome)
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-5 no-padding">
+                                    <div class="col-sm-12">
+
+                                        <div class="form-group">
+                                            <label class="col-md-5 control-label required">@Resource.Username</label>
+                                            <div class="col-md-7">
+                                                @Html.TextBoxFor(q => q.Employee.UserName, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.UserName", maxlength = 50, placeholder = Resource.Username, autocomplete = "new-password" })
+                                                @Html.ValidationMessageFor(q => q.Employee.UserName)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-5 control-label">@Resource.Password</label>
+                                            <div class="col-md-7">
+                                                @Html.PasswordFor(q => q.Employee.NewPassword, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.NewPassword", maxlength = 20, placeholder = Resource.Password, autocomplete = "new-password" })
+                                                @Html.ValidationMessageFor(q => q.Employee.NewPassword)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+
+                                            <label class="col-md-5 control-label">@Resource.ConfirmPassword</label>
+                                            <div class="col-md-7">
+                                                @if (Model != null && Model.Employee.EmployeeID > 0)
+                                                {
+                                                    @Html.PasswordFor(q => q.Employee.TempConfirmPassword, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.TempConfirmPassword", maxlength = 20, placeholder = Resource.ConfirmPassword })
+                                                    @Html.ValidationMessageFor(q => q.Employee.TempConfirmPassword)
+                                                }
+                                                else
+                                                {
+                                                    @Html.PasswordFor(q => q.Employee.ConfirmPassword, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.ConfirmPassword", maxlength = 20 })
+                                                    @Html.ValidationMessageFor(q => q.Employee.ConfirmPassword)
+                                                }
+
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+
+                                            <label class="col-md-5 control-label required">@Resource.SecurityQuestion</label>
+                                            <div class="col-md-7 input-group-sm">
+                                                @Html.DropDownListFor(p => p.Employee.SecurityQuestionID, Model.SecurityQuestionList.ToSelectList(Model.Employee.SecurityQuestionID.ToString() ?? "", "Question", "SecurityQuestionID", @Resource.SelectSecurityQuestion, ""),
+                                                                  new
+                                                                      {
+                                                                          data_ng_model = "EditProfileModel.Employee.SecurityQuestionID",
+                                                                          data_ng_init = "EditProfileModel.Employee.SecurityQuestionID=EditProfileModel.Employee.SecurityQuestionID==''?null:EditProfileModel.Employee.SecurityQuestionID.toString()",
+                                                                          @class = "form-control requiredStrip",
+                                                                          data_ng_setname = "EditProfileModel.Employee.Question"
+                                                                      })
+                                                @Html.ValidationMessageFor(q => q.Employee.SecurityQuestionID)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label class="col-md-5 control-label required">@Resource.SecurityAnswer</label>
+                                            <div class="col-md-7">
+                                                @Html.TextBoxFor(q => q.Employee.SecurityAnswer, new { @class = "form-control input-sm", data_ng_model = "EditProfileModel.Employee.SecurityAnswer", maxlength = 100, placeholder = Resource.SecurityAnswer })
+                                                @Html.ValidationMessageFor(q => q.Employee.SecurityAnswer)
+                                            </div>
+                                        </div>
+
+                                        @if (1 == 2)
+                                        {
+
+                                            <div class="form-group">
+                                                <label class="col-md-5 control-label required">Signature</label>
+                                                <div class="col-md-7">
+
+                                                    @*@Html.TextBoxFor(q => q.Employee.EmpSignature,
+                                                                         new
+                                                                             {
+                                                                                 data_ng_model = "EditProfileModel.Employee.EmpSignature",
+                                                                                 @class = "form-control hideErrorContent replaceErrorSource"
+                                                                             })
+                                                        @Html.ValidationMessageFor(q => q.Employee.EmpSignature)
+                                                        <div class="dirSignature replaceErrorDest" data-ng-value="EditProfileModel.Employee.EmpSignature"></div>
+                                                        <a class="btn btn-default btn-xs clearSignature">Clear</a>*@
+                                                    @Html.TextBoxFor(q => q.Employee.TempSignaturePath,
+                                                        new
+                                                        {
+                                                            data_ng_model = "EditProfileModel.Employee.TempSignaturePath",
+                                                            @class = "form-control hideErrorContent replaceErrorSource"
+                                                        })
+                                                    @Html.ValidationMessageFor(m => m.Employee.TempSignaturePath)
+                                                    <div class="replaceErrorDest">
+                                                        <div class="btn-group btn-block text-center">
+                                                            <div data-ng-if="!IsFileUploading" class="fileUpload btn btn-xs btn-primary margin-right-0">
+                                                                <span><i class="icon-plus"></i>&nbsp; @Resource.UploadSignature</span>
+                                                                <div>
+
+                                                                    <div class="">
+                                                                        <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                                               amazonfileupload=""
+                                                                               file-uploadurl="{{UploadFile}}"
+                                                                               beforesend="BeforeSend"
+                                                                               aftersend="AfterSend"
+                                                                               progress="Progress"
+                                                                               filelist="UploadingFileList"
+                                                                               onchange="loadFile(event)"
+                                                                               data-ng-aws-settings-model="EditProfileModel.AmazonSettingModel" />
+                                                                    </div>
+
+
+                                                                </div>
+
+                                                            </div>
+                                                        </div>
+                                                        <div class="font-sm col-md-12 no-padding margin-top-10">
+                                                            <b class="font-red-thunderbird">@Resource.NoteLabel</b><i>@Html.Raw(Resource.SignatureImageNote)</i>
+                                                        </div>
+                                                        <div class="margin-top-20">
+                                                            <script>
+                                                                var loadFile = function (event) {
+                                                                    var output = document.getElementById('img1');
+                                                                    output.src = URL.createObjectURL(event.target.files[0]);
+                                                                };
+                                                            </script>
+                                                            <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-show="!IsFileUploading && EditProfileModel.Employee.TempSignaturePath" data-ng-src="{{EditProfileModel.AmazonSettingModel.URL+'/'+EditProfileModel.Employee.TempSignaturePath}}" />
+                                                            <img class="img-responsive signature-image" id="img1" src="" data-ng-show="IsFileUploading" />
+                                                            <img class="img-responsive signature-image" id="defaultSignature" src="/Assets/images/signature.jpg" data-ng-show="!IsFileUploading && !EditProfileModel.Employee.TempSignaturePath" />
+                                                            <div class="col-sm-12 no-padding" data-ng-repeat="filedata in UploadingFileList">
+                                                                <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+
+
+                                                </div>
+
+                                            </div>
+
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 form-group text-center">
+                        <input type="submit" data-ng-click="Save()" class="letter-space btn btn-sm green-jungle " data-ng-disabled="IsFileUploading" value="@Resource.Save" />
+                        <a href="@Constants.DashboardURL" class="btn btn-sm red-mint  letter-space margin-right-10">@Resource.Cancel</a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+}
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/signature")
+    @Scripts.Render("~/assets/js/viewjs/loginapp/security/editprofile")
+    <script type="text/javascript">
+        var InvalidImageUploadMessage = '@Resource.InvalidImageUploadMessage';
+        var MaximumUploadImageSizeMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage2MB))';
+    </script>
+}

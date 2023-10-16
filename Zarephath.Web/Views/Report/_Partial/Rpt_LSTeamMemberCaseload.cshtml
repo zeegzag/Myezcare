@@ -1,0 +1,103 @@
+﻿@model ReportModel
+@Html.Hidden("hdnSetLSTeamMemberCaseloadModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptLSTeamMemberCaseloadController">
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon ribbon-color-warning uppercase">@Resource.LSTeamMemberCaseloads</div>
+        <p class="ribbon-content">
+            @Resource.LSTeamMemberCaseloadsDetail
+        </p>
+        <hr />
+        <div>
+            @*<a class="btn btn-sm blue pull-right" href="#model__SearchRptLSTeamMemberCaseloads" data-toggle="modal">@Resource.GenerateReport</a>*@
+            <a class="btn btn-sm grey-mint pull-right" href="@Constants.ReportLsTeamMemberCaseLoadURL" target="_blank" data-toggle="modal">@Resource.GenerateReport</a>
+            
+        </div>
+        <br />
+    </div>
+
+    <div class="modal fade" id="model__SearchRptLSTeamMemberCaseloads" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.LSTeamMemberCaseloads, Resource.SearchParameter)</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmSearchRptClientStatus">
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Name</label>
+                                        @Html.TextBoxFor(m => m.SearchLSTeamMemberCaseloadReport.ClientName, new { data_ng_model = "SearchLSTeamMemberCaseloadReport.ClientName", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Region</label>
+                                        @Html.DropDownListFor(m => m.SearchLSTeamMemberCaseloadReport.RegionID, Model.Region.ToSelectList(Convert.ToString(Model.SearchLSTeamMemberCaseloadReport.RegionID), "RegionName", "RegionID", Resource.SelectRegion, ""), new
+                                                                  {
+                                                                      id = "RegionID",
+                                                                      data_ng_model = "SearchLSTeamMemberCaseloadReport.RegionID",
+                                                                      data_ng_init = "SearchLSTeamMemberCaseloadReport.RegionID=SearchLSTeamMemberCaseloadReport.RegionID==''?null:SearchLSTeamMemberCaseloadReport.RegionID",
+                                                                      @class = "form-control input-sm",
+                                                                      convert_to_number = "",
+                                                                      data_val = false
+
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.ReferralStartDate</label>
+                                        <div datepicker="SearchLSTeamMemberCaseloadReport.ReferralStartDate" ng-dateval="SearchLSTeamMemberCaseloadReport.ReferralStartDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchLSTeamMemberCaseloadReport.ReferralStartDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ReferralStartDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.ReferralEndDate</label>
+                                        <div datepicker="SearchLSTeamMemberCaseloadReport.ReferralEndDate" ng-dateval="SearchLSTeamMemberCaseloadReport.ReferralEndDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchLSTeamMemberCaseloadReport.ReferralEndDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ReferralEndDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="LSTeamMemberAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                             <span class="padding-left-5"><img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetSearchFilter()" data-dismiss="modal">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm blue"  id="btnLSTMDownload" data-loading-text="@Resource.DownloadingInProgress"   data-ng-click="DownloadLSTeamMemberCaseloadReport('#btnLSTMDownload')">@Resource.Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

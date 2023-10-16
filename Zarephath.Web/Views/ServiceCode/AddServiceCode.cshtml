@@ -1,0 +1,357 @@
+﻿@model AddServiceCodeModel
+@{
+    bool isEditMode = Model.ServiceCodes.ServiceCodeID > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, isEditMode ? Resource.EditServiceCodeDetails : Resource.AddServiceCodeDetails);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ServiceCodeAdd;
+}
+
+@Html.Hidden("hdnAddServiceCodeModel", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="AddServiceCodeController">
+    <form class="form-horizontal" id="frmServiceCode">
+        <div class="page-bar">
+            <h3 class="page-title">@(isEditMode ? Resource.EditServiceCodeDetails : @Resource.AddServiceCodeDetails)
+                <small>@Resource.EnterServiceCodeDetails</small>
+                <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(isEditMode ? Resource.Update : @Resource.Save)"/>
+                <a href="@Constants.GetServiceCodeList">
+                    <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/></a>
+            </h3>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="form-group row">
+                    <div class="col-sm-12">
+
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.ServiceCodeDetails
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.ServiceCodeType</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(m => m.ServiceCodes.ServiceCodeType, Model.ServiceCodeTypeList.ToSelectList(Convert.ToString(Model.ServiceCodes.ServiceCodeType), "Name", "Value", Resource.Select, ""), new
+                                            {
+                                                id = "ServiceCodeType",
+                                                data_ng_model = "ServiceCodeModel.ServiceCodeType",
+                                                data_ng_init = "ServiceCodeModel.ServiceCodeType=ServiceCodeModel.ServiceCodeType==''?null:ServiceCodeModel.ServiceCodeType",
+                                                @class = "form-control input-sm",
+                                                convert_to_number = ""
+                                            })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.ServiceCodeType)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.ServiceCode</label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.ServiceCodes.ServiceCode,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "ServiceCodeModel.ServiceCode",
+                                                    placeholder = @Resource.ServiceCode,
+                                                    maxlength = 50
+                                                })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.ServiceCode)
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label">@Resource.Modifier</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(m => m.ServiceCodes.ModifierID, Model.ModifierList.ToSelectList(Convert.ToString(Model.ServiceCodes.ModifierID), "Name", "Value", Resource.Select, ""), new
+                                            {
+                                                id = "ModifierID",
+                                                data_ng_model = "ServiceCodeModel.ModifierID",
+                                                data_ng_init = "ServiceCodeModel.ModifierID=ServiceCodeModel.ModifierID==''?null:ServiceCodeModel.ModifierID",
+                                                @class = "form-control input-sm",
+                                                convert_to_number = ""
+                                            })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.ModifierID)
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.ServiceName</label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.ServiceCodes.ServiceName,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "ServiceCodeModel.ServiceName",
+                                                    placeholder = @Resource.ServiceName,
+                                                    maxlength = 50
+                                                })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.ServiceName)
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.Description</label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.ServiceCodes.Description,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "ServiceCodeModel.Description",
+                                                    placeholder = @Resource.Description,
+                                                    maxlength = 50
+                                                })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.Description)
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.UnitType</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(m => m.ServiceCodes.UnitType, Model.UnitTypeList.ToSelectList(Convert.ToString(Model.ServiceCodes.UnitType), "Name", "Value", Resource.Select, ""), new
+                                            {
+                                                id = "UnitType",
+                                                data_ng_model = "ServiceCodeModel.UnitType",
+                                                data_ng_init = "ServiceCodeModel.UnitType=ServiceCodeModel.UnitType==''?null:ServiceCodeModel.UnitType",
+                                                @class = "form-control input-sm",
+                                                convert_to_number = "",
+                                                //disabled="disabled"
+                                            })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.UnitType)
+                                        </div>
+                                    </div>
+
+
+
+
+
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.PerUnitValue
+                                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.PerUnitValueHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="col-md-8">
+                                            <div class="col-md-4 no-padding">
+                                                @Html.TextBoxFor(q => q.ServiceCodes.PerUnitQuantity,
+                                                    new
+                                                    {
+                                                        @class = "form-control input-sm",
+                                                        data_ng_model = "ServiceCodeModel.PerUnitQuantity",
+                                                        placeholder = @Resource.PerUnitValue,
+                                                        maxlength = 50
+                                                    })
+                                                @Html.ValidationMessageFor(q => q.ServiceCodes.PerUnitQuantity)
+                                            </div>
+                                            <div class="col-md-8 no-padding">
+                                                <input type="text" disabled="disabled" class="form-control input-sm" data-ng-model="SelectedUnit" />
+                                            </div>
+                                            <small class="bold"><span class="font-red required ">@Resource.Note:</span> &nbsp;&nbsp;@Html.Raw(Resource.PerUnitValueHelpText)</small>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.DefaultUnitIgnoreUnitCalculation</label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.ServiceCodes.DefaultUnitIgnoreCalculation,
+                                                        new
+                                                        {
+                                                            @class = "form-control input-sm",
+                                                            data_ng_model = "ServiceCodeModel.DefaultUnitIgnoreCalculation",
+                                                            placeholder = @Resource.DefaultUnitIgnoreUnitCalculation,
+                                                            maxlength = 50
+                                                        })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.DefaultUnitIgnoreCalculation)
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.MaxUnitLimit
+                                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.MaxUnitHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.ServiceCodes.MaxUnit,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "ServiceCodeModel.MaxUnit",
+                                                    placeholder = @Resource.MaxUnit,
+                                                    maxlength = 50
+                                                })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.MaxUnit)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.DailyUnitLimit
+                                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.DailyUnitHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.ServiceCodes.DailyUnitLimit,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "ServiceCodeModel.DailyUnitLimit",
+                                                    placeholder = @Resource.DailyUnitLimit,
+                                                    maxlength = 50
+                                                })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.DailyUnitLimit)
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label">@Resource.IsBillable</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(m => m.ServiceCodes.IsBillable, Common.SetYesNoListForBoolean().ToSelectList(Convert.ToString(Model.ServiceCodes.IsBillable), "Name", "Value"), new
+                                                    {
+                                                        id = "UnitType",
+                                                        data_ng_model = "ServiceCodeModel.IsBillable",
+                                                        data_ng_init = "ServiceCodeModel.IsBillable=ServiceCodeModel.IsBillable==''?null:ServiceCodeModel.IsBillable",
+                                                        @class = "form-control input-sm",
+                                                        convert_to_boolean = "",
+                                                        //disabled="disabled"
+                                                    })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.IsBillable)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label">@Resource.HasGroupOption</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(m => m.ServiceCodes.HasGroupOption, Common.SetYesNoListForBoolean().ToSelectList(Convert.ToString(Model.ServiceCodes.HasGroupOption), "Name", "Value"), new
+                                                    {
+                                                        id = "UnitType",
+                                                        data_ng_model = "ServiceCodeModel.HasGroupOption",
+                                                        data_ng_init = "ServiceCodeModel.HasGroupOption=ServiceCodeModel.HasGroupOption==''?null:ServiceCodeModel.HasGroupOption",
+                                                        @class = "form-control input-sm",
+                                                        convert_to_boolean = "",
+                                                        //disabled="disabled"
+                                                    })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.HasGroupOption)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label">@Resource.CheckRespiteHours</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(m => m.ServiceCodes.CheckRespiteHours, Common.SetYesNoListForBoolean().ToSelectList(Convert.ToString(Model.ServiceCodes.CheckRespiteHours), "Name", "Value"), new
+                                                    {
+                                                        id = "UnitType",
+                                                        data_ng_model = "ServiceCodeModel.CheckRespiteHours",
+                                                        data_ng_init = "ServiceCodeModel.CheckRespiteHours=ServiceCodeModel.CheckRespiteHours==''?null:ServiceCodeModel.CheckRespiteHours",
+                                                        @class = "form-control input-sm",
+                                                        convert_to_boolean = "",
+                                                        //disabled="disabled"
+                                                    })
+                                            @Html.ValidationMessageFor(q => q.ServiceCodes.CheckRespiteHours)
+                                        </div>
+                                    </div>
+
+
+
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.StarDate</label>
+                                        <div class="col-md-8">
+                                            <div class="input-group date" datepicker="ServiceCodeModel.ServiceCodeStartDate"
+                                                data-ng-dateval="ServiceCodeModel.ServiceCodeStartDate">
+                                                @Html.TextBoxFor(q => q.ServiceCodes.ServiceCodeStartDate,
+                                                            new
+                                                            {
+                                                                @class = "form-control input-sm dateInputMask",
+                                                                placeholder = Resource.StartDate
+                                                            })
+                                                @Html.ValidationMessageFor(q => q.ServiceCodes.ServiceCodeStartDate)
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.EndDate</label>
+                                        <div class="col-md-8">
+                                            <div class="input-group date" datepicker="ServiceCodeModel.ServiceCodeEndDate"
+                                                data-ng-dateval="ServiceCodeModel.ServiceCodeEndDate">
+                                                @Html.TextBoxFor(q => q.ServiceCodes.ServiceCodeEndDate,
+                                                            new
+                                                            {
+                                                                @class = "form-control input-sm dateInputMask",
+                                                                placeholder = Resource.EndDate
+                                                            })
+                                                @Html.ValidationMessageFor(q => q.ServiceCodes.ServiceCodeEndDate)
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-12 form-group no-margin no-padding">
+            <div class="col-md-10 no-padding font-size-16">
+                <div class="alert alert-danger">
+                    <strong>@Resource.Note:</strong> <span>&nbsp; @Resource.ServiceCodeUpdateHelpMSG</span>
+                </div>
+            </div>
+
+
+            <div class="col-md-2">
+                <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(isEditMode ? Resource.Update : @Resource.Save)"/>
+                <a href="@Constants.GetServiceCodeList">
+                    <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/></a>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/servicecode/addservicecode")
+}
+
+<script type="text/javascript">
+    var MaxUnit = "@Resource.MaxUnit";
+    var DailyUnitLimit = "@Resource.DailyUnitLimit";
+    var Billable = "@Resource.Billable";
+    var GroupOption = "@Resource.GroupOption";
+
+    var UnitTime = "@((int)EnumUnitType.Time)";
+    var UnitTimeValue = "@(Resource.UnitTimeValue)";
+    var UnitStop = "@((int)EnumUnitType.Stop)";
+    var UnitStopValue = "@(Resource.UnitStopValue)";
+    var UnitMiles = "@((int)EnumUnitType.DistanceInMiles)";
+    var UnitMilesValue = "@(Resource.UnitMilesValue)";
+    
+
+</script>

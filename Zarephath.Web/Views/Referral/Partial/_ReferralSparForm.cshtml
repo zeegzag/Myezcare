@@ -1,0 +1,615 @@
+﻿@model SetReferralSparFormModel
+@{
+    // For: on reset fields, will set current date
+    if (Model.ReferralSparForm.DemographicDate == DateTime.MinValue)
+    {
+        Model.ReferralSparForm.DemographicDate = DateTime.Now;
+    }
+    if (Model.ReferralSparForm.Date == DateTime.MinValue)
+    {
+        Model.ReferralSparForm.Date = DateTime.Now;
+    }
+}
+@Html.Hidden("hdnSetReferralSparFormModel", Common.SerializeObject(Model))
+
+<form id="frmreferralsparform">
+
+    <div class="row">
+
+        <div class="col-md-6 col-sm-6 padding-left-25">
+            <span class="badge  badge-success" data-ng-if="ReferralSparForm.IsSparFormOffline">
+                <strong>@Resource.FormIsOffline</strong>
+            </span>
+        </div>
+
+        <div class="col-md-6 col-sm-6 pull-right no-print text-align-right">
+            <a class="btn btn-sm btn-primary margin-right-10 yellow" data-ng-click="PrintDiv('print-content-sparform')" title="Print"><i class="fa fa-print"></i>&nbsp;@Resource.Print</a>
+            @if (Common.HasPermission(Constants.Permission_ReferralSparForm_AddUpdate))
+            {
+                <button data-ng-click="ResetReferralSparForm()" class="btn btn-sm red">
+                    <i class="fa fa-remove">&nbsp;&nbsp;</i>@Resource.Reset
+                </button>
+                <button data-ng-click="SaveReferralSparForm()" class="btn btn-sm green-jungle">
+                    <i class="fa fa-save">&nbsp;&nbsp;</i>@Resource.Save
+                </button>
+            }
+
+        </div>
+
+        <div class="col-md-12 col-sm-12 content-sparform">
+            <div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 control-label">@Resource.ClientName</label>
+                    <div class="col-md-8 col-sm-8">
+                        @Html.TextBoxFor(m => m.ReferralForReferralSparFormModel.ReferralName, new
+                   {
+                       data_ng_model = "ReferralDetail.ReferralName",
+                       @class = "form-control input-sm prevent-enable",
+                       disabled = "disabled"
+                   })
+                        @*<input type="text" class="form-control input-sm" id="Text65" name="inputMiddleName" disabled="disabled">*@
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 control-label">@Resource.ClientDob</label>
+                    <div class="col-md-8 col-sm-8" datepicker="ReferralDetail.DateOfBirth" ng-dateval="ReferralDetail.DateOfBirth">
+                        @Html.TextBoxFor(m => m.ReferralForReferralSparFormModel.DateOfBirth, new
+                   {
+                       @class = "form-control input-sm datepicker prevent-enable",
+                       disabled = "disabled",
+                       date_mask = ""
+                   })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 control-label">@Resource.ProviderAgency</label>
+                    <div class="col-md-8 col-sm-8">
+                        @Html.TextBoxFor(m => m.ReferralForReferralSparFormModel.ReferringAgency, new
+                   {
+                       data_ng_model = "ReferralDetail.ReferringAgency",
+                       @class = "form-control input-sm prevent-enable",
+                       disabled = "disabled"
+                   })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 control-label">@Resource.DateOfReview</label>
+                    <div class="col-md-8 col-sm-8" datepicker="ReferralSparForm.ReviewDate" ng-dateval="ReferralSparForm.ReviewDate">
+                        @Html.TextBoxFor(m => m.ReferralSparForm.ReviewDate, new { @class = "form-control input-sm dateInputMask", maxlength = "10", date_mask = "" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 control-label">@Resource.AdmissionDate</label>
+                    <div class="col-md-8 col-sm-8" datepicker="ReferralSparForm.AdmissionDate" ng-dateval="ReferralSparForm.AdmissionDate">
+                        @Html.TextBoxFor(m => m.ReferralSparForm.AdmissionDate, new { @class = "form-control input-sm prevent-enable", maxlength = "10", date_mask = "", disabled = "disabled" })
+                    </div>
+                </div>
+
+                <div class="space20"></div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <strong class="sparform-lable">@Resource.AssessmentChecklist</strong>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 control-label">@Resource.DateOfAssessmentReviewing</label>
+                    <div class="col-md-7 col-sm-7">
+                        @Html.TextBoxFor(m => m.ReferralSparForm.AssessmentDate, new { data_ng_model = "ReferralSparForm.AssessmentDate", @class = "form-control input-sm", maxlength = "100" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-7 col-sm-7 control-label">
+                        @Resource.SubmittedAssessmentCompletedText
+                    </label>
+                    <div class="col-md-5 col-sm-5">
+                        @*@Html.DropDownListFor(p => p.ReferralSparForm.AssessmentCompletedAndSignedByBHP, Common.SetYesNoListForBoolean().ToSelectList(Model.ReferralSparForm.AssessmentCompletedAndSignedByBHP.ToString() ?? "", "Name", "Value", "Select","-1"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralSparForm.AssessmentCompletedAndSignedByBHP",
+                                                  data_ng_init = "ReferralSparForm.AssessmentCompletedAndSignedByBHP=(ReferralSparForm.AssessmentCompletedAndSignedByBHP==null?'-1': ReferralSparForm.AssessmentCompletedAndSignedByBHP.toString())",
+                                                  @class = "form-control",
+                                                  
+                                              })*@
+
+                        <div class="mt-checkbox-inline">
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.AssessmentCompletedAndSignedByBHP"
+                                    class="uniformControls" data-uniform-value="ReferralSparForm.AssessmentCompletedAndSignedByBHP"
+                                    data-ng-true-value="true" data-ng-false-value="false"
+                                    type="checkbox">@Resource.Yes<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.AssessmentCompletedAndSignedByBHP"
+                                    class="uniformControls" data-uniform-value="!ReferralSparForm.AssessmentCompletedAndSignedByBHP"
+                                    data-ng-true-value="false" data-ng-false-value="true"
+                                    type="checkbox">@Resource.No<span></span>
+                            </label>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-7 control-label">@Resource.AssessmentIdentifiesDtoDtsText</label>
+                    <div class="col-md-5 col-md-5">
+                        <div class="mt-checkbox-inline">
+                            <!-- <label class="mt-checkbox mt-checkbox-outline">
+                                     <input data-ng-model="ReferralSparForm.IdentifyDTSDTOBehavior" ng-true-value="true" ng-false-value="false" name="AssessmentIdentifiesDtoDtsText" type="checkbox">@*class="unicheckbox" val="ReferralSparForm.IdentifyDTSDTOBehavior"*@
+                                     @Resource.Yes
+                                     <span></span>
+                                 </label>
+                                <label class="mt-checkbox mt-checkbox-outline">
+                                    <input data-ng-model="ReferralSparForm.IdentifyDTSDTOBehavior" ng-true-value="false" ng-false-value="true" name="AssessmentIdentifiesDtoDtsText" type="checkbox">@*class="unicheckbox" val="ReferralSparForm.IdentifyDTSDTOBehavior"*@
+                                    @Resource.No
+                                    <span></span>
+                                </label> -->
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.IdentifyDTSDTOBehavior"
+                                    class="uniformControls" data-uniform-value="ReferralSparForm.IdentifyDTSDTOBehavior"
+                                    data-ng-true-value="true" data-ng-false-value="false"
+                                    type="checkbox">@Resource.Yes<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.IdentifyDTSDTOBehavior"
+                                    class="uniformControls" data-uniform-value="!ReferralSparForm.IdentifyDTSDTOBehavior"
+                                    data-ng-true-value="false" data-ng-false-value="true"
+                                    type="checkbox">@Resource.No<span></span>
+                            </label>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input padding-top-20">
+                    @*<label class="col-md-2 control-label">@Resource.DemographicDate:</label>*@
+
+                    @*<div class="col-md-3">
+                        <label class="control-label bold">@Resource.DemographicDate</label>
+                        <div datepicker="ReferralSparForm.DemographicDate" ng-dateval="ReferralSparForm.DemographicDate">
+                            @Html.TextBoxFor(m => m.ReferralSparForm.DemographicDate, new { @class = "form-control input-sm dateInputMask" })
+                        </div>
+                    </div>*@
+
+                    <label class="col-md-2 control-label bold">@Resource.CASIIScore</label>
+                    <div class="col-md-5">
+                        @Html.TextBoxFor(m => m.ReferralSparForm.CASIIScore, new
+                   {
+                       @class = "form-control input-sm",
+                       dir_valid_number = "",
+                       data_ng_model = "ReferralSparForm.CASIIScore",
+                       @placeholder = Resource.CASIIScore,
+                       maxlength = "10"
+                   })
+                    </div>
+
+
+
+                    <div class="col-md-5 col-md-5 ">
+                        <div class="mt-checkbox-inline">
+                            @* <label class="mt-checkbox mt-checkbox-outline">
+                                <input type="checkbox" data-ng-model="ReferralSparForm.IsROI" class="unicheckbox" val="ReferralSparForm.IsROI">@Resource.ROI
+                                <span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input type="checkbox" data-ng-model="ReferralSparForm.IsSNCD" class="unicheckbox" val="ReferralSparForm.IsSNCD">
+                                @Resource.SNCD
+                                <span></span>
+                            </label>*@
+
+
+                            <label class="mt-checkbox mt-checkbox-outline display-none">
+                                <input data-ng-model="ReferralSparForm.IsROI"
+                                    class="uniformControls " data-uniform-value="ReferralSparForm.IsROI"
+                                    data-ng-true-value="true" data-ng-false-value="false"
+                                    type="checkbox">@Resource.ROI<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.IsSNCD"
+                                    class="uniformControls" data-uniform-value="ReferralSparForm.IsSNCD"
+                                    type="checkbox" />
+                                @Resource.SNCD
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="span12"></div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="bold col-md-2 control-label">@Resource.UpdatesIfApplicable</label>
+                    <div class="col-md-12">
+                        @Html.TextAreaFor(m => m.ReferralSparForm.DTSDTOUpdateText, new { data_ng_model = "ReferralSparForm.DTSDTOUpdateText", @class = "form-control input-sm", rows = "3", maxlength = "500" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="bold col-md-3 control-label">@Resource.AdditionalInformation</label>
+                    <div class="col-md-12">
+                        @Html.TextAreaFor(m => m.ReferralSparForm.AdditionInformation, new { data_ng_model = "ReferralSparForm.AdditionInformation", @class = "form-control input-sm", rows = "3", maxlength = "500" })
+                    </div>
+                </div>
+
+                <div class="space20"></div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <strong class="sparform-lable">@Resource.ServicePlanChecklist</strong>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-7 col-sm-7 control-label">@Resource.ServicePlanSignedByGuardian</label>
+                    <div class="col-md-5 col-sm-5">
+                        <div class="mt-checkbox-inline">
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.ServicePlanCompleted"
+                                    class="uniformControls" data-uniform-value="ReferralSparForm.ServicePlanCompleted"
+                                    data-ng-true-value="true" data-ng-false-value="false"
+                                    type="checkbox">@Resource.Yes<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.ServicePlanCompleted"
+                                    class="uniformControls" data-uniform-value="!ReferralSparForm.ServicePlanCompleted"
+                                    data-ng-true-value="false" data-ng-false-value="true"
+                                    type="checkbox">@Resource.No<span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-7 col-sm-7 control-label">@Resource.ServicePlanSignedAndDatedByBHP</label>
+                    <div class="col-md-5 col-sm-5">
+                        <div class="mt-checkbox-inline">
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.ServicePlanSignedDatedByBHP"
+                                    class="uniformControls" data-uniform-value="ReferralSparForm.ServicePlanSignedDatedByBHP"
+                                    data-ng-true-value="true" data-ng-false-value="false"
+                                    type="checkbox">@Resource.Yes<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.ServicePlanSignedDatedByBHP"
+                                    class="uniformControls" data-uniform-value="!ReferralSparForm.ServicePlanSignedDatedByBHP"
+                                    data-ng-true-value="false" data-ng-false-value="true"
+                                    type="checkbox">@Resource.No<span></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-7 col-sm-7 control-label">@Resource.ServicePlanHasRespiteCounselingLifeSkills</label>
+                    <div class="col-md-5 col-sm-5">
+                        <div class="mt-checkbox-inline">
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.ServicePlanIdentified"
+                                    class="uniformControls" data-uniform-value="ReferralSparForm.ServicePlanIdentified"
+                                    data-ng-true-value="true" data-ng-false-value="false"
+                                    type="checkbox">@Resource.Yes<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.ServicePlanIdentified"
+                                    class="uniformControls" data-uniform-value="!ReferralSparForm.ServicePlanIdentified"
+                                    data-ng-true-value="false" data-ng-false-value="true"
+                                    type="checkbox">@Resource.No<span></span>
+                            </label>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="col-md-7 col-sm-7 control-label">@Resource.ServicePlanHasFrequencyOfTheIdentified</label>
+                    <div class="col-md-5 col-sm-5">
+
+                        <div class="mt-checkbox-inline">
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.ServicePlanHasFrequency"
+                                    class="uniformControls" data-uniform-value="ReferralSparForm.ServicePlanHasFrequency"
+                                    data-ng-true-value="true" data-ng-false-value="false"
+                                    type="checkbox">@Resource.Yes<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralSparForm.ServicePlanHasFrequency"
+                                    class="uniformControls" data-uniform-value="!ReferralSparForm.ServicePlanHasFrequency"
+                                    data-ng-true-value="false" data-ng-false-value="true"
+                                    type="checkbox">@Resource.No<span></span>
+                            </label>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <label class="bold col-md-3 control-label">@Resource.AdditionalInformation</label>
+                    <div class="col-md-12">
+                        @Html.TextAreaFor(m => m.ReferralSparForm.ServicePlanAdditionalInfo, new { data_ng_model = "ReferralSparForm.ServicePlanAdditionalInfo", @class = "form-control input-sm", rows = "3", maxlength = "500" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input display-none">
+                    <div class="col-md-6 col-sm-6">
+                        @Html.TextBoxFor(m => m.ReferralSparForm.BHPReviewSignature, new { data_ng_model = "ReferralSparForm.BHPReviewSignature", @class = "form-control input-sm" })
+                    </div>
+                    <div class="col-md-5" datepicker="ReferralSparForm.Date" ng-dateval="ReferralSparForm.Date">
+                        @Html.TextBoxFor(m => m.ReferralSparForm.Date, new { @class = "form-control input-sm dateInputMask  pull-right", maxlength = "10" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input display-none">
+                    <label class="col-md-6 col-sm-3 control-label">@Resource.BHPReviewerSignatureCredentials</label>
+                    <label class="col-md-6 col-sm-3 center-block control-label">@Resource.Date</label>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-sm-6">
+        <div class="col-md-12 margin-bottom-5">
+            <div class="col-sm-1 no-left-padding">
+                <input type="checkbox" id="markoffline" data-ng-model="ReferralSparForm.IsSparFormOffline" class="unicheckbox" val="ReferralSparForm.IsSparFormOffline">
+            </div>
+            <div class="col-sm-5 no-left-padding">
+                <label for="markoffline"><strong class="markcomplete">@Resource.MarkAsOffline</strong></label>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="col-sm-1 no-left-padding">
+                <input type="checkbox" id="markcomplete" data-ng-model="ReferralSparForm.IsSparFormCompleted" class="unicheckbox" val="ReferralSparForm.IsSparFormCompleted">
+            </div>
+            <div class="col-sm-5 no-left-padding">
+                <label for="markcomplete"><strong class="markcomplete">@Resource.MarkAsComplete</strong></label>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="col-md-6 col-sm-6 text-right">
+        <a class="btn btn-sm btn-primary margin-right-10 yellow" data-ng-click="PrintDiv('print-content-sparform')" title="Print"><i class="fa fa-print"></i>&nbsp;@Resource.Print</a>
+        @if (Common.HasPermission(Constants.Permission_ReferralSparForm_AddUpdate))
+        {
+            <button data-ng-click="ResetReferralSparForm()" class="btn btn-sm red">
+                <i class="fa fa-remove">&nbsp;&nbsp;</i>@Resource.Reset
+            </button>
+            <button data-ng-click="SaveReferralSparForm()" class="btn btn-sm green-jungle">
+                <i class="fa fa-save">&nbsp;&nbsp;</i>@Resource.Save
+            </button>
+        }
+    </div>
+
+</form>
+<div class="space10"></div>
+
+<div class="space20"></div>
+
+<div class="row">
+    <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+        <label class="col-md-4 col-sm-3 control-label">
+            @Resource.Policy707_708
+        </label>
+
+        <label class="col-md-4 col-sm-3 center-block control-label text-center">
+            @Resource.ZarephathConfidential
+        </label>
+
+        <label class="col-md-4 col-sm-3 pull-right control-label">
+            <span class="pull-right">@Resource.Effective 05/25/2016</span>
+        </label>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="space30"></div>
+<div id="print-content-sparform" data-ng-show="PrintContent">
+@*<div>*@
+    <div class="row">
+        <div class="col-xs-12">
+
+            <div class="col-xs-6  pull-left">
+                <img src="/Assets/images/logo-zrpath.png" alt="Logo" />
+            </div>
+
+            <div class="col-xs-6 pull-right">
+                <label class="font-size-25 pull-right margin-top-15">@Resource.NewReferralSparForm</label>
+            </div>
+
+        </div>
+
+        <form class="col-xs-12 form-inline print-font-custom no-padding">
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.ClientName</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.ReferralName}}</label>
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.ClientDob</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.DateOfBirth | dateformat}}</label>
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.ProviderAgency</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.ReferringAgency ? ReferralDetail.ReferringAgency:'@Resource.NA'}}</label>
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.DateOfReview</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label" style="border-bottom: 1px dashed #000 !important;">{{ReferralSparForm.ReviewDate ? (ReferralSparForm.ReviewDate | dateformat) : '@Resource.NA'}}</label>
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.AdmissionDate</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label" style="border-bottom: 1px dashed #000 !important;">{{ReferralSparForm.AdmissionDate ? (ReferralSparForm.AdmissionDate | dateformat): '@Resource.NA'}}</label>
+                </div>
+            </div>
+            <div class="space20"></div>
+            <div class="col-xs-12">
+                <strong class="sparform-lable">@Resource.AssessmentChecklist</strong>
+            </div>
+            <div class="col-xs-12 margin-left-10">
+                <div class="col-xs-12 form-md-line-input">
+                    <label>@Resource.DateOfAssessmentReviewing</label>
+                    <span class="checklist-print-value inline margin-left-10" style="border-bottom: 1px dashed #000 !important; float: right; display: inline-block; width: 85%;">{{ReferralSparForm.AssessmentDate ? ReferralSparForm.AssessmentDate : '@Resource.NA'}}
+                    </span>
+                </div>
+                <div class="col-xs-12 form-md-line-input">
+                    <label>@Resource.SubmittedAssessmentCompletedText</label>
+                    <div class="inline margin-left-10 chk pull-right">
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.AssessmentCompletedAndSignedByBHP == true" type="checkbox">
+                            @Resource.Yes
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.AssessmentCompletedAndSignedByBHP == false || ReferralSparForm.AssessmentCompletedAndSignedByBHP == null" type="checkbox">
+                            @Resource.No
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-md-line-input"  >
+                    <label>@Resource.AssessmentIdentifiesDtoDtsText</label>
+                    <div class="inline margin-left-10 chk pull-right">
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.IdentifyDTSDTOBehavior == true" data-ng-true-value="true" data-ng-false-value="false" type="checkbox">
+                            @Resource.Yes
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.IdentifyDTSDTOBehavior == false || ReferralSparForm.IdentifyDTSDTOBehavior == null" data-ng-true-value="false" data-ng-false-value="true" type="checkbox">
+                            @Resource.No
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-md-line-input">
+                    @*<label>@Resource.DemographicDate:</label>
+                    <span class="checklist-print-value inline margin-left-10" style="border-bottom: 1px dashed #000 !important; display: inline-block; width: 30%;">{{ReferralSparForm.DemographicDate ? ReferralSparForm.DemographicDate : '@Resource.NA'}}</span>*@
+                    <div class="pull-left" style=" width: 80%; position: absolute;">
+                        <label class="control-label bold">@Resource.CASIIScore</label>
+                        <span class="checklist-print-value inline margin-left-10" style="position: absolute; border-bottom: 1px dashed #000 !important; display: inline-block; width: 85%;"><b><u>{{ReferralSparForm.CASIIScore ? ReferralSparForm.CASIIScore : '@Resource.NA'}}</u></b></span>
+                    </div>
+
+                    <div class="inline margin-left-10 chk pull-right">
+                        @*<label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.IsROI == true" type="checkbox">
+                            @Resource.Yes
+                        </label>*@
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.IsSNCD == true" type="checkbox">
+                            @Resource.SNCD
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-md-line-input">
+                    @*<label>@Resource.UpdatesIfApplicable</label>*@
+                    <b>@Resource.UpdatesIfApplicable</b>&nbsp;&nbsp;<span class="checklist-print-value inline margin-left-10  line-height-16px" style="width: 95%;display: inline-block; border-bottom: 1px dashed #000 !important;">{{ReferralSparForm.DTSDTOUpdateText ? ReferralSparForm.DTSDTOUpdateText : '@Resource.NA'}}
+                    </span>
+                </div>
+                <div class="col-xs-12 form-md-line-input">
+                    @*<label>@Resource.AdditionalInformation</label>*@
+                    <b>@Resource.AdditionalInformation</b>&nbsp;&nbsp;<span class="checklist-print-value inline margin-left-10  line-height-16px" style="width: 95%;display: inline-block; border-bottom: 1px dashed #000 !important;">{{ReferralSparForm.AdditionInformation ? ReferralSparForm.AdditionInformation : '@Resource.NA'}}
+                    </span>
+                </div>
+            </div>
+            <div class="space20"></div>
+            <div class="form-group col-xs-12">
+                <strong class="sparform-lable">@Resource.ServicePlanChecklist</strong>
+            </div>
+            <div class="col-xs-12 margin-left-10">
+                <div class="col-xs-12 form-md-line-input">
+                    <label>@Resource.ServicePlanSignedByGuardian</label>
+                    <div class="inline margin-left-10 chk pull-right">
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.ServicePlanCompleted == true" type="checkbox">
+                            @Resource.Yes
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.ServicePlanCompleted == false || ReferralSparForm.ServicePlanCompleted == null" type="checkbox">
+                            @Resource.No
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-md-line-input">
+                    <label>@Resource.ServicePlanSignedAndDatedByBHP</label>
+                    <div class="inline margin-left-10 chk pull-right">
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.ServicePlanSignedDatedByBHP == true" type="checkbox">
+                            @Resource.Yes
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.ServicePlanSignedDatedByBHP == false || ReferralSparForm.ServicePlanSignedDatedByBHP == null" type="checkbox">
+                            @Resource.No
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-md-line-input">
+                    <label>@Resource.ServicePlanHasRespiteCounselingLifeSkills</label>
+                    <div class="inline margin-left-10 chk pull-right">
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.ServicePlanIdentified == true" type="checkbox">
+                            @Resource.Yes
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.ServicePlanIdentified == false || ReferralSparForm.ServicePlanIdentified == null" type="checkbox">
+                            @Resource.No
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-md-line-input">
+                    <label>@Resource.ServicePlanHasFrequencyOfTheIdentified</label>
+                    <div class="inline margin-left-10 chk pull-right">
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.ServicePlanHasFrequency == true" type="checkbox">
+                            @Resource.Yes
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralSparForm.ServicePlanHasFrequency == false || ReferralSparForm.ServicePlanHasFrequency == null" type="checkbox">
+                            @Resource.No
+                        </label>
+                    </div>
+                </div>
+                <div class="col-xs-12 form-md-line-input">
+                    @*<label>@Resource.AdditionalInformation</label>*@
+                    <b>@Resource.AdditionalInformation</b>&nbsp;&nbsp;<span class="checklist-print-value margin-left-10  line-height-16px" style="width: 95%;display: inline-block; border-bottom: 1px dashed #000 !important;">{{ReferralSparForm.ServicePlanAdditionalInfo ? ReferralSparForm.ServicePlanAdditionalInfo : '@Resource.NA'}}
+                    </span>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>

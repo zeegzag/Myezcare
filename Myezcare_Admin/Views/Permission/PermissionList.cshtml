@@ -1,0 +1,171 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Permission);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.Permission;
+}
+@model SetPermissionsListModel
+@Html.Hidden("hdnPermissionListPage", Common.SerializeObject(Model))
+
+<style>
+    #frmFormlist{
+        max-height:70vh;
+        overflow:auto;
+    }
+</style>
+<Hi>PermissionList</Hi>
+<div data-ng-controller="PermissionsListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.Permission List
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+            </div>
+            <div class="btn-group" data-ng-if="SelectedFormIds.length > 0">
+                <button type="button" data-ng-click="DeleteForm()" class="btn blue btn-sm grey border-grey-cascade">
+                    <i class="fa fa-random margin-right-10"></i>{{TempSearchFormModel.IsDeleted==0 ?'@Resource.DisableSelected' :(TempSearchFormModel.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                </button>
+              </div>
+
+            <div class="btn-group">
+                <div class="padding-left-15">
+                </div>
+            </div>
+            <div class="inline-block pull-right" data-ng-show="FormList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" on-page-change="FormListPager.pageChanged(newPageNumber)" pagination-id="FormListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="">
+                        <form id="frmFormlist">
+                            <table class="table table-pinned table-bordered table-striped table-condensed">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-50px text-align-center">
+                                            <div class="btn-group" data-ng-show="FormList.length > 0">
+                                                <input id="SelectAllForm" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll(SelectAllCheckbox)" val="SelectAllCheckbox">
+                                                <label for="SelectAllForm"></label>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('Name')">Permission Name</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'Name'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('FormLongName')">Description</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormLongName'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        @*<th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('Version')">ParentID</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'Version'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('FormCategory')">OrderID</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormCategory'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>*@
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('FormPrice')">Permission Code</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormPrice'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('FormPrice')">Permission Platform</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormPrice'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-140px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        <td>
+                                            <span>
+                                                <input type="checkbox" class="unicheckbox" data-ng-model="form.IsChecked" data-ng-change="SelectForm(form)" val="form.IsChecked">
+                                            </span>
+                                        </td>
+                                        <td><input id="SearchPermissionName" type="text" /></td>
+                                        <td><input id="SearchDescription" type="text" /></td>
+                                        @*<td><input type="text" /></td>
+                                        <td><input type="text" /></td>*@
+                                        <td><input id="SearchPermissionCode" type="text" /></td>
+                                        <td>
+                                            <select id="SearchPlatform">
+                                                <option value="" selected>Select Platform</option>
+                                                <option value="Web">Web</option>
+                                                <option value="Mobile">Mobile</option>
+                                            </select>
+                                        </td>
+                                        <td class="text-align-center">
+                                            <input type="button" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchPermnmissionList()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':form.IsDeleted}" dir-paginate="item in PermissionsList | itemsPerPage: FormListPager.pageSize" total-items="FormListPager.totalRecords" current-page="FormListPager.currentPage" pagination-id="FormListPagerID">
+                                        <td class="text-align-center">
+                                            <span>
+                                                <input type="checkbox" class="unicheckbox" data-ng-model="form.IsChecked" data-ng-change="SelectForm(form)" val="form.IsChecked">
+                                            </span>
+                                        </td>
+                                        <td>{{ item.PermissionName }}</td>
+                                        <td>{{ item.Description }}</td>
+                                        @*<td>{{ item.ParentID }}</td>
+                                        <td>{{ item.OrderID }}</td>*@
+                                        <td>{{ item.PermissionCode }}</td>
+                                        <td>{{ item.PermissionPlatform }}</td>
+
+                                        <td class="text-align-center">
+                                            <a href="{{ AddPermissionURL + item.PermissionID}}" class="btn btn-xs blue">@Resource.Edit </a>
+                                            <button data-id="{{item.PermissionID}}" data-ng-click="DeletePermission()" class="btn btn-xs red">Delete</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="FormList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(FormListPager.pageSize * FormListPager.currentPage) - FormListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(FormListPager.pageSize == FormListPager.currentPageSize) ? (FormListPager.pageSize * FormListPager.currentPage) :(FormListPager.pageSize * FormListPager.currentPage) - FormListPager.pageSize  + FormListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="FormListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" on-page-change="FormListPager.pageChanged(newPageNumber)" pagination-id="FormListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="FormList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/permissions/permissionslist")
+  
+}

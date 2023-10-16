@@ -1,0 +1,147 @@
+﻿@model ReportModel
+@Html.Hidden("hdnSetGeneralNoticeModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptGeneralNoticeController">
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon  ribbon-color-success uppercase">@Resource.GeneralNotice</div>
+        <p class="ribbon-content">
+            @Resource.GeneralNoticeDetail
+        </p>
+        <hr />
+        <div>
+            <a class="btn btn-sm blue pull-right" href="#model__SearchRptGeneralNotice" data-toggle="modal">@Resource.GenerateReport</a>
+        </div>
+        <br />
+    </div>
+
+    <div class="modal fade" id="model__SearchRptGeneralNotice" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.GeneralNotice, Resource.SearchParameter)</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmSearchRptClientStatus">
+                                <div class="col-md-12 no-padding">
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Region</label>
+                                        @Html.DropDownListFor(m => m.SearchGeneralNoticeModel.RegionID, Model.Region.ToSelectList(Convert.ToString(Model.SearchGeneralNoticeModel.RegionID), "RegionName", "RegionID", Resource.SelectRegion, ""), new
+                                                                  {
+                                                                      id = "RegionID",
+                                                                      data_ng_model = "SearchGeneralNoticeModel.RegionID",
+                                                                      data_ng_init = "SearchGeneralNoticeModel.RegionID=SearchGeneralNoticeModel.RegionID==''?null:SearchGeneralNoticeModel.RegionID",
+                                                                      @class = "form-control input-sm",
+                                                                      convert_to_number = ""
+
+                                                                  })
+                                    </div>
+                                    
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Agency</label>
+                                        @Html.DropDownListFor(p => p.SearchGeneralNoticeModel.AgencyID, Model.Agencies.ToSelectList(Model.SearchGeneralNoticeModel.AgencyID.ToString() ?? "", "NickName", "AgencyID", Resource.SelectAgency, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "AgencyID",
+                                                                      data_ng_model = "SearchGeneralNoticeModel.AgencyID",
+                                                                      data_ng_init = "SearchGeneralNoticeModel.AgencyID=SearchGeneralNoticeModel.AgencyID==''?null:SearchGeneralNoticeModel.AgencyID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+                                    
+                                     <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Payor</label>
+                                        @Html.DropDownListFor(p => p.SearchGeneralNoticeModel.PayorID, Model.Payors.ToSelectList(Model.SearchGeneralNoticeModel.PayorID.ToString() ?? "", "PayorName", "PayorID", Resource.SelectPayor, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "PayorID",
+                                                                      data_ng_model = "SearchGeneralNoticeModel.PayorID",
+                                                                      data_ng_init = "SearchGeneralNoticeModel.PayorID=SearchGeneralNoticeModel.PayorID==''?null:SearchGeneralNoticeModel.PayorID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Status</label>
+                                        @Html.DropDownListFor(p => p.SearchGeneralNoticeModel.ReferralStatusID, Model.ReferralStatuses.ToSelectList(Model.SearchGeneralNoticeModel.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", Resource.SelectStatus, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "ReferralStatusID",
+                                                                      data_ng_model = "SearchGeneralNoticeModel.ReferralStatusID",
+                                                                      data_ng_init = "SearchGeneralNoticeModel.ReferralStatusID=SearchGeneralNoticeModel.ReferralStatusID==''?null:SearchGeneralNoticeModel.ReferralStatusID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 ">
+                                        <label class="control-label">@Resource.ClientLabel</label>
+                                        <input type="text"
+                                               token-input
+                                               ng-val="SearchGeneralNoticeModel.ReferralID"
+                                               textfield='Name'
+                                               valuefield='ReferralID'
+                                               searchurl="{{GetReferralInfoforReportURL}}"
+                                               placeholder="@Resource.SearchClientInformation"
+                                               tokenlimit='1'
+                                               onresultsformatter='GN_ReferralDetailResultsFormatter'                                       
+                                               ontokenformatter="GN_ReferralTokenFormatter"            
+                                               ondeletecallback='GN_RemoveReferral'                           
+                                               autoSelectFirstResult="false"
+                                               minChars="1"
+                                               tokeninputobj="GeneralNoticeTokenObj"
+                                               id="AddGeneralReferralIDTkn"
+                                               customclass="form-control input-sm"
+                                               name="ReferralID" />
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6" style="display: none">
+                                        <label class="control-label">@Resource.EnableDisableClient</label>
+                                        @Html.DropDownListFor(m => m.SearchGeneralNoticeModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchGeneralNoticeModel.IsDeleted), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      id = "IsDeleted",
+                                                                      data_ng_model = "SearchGeneralNoticeModel.IsDeleted",
+                                                                      data_ng_init = "SearchGeneralNoticeModel.IsDeleted = SearchGeneralNoticeModel.IsDeleted==null?'-1':SearchGeneralNoticeModel.IsDeleted.toString()",
+                                                                      @class = "form-control input-sm"
+
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="GeneralNoticeAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                             <span class="padding-left-5"><img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+                                    
+                                    
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetSearchFilter()" data-dismiss="modal">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm blue" id="btnGnDownload" data-loading-text="@Resource.DownloadingInProgress"  data-ng-click="DownloadGeneralNoticeReport('#btnGnDownload')">@Resource.Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

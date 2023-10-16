@@ -1,0 +1,186 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.PreferenceSkillList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_PreferenceList;
+}
+
+@model SetPreferenceListPage
+@Html.Hidden("hdnSetPreferenceListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="PreferenceListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.PreferenceSkillList &nbsp;@*<small>@Resource.PreferenceListInformation</small>*@
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-sm-8 col-xs-12">
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchPreferenceListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchPreferenceListPage.IsDeleted), "Name", "Value", "", ""),
+                                                               new
+                                                               {
+                                                                   id = "IsDeleted",
+                                                                   data_ng_model = "TempSearchPreferenceListPage.IsDeleted",
+                                                                   data_ng_init = "TempSearchPreferenceListPage.IsDeleted = TempSearchPreferenceListPage.IsDeleted==null?'-1':TempSearchPreferenceListPage.IsDeleted.toString()",
+                                                                   @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                   data_ng_change = "SearchPreference()"
+                                                               })
+            </div>
+            @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_Delete))
+            {
+                <div class="btn-group" data-ng-if="SelectedPreferenceIds.length > 0">
+                    <button type="button" data-ng-click="DeletePreference()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchPreferenceListPage.IsDeleted==0 ?'@Resource.DisableSelected' :(TempSearchPreferenceListPage.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                    </button>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_AddUpdate))
+            {
+                <div class="btn-group padding-left-15">
+                    <a href="" ng-click="PreferenceEditModel(Preference.EncryptedPreferenceID)" class="btn btn-sm letter-space green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.PreferenceSkill</a>
+                </div>
+            }
+            <div class="inline-block pull-right" data-ng-show="PreferenceList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="PreferenceListPager.maxSize" on-page-change="PreferenceListPager.pageChanged(newPageNumber)" pagination-id="PreferenceListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-md-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmPreferenceList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_Delete))
+                                        {
+                                            <th class="width-20px"></th>
+                                        }
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PreferenceListPager.sortColumn('PreferenceName')">@Resource.Name</a>
+                                            <span class="sortorder" data-ng-show="PreferenceListPager.sortIndex === 'PreferenceName'" data-ng-class="{reverse:PreferenceListPager.reverse}"></span>
+                                        </th>
+                                        <th class="col-sm-2">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PreferenceListPager.sortColumn('KeyType')">@Resource.Type</a>
+                                            <span class="sortorder" data-ng-show="PreferenceListPager.sortIndex === 'KeyType'" data-ng-class="{reverse:PreferenceListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-130px" style="text-align:center">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_Delete))
+                                        {
+                                            <td>
+                                                <div class="btn-group" data-ng-show="PreferenceList.length > 0">
+                                                    <input id="SelectAllDxCode" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                    <label for="SelectAllDxCode"></label>
+                                                </div>
+                                            </td>
+                                        }
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchPreferenceListPage.PreferenceName, new { data_ng_model = "TempSearchPreferenceListPage.PreferenceName", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 100 })
+
+                                        </td>
+                                        <td>
+                                            @*@Html.TextBoxFor(m => m.SearchPreferenceListPage.PreferenceType, new { data_ng_model = "TempSearchPreferenceListPage.PreferenceType", @class = "form-control input-sm", placeholder = Resource.TaskType, maxlength = 100 })*@
+                                            @Html.DropDownListFor(p => p.SearchPreferenceListPage.PreferenceType, Model.PreferenceTypes.ToSelectList(Model.SearchPreferenceListPage.PreferenceType ?? "", "Name", "Value", @Resource.SelectType, ""),
+                                                                      new
+                                                                      {
+                                                                          data_ng_model = "TempSearchPreferenceListPage.PreferenceType",
+                                                                          @class = "form-control input-sm"
+                                                                      })
+                                        </td>
+
+                                        <td class="text-align-center">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchPreference()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':Preference.IsDeleted}" dir-paginate="Preference in PreferenceList | itemsPerPage: PreferenceListPager.pageSize" total-items="PreferenceListPager.totalRecords" current-page="PreferenceListPager.currentPage" pagination-id="PreferenceListPager_ID">
+                                        @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_AddUpdate))
+                                        {
+                                            <td class="text-align-center">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="Preference.IsChecked" data-ng-change="SelectPreference(Preference)" val="Preference.IsChecked">
+                                            </td>
+                                        }
+                                        <td data-ng-bind="Preference.PreferenceName"></td>
+                                        <td data-ng-bind="Preference.KeyType"></td>
+                                        <td class="text-align-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_AddUpdate))
+                                            {
+                                                <a href="" ng-click="PreferenceEditModel(Preference.EncryptedPreferenceID)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                            }
+                                            @if (Common.HasPermission(Constants.HC_Permission_PreferenceSkill_Delete))
+                                            {
+                                                <a href="javascript:void(0);" data-ng-show="Preference.IsDeleted" data-ng-click="DeletePreference(Preference.PreferenceID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!Preference.IsDeleted" data-ng-click="DeletePreference(Preference.PreferenceID,'@Resource.Disable')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-8" data-ng-if="PreferenceList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(PreferenceListPager.pageSize * PreferenceListPager.currentPage) - PreferenceListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(PreferenceListPager.pageSize == PreferenceListPager.currentPageSize) ? (PreferenceListPager.pageSize * PreferenceListPager.currentPage) :(PreferenceListPager.pageSize * PreferenceListPager.currentPage) - PreferenceListPager.pageSize  + PreferenceListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PreferenceListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="PreferenceListPager.maxSize" on-page-change="PreferenceListPager.pageChanged(newPageNumber)" pagination-id="PreferenceListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div data-ng-if="PreferenceList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="preference_fixedAside" class="asideBar-right fixed">
+        <div class="listContentinner">
+            <div class="closeasidebar" data-ng-click="PreferenceEditModelClosed()"><i class="fa fa-close"></i></div>
+            <iframe id="preference_fixedAsidelDDLBindIFrame" style="position:absolute; top:2%;  bottom:0px; right:0px; width:100%; min-height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/preference/preferencelist")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.Preference)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Preference)';
+    </script>
+}

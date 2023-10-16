@@ -1,0 +1,141 @@
+﻿<div id="EmpOverTimeList" class="row">
+    <div class="col-md-12">
+        <div class="portlet box">
+
+            <div class="portlet-title">
+                <div class="caption header-font-size-14 uppercase">
+                    @Resource.EmployeeOverTimeInLast7Days
+                    <div class="pull-right padding-left-25" data-ng-show="EmpOverTimeListAjaxStart">
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="collapse"></a>
+                    <a href="javascript:;" class="fullscreen"></a>
+                </div>
+            </div>
+
+            <div class="portlet-body table_font-size-12">
+                <div class="row">
+                    <div class="col-sm-12 form-group  padding-right-15" data-ng-if="EmpOverTimeList.length > 0">
+                        <div class="pull-right padding-right-5">
+                            <dir-pagination-controls boundary-links="true" on-page-change="EmpOverTimeListPager.pageChanged(newPageNumber)" pagination-id="EmpOverTimeListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row form-group">
+                    <div class="col-sm-4">
+                        <div class="fields">
+                            <label>@Resource.StarDate</label>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="EmpOverTimeListSearchModel.StartDate" ng-dateval="EmpOverTimeListSearchModel.StartDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-4">
+                        <div class="fields">
+                            <label>@Resource.EndDate</label>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="EmpOverTimeListSearchModel.EndDate" ng-dateval="EmpOverTimeListSearchModel.EndDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-2">
+
+                        <div>
+                            <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Search" data-ng-click="SearchEmpOverTimeList()" />
+                        </div>
+                    </div>
+                </div>
+
+                @*<div class="table-responsive">*@
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="portlet-body" style="display: block;">
+                            <div class="table-responsive">
+                                <form id="frmReferralinterMessageList">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpOverTimeListPager.sortColumn('Employee')">@Resource.Employee</a>
+                                                    <span class="sortorder" data-ng-show="EmpOverTimeListPager.sortIndex === 'Employee'" data-ng-class="{reverse:EmpOverTimeListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpOverTimeListPager.sortColumn('WeeklyAllocatedHours')">@Resource.AllocatedHrs</a>
+                                                    <span class="sortorder" data-ng-show="EmpOverTimeListPager.sortIndex === 'WeeklyAllocatedHours'" data-ng-class="{reverse:EmpOverTimeListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpOverTimeListPager.sortColumn('WeeklyUsedHours')">@Resource.UsedHrs</a>
+                                                    <span class="sortorder" data-ng-show="EmpOverTimeListPager.sortIndex === 'WeeklyUsedHours'" data-ng-class="{reverse:EmpOverTimeListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpOverTimeListPager.sortColumn('WeeklyOverTimeHours')">@Resource.OverTimeHrs</a>
+                                                    <span class="sortorder" data-ng-show="EmpOverTimeListPager.sortIndex === 'WeeklyOverTimeHours'" data-ng-class="{reverse:EmpOverTimeListPager.reverse}"></span>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="item in EmpOverTimeList | itemsPerPage: EmpOverTimeListPager.pageSize" total-items="EmpOverTimeListPager.totalRecords" current-page="EmpOverTimeListPager.currentPage" pagination-id="EmpOverTimeListPagerID">
+                                                <td>
+                                                    <span data-ng-bind="item.Employee"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.WeeklyAllocatedHours"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.WeeklyUsedHours"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.WeeklyOverTimeHours"></span>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*</div>*@
+                <div class="row">
+                    <div class="col-sm-12" data-ng-if="EmpOverTimeList.length > 0">
+                        <div class="col-sm-6 pull-left no-left-padding"
+                             data-ng-hide="EmpOverTimeListPager.currentPage==1 && (EmpOverTimeListPager.currentPageSize < EmpOverTimeListPager.pageSize)">
+                            @Resource.Showing <span data-ng-bind="(EmpOverTimeListPager.pageSize * EmpOverTimeListPager.currentPage) -EmpOverTimeListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(EmpOverTimeListPager.pageSize == EmpOverTimeListPager.currentPageSize) ? (EmpOverTimeListPager.pageSize * EmpOverTimeListPager.currentPage) :(EmpOverTimeListPager.pageSize * EmpOverTimeListPager.currentPage) - EmpOverTimeListPager.pageSize  + EmpOverTimeListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmpOverTimeListPager.totalRecords"></span>&nbsp;@Resource.Records
+                        </div>
+                        <div class="pull-right">
+                            <dir-pagination-controls boundary-links="true" on-page-change="EmpOverTimeListPager.pageChanged(newPageNumber)" pagination-id="EmpOverTimeListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="EmpOverTimeList.length == 0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br class="clearfix" />
+            </div>
+        </div>
+    </div>
+
+</div>

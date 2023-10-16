@@ -1,0 +1,56 @@
+﻿@model HC_AddReferralModel
+@{bool isEditMode = Model != null && Model.Referral.ReferralID > 0;}
+
+
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="fscontainer dxcodeBlock">
+            <div class="legend">
+                Access Detail
+                <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.DXCodeHelptext"
+                   data-ng-custom-class="tooltip-extra-z-index"></i>
+            </div>
+            <div class="row" style="margin: 0px 22px 0px 23px;">
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">@Resource.Username</label>
+                    @Html.TextBoxFor(q => q.Referral.UserName, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.Referral.UserName", placeholder = @Resource.Username, maxlength = 50, autocomplete = "new-password" })
+                    @Html.ValidationMessageFor(q => q.Referral.UserName)
+                </div>
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">@Resource.Password</label>
+
+                    @Html.PasswordFor(q => q.Referral.NewPassword, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.Referral.NewPassword", maxlength = 20, placeholder = @Resource.Password, autocomplete = "new-password" })
+                    @Html.ValidationMessageFor(q => q.Referral.NewPassword)
+
+                </div>
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">@Resource.ConfirmPassword</label>
+                    @Html.PasswordFor(q => q.Referral.ConfirmPassword, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.Referral.ConfirmPassword", maxlength = 20, placeholder = @Resource.ConfirmPassword })
+                    @Html.ValidationMessageFor(q => q.Referral.ConfirmPassword)
+                </div>
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label required">@Resource.SignatureRequired</label>
+                    @Html.DropDownListFor(p => p.Referral.SignatureNeeded, Model.SignatureNeededList.ToSelectList(Model.Referral.SignatureNeeded.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                               new
+                                               {
+                                                   data_ng_model = "ReferralModel.Referral.SignatureNeeded",
+                                                   data_ng_init = "ReferralModel.Referral.SignatureNeeded=ReferralModel.Referral.SignatureNeeded==null?'':ReferralModel.Referral.SignatureNeeded.toString()",
+                                                   @class = "form-control input-sm validateElement",
+                                                   data_error_Count = "ReferralErrorCount.ClientTab",
+                                                   convert_to_boolean = "",
+                                               })
+
+                    @Html.ValidationMessageFor(q => q.Referral.SignatureNeeded)
+                </div>
+                <div class="form-group col-lg-6 col-md-3 col-sm-3" data-ng-if="ReferralModel.Referral.ProfileImagePath != null && ReferralModel.Referral.ProfileImagePath != ''">
+                    <label class="control-label"><strong>@Resource.ProfileImage</strong></label>
+                    <img class="img-responsive RefProfile-image" id="imgDisplay" src="" data-ng-src="{{ReferralModel.Referral.ProfileImagePath}}" />
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

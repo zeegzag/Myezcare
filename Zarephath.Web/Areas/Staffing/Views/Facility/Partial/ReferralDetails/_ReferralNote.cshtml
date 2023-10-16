@@ -1,0 +1,275 @@
+﻿@{
+    string noteFrom = ViewBag.NoteFrom;
+    HC_AddBatchModel HCABMModel = new HC_AddBatchModel();
+}
+@using Zarephath.Core.Models
+
+
+
+@*@model HC_AddReferralModel*@
+@*@Html.Hidden("hdnSetReferralNoteSentenceListModel", Common.SerializeObject(Model.ser))*@
+@Html.Hidden("hdnSetReferralNoteSentenceListModel", Common.SerializeObject(HCABMModel))
+<div class="referal_note_head">
+    @if (
+            (noteFrom != null && noteFrom == "PATIENT" && Common.HasPermission(Constants.HC_Permission_PatientIntake_Notes_Add))
+            || (noteFrom != null && noteFrom == "EMPLOYEE" && Common.HasPermission(Constants.HC_Permission_Empoyee_Notest_Add))
+        )
+    {
+        <div class="pull-right">
+            <a href="#AddReferralNoteModal" data-toggle="modal" class="btn btn-xs green-jungle pull-right" data-ng-click="OnAddReferralClick()">
+                <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddNote
+            </a>
+        </div>
+    }
+</div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="col-md-12 referralNoteCol">
+            <div class="portlet-body compact" style="display: block;">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-condensed flip-content">
+                        <thead class="">
+                            <tr>
+                                <th width="40%" class="text-center">
+                                    <span>@Resource.Note</span>
+                                </th>
+                                <th>
+                                    <span>@Resource.AddedBy</span>
+                                </th>
+                                <th>
+                                    <span>Category</span>
+                                </th>
+                                <th>
+                                    <span>@Resource.AddedDate</span>
+                                </th>
+                                <th width="110px">@Resource.Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in ReferralNoteList">
+                                @*<td>{{item.Note}}</td>*@
+                                <td title="Click on Notes">
+                                    <span href="javascript:void(0);" class="display-block pull-left cursor-pointer" common-detail-popover="ABC" popover-trigger="click" data-content="{{item.Note}}"
+                                          ng-header="@Resource.Notes">{{item.Note.length>50 ? item.Note.substr(0,50)+'...' :  item.Note}}</span>
+                                </td>
+                                <td>{{item.CreatedByName}}</td>
+
+                                <td>{{item.Category}}</td>
+                                <td>{{item.CreatedDate | date:'@Resource._DateFormat'}}</td>
+                                <td>
+                                    @*ToDo: Add Permission Check here*@
+                                    <span>
+                                        @if (
+                                        (noteFrom != null && noteFrom == "PATIENT" && Common.HasPermission(Constants.HC_Permission_PatientIntake_Notes_Add))
+                                        || (noteFrom != null && noteFrom == "EMPLOYEE" && Common.HasPermission(Constants.HC_Permission_Empoyee_Notest_Add))
+                                        )
+                                        {
+                                            <a href="#AddReferralNoteModal" data-ng-click="EditReferralNote(item)" data-toggle="modal" class="btn btn-xs blue">
+                                                <i class="fa fa-edit"></i>
+                                            </a>
+                                        }
+                                        @if (
+                                        (noteFrom != null && noteFrom == "PATIENT" && Common.HasPermission(Constants.HC_Permission_PatientIntake_Notes_Delete))
+                                        || (noteFrom != null && noteFrom == "EMPLOYEE" && Common.HasPermission(Constants.HC_Permission_Empoyee_Notes_Delete))
+                                        )
+                                        {
+                                            <a class="btn btn-xs red" href="javascript:void(0);" data-ng-click="DeleteReferralNote(item)"><i class="fa fa-trash"></i> </a>
+                                        }
+                                    </span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-sm-12">
+        <div class="col-md-12">
+            <div data-ng-if="ReferralNoteList.length == 0" class="ng-scope">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(@Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade ReferralNote" id="AddReferralNoteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="H1"><span data-ng-show="!IsEdit">@Resource.AddNote</span><span data-ng-show="IsEdit">Edit Note</span></h4>
+            </div>
+            <div class="modal-body">
+                <form id="frmNewReferralNote">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="control-label required">@Resource.Role</label>
+                                            <select class="form-control input-sm requiredStrip" multiple="multiple" title="@Resource.AssigneeRequired"
+                                                    data-val="true" selectpicker="SelectedRoleID" name="ReferralNote.SelectedRoleID" data-ng-change="GetReferralEmployee(option.RoleID)" data-ng-model="option.RoleID">
+                                                <option data-ng-repeat="option in PermissionList" value="{{option.RoleID}}">{{option.RoleName}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="control-label required">@Resource.Assignee</label>
+                                            <select class="form-control input-sm requiredStrip" multiple="multiple" title="@Resource.AssigneeRequired"
+                                                    data-val="true" selectpicker="SelectedEmployeesID" name="ReferralNote.SelectedEmployeesID">
+                                                <option data-ng-repeat="option in EmployeeList" value="{{option.EmployeeID}}">{{option.LastName}} {{option.FirstName}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row" style="padding-top:6px;">
+                                        <div class="col-sm-6">
+                                            <label class="control-label">Category</label>
+                                            <select class="form-control input-sm"
+                                                    data-ng-model="selecteditem">
+                                                <option value="0" ng-selected="0">Category is required</option>
+                                                <option data-ng-repeat="option in CategoryList" ng-selected="selecteditem == option.value" value="{{option.Value}}">{{option.Title}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-sm-6">
+                                            </div>
+                                        </div>
+                                    </div>
+                            </div>
+                            <div class="pull-right">
+                                <a href="#ReferralNoteSentence" data-toggle="modal" class="btn btn-xs green-jungle pull-right">
+                                    <i class="fa fa-plus">&nbsp;&nbsp;</i>Add Note Sentence
+                                </a>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <label class="control-label required">@Resource.Note</label>
+                                        </div>
+                                        <div class="col-sm-12">
+                                            <textarea rows="5" class="form-control input-sm requiredStrip" data-ng-model="ReferralNoteDetail"
+                                                      placeholder="@Resource.Note" data-val="true"
+                                                      data-val-required="@Resource.ReasonRequired"
+                                                      name="Notes" id="Notes" data-ng-change="Onclick()"></textarea>
+                                            <span id="NoteReq" hidden style="color:red">Notes are required.</span>
+                                            <span class="field-validation-valid" data-valmsg-for="Notes" data-valmsg-replace="true"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal" data-ng-click="ResetRNote()">@Resource.Cancel</button>
+                        <button type="submit" data-ng-click="SaveReferralNote()" class="btn green-jungle">@Resource.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ReferralNoteSentence" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="H1"><span data-ng-show="!IsEdit">Add Note Sentence</span><span data-ng-show="IsEdit">Edit Note</span></h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-hover table-condensed">
+                            <thead class="">
+                                <tr>
+                                    <th></th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteSentenceListPager.sortColumn('NoteSentenceTitle')">@Resource.NoteSentenceTitle</a>
+                                        <span class="sortorder" data-ng-show="NoteSentenceListPager.sortIndex === 'NoteSentenceTitle'" data-ng-class="{reverse:NoteSentenceListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteSentenceListPager.sortColumn('NoteSentenceDetails')">@Resource.NoteSentenceDetails</a>
+                                        <span class="sortorder" data-ng-show="NoteSentenceListPager.sortIndex === 'NoteSentenceDetails'" data-ng-class="{reverse:NoteSentenceListPager.reverse}"></span>
+                                    </th>
+                                    <th class="width-130px" style="text-align:center">@Resource.Action</th>
+                                </tr>
+                            </thead>
+                            <tr class="compact-search-tr">
+                                <td></td>
+                                <td>
+                                    <input type="text" ng-model="TempSearchNoteSentenceListPage.NoteSentenceTitle" class="form-control input-sm" maxlength="100" />
+
+                                    @*@Html.TextBoxFor(m => m.SearchReferralNoteSentenceList.NoteSentenceTitle, new { data_ng_model = "TempSearchNoteSentenceListPage.NoteSentenceTitle", @class = "form-control input-sm", placeholder = Resource.NoteSentenceTitle, maxlength = 100 })*@
+                                </td>
+                                <td>
+                                    <input type="text" ng-model="TempSearchNoteSentenceListPage.NoteSentenceDetails" class="form-control input-sm" maxlength="100" />
+
+                                    @* @Html.TextBoxFor(m => m.SearchReferralNoteSentenceList.NoteSentenceDetails, new { data_ng_model = "TempSearchNoteSentenceListPage.NoteSentenceDetails", @class = "form-control input-sm", placeholder = Resource.NoteSentenceDetails, maxlength = 100 })*@
+                                </td>
+                                <td>
+                                    <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchNoteSentence()" />
+                                    <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                </td>
+                            </tr>
+
+                            <tr data-ng-repeat="item in NoteSentenceList">
+                                <td>
+                                    <input type="checkbox" ng-model="item.checked" class="unicheckbox text-align-center" ng-click="SelectNoteSentence(item.NoteSentenceDetails,item.checked)" value="{{item.NoteSentenceDetails}}" />
+                                </td>
+                                <td>{{item.NoteSentenceTitle}}</td>
+                                @*<td>{{item.NoteSentenceDetails}}</td>*@
+                                <td title="Click on Notes">
+                                    <span href="javascript:void(0);" class="display-block pull-left cursor-pointer" common-detail-popover="ABC" popover-trigger="click" data-content="{{item.NoteSentenceDetails}}"
+                                          ng-header="@Resource.Notes">{{item.NoteSentenceDetails.length>100 ? item.NoteSentenceDetails.substr(0,100)+'...' : item.NoteSentenceDetails}}</span>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12" data-ng-if="NoteSentenceList.length > 0">
+                        <div class="col-sm-3 pull-left no-padding">
+                            @Resource.Showing <span data-ng-bind="(NoteSentenceListPager.pageSize * NoteSentenceListPager.currentPage) - NoteSentenceListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(NoteSentenceListPager.pageSize == NoteSentenceListPager.currentPageSize) ? (NoteSentenceListPager.pageSize * NoteSentenceListPager.currentPage) :(NoteSentenceListPager.pageSize * NoteSentenceListPager.currentPage) - NoteSentenceListPager.pageSize  + NoteSentenceListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="NoteSentenceListPager.totalRecords"></span>&nbsp;@Resource.Records
+                        </div>
+                        @*<div class="pull-right top pagination-sm">
+                                <dir-pagination-controls boundary-links="true" max-size="NoteSentenceListPager.maxSize" on-page-change="NoteSentenceListPager.pageChanged(newPageNumber)" pagination-id="NoteSentenceListPager_ID"></dir-pagination-controls>
+                            </div>*@
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="NoteSentenceList.length == 0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+

@@ -1,0 +1,135 @@
+﻿@model HC_AddReferralModel
+@{
+    string clientSideDateFormat = ConfigSettings.ClientSideDateTimeFormat;
+    const int legalGuardianContactTypeID = (int)@Common.ContactTypes.LegalGuardian;
+    int primaryContactTypeID = (int)@Common.ContactTypes.PrimaryPlacement;
+    string isEditMode = !string.IsNullOrEmpty(Model.Referral.EncryptedReferralID) && Model.Referral.ReferralID > 0 ? "1" : "0";
+
+
+}
+@*@Html.Hidden("hdnAddReferralModel", Common.SerializeObject(Model))*@
+
+<div>
+    <div class="form-group row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="fscontainer groupErrorParent" id="ShowAddedContactList" style="padding: 1px 0px 0px 0px">
+                <div class="legend">
+                    @Resource.ContactDetails
+                </div>
+                <div class="contactDetailHeader">
+                    <input data-val-required="@Resource.PatientAddressRequired"
+                           data-ng-model="ContactServiceErrorCount" data-val="true"
+                           id="Referral_ContactServiceErrorCount"
+                           class="form-control input-sm groupError hideErrorContent validateElement"
+                           data-error-Count="ReferralErrorCount.ContactTab"
+                           name="Referral.ContactServiceErrorCount" />
+                    @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientDetails_AddUpdate))
+                    {
+                        <a href="#model_AddContact" data-ng-click="OpenAddContactModal()" class="btn btn-xs blue pull-right margin-top-minus-15px" data-toggle="modal">
+                            <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddNewContact
+                        </a>
+                    }
+                    <p class="label-italic">
+                        <b class="font-red-thunderbird">@Resource.NoteLabel</b>
+                        <span>@Html.Raw(Resource.PatientAddressRequiredNote)</span>
+                    </p>
+                </div>
+                
+                <div data-ng-if="ReferralModel.ContactInformationList.length > 0">
+
+                    <div class="row padding-left-right-10">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="portlet-body compact">
+                                <div class="dataTables_wrapper">
+                                    <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                        <thead>
+                                            <tr>
+                                                <th></th>
+                                                <th><strong>@Resource.ContactType</strong></th>
+                                                <th><strong>@Resource.Name</strong></th>
+                                                <th><strong>@Resource.Phone</strong></th>
+                                                <th><strong>@Resource.Address</strong></th>
+                                                <th><strong>@Resource.Email</strong></th>
+                                                <th><strong>@Resource.AddedBy</strong></th>
+                                                <th><strong>@Resource.Actions</strong></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody data-ng-repeat="AddAndListContactInformation in ReferralModel.ContactInformationList track by $index">
+
+                                            <tr>
+                                                <td>
+                                                    <span data-ng-if="AddAndListContactInformation.IsEmergencyContact==true || AddAndListContactInformation.IsEmergencyContact=='true'"
+                                                          data-ng-class="{'badge badge-danger': AddAndListContactInformation.IsEmergencyContact==true
+                                                        || AddAndListContactInformation.IsEmergencyContact=='true'}"
+                                                          title="Emergency Contact">E</span>
+                                                </td>
+                                                <td>
+                                                    {{AddAndListContactInformation.ContactTypeName}}&nbsp;&nbsp;
+
+
+                                                    <span data-ng-if="AddAndListContactInformation.IsDCSLegalGuardian==true || AddAndListContactInformation.IsDCSLegalGuardian=='true'"
+                                                          data-ng-class="{'badge badge-info': AddAndListContactInformation.IsDCSLegalGuardian==true
+                                                        || AddAndListContactInformation.IsDCSLegalGuardian=='true'}"
+                                                          title="DSC is legal gurdian">DCS</span>
+
+                                                    @*<span data-ng-show="{{AddAndListContactInformation.IsDCSLegalGuardian}}" data-ng-class="{'badge badge-info':AddAndListContactInformation.IsDCSLegalGuardian}" title="DSC is legal gurdian">DCS</span></td>*@
+                                                </td>
+                                                <td>{{AddAndListContactInformation.LastName +', ' + AddAndListContactInformation.FirstName}}</td>
+                                                <td>{{AddAndListContactInformation.Phone1 | phoneformat}}</td>
+                                                <td>
+                                                    <span data-ng-if="AddAndListContactInformation.Address">{{AddAndListContactInformation.Address}} &nbsp;{{AddAndListContactInformation.City}} &nbsp;{{AddAndListContactInformation.State}}- {{AddAndListContactInformation.ZipCode}}</span>
+                                                    <span data-ng-if="!AddAndListContactInformation.Address">@Resource.NA</span>
+                                                </td>
+                                                <td>
+
+                                                    <a data-ng-show="AddAndListContactInformation.Email" data-ng-attr-href="{{'mailto:'+AddAndListContactInformation.Email}}">{{AddAndListContactInformation.Email}}</a>
+                                                    <span data-ng-show="!AddAndListContactInformation.Email">{{AddAndListContactInformation.Email ? AddAndListContactInformation.Email :'@Resource.NA'}}</span>
+                                                    @* <span>{{ (AddAndListContactInformation.ROIExpireDate != null && AddAndListContactInformation.ROIExpireDate != '') ? (AddAndListContactInformation.ROIExpireDate | orgdate) : '@Resource.NA'}} </span>
+        <span>|</span>
+        <span>{{ (AddAndListContactInformation.ROIType != null && AddAndListContactInformation.ROIType != '') ? AddAndListContactInformation.ROIType.toString() == '1' ?  '@Common.ROITypes.Verbal' : '@Common.ROITypes.Written' :'@Resource.NA'}}</span>*@
+
+                                                </td>
+                                                <td>{{AddAndListContactInformation.EmpFullName ? AddAndListContactInformation.EmpFullName :'@Resource.NA'}}</td>
+                                                <td>
+                                                    @* <a class="dirPopover" data-popover-content="Message" data-popover-trigger="hover"
+                                                data-popover-placement="top" data-ng-show="{{AddAndListContactInformation.ContactMappingID == 0}}" aria-hidden="true">
+                                                <i class=" fa fa-info-circle icon-italic fa-lg"></i>
+                                            </a>*@
+                                                    @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_PatientDetails_AddUpdate))
+                                                    {
+                                                        <a href="javascript:void(0);" data-ng-click="EditContact($index, AddAndListContactInformation)" title="Edit Contact"><i class="fa fa-edit"></i></a>
+                                                        <a href="javascript:void(0);" data-ng-if="AddAndListContactInformation.ContactMappingID==0 || (@primaryContactTypeID!=AddAndListContactInformation.ContactTypeID) && (@legalGuardianContactTypeID!=AddAndListContactInformation.ContactTypeID)" title="Delete Contact"
+                                                           data-ng-click="DeleteContact($index, AddAndListContactInformation)"><i class="fa fa-remove"></i></a>
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div data-ng-if="ReferralModel.ContactInformationList.length == 0">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-danger">
+                                            @Html.Raw(Resource.NoRecordsFound)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+        
+
+
+</div>

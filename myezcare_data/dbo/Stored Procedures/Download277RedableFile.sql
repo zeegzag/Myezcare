@@ -1,0 +1,8 @@
+﻿CREATE PROCEDURE [dbo].[Download277RedableFile]
+@Edi277FileID BIGINT
+AS 
+BEGIN
+
+SELECT * FROM Edi277FileDetails WHERE Edi277FileID=@Edi277FileID;
+
+END

@@ -1,0 +1,287 @@
+﻿<div id="transportassignpatientpopovermodal" class="modal fade" role="dialog" data-ng-controller="TransportAssignPatientPopoverController">
+    <div class="modal-dialog modal-lg" style="width: 97%;">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    @*<a class="text-decoration-none sbold uppercase ng-binding" target="_blank" href="@Constants.HC_AddReferral{{PatientDetail.EncryptedReferralID}}">{{PatientDetail.ReferralName}}</a>
+                        <a target="_blank"
+                           data-ng-if="PatientDetail.ReferralTSDateID > 0 && PatientDetail.ScheduleID == 0"
+                           href="@Constants.HC_BroadcastNotificationURL@Convert.ToString(Mobile_Notification.NotificationTypes.ScheduleNotification).ToLower()/{{PatientDetail.EncryptedReferralTSDateID}}"
+                           class="btn btn-xs purple" style="float: right; margin-right: 30px; margin-top: -5px;">
+                            <i class="fa fa-send-o"></i> &nbsp;&nbsp;
+                            @Resource.SendScheduleNotification
+                        </a>*@
+                    @*<i>Transport Assignment detail here</i>*@
+                    <a class="text-decoration-none sbold uppercase ng-binding" target="_blank">
+                        {{TransportItem.FacilityName}} - {{TransportItem.RouteName}} - {{TransportItem.VehicleName}}
+                    </a>
+                </h4>
+
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+
+                        <div class="row">
+                            <div class="top pagination-sm" data-ng-show="AjaxStart">
+                                @Resource.Loading
+                                <img src="~/Assets/images/lazyload.gif" />
+                            </div>
+                        </div>
+                        <div class="row form-group margin-top-8 margin-bottom-3">
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label class="control-label">@Resource.Name</label>
+                                    <input type="hidden" data-ng-model="TempSearchReferralModel.TransportID" />
+                                    <input type="text"
+                                           data-ng-model="TempSearchReferralModel.ClientName"
+                                           data-ng-change="SearchReferral()"
+                                           data-ng-model-options="{debounce: 700}"
+                                           class="form-control input-sm" placeholder='@Resource.Name' maxlength=50 />                                  
+                                </div>
+                            </div>                            
+
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label class="control-label">Group(s)</label>
+                                    <select class="form-control input-sm" multiple title="@Resource.Select" id="multipleSelect"
+                                            data-val="true" data-ng-model="TempSearchReferralModel.GroupIds" data-ng-change="SearchReferral()" selectpicker="SelectedGroups">
+                                        <option data-ng-repeat="option in GroupList" value="{{option.Value}}">{{option.Title}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label class="control-label">@Resource.IsDraft</label>
+                                    <select id="IsSaveAsDraft"
+                                            data-ng-model="TempSearchReferralModel.IsSaveAsDraft"
+                                            data-ng-init="TempSearchReferralModel.IsSaveAsDraft = TempSearchReferralModel.IsSaveAsDraft==null?'-1':TempSearchReferralModel.IsSaveAsDraft.toString()"
+                                            data-ng-change="SearchReferral()"
+                                            class="form-control input-sm">
+                                        <option value="">@Resource.SelectStatus</option>
+                                        <option data-ng-repeat='x in newInstance.Draft' value={{x.Value}}>{{x.Name}}</option>
+                                    </select>                                    
+                                </div>
+                            </div>
+
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label class="control-label">@Resource.ServiceType</label>
+                                    <select id="ServiceTypeID"
+                                            data-ng-model="TempSearchReferralModel.ServiceTypeID"
+                                            data-ng-init="TempSearchReferralModel.ServiceTypeID = TempSearchReferralModel.ServiceTypeID==null?'-1':TempSearchReferralModel.ServiceTypeID.toString()"
+                                            data-ng-change="SearchReferral()"
+                                            class="form-control input-sm">
+                                        <option value="">@Resource.SelectStatus</option>
+                                        <option data-ng-repeat='x in newInstance.ServiceTypeList' value={{x.ServiceTypeID}}>{{x.ServiceTypeName}}</option>
+                                    </select>                                    
+                                </div>
+                            </div>
+
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label class="control-label">@Resource.Account #</label>
+                                    <input type="text"
+                                           data-ng-model="TempSearchReferralModel.AHCCCSID"
+                                           data-ng-change="SearchReferral()"
+                                           data-ng-model-options="{debounce: 700}"
+                                           class="form-control input-sm" placeholder='@Resource.AccountNumber' maxlength=20 />                                    
+                                </div>
+                            </div>
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label class="control-label">Region</label>
+                                    <select id="RegionID"
+                                            data-ng-model="TempSearchReferralModel.RegionID"
+                                            data-ng-init="TempSearchReferralModel.RegionID = TempSearchReferralModel.RegionID==null?'-1':TempSearchReferralModel.RegionID.toString()"
+                                            data-ng-change="SearchReferral()"
+                                            class="form-control input-sm">
+                                        <option value="">@Resource.SelectStatus</option>
+                                        <option data-ng-repeat='x in newInstance.RegionModel' value={{x.RegionID}}>{{x.RegionName}}</option>
+                                    </select>
+                                </div>
+                            </div>                          
+
+                        </div>
+
+                        <div class="row" data-ng-if="ReferralList.length > 0">
+                            <div class="col-sm-12">
+                                <div class="portlet-body compact" style="display: block;">
+                                    <div class="table-responsive" style="overflow-x :initial !important">
+                                        <table class=" table table-bordered table-striped table-condensed flip-content table-checkable">
+
+                                            <thead class="">
+                                                <tr>
+                                                    <th class="width-50px text-align-left">
+
+                                                        <div class="btn-group" data-ng-show="ReferralList.length > 0">
+                                                            <input id="SelectAllReferral" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll(SelectAllCheckbox)" val="SelectAllCheckbox">
+                                                            <label for="SelectAllReferral"></label>
+                                                        </div>
+
+                                                    </th>
+                                                    <th>
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ClientName')">@Resource.ClientLabel</a>
+                                                        <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                    </th>
+                                                    <th>
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Address')">@Resource.Address</a>
+                                                        <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Address'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                    </th>
+                                                    <th>
+                                                        Startdate-EndDate
+                                                    </th>
+                                                    <th>
+                                                        Note
+                                                        @*<a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Address')">@Resource.Address</a>
+                                                            <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Address'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>*@
+                                                    </th>
+                                                    <th>
+                                                        IsBillable
+                                                        @*<a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Address')">@Resource.Address</a>*@
+                                                        @*<span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Address'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>*@
+                                                    </th>
+
+                                                    <th class="width-130px text-align-center">Actions</th>
+
+                                                </tr>
+                                            </thead>
+
+
+                                            <tbody data-ng-if="ReferralList.length > 0" dir-paginate="referral in ReferralList | itemsPerPage: ReferralListPager.pageSize"
+                                                   total-items="ReferralListPager.totalRecords" current-page="ReferralListPager.currentPage" pagination-id="ReferralListPagerID">
+                                                <tr data-ng-class="{'deleted':referral.IsDeleted}">
+                                                    <td>
+                                                        <span  data-ng-show="referral.TransportAssignPatientID" class="pull-left">
+                                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="referral.IsChecked" data-ng-change="SelectReferral(referral)" val="referral.IsChecked">
+                                                        </span>
+                                                    </td>
+                                                    <td>
+
+                                                        <a href="#" ng-click="ReferralEditModel(referral.EncryptedReferralID)" data-ng-bind="referral.Name"></a>
+                                                        <span>
+                                                            <i class="fa fa-star priority" data-ng-if="referral.IsSaveAsDraft" title="@Resource.DraftTitle"></i>
+                                                        </span>
+                                                        <span data-ng-if="referral.IsAuthorizationDetailsCaptured">
+                                                            <span class="event-container pull-right" data-ng-if="ReferralDetails[referral.ReferralID].Authorizations.length==0">
+                                                                <i id="pops{{referral.ReferralID}}" data-ng-mouseover="OpenNoAuthMessage($event)" class="fa fa-exclamation-triangle alertIcon"></i>
+                                                            </span>
+                                                            <span class="event-container pull-right" data-ng-if="IsActivePayorAuthExist(ReferralDetails[referral.ReferralID].Authorizations)==false">
+                                                                <i id="pops{{referral.ReferralID}}" data-ng-mouseover="OpenNoActiveAuthMessage($event)" class="fa fa-exclamation-triangle alertIcon"></i>
+                                                            </span>
+                                                            <span class="event-container pull-right" data-ng-if="IsRecentFutureEndDate(ReferralDetails[referral.ReferralID].Authorizations)==true">
+                                                                <i id="pops{{referral.ReferralID}}" data-ng-mouseover="OpenRecentFutureAuthMessage($event,ReferralDetails[referral.ReferralID].Authorizations)" class="fa fa-exclamation-triangle alertIcon"></i>
+                                                            </span>
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <span data-ng-bind="referral.Address"></span>
+                                                    </td>
+                                                    <td>
+                                                        <!---->
+                                                        <div data-ng-show="referral.isAssigned && !referral.IsEdit">
+                                                            <span data-ng-show="referral.Startdate != ''">{{referral.Startdate | dateformat}}-{{referral.EndDate | dateformat}}</span>
+                                                        </div>
+                                                        <div data-ng-show="!referral.isAssigned || referral.IsEdit" class="fields text-center">
+                                                            <div id="start-date" class="input-group date date-picker pull-right ng-isolate-scope pull-left" datepicker="referral.Startdate" ng-dateval="referral.Startdate" style="max-width: 130px;"
+                                                                 data-ng-mindate="referral.EndDate"
+                                                                 >
+
+                                                                <input class="form-control input-sm dateInputMask" data-val="true" data-val-date="The field StartDate must be a date." id="referral_Startdate" maxlength="50" name="referral.Startdate" placeholder="mm/dd/yyyy" type="text" value="">
+                                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                            </div>
+                                                            <div class="pull-left">-</div>
+                                                            <div id="end-date" class="input-group date date-picker pull-right ng-isolate-scope pull-left" datepicker="referral.EndDate" ng-dateval="referral.EndDate" style="max-width: 130px;"
+                                                                 data-ng-mindate="referral.Startdate"
+                                                                 >
+                                                                @*data-ng-maxdate="SearchTransportAssignmentModel.StartDate"*@
+                                                                <input class="form-control input-sm dateInputMask" data-val="true" data-val-date="The field StartDate must be a date." id="referral_EndDate" maxlength="50" name="referral.EndDate" placeholder="mm/dd/yyyy" type="text" value="">
+                                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                            </div>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div data-ng-show="referral.isAssigned && !referral.IsEdit">
+                                                            <i data-ng-show="referral.Note != null && referral.Note != 'null'">{{referral.Note}}</i>
+                                                        </div>
+                                                        <input type="text" data-ng-show="!referral.isAssigned || referral.IsEdit" data-ng-model="referral.Note" class="form-control input-sm" />
+                                                    </td>
+                                                    <td>
+                                                        <B data-ng-show="referral.isAssigned && !referral.IsEdit">
+                                                            <span data-ng-show="referral.IsBillable">Yes</span>
+                                                            <span data-ng-show="!referral.IsBillable">No</span>
+                                                        </B>
+                                                        <div data-ng-show="!referral.isAssigned || referral.IsEdit">
+                                                            <input type="checkbox" data-ng-model="referral.IsBillable" class="unicheckbox text-align-center" val="referral.IsBillable" />
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-align-center">
+                                                        <div data-ng-show="!referral.IsEdit" class="btn-group" data-ng-click="Cancel1(EmployeeVisit)">
+                                                            <a data-ng-show="!referral.isAssigned" class="btn btn-xs green-jungle letter-space" data-ng-click="AssignReferral(referral)">
+                                                                <i class="fa fa-plus">&nbsp;&nbsp;</i>Assign
+                                                            </a>
+                                                            <a data-ng-show="referral.isAssigned" href="javascript:void(0);" data-ng-click="GetTransportAssignmentPatientForEdit(referral)" class="btn btn-xs blue"><i class="fa fa-edit"></i></a>
+                                                            <a data-ng-show="referral.isAssigned" href="javascript:void(0);" data-ng-click="DeleteTransportAssignmentPatient(referral,'Delete record')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                        </div>
+                                                        <div data-ng-show="referral.IsEdit" class="fields text-center btn-group">
+                                                            <input type='button' class="btn btn-xs btn-default bg-gray-color" value="@Resource.Update" data-ng-click="EditTransportAssignmentPatient(referral)" />
+                                                            <input type='button' class="btn btn-xs btn-default bg-gray-color" value="@Resource.Cancel" data-ng-click="CancelEditTransportAssignmentPatient(referral)" />
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                        </table>
+                                    </div>
+                                    <div class="col-sm-12" data-ng-if="ReferralList.length > 0">
+                                        <div class="col-sm-3 pull-left no-padding">
+                                            @Resource.Showing <span data-ng-bind="(ReferralListPager.pageSize * ReferralListPager.currentPage) - ReferralListPager.pageSize  + 1"></span>
+                                            &nbsp;@Resource.To <span data-ng-bind="(ReferralListPager.pageSize == ReferralListPager.currentPageSize) ? (ReferralListPager.pageSize * ReferralListPager.currentPage) :(ReferralListPager.pageSize * ReferralListPager.currentPage) - ReferralListPager.pageSize  + ReferralListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                        </div>
+                                        <div class="pull-right top pagination-sm">
+                                            <dir-pagination-controls boundary-links="true" max-size="ReferralListPager.maxSize" on-page-change="ReferralListPager.pageChanged(newPageNumber)" pagination-id="ReferralListPagerID"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div data-ng-if="ReferralList.length == 0">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger">
+                                                @Html.Raw(Resource.NoRecordsFound)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    @*<div class="col-sm-3">
+                            start Date -  end Date here <br />
+                            note <br />
+                            Schedure button here<br />
+                            remove schedure button here<br />
+                        </div>*@
+                </div>
+                @*<div class="row">
+                        <div class="col-sm-1 padding-right-0">
+                            <select>
+                                <option data-ng-repeat='x in Agencies' value={{x.AgencyID}}>{{x.NickName}}</option>
+                            </select>
+                            Patient list will here
+                            patient, address, startdate, enddate, "schedule" , delete, hold, note
+                        </div>
+                    </div>*@
+            </div>
+        </div>
+
+    </div>
+</div>

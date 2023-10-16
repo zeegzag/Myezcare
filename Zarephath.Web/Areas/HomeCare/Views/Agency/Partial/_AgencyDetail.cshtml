@@ -1,0 +1,344 @@
+﻿@model AddAgencyModel
+
+@Html.Hidden("hdnAgencyModel", Common.SerializeObject(Model))
+<form class="form-horizontal" id="frmAgency">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <div class="form-group row">
+                <div class="col-sm-12">
+
+                    <div class="fscontainer">
+                        <div class="legend">
+                            @Resource.AgencyDetails
+                        </div>
+                        <div class="col-sm-6 no-padding">
+                            <div class="col-sm-12">
+                                @if (SessionHelper.IsCaseManagement)
+                                {
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.AgencyType</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(m => m.Agency.AgencyType, Common.GetAgencyTypes().ToSelectList(Convert.ToString(Model.Agency.AgencyType), "Name", "Value", Resource.Select, ""), new
+                                       {
+                                           id = "AgencyType",
+                                           data_ng_model = "AgencyModel.Agency.AgencyType",
+                                           data_ng_init = "AgencyModel.Agency.AgencyType=AgencyModel.Agency.AgencyType==''?null:AgencyModel.Agency.AgencyType",
+                                           @class = "form-control input-sm requiredStrip"
+                                       })
+                                            @Html.ValidationMessageFor(q => q.Agency.AgencyType)
+                                        </div>
+                                    </div>
+                                }
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label">@Resource.AgencyNPI</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.NPI,
+                                                                 new
+                                                                 {
+                                                                     @class = "form-control input-sm",
+                                                                     data_ng_model = "AgencyModel.Agency.NPI",
+                                                                     placeholder = @Resource.AgencyNPI,
+                                                                     maxlength = 10,
+                                                                     data_ng_blur = "FetchNPIData()"
+                                                                 })
+                                        @*@Html.ValidationMessageFor(q => q.Agency.NPI)*@
+                                    </div>
+                                </div>
+                                @*<div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label required">@Resource.AgencyFirstName</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.FirstName,
+                                                                 new
+                                                                 {
+                                                                     @class = "form-control input-sm",
+                                                                     data_ng_model = "AgencyModel.Agency.FirstName",
+                                                                     placeholder = @Resource.AgencyFirstName,
+                                                                     maxlength = 50
+                                                                 })
+                                        @Html.ValidationMessageFor(q => q.Agency.FirstName)
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label">@Resource.AgencyMiddleName</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.MiddleName,
+                                                                 new
+                                                                 {
+                                                                     @class = "form-control input-sm",
+                                                                     data_ng_model = "AgencyModel.Agency.MiddleName",
+                                                                     placeholder = @Resource.AgencyMiddleName,
+                                                                     maxlength = 50
+                                                                 })
+                                        @Html.ValidationMessageFor(q => q.Agency.MiddleName)
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label required">@Resource.AgencyLastName</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.LastName,
+                                                                 new
+                                                                 {
+                                                                     @class = "form-control input-sm",
+                                                                     data_ng_model = "AgencyModel.Agency.LastName",
+                                                                     placeholder = @Resource.AgencyLastName,
+                                                                     maxlength = 50
+                                                                 })
+                                        @Html.ValidationMessageFor(q => q.Agency.LastName)
+                                    </div>
+                                </div>*@
+                                <div class="form-group col-sm-12" style="display: none">
+                                    <label class="col-md-4 control-label">@Resource.AgencyShortName</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.ShortName,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.ShortName",
+                                                    placeholder = @Resource.AgencyShortName,
+                                                    maxlength = 50,
+                                                    ng_val = "false"
+                                                })
+                                        @* @Html.ValidationMessageFor(q => q.Agency.ShortName)*@
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label">@Resource.Region</label>
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(m => m.Agency.RegionID, Model.RegionListModel.ToSelectList(Convert.ToString(Model.Agency.RegionID), "RegionName", "RegionID", Resource.SelectRegion, ""), new
+                                   {
+                                       id = "RegionID",
+                                       data_ng_model = "AgencyModel.Agency.RegionID",
+                                       data_ng_init = "AgencyModel.Agency.RegionID=AgencyModel.Agency.RegionID==''?null:AgencyModel.Agency.RegionID",
+                                       @class = "form-control input-sm",
+                                       data_val = "false",
+                                       convert_to_number = ""
+                                   })
+                                        @*@Html.ValidationMessageFor(q => q.Agency.NickName)*@
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label ">@Resource.State</label>
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(p => p.Agency.StateCode, Model.StateCodeListModel.ToSelectList("", "StateName", "StateCode", @Resource.Select, ""),
+                                            new
+                                            {
+                                                data_ng_model = "AgencyModel.Agency.StateCode",
+                                                data_ng_init = "AgencyModel.Agency.StateCode=AgencyModel.Agency.StateCode==null?'AZ':AgencyModel.Agency.StateCode.toString()",
+                                                @class = "form-control input-sm"
+                                            })
+                                        @Html.ValidationMessageFor(q => q.Agency.StateCode)
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-12" style="display: none">
+                                    <label class="col-md-4 control-label ">
+                                        @Resource.ContactName
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        @Html.TextBoxFor(q => q.Agency.ContactName,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.ContactName",
+                                                    placeholder = @Resource.ContactName,
+                                                    maxlength = 50
+                                                })
+                                        @* @Html.ValidationMessageFor(q => q.Agency.ContactName)*@
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12" style="display: none">
+                                    <label class="col-md-4 control-label">@Resource.Email</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.Email,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.Email",
+                                                    placeholder = @Resource.Email,
+                                                    maxlength = 50
+                                                })
+                                        @Html.ValidationMessageFor(q => q.Agency.Email)
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label">@Resource.Fax</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.Fax,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.Fax",
+                                                    maxlength = 15,
+                                                    placeholder = "(XXX) XXX-XXXX",
+                                                    phone_input = ""
+                                                })
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label">@Resource.Phone</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.Phone,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.Phone",
+                                                    maxlength = 15,
+                                                    placeholder = "(XXX) XXX-XXXX",
+                                                    phone_input = ""
+                                                })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label ">
+                                        @Resource.MobileNumber
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        @Html.TextBoxFor(q => q.Agency.Mobile,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.Mobile",
+                                                    placeholder = "(XXX) XXX-XXXX",
+                                                    phone_input = "",
+                                                    maxlength = 15
+                                                })
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-6 no-padding">
+                            <div class="col-sm-12">
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label required">@Resource.AgencyName</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.NickName,
+                                                                 new
+                                                                 {
+                                                                     @class = "form-control input-sm",
+                                                                     data_ng_model = "AgencyModel.Agency.NickName",
+                                                                     placeholder = @Resource.AgencyName,
+                                                                     maxlength = 50
+                                                                 })
+                                        @Html.ValidationMessageFor(q => q.Agency.NickName)
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label ">
+                                        @Resource.TIN
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        @Html.TextBoxFor(q => q.Agency.TIN,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.TIN",
+                                                    placeholder = @Resource.TIN,
+                                                    maxlength = 100
+                                                })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label ">
+                                        @Resource.EIN
+                                    </label>
+                                    <div class="col-md-8 col-sm-12">
+                                        @Html.TextBoxFor(q => q.Agency.EIN,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.EIN",
+                                                    placeholder = @Resource.EIN,
+                                                    maxlength = 100
+                                                })
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label">@Resource.Address</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.Address,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.Address",
+                                                    placeholder = @Resource.Address,
+                                                    maxlength = 99,
+                                                })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label">@Resource.City</label>
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(q => q.Agency.City,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "AgencyModel.Agency.City",
+                                                    placeholder = @Resource.City,
+                                                    maxlength = 49,
+                                                })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-4 control-label">@Resource.ZipCode</label>
+                                    <div class="col-md-8">
+                                        <zipcode class="Agency-Zipcode" type="text" ng-model="AgencyModel.Agency.ZipCode" modelid="ZipCode" />
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 no-padding">
+                            <label class="col-md-2 control-label">@Resource.Taxonomy</label>
+                            <div class="col-md-10">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">@Resource.PrimaryTaxonomy</th>
+                                            <th scope="col">@Resource.SelectedTaxonomy</th>
+                                            <th scope="col">@Resource.TaxonomyState</th>
+                                            <th scope="col">@Resource.LicenseNumber</th>
+                                            @*<th scope="col"></th>*@
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="i in AgencyModel.AgencyTaxonomies">
+                                            <th scope="row">{{i.IsPrimary ? 'Yes' : 'No'}}</th>
+                                            <td>
+                                                {{i.TaxonomyGroup}} <br />
+                                                {{i.Code}} {{i.Description}}
+                                            </td>
+                                            <td>{{i.State}}</td>
+                                            <td>{{i.License}}</td>
+                                            @*<td>
+                                                <div class="form-check">
+                                                    <input class="form-check-input" type="radio" name="gridRadios" id="gridRadios1" value="option1">
+                                                </div>
+                                            </td>*@
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 form-group text-center">
+                <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle" value="@(Model.Agency != null && Model.Agency.AgencyID > 0 ? Resource.Update : @Resource.Save)" />
+                <a href="javascript:;">
+                    <input type="button" class="btn btn-sm red-mint" data-ng-click="Cancel()" value="@Resource.Cancel" />
+                </a>
+            </div>
+        </div>
+    </div>
+</form>

@@ -1,0 +1,465 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.NurseSignature);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_NurseSignature;
+}
+
+@model SetNurseSignaturePage
+@Html.Hidden("hdnSetNurseSignaturePage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="NurseSignatureController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.NurseSignature &nbsp;
+        </h3>
+        <div class="pull-right padding-top-15 margin-left-110" data-ng-show="NurseSignatureListAjaxStart">
+            <img src="~/Assets/images/lazyload.gif" />
+        </div>
+        <div class="tools width-100px margin-right-0">
+            <div class="drop-1">
+                <button class="btn btn-success pull-right" data-ng-disabled="ApprovedEmployeeVisitIds.length === 0" ng-click="OpenApproverSignModel();">Approve</button>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="panel panel-info">
+        <div class="panel-body">
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <form id="frmFilters">
+                        <div class="row form-group">
+                            <div class="col-sm-2 small-select padding-right-0">
+                                <div class="fields">
+                                    <label>@Resource.Employee</label>
+                                    <select class="form-control input-sm" title="@Resource.SelectEmployee"
+                                            data-val="true" actions-box="true" multiple="multiple"
+                                            selectpicker="SearchNurceTimesheetListPage.EmployeeIDs" name="SearchNurceTimesheetListPage.EmployeeIDs">
+                                        <option data-ng-repeat="option in NurseSignatureModel.EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2 small-select padding-right-0">
+                                <div class="fields">
+                                    <label>@Resource.Patient</label>
+                                    <select class="form-control input-sm" title="@Resource.SelectPatient"
+                                            data-val="true" actions-box="true" multiple="multiple"
+                                            selectpicker="SearchNurceTimesheetListPage.ReferralIDs" name="SearchNurceTimesheetListPage.ReferralIDs">
+                                        <option data-ng-repeat="option in NurseSignatureModel.ReferralList" value="{{option.ReferralID}}">{{option.ReferralName}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-1 small-select padding-right-0">
+                                <div class="fields">
+                                    <label>@Resource.Status</label>
+
+                                    <select class="form-control input-sm" data-ng-model="SearchNurceTimesheetListPage.StatusId" id="SearchNurceTimesheetListPage.StatusId"
+                                            name="SearchNurceTimesheetListPage.StatusId">
+                                        <option value="-1">All</option>
+                                        <option value="1">Approved</option>
+                                        <option value="0">Pending</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2 small-select padding-right-0">
+                                <div class="fields">
+                                    <label>@Resource.CareType</label>
+
+                                    <select class="form-control input-sm" title="@Resource.SelectCareType"
+                                            data-val="true" actions-box="true" multiple="multiple"
+                                            selectpicker="SearchNurceTimesheetListPage.CareTypeIDs" id="SearchNurceTimesheetListPage.CareTypeIDs"
+                                            name="SearchNurceTimesheetListPage.CareTypeIDs">
+                                        <option data-ng-repeat="option in NurseSignatureModel.CareTypeList" value="{{option.CareTypeID}}">{{option.CareType}}</option>
+                                    </select>
+
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-2 small-select padding-right-0">
+                                <div class="fields">
+                                    <label>From Date</label>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="SearchNurceTimesheetListPage.StartDate" ng-dateval="SearchNurceTimesheetListPage.StartDate" data-ng-maxdate="SearchNurceTimesheetListPage.EndDate">
+                                        @Html.TextBoxFor(m => m.SearchNurceTimesheetListPage.StartDate, new
+                                           {
+                                               @class = "form-control input-sm dateInputMask requiredStrip",
+                                               maxlength = "50",
+                                               placeholder = Resource.DateFormat,
+                                               @required = "true",
+                                               autocomplete = "off"
+                                           })
+                                        @Html.ValidationMessageFor(m => m.SearchNurceTimesheetListPage.StartDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-2 small-select padding-right-0">
+                                <div class="fields">
+                                    <label>To Date</label>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="SearchNurceTimesheetListPage.EndDate" ng-dateval="SearchNurceTimesheetListPage.EndDate" data-ng-mindate="SearchNurceTimesheetListPage.StartDate">
+                                        @Html.TextBoxFor(m => m.SearchNurceTimesheetListPage.EndDate, new
+                                           {
+                                               @class = "form-control input-sm dateInputMask requiredStrip",
+                                               maxlength = "50",
+                                               placeholder = Resource.DateFormat,
+                                               @required = "true",
+                                               autocomplete = "off"
+                                           })
+                                        @Html.ValidationMessageFor(m => m.SearchNurceTimesheetListPage.EndDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-1  padding-right-0">
+                                <div class="clockIn-btn">
+                                    <input type="button" class="btn btn-sm btn-primary" value="@Resource.Search" data-ng-click="SearchNurseSignature()">
+                                </div>
+                            </div>
+                            <div class="col-sm-1  padding-right-0">
+                                <div class="clockIn-btn">
+                                    <input type="button" class="btn btn-sm btn-default" value="@Resource.Reset" data-ng-click="ResetSearchFilter()">
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                    
+
+                    <div class="filter-cols">
+                        <div class="col-md-12 col-sm-12 col-xs-12">
+                            <div class="inline-block pull-left" data-ng-show="SelectedItemCount > 0">
+                                <span><span style="font-weight:600">Selected : </span>{{SelectedItemCount}}</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row margin-bottom-10">
+                <div class="col-md-12">
+                    <div class="inline-block ">
+                        <button class="btn btn-sm btn-default" type="button" data-ng-disabled="ApprovedEmployeeVisitIds.length === 0" data-ng-click="MultiplePDFDownload()"><i class="fa fa-print"></i>Print Selected </button>
+                    </div>
+                    <div class="pull-right top pagination-sm">
+                        <dir-pagination-controls boundary-links="true" max-size="NurseSignatureListPager.maxSize" on-page-change="NurseSignatureListPager.pageChanged(newPageNumber)" pagination-id="NurseSignatureListPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row" data-ng-if="NurseSignatureList.length > 0">
+                <div class="col-sm-12">
+                    <div class="portlet-body compact" style="display: block;">
+                        <form id="frmEmployeeVisitApprovalList">
+                            <div class="table-responsive employeetable">
+                                <table class="table table-hover table-bordered table-striped table-condensed table-checkable empvisitlist_tbl employeetable">
+                                    <thead class="flip-content">
+                                        <tr>
+                                            <th class="width-20px">
+                                                <div class="btn-group" data-ng-show="NurseSignatureList.length > 0">
+                                                    <input id="SelectAllApprove" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllApproveCheckbox" data-ng-click="SelectAllApprove(!SelectAllApproveCheckbox)" val="SelectAllApproveCheckbox">
+                                                    <label for="SelectAllApprove"></label>
+                                                </div>
+                                            </th>
+                                            <th class="width-250px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="NurseSignatureListPager.sortColumn('Name')">@Resource.EmployeeName</a>
+                                                <span class="sortorder" data-ng-show="NurseSignatureListPager.sortIndex === 'Name'" data-ng-class="{reverse:NurseSignatureListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-150px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="NurseSignatureListPager.sortColumn('PatientName')">@Resource.PatientName</a>
+                                                <span class="sortorder" data-ng-show="NurseSignatureListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:NurseSignatureListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-110px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="NurseSignatureListPager.sortColumn('CareType')">@Resource.CareType</a>
+                                                <span class="sortorder" data-ng-show="NurseSignatureListPager.sortIndex === 'CareType'" data-ng-class="{reverse:NurseSignatureListPager.reverse}"></span>
+                                            </th>
+
+                                            <th class="width-150px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="NurseSignatureListPager.sortColumn('StartDate')">@Resource.VisitDate</a>
+                                                <span class="sortorder" data-ng-show="NurseSignatureListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:NurseSignatureListPager.reverse}"></span>
+                                            </th>
+
+                                            <th class="width-150px">
+                                                @Resource.VisitDay
+                                            </th>
+                                            <th class="width-110px">
+                                                @Resource.ClockInTime
+                                            </th>
+                                            <th class="width-110px">
+                                                @Resource.ClockOutTime
+                                            </th>
+                                            <th class="width-400px">
+                                                Note
+                                            </th>
+                                            <th class="width-110px">@Resource.Action</th>
+                                        </tr>
+
+
+                                    </thead>
+                                    <tbody data-ng-if="NurseSignatureList.length > 0" dir-paginate="ApprovalVisit in NurseSignatureList | itemsPerPage: NurseSignatureListPager.pageSize" total-items="NurseSignatureListPager.totalRecords" current-page="NurseSignatureListPager.currentPage" pagination-id="NurseSignatureListPagerID">
+
+                                        <tr data-ng-class="{'deleted': valVisit.CanApprove}">
+                                            <td class="text-align-center">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="ApprovalVisit.IsChecked" data-ng-change="SelectEmployeeVisitApprove(ApprovalVisit)" val="ApprovalVisit.IsChecked">
+                                                <span class="collapseSource collapsed  curser-pointer font-size-18 font-blue fa fa-plus-circle" title="Expand / Collapse"
+                                                      data-ng-click="OnPage_GetApprovalVisitDetails(ApprovalVisit,'#OnPage_ApprovalVisitDetails-'+ApprovalVisit.EmployeeVisitID)"
+                                                      data-ng-attr-id="{{'OnPage_CNDetails-'+ApprovalVisit.EmployeeVisitID }}"
+                                                      data-toggle="collapse"
+                                                      data-ng-attr-data-target="{{'#OnPage_ApprovalVisitDetails-'+ApprovalVisit.EmployeeVisitID }}">
+                                                </span>
+                                            </td>
+                                            <td>
+
+                                                <span data-ng-if="ApprovalVisit.AnyActionMissing==0">
+                                                    <a class="text-decoration-none font-size-14 webpop" style="color: red !important;" item-detail-popup-new
+                                                       data-ng-model="ApprovalVisit" data-ng-template-selector="#approvalVisit-popover" data-popover-cloasble="true">
+                                                        <i class="fa  fa-exclamation -circle"></i>
+                                                    </a>
+                                                </span>
+                                                <span data-ng-if="ApprovalVisit.AnyActionMissing==1">
+                                                    <a class="text-decoration-none font-size-14 webpop" style="color: green !important;" item-detail-popup-new
+                                                       data-ng-model="ApprovalVisit" data-ng-template-selector="#approvalVisit-popover" data-popover-cloasble="true">
+                                                        <i class="fa fa-info-circle"></i>
+                                                    </a>
+                                                </span>
+                                                &nbsp;
+                                                <a class="" data-ng-href="@Constants.HC_AddEmployee{{ApprovalVisit.EncryptedEmployeeID}}" target="_new">
+                                                    {{ApprovalVisit.Name}}
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a class="" data-ng-href="@Constants.HC_AddReferral{{ApprovalVisit.EncryptedReferralID}}" target="_new">
+                                                    {{ApprovalVisit.PatientName}}
+                                                </a>
+                                                <br />
+                                                <span data-ng-show="ApprovalVisit.IsApproved==0" class="badge badge-danger">Pending</span>
+                                                <span data-ng-show="ApprovalVisit.IsApproved==1" class="badge badge-success">Approve</span>
+                                            </td>
+                                            <td>{{ApprovalVisit.CareType}}</td>
+                                            <td>{{ApprovalVisit.StartDate | orgdate }}</td>
+                                            <td>{{ApprovalVisit.EndDate | date:'EEEE' }}</td>
+                                            <td>
+                                                <span>{{ApprovalVisit.ClockInTime | timeformat }}</span>
+                                            </td>
+                                            <td>
+                                                <span>{{ApprovalVisit.ClockOutTime | timeformat}}</span>
+                                            </td>
+                                            <td>
+                                                <div class="display-flex align-items-center">
+                                                    <textarea type="text" ng-model="ApprovalVisit.ApproveNote"
+                                                              class="form-control input-sm"
+                                                              placeholder="Note (Optional)"
+                                                              id="ApproveNote{{$index}}"
+                                                              name="ApproveNote{{$index}}"
+                                                              rows="4">
+                                                            </textarea>
+                                                </div>
+                                            </td>
+                                            <td class="text-align-center">
+                                                <div class="btn-group  dropup">
+                                                    <button class="btn btn-default btn-xs dropdown-toggle green-haze-stripe" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                        <b>@Resource.Action</b>
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu ">
+                                                        @if (SessionHelper.IsHomeCare)
+                                                        {
+                                                            <li>
+                                                                <a href="javascript:void(0);" title="@Resource.PrintPCATimeSheet"  data-ng-click="PrintTimeSheetReportHomecare(ApprovalVisit.EmployeeVisitID)"><i class="fa fa-print"></i>@Resource.PrintPCATimeSheet</a>
+                                                            </li>
+                                                        }
+
+                                                        @if (SessionHelper.IsDayCare)
+                                                        {
+                                                            <li>
+                                                                <a href="javascript:void(0);" title="@Resource.PrintPCATimeSheet"  data-ng-click="PrintTimeSheetReportDaycare(ApprovalVisit.EmployeeVisitID)"><i class="fa fa-print"></i>@Resource.PrintPCATimeSheet</a>
+                                                            </li>
+                                                        }
+                                                        
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr data-ng-attr-id="{{'OnPage_ApprovalVisitDetails-'+ApprovalVisit.EmployeeVisitID }}" class="collapse collapseDestination OnPage_ApprovalVisitDetails">
+                                            <td colspan="11" style="text-align: left;">
+
+                                                <div class="modal-dialog" style="width:95%;">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h4 class="modal-title page-title no-margin">
+                                                                <b>
+                                                                    <span>
+                                                                        <span class="font-size-18">
+                                                                            VISIT DETAILS
+                                                                        </span>
+                                                                        <span class="font-size-14">
+                                                                            <span class='font-size-18 font-weight-400 '>
+                                                                                <small>
+                                                                                    &nbsp;-&nbsp;
+                                                                                    @Resource.Visit: #<b>{{ApprovalVisit.ApprovalVisitDetails.EmployeeVisitID}}</b>&nbsp;/&nbsp;
+                                                                                    @Resource.Payor: <b>{{ApprovalVisit.ApprovalVisitDetails.PayorName}}</b>&nbsp;/&nbsp;
+                                                                                    @Resource.AuthorizationCode: <b>{{ApprovalVisit.ApprovalVisitDetails.AuthorizationCode || '-'}}</b>
+                                                                                </small>
+                                                                            </span>
+
+
+                                                                        </span>
+                                                                    </span>
+                                                                </b>
+                                                                <br />
+                                                                <span data-ng-if="ApprovalVisit.ApprovalVisitDetails.ClockInTime || ApprovalVisit.ApprovalVisitDetails.ClockOutTime" class="font-size-14 margin-top-10">
+                                                                    @Resource.ServiceDate:
+                                                                    <b>
+                                                                        <span data-ng-if="ApprovalVisit.ApprovalVisitDetails.ClockInTime" class="padding-left-5">{{ApprovalVisit.ApprovalVisitDetails.ClockInTime | orgdatetime }}</span>
+                                                                        <span data-ng-if="ApprovalVisit.ApprovalVisitDetails.ClockInTime && ApprovalVisit.ApprovalVisitDetails.ClockOutTime" class="padding-left-right-2">-</span>
+                                                                        <span data-ng-if="ApprovalVisit.ApprovalVisitDetails.ClockOutTime">{{ApprovalVisit.ApprovalVisitDetails.ClockOutTime | orgdatetime }}</span>
+                                                                    </b>
+                                                                </span>
+
+                                                            </h4>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <div class="row">
+                                                                <div data-ng-class="{'col-sm-6':ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList2.length > 0, 'col-sm-12': !(ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList2.length > 0)}">
+                                                                    <table class="table table-hover table-bordered table-striped table-condensed table-checkable" style="margin-bottom: 3px;">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th class="text-align-left">Task</th>
+                                                                                <th class="width-250px">Time</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr data-ng-class="{'deleted':EmployeeVisitNote.IsDeleted}" data-ng-repeat="EmployeeVisitNote in ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList1">
+                                                                                <td class="text-align-left" data-ng-bind="EmployeeVisitNote.VisitTaskDetail"></td>
+                                                                                <td>{{EmployeeVisitNote.ServiceTime | timeinhrs}}&nbsp;hrs</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                                <div class="col-sm-6" data-ng-class="{'hidden': !(ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList2.length > 0)}">
+                                                                    <table class="table table-hover table-bordered table-striped table-condensed table-checkable" style="margin-bottom: 3px;">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th class="text-align-left">Task</th>
+                                                                                <th class="width-250px">Time</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr data-ng-class="{'deleted':EmployeeVisitNote.IsDeleted}" data-ng-repeat="EmployeeVisitNote in ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList2">
+                                                                                <td class="text-align-left" data-ng-bind="EmployeeVisitNote.VisitTaskDetail"></td>
+                                                                                <td>{{EmployeeVisitNote.ServiceTime | timeinhrs}}&nbsp;hrs</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row" data-ng-if="!(ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList.length > 0)">
+                                                                <div class="col-sm-12">
+                                                                    <div class="alert alert-danger mb-0">
+                                                                        @Html.Raw(Resource.NoRecordsFound)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <table class="table table-hover table-bordered table-striped table-condensed table-checkable" style="margin-top: 20px; margin-bottom: 3px;">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th class="text-align-left" scope="col">Conclusion</th>
+                                                                        <th class="width-110px" scope="col">Yes/No</th>
+                                                                        <th scope="col">Notes</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr data-ng-repeat="EmployeeVisitConclusion in ApprovalVisit.ApprovalVisitDetails.EmployeeVisitConclusionList">
+                                                                        <td class="text-align-left" data-ng-bind="EmployeeVisitConclusion.VisitTaskDetail"></td>
+                                                                        <td>
+                                                                            <i class="glyphicon glyphicon-ok text-success" data-ng-if="EmployeeVisitConclusion.Description==='YES'"></i>
+                                                                            <i class="glyphicon glyphicon-remove text-danger" data-ng-if="EmployeeVisitConclusion.Description==='NO'"></i>
+                                                                            <span data-ng-if="EmployeeVisitConclusion.Description==null">@Resource.NA</span>
+                                                                        </td>
+                                                                        <td data-ng-bind="EmployeeVisitConclusion.AlertComment"></td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="row" data-ng-if="!(ApprovalVisit.ApprovalVisitDetails.EmployeeVisitConclusionList.length > 0)">
+                                                                <div class="col-sm-12">
+                                                                    <div class="alert alert-danger mb-0">
+                                                                        @Html.Raw(Resource.NoRecordsFound)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-sm-12" data-ng-if="NurseSignatureList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(NurseSignatureListPager.pageSize * NurseSignatureListPager.currentPage) - NurseSignatureListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(NurseSignatureListPager.pageSize == NurseSignatureListPager.currentPageSize) ? (NurseSignatureListPager.pageSize * NurseSignatureListPager.currentPage) :(NurseSignatureListPager.pageSize * NurseSignatureListPager.currentPage) - NurseSignatureListPager.pageSize  + NurseSignatureListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="NurseSignatureListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="NurseSignatureListPager.maxSize" on-page-change="NurseSignatureListPager.pageChanged(newPageNumber)" pagination-id="NurseSignatureListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+
+            <div class="row" data-ng-if="!(NurseSignatureList.length > 0)">
+                <div class="col-sm-12">
+                    <div class="alert alert-danger mb-0">
+                        @Html.Raw(Resource.NoRecordsFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <button class="btn btn-success pull-right" data-ng-disabled="ApprovedEmployeeVisitIds.length === 0" ng-click="OpenApproverSignModel();">Approve</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ApproverSignatureModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none; margin-top: 0px;" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="font-size-20">Signature</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="CloseApproverSignModel()"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container" style="width:570px;height:210px;">
+                        <signature-pad accept="accept" clear="clear" style="border:1px solid" height="220" width="568" dataurl="dataurl"></signature-pad>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-success pull-right" id="save-png" data-ng-click="SaveSignatureImage()">Save</button>
+                    <button class="btn btn-danger margin-right-15" id="clear" data-ng-click="ClearSignatureImage()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/nursesignature")
+<script id="approvalVisit-popover" type="text/ng-template">
+    @Html.Partial("Partial/_EmployeeVisitInformationTipPopover")
+</script>
+}

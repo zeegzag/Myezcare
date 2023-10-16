@@ -1,0 +1,237 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Invoice);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model InvoiceModel
+@Html.Hidden("hdnInvoiceModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="AddInvoiceController">
+
+    <form id="frmSaveInvoice" action="POST">
+        <div class="page-bar">
+            <h3 class="page-title">
+                {{InvoiceModel.IsUpdate ==false ?'Add Invoice':'Edit Invoice'}}
+            </h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="fscontainer">
+                    <div class="legend">
+                        {{InvoiceModel.IsUpdate ==false ?'Add Invoice':'Edit Invoice'}}
+                    </div>
+                    <div class="clearfix">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Select Month</label>
+                                <select required class="form-control input-sm" data-ng-model="InvoiceModel.MonthId" id="MonthID" name="MonthID" placeholder="Month Name">
+                                    <option value="">Select</option>
+                                    <option data-ng-repeat="item in AllMonthList" value="{{item.Id}}">{{item.Name}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Invoice Number</label>
+                                <input required readonly type="text" class="form-control input-sm" data-ng-model="InvoiceModel.InvoiceNumber" name="InvoiceNumber" placeholder="Invoice Number" />
+                            </div>
+
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Organization</label>
+                                <select required class="form-control input-sm" data-ng-model="InvoiceModel.OrganizationId" id="OrganizationId" name="OrganizationId" placeholder="Organization Name">
+                                    <option value="" selected>Select</option>
+                                    <option data-ng-repeat="item in OrganizationList" value="{{item.OrganizationID}}">{{item.DisplayName}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Invoice Date</label>
+                                <div class="col-md-8 input-group date" datepicker="InvoiceModel.InvoiceDate"
+                                     ng-dateval="InvoiceModel.InvoiceDate">
+                                    @Html.TextBoxFor(q => q.InvoiceDate, new { @required = "required", @class = "form-control input-sm dateInputMask", maxlength = 10, placeholder = Resource.Date })
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Plan</label>
+                                <select required class="form-control input-sm" data-ng-model="InvoiceModel.PlanName" id="PlanNameId" name="PlanName" placeholder="Plan Name">
+                                    <option value="" selected>Select</option>
+                                    <option data-ng-repeat="item in PlanList" value="{{item.Id}}">{{item.Name}}</option>
+                                </select>
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Due Date </label>
+                                @* <input type="text" class="form-control input-sm" data-ng-model="PermissionModel.PermissionPlatform" name="PermissionPlatform" placeholder="Permission Platform" />*@
+                                <div class="col-md-8 input-group date" datepicker="InvoiceModel.DueDate"
+                                     ng-dateval="InvoiceModel.DueDate">
+                                    @Html.TextBoxFor(q => q.DueDate, new { @required = "required", @class = "form-control input-sm dateInputMask", maxlength = 10, placeholder = Resource.Date })
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Invoice Status</label>
+                                <select required class="form-control input-sm" data-ng-model="InvoiceModel.InvoiceStatus" id="OrganizationId" name="OrganizationId" placeholder="Organization Name">
+                                    <option value="" selected>Select</option>
+                                    <option value="1">Paid</option>
+                                    <option value="2">Cancelled</option>
+                                    <option value="3">Unpaid</option>
+                                    <option value="4">Overdue</option>
+                                    <option value="5">WriteOff</option>
+
+                                </select>
+                                @*<input type="text" class="form-control input-sm" data-ng-model="PermissionModel.ParentID" name="ParentID" placeholder="ParentID" />*@
+                            </div>
+                        </div>
+
+                        <div class="col-lg-12 col-md-12 col-sm-3 bg-grey h-25" style="height: 23px;">
+                            <div class="col-lg-3 col-md-3 col-sm-2">Item</div>
+                            <div class="col-lg-3 col-md-3 col-sm-2">Quantity</div>
+                            <div class="col-lg-3 col-md-3 col-sm-2">UNIT   </div>
+                            <div class="col-lg-3 col-md-3 col-sm-2">AMOUNT</div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label>ACTIVE PATIENT</label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.ActivePatientQuantity,$event)" class="form-control input-sm" data-ng-model="InvoiceModel.ActivePatientQuantity" id="ActivePatientQuantity" name="InvoiceNumber" placeholder="Quantity" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.ActivePatientUnit,$event)" class="form-control input-sm" data-ng-model="InvoiceModel.ActivePatientUnit" id="ActivePatientUnit" name="ActivePatientUnit" placeholder="Unit" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input readonly type="text" class="form-control input-sm" data-ng-model="InvoiceModel.ActivePatientAmount" name="InvoiceNumber" placeholder="Amount" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label>NUMBER OF TIME SHEET</label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.NumberOfTimeSheetQuantity,$event)" class="form-control input-sm" data-ng-model="InvoiceModel.NumberOfTimeSheetQuantity" name="NumberOfTimeSheetQuantity" placeholder="Quantity" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.NumberOfTimeSheetUnit,$event)" class="form-control input-sm" data-ng-model="InvoiceModel.NumberOfTimeSheetUnit" name="NumberOfTimeSheetUnit" placeholder="Unit" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input readonly type="text" class="form-control input-sm" data-ng-model="InvoiceModel.NumberOfTimeSheetAmount" name="NumberOfTimeSheetAmount" placeholder="Amount" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label>IVR</label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.IVRQuantity,$event)"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.IVRQuantity" name="IVR" placeholder="Quantity" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.IVRUnit,$event)"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.IVRUnit" name="IVRUnit" placeholder="Unit" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input readonly type="text"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.IVRAmount" name="InvoiceNumber" placeholder="Amount" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label>MESSAGES</label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.MessageQuantity,$event)"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.MessageQuantity" name="MessageQuantity" placeholder="Quantity" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.MessageUnit,$event)"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.MessageUnit" name="MessageUnit" placeholder="Unit" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input readonly type="text" class="form-control input-sm" data-ng-model="InvoiceModel.MessageAmount" name="MessageAmount" placeholder="Amount" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label>CLAIMS</label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.ClaimsQuantity,$event)"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.ClaimsQuantity" name="ClaimsQuantity" placeholder="Quantity" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.ClaimsUnit,$event)"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.ClaimsUnit" name="ClaimsUnit" placeholder="Unit" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input readonly type="text" class="form-control input-sm" data-ng-model="InvoiceModel.ClaimsAmount" name="ClaimsAmount" placeholder="Amount" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label>FORMS</label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.FormsQuantity,$event)"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.FormsQuantity" name="FormsQuantity" placeholder="Quantity" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input type="text" ng-keyup="getkeys(InvoiceModel.FormsUnit,$event)"
+                                       class="form-control input-sm" data-ng-model="InvoiceModel.FormsUnit" name="FormsUnit" placeholder="Unit" />
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input readonly type="text" class="form-control input-sm" data-ng-model="InvoiceModel.FormsAmount" name="FormsAmount" placeholder="Amount" />
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label></label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                @*<input type="text" required class="form-control input-sm" data-ng-model="InvoiceModel.FormsQuantity" name="FormsQuantity" placeholder="Quantity" />*@
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                SUB TOTAL
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                {{InvoiceModel.InvoiceAmount}}
+                            </div>
+                        </div>
+                        <div class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label></label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                @*<input type="text" required class="form-control input-sm" data-ng-model="InvoiceModel.FormsQuantity" name="FormsQuantity" placeholder="Quantity" />*@
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                Upload PDF
+                            </div>
+                            <div class="col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                <input id="invoiceFileId" type="file" name="invoicefiles" class="upload" value="Browse" />
+                            </div>
+                        </div>
+                        <div data-ng-if="InvoiceModel.IsUpdate" class="col-md-12 col-lg-12 col-sm-12 margin-top-10">
+                            <div class="col-lg-3 col-md-3 col-sm-2 col-md-2"><label></label></div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                @*<input type="text" required class="form-control input-sm" data-ng-model="InvoiceModel.FormsQuantity" name="FormsQuantity" placeholder="Quantity" />*@
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                View Document
+                            </div>
+                            <div class="form-group col-lg-2 col-md-2 col-sm-2 col-md-2">
+                                {{InvoiceModel.OrginalFileName }}  <a href="{{InvoiceModel.FilePath}}" target="_blank" title="@Resource.ViewDetails"><i class="fa fa-eye" aria-hidden="true"></i></a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <a href="@Constants.InvoiceListURL">
+                    <input type="button" class="btn btn-sm red-mint margin-right-10" value="@Resource.Cancel" />
+                </a>
+                <button data-ng-if="!InvoiceModel.IsUpdate" type="button" class="btn btn-sm  btn-primary blue" data-ng-click="SaveInvoice()">
+                    @Resource.Save
+                </button>
+
+                <button data-ng-if="InvoiceModel.IsUpdate" type="button" class="btn btn-sm  btn-primary blue" data-ng-click="UpdateInvoice()">
+                    @Resource.Update
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/Invoice/addInvoice")
+    <script src="~/Assets/js/sitejs/jquery.validate.js"></script>
+    <script src="~/Assets/js/sitejs/jquery-ui.js"></script>
+}

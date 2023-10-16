@@ -1,0 +1,260 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.FacilityHouseList);
+    Layout = !Model.IsPartial ? "~/Views/Shared/_Layout.cshtml" : null;
+    ViewBag.SelectedMenuItem = Resource.SMI_FacilityHouseList;
+}
+@model HC_SetFacilityHouseListModel
+@Html.Hidden("hdnFacilityHouseListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="FacilityHouseListController">
+    @if (!Model.IsPartial)
+    {
+        <div class="page-bar">
+            <h3 class="page-title">
+                @Resource.FacilityHouseList @*&nbsp;<small>@Resource.FacilityHouseInformation</small>*@
+            </h3>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @*@if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_AddUpdate))
+                {
+                    <div class="btn-group" data-ng-show="FacilityHouseList.length > 0">
+                        <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                            <input id="SelectAllFacilityHouse" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                            <label for="SelectAllFacilityHouse"></label>
+                        </span>
+                    </div>
+                }*@
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchFacilityHouseModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchFacilityHouseModel.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "SearchFacilityHouseModel.IsDeleted",
+                                                                          data_ng_init = "SearchFacilityHouseModel.IsDeleted = SearchFacilityHouseModel.IsDeleted==null?'-1':SearchFacilityHouseModel.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchFacilityHouse()"
+                                                                      })
+            </div>
+            @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_Delete))
+            {
+                <div class="btn-group" data-ng-if="SelectedFacilityIds.length > 0">
+                    <button type="button" data-ng-click="DeleteFacilityHouse()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{SearchFacilityHouseModel.IsDeleted==0?'@Constants.DisableSelected' :(SearchFacilityHouseModel.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                    </button>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_AddUpdate))
+            {
+                if (!Model.IsPartial)
+                {
+                    <div class="btn-group padding-left-15">
+                        <a href="" ng-click="FacilityHouseEditModel(facilityHouse.EncryptedFacilityID)" class="btn btn-sm green-jungle letter-space pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.FacilityHouse</a>
+                    </div>
+                }
+                else
+                {
+                    <div class="btn-group padding-left-15">
+                        <a href="#AgencyFacility" data-ng-click="OpenAddFacilityModal('')" class="btn btn-sm green-jungle letter-space pull-right" data-toggle="modal"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.FacilityHouse</a>
+                    </div>
+                }
+            }
+            <div class="inline-block pull-right" data-ng-show="FacilityHouseList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" on-page-change="FacilityHouseListPager.pageChanged(newPageNumber)" pagination-id="FacilityHouseListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive">
+                        <form id="frmfaclilityhouselist">
+                            @* <table data-table-head-fixer="" data-val="FacilityHouseList" data-left="2" class="tblfacilityhouse fixed-table table table-pinned table-bordered table-striped table-checkable">*@
+                            <table class="table table-pinned table-bordered table-striped table-condensed">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_Delete))
+                                        {
+                                            <th class="width-20px"></th>
+                                        }
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FacilityHouseListPager.sortColumn('FacilityName')">@Resource.Name</a>
+                                            <span class="sortorder" data-ng-show="FacilityHouseListPager.sortIndex === 'FacilityName'" data-ng-class="{reverse:FacilityHouseListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FacilityHouseListPager.sortColumn('Licensure')">@Resource.Licensure</a>
+                                            <span class="sortorder" data-ng-show="FacilityHouseListPager.sortIndex === 'Licensure'" data-ng-class="{reverse:FacilityHouseListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FacilityHouseListPager.sortColumn('LicenseRenewal')" title="License Renewal Date">LR Date</a>
+                                            <span class="sortorder" data-ng-show="FacilityHouseListPager.sortIndex === 'LicenseRenewal'" data-ng-class="{reverse:FacilityHouseListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FacilityHouseListPager.sortColumn('NPI')">@Resource.NPI</a>
+                                            <span class="sortorder" data-ng-show="FacilityHouseListPager.sortIndex === 'NPI'" data-ng-class="{reverse:FacilityHouseListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FacilityHouseListPager.sortColumn('AHCCCSID')">@Resource.AHCCCSID</a>
+                                            <span class="sortorder" data-ng-show="FacilityHouseListPager.sortIndex === 'AHCCCSID'" data-ng-class="{reverse:FacilityHouseListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FacilityHouseListPager.sortColumn('EIN')">@Resource.EIN</a>
+                                            <span class="sortorder" data-ng-show="FacilityHouseListPager.sortIndex === 'EIN'" data-ng-class="{reverse:FacilityHouseListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-120px" style="text-align:center">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_Delete))
+                                        {
+                                            <td class="text-align-center">
+                                                <input id="SelectAllFacilityHouse" data-ng-show="FacilityHouseList.length > 0" class="unicheckbox " type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                            </td>
+                                        }
+                                        <td class="">
+                                            @Html.TextBoxFor(m => m.SearchFacilityHouseModel.FacilityName, new { data_ng_model = "SearchFacilityHouseModel.FacilityName", @class = "form-control input-sm", placeholder = Resource.FacilityName, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchFacilityHouseModel.ListOfIdsInCsv, new { data_ng_model = "SearchFacilityHouseModel.Licensure", @class = "form-control input-sm", placeholder = Resource.Licensure, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            <div class="input-group date date-picker pull-right"
+                                                 datepicker="TempSearchEmployeeVisitListPage.StartDate" ng-dateval="SearchFacilityHouseModel.StartDate" data-ng-maxdate="SearchFacilityHouseModel.StartDate">
+                                                @Html.TextBoxFor(m => m.SearchFacilityHouseModel.StartDate, new
+                                           {
+                                               @class = "form-control input-sm dateInputMask",
+                                               maxlength = "50",
+                                               placeholder = Resource.DateFormat
+                                           })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchFacilityHouseModel.NPI, new { data_ng_model = "SearchFacilityHouseModel.NPI", dir_valid_number = "", @class = "form-control input-sm", placeholder = Resource.NPI, maxlength = 10 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchFacilityHouseModel.AHCCCSID, new { data_ng_model = "SearchFacilityHouseModel.AHCCCSID", dir_valid_number = "", @class = "form-control input-sm", placeholder = Resource.AHCCCSID, maxlength = 10 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchFacilityHouseModel.EIN, new { data_ng_model = "SearchFacilityHouseModel.EIN", dir_valid_number = "", @class = "form-control input-sm", placeholder = Resource.EIN, maxlength = 10 })
+                                        </td>
+                                        <td class="text-align-center" width="150">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchFacilityHouse()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':facilityHouse.IsDeleted}" dir-paginate="facilityHouse in FacilityHouseList | itemsPerPage: FacilityHouseListPager.pageSize" total-items="FacilityHouseListPager.totalRecords" current-page="FacilityHouseListPager.currentPage" pagination-id="FacilityHouseListPagerID">
+                                        @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_Delete))
+                                        {
+                                            <td class="text-align-center">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="facilityHouse.IsChecked" data-ng-change="SelectFacilityHouse(facilityHouse)" val="facilityHouse.IsChecked">
+                                            </td>
+                                        }
+                                        <td data-ng-bind="facilityHouse.FacilityName"></td>
+                                        <td data-ng-bind="facilityHouse.Licensure"></td>
+                                        <td data-ng-bind="facilityHouse.LicensureRenewalDate  | date: '@Resource._DateFormat'"></td>
+                                        <td data-ng-bind="facilityHouse.NPI != null ? facilityHouse.NPI : '@Resource.NA'"></td>
+                                        <td data-ng-bind="facilityHouse.AHCCCSID"></td>
+                                        <td data-ng-bind="facilityHouse.EIN"></td>
+                                        <td class="text-align-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_AddUpdate))
+                                            {
+                                                if (!Model.IsPartial)
+                                                {
+                                                    <a href="" ng-click="FacilityHouseEditModel(facilityHouse.EncryptedFacilityID)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                }
+                                                else
+                                                {
+                                                    <a href="#AgencyFacility" data-ng-click="OpenAddFacilityModal(facilityHouse.EncryptedFacilityID)" class="btn btn-xs blue" data-toggle="modal">@Resource.Edit</a>
+                                                }
+                                            }
+                                            @if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_Delete))
+                                            {
+                                                <a href="javascript:void(0);" data-ng-show="facilityHouse.IsDeleted" data-ng-click="DeleteFacilityHouse(facilityHouse.FacilityID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!facilityHouse.IsDeleted" data-ng-click="DeleteFacilityHouse(facilityHouse.FacilityID,'Disable')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="FacilityHouseList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(FacilityHouseListPager.pageSize * FacilityHouseListPager.currentPage) - FacilityHouseListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(FacilityHouseListPager.pageSize == FacilityHouseListPager.currentPageSize) ? (FacilityHouseListPager.pageSize * FacilityHouseListPager.currentPage) :(FacilityHouseListPager.pageSize * FacilityHouseListPager.currentPage) - FacilityHouseListPager.pageSize  + FacilityHouseListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="FacilityHouseListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" on-page-change="FacilityHouseListPager.pageChanged(newPageNumber)" pagination-id="FacilityHouseListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="FacilityHouseList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="FacilityHouse_fixedAside" class="asideBar-right fixed">
+        <div class="listContentinner">
+            <div class="closeasidebar" data-ng-click="EmployeeEditModelClosed()"><i class="fa fa-close"></i></div>
+            <iframe id="FacilityHouse_fixedAsidelDDLBindIFrame" style="position:absolute; top:2%;  bottom:0px; right:0px; width:100%; min-height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+        </div>
+    </div>
+
+</div>
+
+@if (Model.IsPartial)
+{
+    <div class="modal fade" id="AgencyFacility" tabindex="-1" role="dialog" aria-labelledby="AgencyFacility">
+        <div class="modal-dialog modal-elg" role="AgencyFacility">
+            <div class="modal-content">
+                <button type="button" class="close" data-dismiss="modal" onclick="window.location.reload()"></button>
+                @*<div class="closeasidebar" data-ng-click="CloseAgencyModels()"><i class="fa fa-close"></i></div>*@
+                <div class="modal-body" style="min-height:625px;">
+                    <iframe id="AddFacilityIFrame" style="position:fixed; top:0px; left:0px; bottom:0px; right:0px; width:100%; min-height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@section Scripts{
+    @if (!Model.IsPartial)
+    {
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/facilityhouse/facilityhouselist")
+    }    
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, Resource.FacilityHouse)';
+        var FacilityHouseScheduleExistMessage = '@Resource.FacilityHouseScheduleExistMessage';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.FacilityHouse)';
+    </script>
+}

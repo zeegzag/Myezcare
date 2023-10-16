@@ -1,0 +1,123 @@
+﻿<div id="PatientPendingList" class="row">
+    <div class="col-md-12">
+        <div class="portlet box">
+            <div class="portlet-title">
+                <div class="caption header-font-size-14 uppercase">
+                    Patient - Pending
+                    <div class="pull-right padding-left-25" data-ng-show="PatientPendingListAjaxStart">
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="collapse"></a>
+                    <a href="javascript:;" class="fullscreen"></a>
+                </div>
+            </div>
+
+            <div class="portlet-body table_font-size-12">
+
+                <div class="row form-group">
+                    <div class="col-sm-4">
+                        <div class="fields">
+                            <label>@Resource.StarDate</label>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="PatientPendingListSearchModel.StartDate" ng-dateval="PatientPendingListSearchModel.StartDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-4">
+                        <div class="fields">
+                            <label>@Resource.EndDate</label>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="PatientPendingListSearchModel.EndDate" ng-dateval="PatientPendingListSearchModel.EndDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+
+                        <div>
+                            <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Search" data-ng-click="SearchPatientPendingList()" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="portlet-body" style="display: block;">
+                            <div class="table-responsive">
+                                <form id="frmReferralinterMessageList">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientPendingListPager.sortColumn('Patient')">@Resource.Patient</a>
+                                                    <span class="sortorder" data-ng-show="PatientPendingListPager.sortIndex === 'Patient'" data-ng-class="{reverse:PatientPendingListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientPendingListPager.sortColumn('CreatedDate')">@Resource.CreatedDate</a>
+                                                    <span class="sortorder" data-ng-show="PatientPendingListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:PatientPendingListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientPendingListPager.sortColumn('CreatedBy')">@Resource.CreatedBy</a>
+                                                    <span class="sortorder" data-ng-show="PatientPendingListPager.sortIndex === 'CreatedBy'" data-ng-class="{reverse:PatientPendingListPager.reverse}"></span>
+                                                </th>
+
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="item in PatientPendingList | itemsPerPage: PatientPendingListPager.pageSize" total-items="PatientPendingListPager.totalRecords" current-page="PatientPendingListPager.currentPage" pagination-id="PatientPendingListPagerID">
+                                                <td>
+                                                    <span data-ng-bind="item.Patient"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.CreatedDate | orgdatetime"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.CreatedBy"></span>
+                                                </td>
+
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12" data-ng-if="PatientPendingList.length > 0">
+                        <div class="col-sm-6 pull-left no-left-padding"
+                             data-ng-hide="PatientPendingListPager.currentPage==1 && (PatientPendingListPager.currentPageSize < PatientPendingListPager.pageSize)">
+                            @Resource.Showing <span data-ng-bind="(PatientPendingListPager.pageSize * PatientPendingListPager.currentPage) -PatientPendingListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(PatientPendingListPager.pageSize == PatientPendingListPager.currentPageSize) ? (PatientPendingListPager.pageSize * PatientPendingListPager.currentPage) :(PatientPendingListPager.pageSize * PatientPendingListPager.currentPage) - PatientPendingListPager.pageSize  + PatientPendingListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PatientPendingListPager.totalRecords"></span>&nbsp;@Resource.Records
+                        </div>
+                        <div class="pull-right">
+                            <dir-pagination-controls boundary-links="true" on-page-change="PatientPendingListPager.pageChanged(newPageNumber)" pagination-id="PatientPendingListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="PatientPendingList.length == 0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br class="clearfix" />
+            </div>
+        </div>
+    </div>
+
+</div>

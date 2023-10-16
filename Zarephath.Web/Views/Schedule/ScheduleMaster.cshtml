@@ -1,0 +1,951 @@
+﻿@model ScheduleMasterModel
+
+@{
+    
+    ViewBag.Title = Model.IsPartial ? string.Format("{0} {1}", Resource.ZarePhath, Resource.AddReferral) : string.Format("{0} {1}", Resource.ZarePhath, Resource.ScheduleMasterList);
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Model.IsPartial ? Resource.SMI_ReferralAdd : Resource.SMI_ScheduleMaster;
+}
+
+
+@Html.Hidden("hdnSetScheduleMasterListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="ScheduleMasterListController">
+
+    @*@if (!Model.IsPartial)
+    {
+        <div class="page-bar">
+            <h3 class="page-title">@Resource.ScheduleMasterList
+            </h3>
+        </div>
+    }*@
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @if (Common.HasPermission(Constants.Permission_Schedule_Update))
+            {
+                <div class="btn-group" data-ng-show="ScheduleMasterList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllCaseManager" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllCaseManager"></label>
+                    </span>
+                </div>
+            }
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()" tabindex="1">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+
+            </div>
+            @if (!Model.IsPartial)
+            {
+                <div class="btn-group pull-right">
+                    <a href="#" class="btn blue btn-xs  text-decoration-none" data-ng-href="/schedule/ScheduleBatchServiceList/" target="_blank">@Resource.ScheduleBatchServices</a>
+                </div>
+            }
+            <div class="btn-group">
+                @Html.DropDownListFor(p => p.SearchScheduleMasterModel.RegionID, Model.Regions.ToSelectList(Model.SearchScheduleMasterModel.RegionID.ToString() ?? "", "Name", "Value", Resource.Region, ""),
+                                      new
+                                          {
+                                              id = "RegionID",
+                                              data_ng_model = "TempSearchScheduleMasterListPage.RegionID",
+                                              data_ng_init = "TempSearchScheduleMasterListPage.RegionID=TempSearchScheduleMasterListPage.RegionID==''?null:TempSearchScheduleMasterListPage.RegionID",
+                                              @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                              data_ng_change = "SearchScheduleMaster()"
+                                          })
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(p => p.SearchScheduleMasterModel.LanguageID, Model.Languages.ToSelectList(Model.SearchScheduleMasterModel.LanguageID.ToString() ?? "", "Name", "Value", Resource.Language, ""),
+                                      new
+                                          {
+                                              id = "LanguageID",
+                                              data_ng_model = "TempSearchScheduleMasterListPage.LanguageID",
+                                              data_ng_init = "TempSearchScheduleMasterListPage.LanguageID=TempSearchScheduleMasterListPage.LanguageID==''?null:TempSearchScheduleMasterListPage.LanguageID",
+                                              @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                              data_ng_change = "SearchScheduleMaster()"
+                                          })
+            </div>
+
+            <div class="btn-group">
+                @Html.DropDownListFor(p => p.SearchScheduleMasterModel.PreferredCommunicationMethodID, Model.PreferredCommunicationMethod.ToSelectList(Model.SearchScheduleMasterModel.PreferredCommunicationMethodID.ToString() ?? "", "Name", "Value", Resource.AllPCM, ""),
+                                      new
+                                          {
+
+                                              id = "PreferredCommunicationMethodID",
+                                              data_ng_model = "TempSearchScheduleMasterListPage.PreferredCommunicationMethodID",
+                                              data_ng_init = "TempSearchScheduleMasterListPage.PreferredCommunicationMethodID=TempSearchScheduleMasterListPage.PreferredCommunicationMethodID==''?'0':TempSearchScheduleMasterListPage.PreferredCommunicationMethodID",
+                                              @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                              data_ng_change = "SearchScheduleMaster()"
+                                          })
+            </div>
+
+            @if (Common.HasPermission(Constants.Permission_Schedule_Update))
+            {
+                <div class="btn-group" data-ng-if="SelectedScheduleMasterIds.length > 0">
+                    <button type="button" data-ng-click="DeleteSchedule()" class="btn btn-default btn-sm grey-steel border-grey-cascade">
+                        <i class="fa fa-trash"></i>&nbsp;&nbsp;@Resource.Delete</button>
+                </div>
+            }
+
+
+            <div class="btn-group padding-left-25" data-ng-if="SelectedScheduleMasterIds.length > 0">
+                <button class="btn blue btn-sm grey border-grey-cascade" 
+                        data-ng-click="OpenScheduleBatchServicePopup('@((int)ScheduleBatchService.ScheduleBatchServiceTypes.SendEmail)','@Common.GetEnumDisplayValue((ScheduleBatchService.ScheduleBatchServiceTypes.SendEmail))')" tabindex="1">
+                    <i class="fa fa-envelope "></i>&nbsp;&nbsp;@Resource.SendEmail
+                </button>
+            </div>
+            <div class="btn-group" data-ng-if="SelectedScheduleMasterIds.length > 0">
+                <button class="btn blue btn-sm grey border-grey-cascade" 
+                        data-ng-click="OpenScheduleBatchServicePopup('@((int)ScheduleBatchService.ScheduleBatchServiceTypes.SendSMS)','@Common.GetEnumDisplayValue((ScheduleBatchService.ScheduleBatchServiceTypes.SendSMS))')" tabindex="1">
+                    <i class="fa fa-mobile fa-lg"></i>&nbsp;&nbsp;@Resource.SendSMS
+                </button>
+            </div>
+            <div class="btn-group" data-ng-if="SelectedScheduleMasterIds.length > 0">
+                <button class="btn blue btn-sm grey border-grey-cascade" 
+                        data-ng-click="OpenScheduleBatchServicePopup('@((int)ScheduleBatchService.ScheduleBatchServiceTypes.GenerateMailNotice)','@Common.GetEnumDisplayValue(ScheduleBatchService.ScheduleBatchServiceTypes.GenerateMailNotice)')" tabindex="1">
+                    <i class="fa fa-file-text-o"></i>&nbsp;&nbsp;@Resource.GenerateMail
+                </button>
+            </div>
+
+            <div class="btn-group margin-left-20PR">
+                <div class="top pagination-sm" data-ng-show="AjaxStart">
+                    @Resource.Loading
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+            </div>
+
+            <div class="inline-block pull-right">
+
+                <div class="pull-right margin-left-5 width-250px" data-ng-show="ScheduleMasterList.length > 0">
+                    @Resource.Showing <span data-ng-bind="ScheduleMasterList.length "></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ScheduleMasterListPager.totalRecords"></span>&nbsp;@Resource.Records
+                    @*<dir-pagination-controls boundary-links="true" on-page-change="ScheduleMasterListPager.pageChanged(newPageNumber)" pagination-id="ScheduleMasterListPager"></dir-pagination-controls>*@
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive tabbable-custom">
+                        <form id="frmScheduleMasterList">
+                            <table class="table table-bordered table-striped table-condensed flip-content table-checkable">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.Permission_Schedule_Update))
+                                        {
+                                            <th class="width-10px"></th>
+                                        }
+
+                                        @if (!Model.IsPartial)
+                                        {
+
+                                            <th class="col-lg-1">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Name',true)">@Resource.Name</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Name'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-10px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Age',true)">@Resource.Age</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Age'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-10px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Status',true)">@Resource.Status</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Status'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-80px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('StartDate',true)">@Resource.StartDate</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+
+                                            <th class="width-80px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('EndDate',true)">@Resource.EndDate</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            
+                                            <th class="width-150px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('ParentName',true)">@Resource.Parent</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'ParentName'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            
+                                            <th class="width-150px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Location',true)">@Resource.Location</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Location'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            
+                                            <th class="width-110px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Facility',true)">@Resource.Facility</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Facility'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                         
+                                            
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Placement',true)">@Resource.Placement</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Placement'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            
+                                            <th class="col-lg-1">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Comment',true)">@Resource.Comment</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Comment'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-66px">@Resource.Action
+
+                                                <div class="pull-right btn-group">
+                                                    <a class="btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </a>
+                                                    <ul class="multiSort dropdown-menu hold-on-click pull-right">
+
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="StatusCount=0"
+                                                                data-ng-click="StatusCount=StatusCount+1;StatusVal=StatusCount%2==0?'Status ASC':'Status DESC'; 
+                                                                ScheduleMasterListPager.sortMultiColumn(StatusVal,false,true);">
+                                                                <span data-ng-show="ScheduleMasterListPager.sortIndexArray.indexOf(StatusVal)!=-1">{{ScheduleMasterListPager.sortIndexArray.indexOf(StatusVal)}} </span>&nbsp; @Resource.Status
+                                                                <span class="sortorder" data-ng-show="StatusCount>0" data-ng-class="{reverse: StatusCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="ScheduleMasterListPager.sortMultiColumn(StatusVal,true,true);StatusCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="AgeCount=0"
+                                                                data-ng-click="AgeCount=AgeCount+1;AgeVal=AgeCount%2==0?'Age ASC':'Age DESC'; 
+                                                                ScheduleMasterListPager.sortMultiColumn(AgeVal,false,true);">
+                                                                <span data-ng-show="ScheduleMasterListPager.sortIndexArray.indexOf(AgeVal)!=-1">{{ScheduleMasterListPager.sortIndexArray.indexOf(AgeVal)}} </span>&nbsp; @Resource.Age
+                                                                <span class="sortorder" data-ng-show="AgeCount>0" data-ng-class="{reverse: AgeCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="ScheduleMasterListPager.sortMultiColumn(AgeVal,true,true);AgeCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+
+                                                        <li>
+
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="ClientNameCount=0"
+                                                                data-ng-click="ClientNameCount=ClientNameCount+1;ClientNameVal=ClientNameCount%2==0?'ClientName ASC':'ClientName DESC'; ScheduleMasterListPager.sortMultiColumn(ClientNameVal,false,true);">
+                                                                <span data-ng-show="ScheduleMasterListPager.sortIndexArray.indexOf(ClientNameVal)!=-1">{{ScheduleMasterListPager.sortIndexArray.indexOf(ClientNameVal)}} </span>&nbsp; @Resource.Name
+                                                                <span class="sortorder" data-ng-show="ClientNameCount>0" data-ng-class="{reverse:  ClientNameCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="ScheduleMasterListPager.sortMultiColumn('ClientName ASC',true,true);ClientNameCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+
+
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="ParentNameCount=0"
+                                                                data-ng-click="ParentNameCount=ParentNameCount+1;ParentNameVal=ParentNameCount%2==0?'ParentName ASC':'ParentName DESC'; 
+                                                                ScheduleMasterListPager.sortMultiColumn(ParentNameVal,false,true);">
+                                                                <span data-ng-show="ScheduleMasterListPager.sortIndexArray.indexOf(ParentNameVal)!=-1">{{ScheduleMasterListPager.sortIndexArray.indexOf(ParentNameVal)}} </span>&nbsp; @Resource.Parent
+                                                                <span class="sortorder" data-ng-show="ParentNameCount>0" data-ng-class="{reverse: ParentNameCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="ScheduleMasterListPager.sortMultiColumn(ParentNameVal,true,true);ParentNameCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+
+
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="StartDateCount=0"
+                                                                data-ng-click="StartDateCount=StartDateCount+1;StartDateVal=StartDateCount%2==0?'StartDate ASC':'StartDate DESC'; 
+                                                                ScheduleMasterListPager.sortMultiColumn(StartDateVal,false,true);">
+                                                                <span data-ng-show="ScheduleMasterListPager.sortIndexArray.indexOf(StartDateVal)!=-1">{{ScheduleMasterListPager.sortIndexArray.indexOf(StartDateVal)}} </span>&nbsp; @Resource.StartDate
+                                                                <span class="sortorder" data-ng-show="StartDateCount>0" data-ng-class="{reverse: StartDateCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="ScheduleMasterListPager.sortMultiColumn(StartDateVal,true,true);StartDateCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="EndDateCount=0"
+                                                                data-ng-click="EndDateCount=EndDateCount+1;EndDateVal=EndDateCount%2==0?'EndDate ASC':'EndDate DESC'; 
+                                                                ScheduleMasterListPager.sortMultiColumn(EndDateVal,false,true);">
+                                                                <span data-ng-show="ScheduleMasterListPager.sortIndexArray.indexOf(EndDateVal)!=-1">{{ScheduleMasterListPager.sortIndexArray.indexOf(EndDateVal)}} </span>&nbsp; @Resource.EndDate
+                                                                <span class="sortorder" data-ng-show="EndDateCount>0" data-ng-class="{reverse: EndDateCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="ScheduleMasterListPager.sortMultiColumn(EndDateVal,true,true);EndDateCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+
+
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="LocationCount=0"
+                                                                data-ng-click="LocationCount=LocationCount+1;LocationVal=LocationCount%2==0?'Location ASC':'Location DESC'; 
+                                                                ScheduleMasterListPager.sortMultiColumn(LocationVal,false,true);">
+                                                                <span data-ng-show="ScheduleMasterListPager.sortIndexArray.indexOf(LocationVal)!=-1">{{ScheduleMasterListPager.sortIndexArray.indexOf(LocationVal)}} </span>&nbsp; @Resource.Location
+                                                                <span class="sortorder" data-ng-show="LocationCount>0" data-ng-class="{reverse: LocationCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="ScheduleMasterListPager.sortMultiColumn(LocationVal,true,true);LocationCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+
+                                                        <li>
+                                                            <a class="anchor_color " href="javascript:void(0);" data-ng-init="FacilityCount=0"
+                                                                data-ng-click="FacilityCount=FacilityCount+1;FacilityVal=FacilityCount%2==0?'Facility ASC':'Facility DESC'; 
+                                                                ScheduleMasterListPager.sortMultiColumn(FacilityVal,false,true);">
+                                                                <span data-ng-show="ScheduleMasterListPager.sortIndexArray.indexOf(FacilityVal)!=-1">{{ScheduleMasterListPager.sortIndexArray.indexOf(FacilityVal)}} </span>&nbsp; @Resource.Facility
+                                                                <span class="sortorder" data-ng-show="FacilityCount>0" data-ng-class="{reverse: FacilityCount%2==0?false:true}"></span>
+                                                            </a>
+                                                            <a class="pull-right" data-ng-click="ScheduleMasterListPager.sortMultiColumn(FacilityVal,true,true);FacilityCount=0;"><i class="fa fa-remove"></i></a>
+                                                        </li>
+
+
+
+                                                    </ul>
+
+                                                </div>
+
+
+                                            </th>
+                                        }
+                                        else
+                                        {
+                                            <th class="width-10px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Age',true)">@Resource.Age</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Age'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th class="col-lg-1">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Status',true)">@Resource.Status</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Status'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('StartDate',true)">@Resource.StartDate</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('EndDate',true)">@Resource.EndDate</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                           
+                                            
+                                            <th class="col-lg-3">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Location',true)">@Resource.Location</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Location'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            
+                                            <th class="col-lg-3">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Facility',true)">@Resource.Facility</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Facility'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+@*
+                                            <th class="col-lg-2">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Region')">@Resource.Region</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Region'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>*@
+                                            
+                                            
+                                            <th class="col-lg-4">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleMasterListPager.sortColumn('Comment',true)">@Resource.Comment</a>
+                                                <span class="sortorder" data-ng-show="ScheduleMasterListPager.sortIndex === 'Comment'" data-ng-class="{reverse:ScheduleMasterListPager.reverse}"></span>
+                                            </th>
+                                            
+                                            <th class="col-lg-1">@Resource.Action
+
+                                            </th>
+                                        }
+
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.Permission_Schedule_Update))
+                                        {
+                                            <td></td>
+                                        }
+@*@if (!Model.IsPartial)
+                                        {
+                                            <td class="width-10px"></td>
+                                        }*@
+                                        @if (!Model.IsPartial)
+                                        {
+                                            <td>
+                                                @Html.TextBoxFor(m => m.SearchScheduleMasterModel.Name, new { data_ng_model = "TempSearchScheduleMasterListPage.Name", @class = "form-control input-sm", placeholder = Resource.Name })
+                                            </td>
+                                        }
+                                        <td></td>
+                                        <td>
+                                            <div>
+                                                @Html.DropDownListFor(p => p.SearchScheduleMasterModel.ScheduleStatusID, Model.ScheduleStatuses.ToSelectList(Model.SearchScheduleMasterModel.ScheduleStatusID.ToString() ?? "", "ScheduleStatusName", "ScheduleStatusID", Resource.Select, ""),
+                                                                      new
+                                                                          {
+
+                                                                              id = "ScheduleStatusID",
+                                                                              data_ng_model = "TempSearchScheduleMasterListPage.ScheduleStatusID",
+                                                                              data_ng_init = "TempSearchScheduleMasterListPage.ScheduleStatusID=TempSearchScheduleMasterListPage.ScheduleStatusID==''?null:TempSearchScheduleMasterListPage.ScheduleStatusID",
+                                                                              @class = "form-control input-sm"
+
+                                                                          })
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group date no-focus" datepicker="TempSearchScheduleMasterListPage.StartDate" ng-dateval="TempSearchScheduleMasterListPage.StartDate">
+                                                @Html.TextBoxFor(m => m.SearchScheduleMasterModel.StartDate,
+                                                                 new
+                                                                     {
+                                                                         @class = "no-focus form-control input-sm dateInputMask width-80px",
+                                                                         placeholder = Resource.StartDate
+                                                                     })
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="input-group date no-focus" datepicker="TempSearchScheduleMasterListPage.EndDate" ng-dateval="TempSearchScheduleMasterListPage.EndDate">
+                                                @Html.TextBoxFor(m => m.SearchScheduleMasterModel.EndDate,
+                                                                 new
+                                                                     {
+                                                                         @class = "no-focus form-control input-sm dateInputMask width-80px",
+                                                                         placeholder = Resource.EndDate
+                                                                     })
+                                            </div>
+                                        </td>
+
+                                        @if (!Model.IsPartial)
+                                        {
+@*<td>
+                                                @Html.TextBoxFor(m => m.SearchScheduleMasterModel.Name, new { data_ng_model = "TempSearchScheduleMasterListPage.Name", @class = "form-control input-sm", placeholder = Resource.Name })
+                                            </td>*@
+
+
+
+                                            <td>
+                                                @Html.TextBoxFor(m => m.SearchScheduleMasterModel.ParentName, new { data_ng_model = "TempSearchScheduleMasterListPage.ParentName", @class = "form-control input-sm", placeholder = Resource.SearchWithParentData })
+                                            </td>
+                                        }
+                                        <td>
+                                            <div>
+                                                @Html.DropDownListFor(p => p.SearchScheduleMasterModel.DropOffLocation, Model.TransportLocation.ToSelectList(Model.SearchScheduleMasterModel.DropOffLocation.ToString() ?? "", "Location", "TransportLocationID", Resource.Select, ""),
+                                                                      new
+                                                                          {
+                                                                              id = "DropOffLocation",
+                                                                              data_ng_model = "TempSearchScheduleMasterListPage.DropOffLocation",
+                                                                              data_ng_init = "TempSearchScheduleMasterListPage.DropOffLocation=TempSearchScheduleMasterListPage.DropOffLocation==''?null:TempSearchScheduleMasterListPage.DropOffLocation",
+                                                                              @class = "form-control input-sm"
+
+                                                                          })
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                @Html.DropDownListFor(p => p.SearchScheduleMasterModel.FacilityID, Model.Facilities.ToSelectList(Model.SearchScheduleMasterModel.FacilityID.ToString() ?? "", "FacilityName", "FacilityID", Resource.Select, ""),
+                                                                      new
+                                                                          {
+                                                                              id = "FacilityID",
+                                                                              data_ng_model = "TempSearchScheduleMasterListPage.FacilityID",
+                                                                              data_ng_init = "TempSearchScheduleMasterListPage.FacilityID=TempSearchScheduleMasterListPage.FacilityID==''?null:TempSearchScheduleMasterListPage.FacilityID",
+                                                                              @class = "form-control input-sm"
+
+                                                                          })
+                                            </div>
+                                        </td>
+                                        @*<td>
+                                            <div>
+                                                @Html.DropDownListFor(p => p.SearchScheduleMasterModel.RegionID, Model.Regions.ToSelectList(Model.SearchScheduleMasterModel.RegionID.ToString() ?? "", "Name", "Value", Resource.Select, ""),
+                                                                      new
+                                                                          {
+                                                                              id = "RegionID",
+                                                                              data_ng_model = "TempSearchScheduleMasterListPage.RegionID",
+                                                                              data_ng_init = "TempSearchScheduleMasterListPage.RegionID=TempSearchScheduleMasterListPage.RegionID==''?null:TempSearchScheduleMasterListPage.RegionID",
+                                                                              @class = "form-control input-sm width-80px"
+
+                                                                          })
+                                            </div>
+                                        </td>*@
+                                        @if (!Model.IsPartial)
+                                        {
+                                            <td></td>
+                                        }
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchScheduleMaster()"/>
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    @*<tr dir-paginate="schedulemaster in ScheduleMasterList | itemsPerPage: ScheduleMasterListPager.pageSize" total-items="ScheduleMasterListPager.totalRecords" current-page="ScheduleMasterListPager.currentPage" pagination-id="ScheduleMasterListPager">*@
+                                    <tr data-ng-repeat="schedulemaster in ScheduleMasterList">
+
+                                        @if (Common.HasPermission(Constants.Permission_Schedule_Update))
+                                        {
+                                            <td>
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="schedulemaster.IsChecked" data-ng-change="SelectScheduleMaster(schedulemaster)" val="schedulemaster.IsChecked"></td>
+                                        }
+@*@if (!Model.IsPartial)
+                                        {
+                                            <td>
+                                                <span class="badge badge-default" title="@Resource.PermissionForPhone" data-ng-show="schedulemaster.PermissionForVoiceMail">@Resource.PhonePermissionShort</span>
+                                                <span class="badge badge-default" title="@Resource.PermissionForSMS" data-ng-show="schedulemaster.PermissionForSMS">@Resource.SMSPermissionShort</span>
+                                                <span class="badge badge-default" title="@Resource.PermissionForEmail" data-ng-show="schedulemaster.PermissionForEmail">@Resource.EmailPermissionShort</span>
+                                            </td>
+                                        }*@
+                                        @if (!Model.IsPartial)
+                                        {
+                                            <td>
+                                                <a class="" data-ng-href="/referral/addreferral/{{schedulemaster.EncryptedReferralID}}" target="_new">{{schedulemaster.Name}}</a>
+                                            </td>
+                                        }
+                                        <td>{{schedulemaster.Age}}</td>
+                                        <td>
+                                            @if (!Model.IsPartial)
+                                            {
+                                                <a href="#EditSchedule" data-ng-click="EditSchedule(schedulemaster)" title="Edit Schedule" data-toggle="modal" class="badge {{schedulemaster.ScheduleStatusName | removeSpaces}}">{{schedulemaster.ScheduleStatusName}}</a>
+                                            }
+                                            else
+                                            {
+                                                <span class="badge {{schedulemaster.ScheduleStatusName | removeSpaces}}" data-ng-class="" data-ng-bind="schedulemaster.ScheduleStatusName"></span>
+                                            }
+                                        </td>
+                                        <td>{{schedulemaster.StartDate | dateformat | date:'@ConfigSettings.ClientSideDateFormat'}}</td>
+                                        <td>{{schedulemaster.EndDate | dateformat | date:'@ConfigSettings.ClientSideDateFormat'}}</td>
+                                        @*<td data-ng-if="schedulemaster.ScheduleStatusID.toString() != CnclStatus">
+                                            <span class="badge {{schedulemaster.ScheduleStatusName | removeSpaces}}" data-ng-class="" data-ng-bind="schedulemaster.ScheduleStatusName"></span>
+                                        </td>
+                                        <td data-ng-if="schedulemaster.ScheduleStatusID.toString() == CnclStatus">                                            
+                                            <span class="badge {{schedulemaster.ScheduleStatusName | removeSpaces}}" common-detail-popover="schedulemaster" ng-template-selector="#popover-schedule" ng-header="Cancellation Details" data-ng-bind="schedulemaster.ScheduleStatusName"></span>
+                                        </td>*@
+
+                                        @if (!Model.IsPartial)
+                                        {
+                                            <td>
+                                                <a href="javascript:void(0);" class="display-block pull-left" common-detail-popover="SetUp(schedulemaster)" popover-trigger="click" ng-template-selector="#popover-schedule-parent"
+                                                    ng-header="@Resource.ParentDetails">{{schedulemaster.ParentName}}</a>
+
+                                                <span class="badge badge-success  pull-right"
+                                                    data-ng-show="(schedulemaster.PCMVoiceMail && schedulemaster.PermissionForVoiceMail)
+                                                     ||(schedulemaster.PCMSMS && schedulemaster.PermissionForSMS) ||
+                                                    (schedulemaster.PCMEmail && schedulemaster.PermissionForEmail)
+                                                     || (schedulemaster.PCMMail && schedulemaster.PermissionForMail)">
+                                                    <small data-ng-show="schedulemaster.PCMVoiceMail && schedulemaster.PermissionForVoiceMail" title="@Resource.PreferredPermissionForVoiceMail">@Resource.PhonePermissionShort</small>
+                                                    <small data-ng-show="schedulemaster.PCMEmail && schedulemaster.PermissionForEmail" title="@Resource.PreferredPermissionForEmail">@Resource.EmailPermissionShort</small>
+                                                    <small data-ng-show="schedulemaster.PCMSMS  && schedulemaster.PermissionForSMS" title="@Resource.PreferredPermissionForSMS">@Resource.SMSPermissionShort</small>
+                                                    <small data-ng-show="schedulemaster.PCMMail && schedulemaster.PermissionForMail" title="@Resource.PreferredPermissionForGenrateNotice">@Resource.NoticePermissionShort</small>
+                                                </span>
+
+                                                @*<span class="badge badge-danger" 
+                                                      title="@Resource.PreferredPermissionForVoiceMail"
+                                                      data-ng-show="schedulemaster.PCMVoiceMail">@Resource.PhonePermissionShort</span>
+                                                <span class="badge badge-danger" title="@Resource.PreferredPermissionForPhone"
+                                                     data-ng-show="schedulemaster.PCMSMS">@Resource.SMSPermissionShort</span>
+                                                <span class="badge badge-danger" title="@Resource.PreferredPermissionForEmail"
+                                                     data-ng-show="schedulemaster.PCMEmail">@Resource.EmailPermissionShort</span>
+                                                <span class="badge badge-danger" title="@Resource.PreferredPermissionForGenrateNotice" 
+                                                      data-ng-if="schedulemaster.PCMMail">@Resource.NoticePermissionShort</span>*@
+                                                @*<span data-phone-format="schedulemaster.Phone1" data-ng-bind="schedulemaster.Phone1" class="display-block"></span>
+                                                <span data-phone-format="schedulemaster.Phone2" data-ng-bind="schedulemaster.Phone2" data-ng-if="schedulemaster.Phone2" class="display-block"></span>*@
+                                            </td>
+                                        }
+                                        <td>{{schedulemaster.DropOffLocationName}}</td>
+                                        <td>{{schedulemaster.FacilityName}}</td>
+                                        @*<td data-ng-bind="schedulemaster.RegionName"></td>*@
+                                        @if (!Model.IsPartial)
+                                        {
+                                            <td>
+                                                <div class="" dir-popover popover-content="{{schedulemaster.PlacementRequirement}}" popover-title="Placement Requirement">
+                                                    @*{{schedulemaster.PlacementRequirement | stringsubstring:'50'}}*@
+                                                    {{schedulemaster.PlacementRequirement? schedulemaster.PlacementRequirement:''}}
+                                                </div>
+                                            </td>
+                                        }
+                                        @if (!Model.IsPartial)
+                                        {
+                                            <td dir-popover popover-content="{{schedulemaster.Comments}}" popover-title="Comment">{{schedulemaster.Comments | stringsubstring:'25'}}</td>
+                                        }
+                                        else
+                                        {
+                                            <td data-ng-bind="schedulemaster.Comments | stringsubstring:'50'" dir-popover popover-content="{{schedulemaster.Comments}}" popover-title="Comment"></td>
+                                        }
+                                        <td>
+                                            @if (Common.HasPermission(Constants.Permission_Schedule_Update))
+                                            {
+@*if (!Model.IsPartial)
+                                                {
+                                                <a href="#EditSchedule" data-ng-click="EditSchedule(schedulemaster)" title="Edit Schedule" data-toggle="modal"><i class="fa fa-edit"></i></a>
+                                                }*@
+                                                <a href="javascript:void(0);" class="margin-left-5 btn btn-xs red" data-ng-click="DeleteSchedule(schedulemaster)" title="Delete Schedule">@Resource.Delete</a>                                                                                                
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="ScheduleMasterList.length > 0">
+                <div class="no-padding col-md-4 pull-left">
+                    <span>
+                        @Resource.Showing <span data-ng-bind="ScheduleMasterList.length "></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ScheduleMasterListPager.totalRecords"></span>&nbsp;@Resource.Records
+                    </span>
+                    <button class="btn btn-xs margin-left-20 yellow-gold-stripe border-default border-grey-gallery" data-ng-click="LoadMore()" data-ng-show="!AjaxStart">@Resource.LoadMore</button>
+                    @*@Resource.Showing <span data-ng-bind="(ScheduleMasterListPager.pageSize * ScheduleMasterListPager.currentPage) - ScheduleMasterListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(ScheduleMasterListPager.pageSize == ScheduleMasterListPager.currentPageSize) ? (ScheduleMasterListPager.pageSize * ScheduleMasterListPager.currentPage) :(ScheduleMasterListPager.pageSize * ScheduleMasterListPager.currentPage) - ScheduleMasterListPager.pageSize  + ScheduleMasterListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ScheduleMasterListPager.totalRecords"></span>&nbsp;@Resource.Records*@
+                </div>
+                <div class="top pagination-sm margin-left-40PR" data-ng-show="AjaxStart">
+                    @Resource.Loading
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+                @*    <div class="" data-ng-if="ScheduleMasterModel.IsPartial">
+                    
+                      <dir-pagination-controls boundary-links="true" on-page-change="ScheduleMasterListPager.pageChanged(newPageNumber)" pagination-id="ScheduleMasterListPager"></dir-pagination-controls>
+                </div>*@
+            </div>
+        </div>
+
+    </div>
+
+
+
+
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ScheduleMasterList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger" data-ng-show="!AjaxStart">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                        <div class="top pagination-sm" data-ng-show="AjaxStart">
+                            @Resource.Loading
+                            <img src="~/Assets/images/lazyload.gif" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="EditSchedule" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="EditSchdule"><span>@Resource.EditSchedule</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmScheduleEdit">
+                        <div class="row">
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.Status</label>
+                                @Html.DropDownListFor(m => m.ScheduleMaster.ScheduleStatusID, Model.ScheduleStatuses.ToSelectList(Model.ScheduleMaster.ScheduleStatusID.ToString() ?? "", "ScheduleStatusName", "ScheduleStatusID", "Select", ""),
+                                                      new
+                                                          {
+                                                              convert_to_number = "",
+                                                              data_ng_model = "ScheduleDetail.ScheduleStatusID",
+                                                              data_ng_init = "ScheduleDetail.ScheduleStatusID=(ScheduleDetail.ScheduleStatusID == null || ScheduleDetail.ScheduleStatusID==0)?'':ScheduleDetail.ScheduleStatusID",
+                                                              @class = "form-control input-sm",
+                                                          })
+                                @Html.ValidationMessageFor(m => m.ScheduleMaster.ScheduleStatusID)
+                            </div>
+                            <div data-ng-show="ScheduleDetail.ScheduleStatusID.toString() != CnclStatus">
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.PickUp</label>
+                                    <select class="form-control input-sm"
+                                            data-ng-init="ScheduleDetail.PickUpLocation=(ScheduleDetail.PickUpLocation == null || ScheduleDetail.PickUpLocation==0)?'':ScheduleDetail.PickUpLocation"
+                                            data-ng-model="ScheduleDetail.PickUpLocation"
+                                            data-val="true" data-val-required="@Resource.PickUpLocationRequired"
+                                            id="PickUpLocation"
+                                            name="ScheduleDetail.PickUpLocation"
+                                            convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in ScheduleMasterModel.TransportLocation | filter:PickUpLocationFilter(ScheduleDetail.PickUpLocation)" value="{{option.TransportLocationID}}">{{option.Location}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.PickUpLocation)
+                                </div>
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ScheduleDetail.ScheduleStatusID.toString() != CnclStatus">
+                                    <label class="control-label required">@Resource.DropOff</label>
+                                    <select class="form-control input-sm"
+                                            data-ng-init="ScheduleDetail.DropOffLocation=(ScheduleDetail.DropOffLocation == null || ScheduleDetail.DropOffLocation==0)?'':ScheduleDetail.DropOffLocation"
+                                            data-ng-model="ScheduleDetail.DropOffLocation"
+                                            data-val="true" data-val-required="@Resource.DropOffLocationRequired"
+                                            id="DropOffLocation"
+                                            name="ScheduleDetail.DropOffLocation"
+                                            convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in ScheduleMasterModel.TransportLocation | filter:PickUpLocationFilter(ScheduleDetail.DropOffLocation)" value="{{option.TransportLocationID}}">{{option.Location}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.DropOffLocation)
+                                </div>
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-if="(ScheduleDetail.ScheduleStatusID.toString() !='@((int)ScheduleStatus.ScheduleStatuses.Cancelled)' &&ScheduleDetail.ScheduleStatusID.toString() != '@((int)ScheduleStatus.ScheduleStatuses.No_Show)' && ScheduleDetail.ScheduleStatusID.toString() != '@((int)ScheduleStatus.ScheduleStatuses.No_Confirmation)')">
+                                    <label class="control-label required">@Resource.Facility</label>
+                                    <select class="form-control input-sm"
+                                            data-ng-init="ScheduleDetail.FacilityID=(ScheduleDetail.FacilityID == null || ScheduleDetail.FacilityID==0)?'':ScheduleDetail.FacilityID"
+                                            data-ng-model="ScheduleDetail.FacilityID"
+                                            data-val="true" data-val-required="@Resource.FacilityRequired"
+                                            id="EditFacilityID"
+                                            name="ScheduleDetail.FacilityID"
+                                            convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in ScheduleMasterModel.Facilities | filter:FacilityFilter(ScheduleDetail.FacilityID)" value="{{option.FacilityID}}">{{option.FacilityName}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.DropOffLocation)
+                                </div>
+                                <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                                    <label class="control-label">@Resource.Comment</label>
+                                    @Html.TextAreaFor(m => m.ScheduleMaster.Comments, new { data_ng_model = "ScheduleDetail.Comments", @class = "form-control input-sm", maxlength = 500 })
+                                </div>
+                            </div>
+                            <div data-ng-if="ScheduleDetail.ScheduleStatusID.toString() == CnclStatus">
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.WhoCancel</label>
+                                    @Html.DropDownListFor(m => m.ScheduleMaster.WhoCancelled, Model.CancellationReasons.ToSelectList(Model.ScheduleMaster.WhoCancelled ?? "", "Name", "Value", "Select", ""),
+                                                          new
+                                                              {
+                                                                  data_ng_model = "ScheduleDetail.WhoCancelled",
+                                                                  data_ng_init = "ScheduleDetail.WhoCancelled=(ScheduleDetail.WhoCancelled == null || ScheduleDetail.WhoCancelled==0)?'':ScheduleDetail.WhoCancelled",
+                                                                  @class = "form-control input-sm",
+                                                              })
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.WhoCancelled)
+                                </div>
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.WhenCancel</label>
+                                    <div datepicker="ScheduleDetail.WhenCancelled" ng-dateval="ScheduleDetail.WhenCancelled" class="input-group date">
+                                        @Html.TextBoxFor(m => m.ScheduleMaster.WhenCancelled,
+                                                         new
+                                                             {
+                                                                 @class = "form-control input-sm",
+                                                                 placeholder = Resource.WhenCancel,
+                                                                 date_input_mask = ""
+                                                             })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        @Html.ValidationMessageFor(m => m.ScheduleMaster.WhenCancelled)
+
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                                    <label class="control-label required">@Resource.CancellationReason</label>
+                                    @Html.TextAreaFor(m => m.ScheduleMaster.CancelReason, new { data_ng_model = "ScheduleDetail.CancelReason", @class = "form-control input-sm", maxlength = 500 })
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.CancelReason)
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Cancel</button>@*data-ng-click="ResetReferralInternamMessage()"*@
+                                <button type="submit" data-ng-click="SaveScheduleClick(ScheduleDetail)" class="btn green-jungle">@Resource.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="RescheduleClient" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>@Resource.ReschdulingClient</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmReScheduleClient">
+                        <div class="row">
+                            @*<div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.StartDate</label>
+                                <div class="input-group date" datepicker="ScheduleDetail.StartDate" ng-dateval="ScheduleDetail.StartDate">
+                                    @Html.TextBoxFor(m => m.ScheduleMasterDataModel.StartDate, new { @class = "form-control input-sm dateInputMask", placeholder = Resource.StartDate })
+                                    @Html.ValidationMessageFor(m => m.ScheduleMasterDataModel.StartDate)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>*@
+                            @*<div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.EndDate</label>
+                                <div class="input-group date" datepicker="ScheduleDetail.EndDate" ng-dateval="ScheduleDetail.EndDate">
+                                    @Html.TextBoxFor(m => m.ScheduleMasterDataModel.EndDate, new { @class = "form-control input-sm dateInputMask", placeholder = Resource.EndDate })
+                                    @Html.ValidationMessageFor(m => m.ScheduleMasterDataModel.EndDate)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>*@
+
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.Week</label>
+                                @Html.DropDownListFor(m => m.ScheduleMasterDataModel.WeekMasterID, Model.Weeks.ToSelectList(Model.ScheduleMasterDataModel.WeekMasterID.ToString() ?? "", "DisplayName", "weekMasterID", "Select", ""),
+                                                      new
+                                                      {
+                                                          convert_to_number = "",
+                                                          data_ng_model = "ScheduleDetail.WeekMasterID",
+                                                          data_ng_init = "ScheduleDetail.WeekMasterID=(ScheduleDetail.WeekMasterID == null || ScheduleDetail.WeekMasterID==0)?'':ScheduleDetail.WeekMasterID",
+                                                          @class = "form-control input-sm",
+                                                      })
+                            </div>
+
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.Facility</label>
+                                @* @Html.DropDownListFor(m => m.ScheduleMasterDataModel.FacilityID, Model.Facilities.ToSelectList(Model.ScheduleMasterDataModel.FacilityID.ToString() ?? "", "FacilityName", "FacilityID", "Select", ""),
+                                                      new
+                                                      {
+                                                          convert_to_number = "",
+                                                          data_ng_model = "ScheduleDetail.FacilityID",
+                                                          data_ng_init = "ScheduleDetail.FacilityID=(ScheduleDetail.FacilityID == null || ScheduleDetail.FacilityID==0)?'':ScheduleDetail.FacilityID",
+                                                          @class = "form-control input-sm",
+                                                      })*@
+                                <select class="form-control input-sm"
+                                        data-ng-init="ScheduleDetail.FacilityID=(ScheduleDetail.FacilityID == null || ScheduleDetail.FacilityID==0)?'':ScheduleDetail.FacilityID"
+                                        data-ng-model="ScheduleDetail.FacilityID"
+                                        data-val="true" data-val-required="@Resource.FacilityRequired"
+                                        id="FacilityID"
+                                        name="ScheduleDetail.FacilityID"
+                                        convert-to-number="">
+                                    <option value="">@Resource.Select</option>
+                                    <option data-ng-repeat="option in ScheduleMasterModel.Facilities | filter:FacilityFilter(ScheduleDetail.FacilityID)" value="{{option.FacilityID}}">{{option.FacilityName}}</option>
+                                </select>
+                                @Html.ValidationMessageFor(m => m.ScheduleMasterDataModel.FacilityID)
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.Status</label>
+                                @Html.DropDownListFor(m => m.ScheduleMasterDataModel.ScheduleStatusID, Model.ScheduleStatuses.ToSelectList(Model.ScheduleMasterDataModel.ScheduleStatusID.ToString() ?? "", "ScheduleStatusName", "ScheduleStatusID", "Select", ""),
+                                                      new
+                                                          {
+                                                              convert_to_number = "",
+                                                              data_ng_model = "ScheduleDetail.ScheduleStatusID",
+                                                              data_ng_init = "ScheduleDetail.ScheduleStatusID=(ScheduleDetail.ScheduleStatusID == null || ScheduleDetail.ScheduleStatusID==0)?'':ScheduleDetail.ScheduleStatusID",
+                                                              @class = "form-control input-sm",
+                                                          })
+                                @Html.ValidationMessageFor(m => m.ScheduleMasterDataModel.ScheduleStatusID)
+                            </div>
+
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.PickUp</label>
+                                <select class="form-control input-sm"
+                                        data-ng-init="ScheduleDetail.PickUpLocation=(ScheduleDetail.PickUpLocation == null || ScheduleDetail.PickUpLocation==0)?'':ScheduleDetail.PickUpLocation"
+                                        data-ng-model="ScheduleDetail.PickUpLocation"
+                                        data-val="true" data-val-required="@Resource.PickUpLocationRequired"
+                                        id="Schedule_PickUpLocation"
+                                        name="ScheduleDetail.PickUpLocation"
+                                        convert-to-number="">
+                                    <option value="">@Resource.Select</option>
+                                    <option data-ng-repeat="option in ScheduleMasterModel.TransportLocation | filter:PickUpLocationFilter(ScheduleDetail.PickUpLocation)" value="{{option.TransportLocationID}}">{{option.Location}}</option>
+                                </select>
+                                @Html.ValidationMessageFor(m => m.ScheduleMasterDataModel.PickUpLocation)
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ScheduleDetail.ScheduleStatusID != parseInt(CancelStatus)">
+                                <label class="control-label required">@Resource.DropOff</label>
+                                <select class="form-control input-sm"
+                                        data-ng-init="ScheduleDetail.DropOffLocation=(ScheduleDetail.DropOffLocation == null || ScheduleDetail.DropOffLocation==0)?'':ScheduleDetail.DropOffLocation"
+                                        data-ng-model="ScheduleDetail.DropOffLocation"
+                                        data-val="true" data-val-required="@Resource.DropOffLocationRequired"
+                                        id="Schedule_DropOffLocation"
+                                        name="ScheduleDetail.DropOffLocation"
+                                        convert-to-number="">
+                                    <option value="">@Resource.Select</option>
+                                    <option data-ng-repeat="option in ScheduleMasterModel.TransportLocation | filter:PickUpLocationFilter(ScheduleDetail.DropOffLocation)" value="{{option.TransportLocationID}}">{{option.Location}}</option>
+                                </select>
+                                @Html.ValidationMessageFor(m => m.ScheduleMasterDataModel.DropOffLocation)
+                            </div>
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                <label class="control-label required">@Resource.Comment</label>
+                                @Html.TextAreaFor(m => m.ScheduleMasterDataModel.Comments, new { data_ng_model = "ScheduleDetail.Comments", @class = "form-control input-sm", maxlength = 255 })
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <p class="label-italic">
+                                    <b class="font-red-thunderbird">@Resource.PlacementRequirement:</b>
+                                    <span data-ng-bind="ScheduleDetail.PlacementRequirement?ScheduleDetail.PlacementRequirement:'@Constants.NA'"></span>
+                                </p>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <p class="label-italic">
+                                    <b class="font-red-thunderbird">@Resource.BehavioralIssue:</b>
+                                    <span data-ng-bind="ScheduleDetail.BehavioralIssue?ScheduleDetail.BehavioralIssue:'@Constants.NA'"></span>
+                                </p>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Cancel</button>@*data-ng-click="ResetReferralInternamMessage()"*@
+                                <button type="submit" data-ng-click="ReSchedule(ScheduleDetail)" class="btn green-jungle">@Resource.Reschedule</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="AddScheduleBatchServicePopup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>@Resource.BatchProcessForm</span>
+                        <span>({{SelectedScheduleMasterIds.length}} Schedules Selected)</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmAddScheduleBatchService">
+                        <div class="row">
+                            <div class="form-group col-lg-push-2 col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.ScheduleBatchServiceName</label>
+                                @Html.TextBoxFor(m => m.AddScheduleBatchService.ScheduleBatchServiceName, new { @class = "form-control input-sm ", placeholder = Resource.ScheduleBatchServiceName, data_ng_model = "AddScheduleBatchService.ScheduleBatchServiceName" })
+                                @Html.ValidationMessageFor(m => m.AddScheduleBatchService.ScheduleBatchServiceName)
+                            </div>
+                            <div class="form-group col-lg-push-2 col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.ScheduleBatchServiceType</label>
+                                @Html.DropDownListFor(m => m.AddScheduleBatchService.ScheduleBatchServiceType, Model.ScheduleBatchServiceTypeList.ToSelectList("", "Name", "Value", "Select", ""),
+                                                      new
+                                                          {
+                                                              data_ng_model = "AddScheduleBatchService.ScheduleBatchServiceType",
+                                                              @class = "form-control input-sm",
+                                                          })
+                                @Html.ValidationMessageFor(m => m.ScheduleMasterDataModel.ScheduleStatusID)
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Cancel</button>@*data-ng-click="ResetReferralInternamMessage()"*@
+                                <button data-ng-click="SaveScheduleBatchService()" class="btn green-jungle">@Resource.Add</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script id="popover-schedule" type="text/ng-template">
+@Html.Partial("Partial/_ScheduleMasterPopover")
+    </script>
+    <script id="popover-schedule-parent" type="text/ng-template">
+            @Html.Partial("Partial/_ScheduleMasterParentDetailPopover", Model)
+    </script>
+
+
+    @Html.Partial("Partial/_ScheduleNotificationLog", Model)
+    @Html.Partial("Partial/_ParentEmail", Model)
+    @Html.Partial("Partial/_ParentSms", Model)
+
+
+</div>
+
+
+
+@section Scripts{
+    @if (!Model.IsPartial)
+    {    
+        @Scripts.Render("~/assets/js/viewjs/siteApp/schedule/schedulemaster")
+    }
+    <script type="text/javascript">
+        var DeleteConfirmationMessageForSchedule = '@string.Format(@Resource.DeleteConfirmationMessage, "Schedule Master")';
+        var CancelStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Cancelled)';
+        var RescheduleConfirm = '@Resource.RescheduleConfirm';
+        var AlreadyRescheduleConfirm = '@Resource.AlreadyRescheduleConfirm';
+        var ScheduleBatchServiceConfirmation = '@Resource.ScheduleBatchServiceConfirmation';
+        var GenerateMailNotice = '@Resource.GenerateMail';
+        var SendEMail = '@Resource.SendEmail';
+        var SendSMS = '@Resource.SendSMS';
+
+
+
+        //var PageSize = 20;
+    </script>
+
+}

@@ -1,0 +1,69 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.FormList);
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_FormList;
+}
+@model FormPageModel
+@Html.Hidden("hdnFormListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="FormListController">
+    <div class="row">
+
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="tabs">
+                <div class="tabbable tabbable-custom tabs-left">
+
+                    <div class="col-lg-1 col-md-2 col-sm-2 no-padding">
+                        <ul class="nav nav-tabs tabs-left no-padding">
+                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Forms_View))
+                            {
+                                <li class="active">
+                                    <a data-toggle="tab" id="ebForms_newFormList" data-target="#tab_newFormlist" href="#newFormList">@Html.Raw(Resource.NewForms)</a>
+                                </li>
+                                <li>
+                                    <a id="ebForms_savedFormList" data-target="#tab_savedFormList" href="#savedFormList" data-toggle="tab">@Html.Raw(Resource.SavedForms)</a>
+                                </li>
+                            }
+
+                        </ul>
+                    </div>
+
+                    <div class="tab-content col-lg-11 col-md-10 col-sm-10">
+                        <div class="tab-content">
+                        @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Forms_View))
+                        {
+                            <div id="tab_newFormlist" class="tab-pane fade in active" style="min-height: 350px;">
+                                @Html.Partial("Partial/_NewFormlist", Model)
+                            </div>
+
+                            <div id="tab_savedFormList" class="tab-pane fade" style="min-height: 350px;">
+                                @Html.Partial("Partial/_SavedFormList", Model)
+
+                            </div>
+                        }
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+
+
+
+@section Scripts{
+
+    @if (!Model.IsPartial)
+        {
+            @Scripts.Render("~/assets/js/viewjs/siteapp/areas/homecare/form/formlist")
+        }
+    <script type="text/javascript">
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.FormList)';
+        var CanNotSave = '@Resource.CanNotSave';
+        var ReferralFormPageId = '@Resource.ReferralFormPageId';
+    </script>
+}

@@ -1,0 +1,302 @@
+﻿@model HC_AddBatchModel
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h4 class="modal-title">
+        <span data-ng-show="SelectedPatientIds.length > 0" data-ng-tooltip="Back to search" data-ng-click="BackToSearchFilter()"><i class="fa fa-arrow-circle-left"></i></span>
+        @Resource.Add  @Resource.Batch
+    </h4>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="portlet-body compact" style="display: block;">
+                <div class="col-lg-12 no-padding">
+                    <form id="FrmBatch">
+                        <div class="col-md-12 col-sm-12 col-xs-12 no-padding" data-ng-show="SelectedPatientIds.length == 0">
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3 ">
+                                <label class="control-label">@Resource.BatchType</label>
+                                <div>
+                                    @Html.DropDownListFor(p => p.SearchPatientList.BatchTypeID, Model.BatchTypeList.ToSelectList(Model.SearchPatientList.BatchTypeID.ToString() ?? "", "BatchTypeName", "BatchTypeID", @Resource.SelectBatchType, ""), new
+                        {
+                            convert_to_number = "",
+                            data_ng_model = "BatchModel.SearchPatientList.BatchTypeID",
+                            data_ng_init = "BatchModel.SearchPatientList.BatchTypeID=BatchModel.SearchPatientList.BatchTypeID==''?null:BatchModel.SearchPatientList.BatchTypeID.toString()",
+                            @class = "form-control input-sm",
+                        })
+                                    @Html.ValidationMessageFor(q => q.SearchPatientList.BatchTypeID)
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.Payor</label>
+                                <div>
+                                    @Html.DropDownListFor(p => p.SearchPatientList.PayorID, Model.PayorList.ToSelectList(Model.SearchPatientList.PayorID.ToString() ?? "", "PayorName", "PayorID", @Resource.SelectPayor, ""),
+                           new
+                           {
+                               convert_to_number = "",
+                               data_ng_model = "BatchModel.SearchPatientList.PayorID",
+                               data_ng_init = "BatchModel.SearchPatientList.PayorID=BatchModel.SearchPatientList.PayorID==''?null:BatchModel.SearchPatientList.PayorID.toString()",
+                               @class = "form-control input-sm",
+                           })
+                                    @Html.ValidationMessageFor(q => q.SearchPatientList.PayorID)
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.ServiceCode</label>
+                                <div class="groupErrorParent  transportation-dropdown">
+                                    <select class="form-control input-sm groupError selectpicker"
+                                            data-buttonStyle="btn-sm btn-default" multiple="multiple"
+                                            title="@Resource.SelectService" id="ServiceCodeID"
+                                            data-val="false"
+                                            selectpicker="BatchModel.SearchPatientList.ServiceCodeID" name="BatchModel.SearchPatientList.ServiceCodeID">
+                                        <option data-ng-repeat="option in BatchModel.ServiceCodeList" value="{{option.ServiceCodeID}}">{{option.ServiceCode}}</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.ClientN</label>
+                                <div>
+                                    @Html.TextBoxFor(q => q.SearchPatientList.ClientName,
+                             new
+                             {
+                                 @class = "form-control input-sm",
+                                 placeholder = Resource.ClientN,
+                                 data_ng_model = "BatchModel.SearchPatientList.ClientName",
+                             })
+                                    @Html.ValidationMessageFor(q => q.SearchPatientList.ClientName)
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.StartDate</label>
+                                <div class="input-group date" datepicker="BatchModel.SearchPatientList.StartDate"
+                                     data-ng-dateval="BatchModel.SearchPatientList.StartDate">
+                                    @Html.TextBoxFor(q => q.SearchPatientList.StartDate,
+                      new
+                      {
+                          @class = "form-control input-sm dateInputMask",
+                          placeholder = Resource.StartDate,
+                      })
+                                    @Html.ValidationMessageFor(q => q.SearchPatientList.StartDate)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.EndDate</label>
+                                <div class="input-group date" datepicker="BatchModel.SearchPatientList.EndDate"
+                                     data-ng-dateval="BatchModel.SearchPatientList.EndDate">
+                                    @Html.TextBoxFor(q => q.SearchPatientList.EndDate,
+                         new
+                         {
+                             @class = "form-control input-sm dateInputMask",
+                             placeholder = Resource.EndDate,
+                         })
+                                    @Html.ValidationMessageFor(q => q.SearchPatientList.EndDate)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label"></label>
+                                <div>
+                                    <div class="btn-group">
+                                        <button data-ng-click="GetPatientList()" class="btn btn-sm blue cancel margin-right-10">@Resource.Search</button>
+                                        <button data-ng-click="ResetPatientSearchFilter()" class="btn btn-sm dark cancel">@Resource.Reset</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-lg-12 col-md-3 col-sm-3 no-padding " data-ng-show="SelectedPatientIds.length > 0">
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3 ">
+                                <label class="control-label">@Resource.BatchType</label>
+                                <div>
+                                    @Html.DropDownListFor(p => p.SearchPatientList.BatchTypeID, Model.BatchTypeList.ToSelectList(Model.SearchPatientList.BatchTypeID.ToString() ?? "", "BatchTypeName", "BatchTypeID", @Resource.SelectBatchType, ""), new
+                        {
+                            convert_to_number = "",
+                            data_ng_model = "BatchModel.SearchPatientList.BatchTypeID",
+                            data_ng_init = "BatchModel.SearchPatientList.BatchTypeID=BatchModel.SearchPatientList.BatchTypeID==''?null:BatchModel.SearchPatientList.BatchTypeID.toString()",
+                            @class = "form-control input-sm",
+                            disabled = ""
+                        })
+                                    @Html.ValidationMessageFor(q => q.SearchPatientList.BatchTypeID)
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.Comment</label>
+                                <div>
+                                    @Html.TextBoxFor(q => q.SearchPatientList.Comment,
+                             new
+                             {
+                                 @class = "form-control input-sm",
+                                 placeholder = Resource.Comment,
+                                 data_ng_model = "BatchModel.SearchPatientList.Comment",
+                             })
+                                    @Html.ValidationMessageFor(q => q.SearchPatientList.Comment)
+                                </div>
+                            </div>
+
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="SelectedPatientIds.length > 0">
+                                <label class="control-label">Create Patient Wise Batches</label>
+                                <div>
+                                    <input class="unicheckbox text-align-center" type="checkbox"
+                                           data-ng-model="BatchModel.SearchPatientList.CreatePatientWiseBatch"
+                                           val="BatchModel.SearchPatientList.CreatePatientWiseBatch">
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label"></label>
+                                <div>
+                                    <div class="btn-group">
+                                        <button type="button" class="btn btn-sm green-jungle margin-right-10" data-ng-click="CreateBatch()">@Resource.CreateBatch</button>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <div class="col-lg-12" data-ng-if="ClaimValidationMsg">
+                                <div class="alert " data-ng-class="{'alert-success': ClaimValidationStatus == '1', 'alert-danger': ClaimValidationStatus == '0' } ">
+                                    <span>
+                                        <i class="fa fa-warning font-size-15" data-ng-class="{'font-green': ClaimValidationStatus == '1', 'font-red': ClaimValidationStatus == '0' } "></i>
+                                        {{ClaimValidationMsg}}
+                                    </span>
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+                <div class="clearfix"></div>
+                <hr />
+                <div class="font-sm col-md-12 margin-bottom-10" data-ng-show="PatientList.length > 0">
+                    <b class="font-red-thunderbird">@Resource.NoteLabel </b><i>Please select claims to create a new batch.</i>
+                </div>
+                <div class="col-lg-12" style="max-height: 350px;overflow: auto;" data-ng-show="PatientList.length > 0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-condensed flip-content">
+                            <thead class="flip-content">
+                                <tr>
+                                    <th class="width-40px text-align-center">
+                                        <input id="SelectAllPatients" data-ng-show="PatientList.length > 0"
+                                               class="unicheckbox text-align-center" type="checkbox"
+                                               data-ng-model="SelectAllPatientsCheckbox" data-ng-change="SelectAllPatient()"
+                                               val="SelectAllPatientsCheckbox">
+                                    </th>
+                                    <th class="width-30px"></th>
+                                    <th class="">
+                                        <span>@Resource.Patient</span>
+                                    </th>
+                                    <th class="">
+                                        <span>@Resource.Account #</span>
+                                    </th>
+                                    <th class="">
+                                        <span>@Resource.Medicaid #</span>
+                                    </th>
+                                    <th class="">
+                                        <span>@Resource.DOB</span>
+                                    </th>
+                                    <th class="">
+                                        @*<span>@Resource.TotalClaims</span>*@
+                                        <span>Total Line Items</span>
+                                    </th>
+
+                                    <th class="">
+                                        <span>@Resource.TotalAmount</span>
+                                    </th>
+                                    <th class="width-90px">
+                                        <span>@Resource.Action</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody data-ng-repeat="item in PatientList">
+                                <tr id="openTrAddBatch{{$index}}" data-ng-class="{'tr-error-bg':item.ErrorCount > 0}" title="{{item.ErrorMessage}}">
+                                    <td class="text-align-center">
+                                        <input type="checkbox" class="unicheckbox text-align-center"
+                                               data-ng-model="item.IsChecked" data-ng-change="SelectPatient(item)"
+                                               val="item.IsChecked">
+                                    </td>
+                                    <td>
+                                        <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle"
+                                              data-ng-click="GetChildNoteDetailsOfClaim(item,'#CNDetails-'+item.ReferralID,PatientClaimsList.Model)"
+                                              data-ng-attr-id="{{'CNDetails-'+item.ReferralID }}"
+                                              data-toggle="collapse"
+                                              data-ng-attr-data-target="{{'#ChildNoteDetails-'+item.ReferralID }}">
+                                        </span>
+                                    </td>
+                                    <td>{{item.PatientName}}</td>
+                                    <td>{{item.AHCCCSID}}</td>
+                                    <td>{{item.CISNumber}}</td>
+                                    <td>{{item.strDOB}}</td>
+                                    <td>{{item.TotalClaims}}</td>
+                                    <td>{{item.TotalAmount | orgcurrency}}</td>
+                                    
+                                    <td class="text-align-center">
+                                        <a data-ng-if="item.PayorBillingType == '@Common.PayorEDIFileType.Professional.ToString()'" href="javascript:void(0);" data-ng-click="ShowCMS1500File(item)" class="btn btn-xs blue">@Resource.CMS1500</a>
+                                        <a data-ng-if="item.PayorBillingType == '@Common.PayorEDIFileType.Institutional.ToString()'" href="javascript:void(0);" data-ng-click="ShowUB04File(item)" class="btn btn-xs green">@Resource.UB04</a>
+                                    </td>
+                                </tr>
+                                <tr data-ng-attr-id="{{'ChildNoteDetails-'+item.ReferralID }}" class="collapse collapseDestination">
+                                    <td></td>
+                                    <td colspan="8">
+                                        <div class="space5"></div>
+                                        <div class="col-md-12 no-padding">
+                                            <strong><u>Child Note Details</u></strong>
+                                        </div>
+                                        <div class="space5"></div>
+                                        <div class="col-md-12 table-responsive tabbable-custom">
+                                            <table class="table table-hover table-bordered table-striped table-condensed table-checkable ">
+                                                <thead class="flip-content">
+                                                    <tr>
+                                                        <th class="">@Resource.ServiceCode</th>
+                                                        <th class="width-110px">@Resource.ServiceTime (Day)</th>
+                                                        <th class="width-110px">@Resource.Rate / @Resource.Unit</th>
+                                                        <th class="width-110px">@Resource.BillingUnit</th>
+                                                        <th class="width-110px">@Resource.BillingAmount</th>
+                                                        <th class="width-110px">@Resource.Date</th>
+                                                        <th class="width-60px">@Resource.Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody data-ng-repeat="cnItem in item.ChildNoteList">
+                                                    <tr data-ng-class="{'tr-error-bg':cnItem.ErrorCount > 0}">
+                                                        <td>{{(cnItem.CareType == null)? '' : cnItem.CareType + ' - ' }}{{cnItem.ServiceCode}}</td>
+                                                        <td>{{cnItem.CalculatedServiceTime}}</td>
+                                                        <td>{{cnItem.Rate| orgcurrency}}</td>
+                                                        <td>{{cnItem.CalculatedUnit}}</td>
+                                                        <td>{{cnItem.CalculatedAmount| orgcurrency}}</td>
+                                                        <td>{{cnItem.strServiceDate}}</td>
+                                                        <td>
+                                                            <a href="javascript:void(0);" data-ng-click="DeleteTemproryNote(cnItem.NoteID, item, $index)"><i class="fa fa-trash-o font-red"></i></a>
+
+                                                            <i class="fa fa-warning font-red font-size-15 pull-right" data-ng-if="cnItem.ErrorCount > 0 " data-ng-tooltip="{{cnItem.ErrorMessage}}" data-original-title ="{{cnItem.ErrorMessage}}"></i>
+                                                            @*<span class="fa fa-warning font-red font-size-15 pull-right" data-ng-if="cnItem.ErrorCount" title="{{cnItem.ErrorMessage}}"></span>*@
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div data-ng-if="PatientList.length == 0 && !IsPageLoad">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

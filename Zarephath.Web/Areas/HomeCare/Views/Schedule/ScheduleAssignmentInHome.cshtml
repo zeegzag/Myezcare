@@ -1,0 +1,780 @@
+﻿@{
+    bool IsAttandancePage = ViewBag.IsAttandancePage ?? false;
+
+    if (!IsAttandancePage)
+    {
+        ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Assignment);
+        ViewBag.SelectedMenuItem = Resource.SMI_ScheduleAssignment;
+    }
+    else
+    {
+        ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.AttendanceMaster);
+        ViewBag.SelectedMenuItem = Resource.SMI_AttendanceMaster;
+    }
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model HC_ScheduleAssignmentModel
+
+@section Styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/schedule/scheduleassignmentinhome")
+    <style>
+        /*.page-content-wrapper .page-content
+        {
+            padding: 13px 15px 10px 15px;
+        }*/
+        .progressbar {
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .proggress {
+            height: 2px !important;
+        }
+
+        .percentCount {
+            position: absolute !important;
+            right: 0 !important;
+            top: -26px !important;
+            font-size: 11px !important;
+            margin-top: 7px;
+        }
+
+        .lineProgressbar {
+            display: inline-block;
+            width: 100%;
+            float: left;
+        }
+    </style>
+
+}
+@Html.Hidden("hdnScheduleAssignment", Common.SerializeObject(Model))
+<div data-ng-controller="ScheduleAssignmentController" id="ScheduleAssignment">
+    @*<div class="page-bar">
+        <h3 class="page-title">@Resource.Assignment
+            <small>@Resource.ClientScheduleManagement</small>
+        </h3>
+    </div>*@
+
+
+    @if (IsAttandancePage)
+    {
+
+        <div class="page-bar">
+            <h3 class="page-title">Attendance Master
+                <small>Client's Attendance Sheet</small>
+            </h3>
+        </div>
+        
+        
+        
+    }
+
+@*<table>
+        <tr>
+            <th>Name</th>
+            <th ng-repeat="StartDate in HeadCellsUPTrip">{{StartDate}}</th>
+        </tr>
+        <tr ng-repeat="(itemName, value) in rowsUPTrip">
+            <td>{{itemName}}</td>
+            <td ng-repeat="obj in sortByYearProp(value)">{{obj.ClientCount}}</td>
+        </tr>
+    </table>*@
+
+    <div class="row">
+
+        @if (!IsAttandancePage)
+        {
+            <div class="col-lg-4 col-md-4 col-sm-12" ng-show="ShowReferralList">
+                <button type="button" class="btn collapsed grey border-grey-cascade btn-xs margin-bottom-10" data-toggle="collapse" data-target="#filter-panel">
+                    <i class="fa fa-sliders" aria-hidden="true"></i>&nbsp; @Resource.AllFilters
+                </button>
+                @*<button type="button" class="btn collapsed grey border-grey-cascade btn-xs margin-bottom-10" data-ng-init="RefCount=0"
+                    data-ng-click="RefCount=RefCount+1;MinimizeReferralList(RefCount)">
+                    <i class="fa fa-random" aria-hidden="true"></i>&nbsp; @Resource.InverseExpandCollapse
+                </button>*@
+                <div class="btn-group pull-right">
+                    <button type="button" class="btn collapsed grey border-grey-cascade btn-xs margin-bottom-10" data-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-ellipsis-horizontal"></i>@Resource.Sort
+                        <i class="fa fa-angle-down"></i>
+                    </button>
+                    <ul class="dropdown-menu pull-right">
+                        <li>
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ClientName',true)">@Resource.ClientN
+                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('LastAtt',true)">@Resource.LastAtt
+                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'LastAtt'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('NextAtt',true)">@Resource.NextAtt
+                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'NextAtt'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                            </a>
+                        </li>
+                        @* <li>
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ReqDate',true)">@Resource.ReqDt
+                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ReqDate'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                            </a>
+                        </li>*@
+                        <li>
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Gender',true)">@Resource.Sex
+                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Gender'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                            </a>
+                        </li>
+                        <li>
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Age',true)">@Resource.Age
+                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Age'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                            </a>
+                        </li>
+                        @*<li>
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Payor',true)">@Resource.Payor
+                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Payor'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                            </a>
+                        </li>*@
+                        <li>
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Region',true)">@Resource.Location
+                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Region'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+
+
+                <button type="button" class="btn grey border-grey-cascade btn-xs margin-right-05 pull-right" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh" aria-hidden="true"></i>
+                </button>
+
+                @* <button type="button" class="btn btn-xs border-grey-cascade pull-right margin-right-10" 
+                    data-ng-click="DefaultScheduleDaysSet=!DefaultScheduleDaysSet"
+                data-ng-attr-title="{{DefaultScheduleDaysSet?'@Resource.DefaultScheduleDaysSet':'@Resource.SetDefaultScheduleDays' }}"
+                data-ng-class="{'green border-green-dark':DefaultScheduleDaysSet}">
+                    <i class="fa fa-street-view"></i>
+                </button>*@
+
+                <div>
+                    <form>
+                        <div id="filter-panel" class="filter-panel collapse row">
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                @*<label class="control-label">@Resource.Name</label>*@
+                                <div class="">
+                                    @Html.TextBoxFor(q => q.SearchReferralModel.Name, new
+                               {
+                                   @class = "form-control input-sm",
+                                   data_ng_model = "TempSearchReferralModel.Name",
+                                   placeholder = @Resource.Name,
+                                   maxlength = 50
+                               })
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                @*<label class="control-label">Contact</label>*@
+                                <div class="">
+                                    @Html.TextBoxFor(q => q.SearchReferralModel.ContactName, new
+                               {
+                                   @class = "form-control input-sm",
+                                   data_ng_model = "TempSearchReferralModel.ContactName",
+                                   placeholder = @Resource.Contact,
+                                   maxlength = 50
+                               })
+                                    @Html.ValidationMessageFor(q => q.SearchReferralModel.ContactName)
+                                </div>
+                            </div>
+                            @* <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                            <div class="input-group date no-focus" datepicker="TempSearchReferralModel.LastAttFromDate" ng-dateval="TempSearchReferralModel.LastAttFromDate">
+                                @Html.TextBoxFor(m => m.SearchReferralModel.LastAttFromDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.LastAttFromDate })
+                            </div>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                            
+                            <div class="input-group date no-focus" datepicker="TempSearchReferralModel.LastAttFromDate" ng-dateval="TempSearchReferralModel.LastAttToDate">
+                                @Html.TextBoxFor(m => m.SearchReferralModel.LastAttToDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.LastAttToDate })
+                            </div>
+                        </div>*@
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                @*<label class="control-label">Gender</label>*@
+                                <div class="">
+                                    @Html.DropDownListFor(p => p.SearchReferralModel.Gender,
+                                                          Model.GenderList.ToSelectList(Model.SearchReferralModel.Gender.ToString(), "Name", "Value", @Resource.AllGenders, ""),
+                                                          new
+                                                          {
+                                                              data_ng_model = "TempSearchReferralModel.Gender",
+                                                              data_ng_init = "TempSearchReferralModel.Gender=TempSearchReferralModel.Gender==''?null:TempSearchReferralModel.Gender.toString()",
+                                                              @class = "form-control input-sm ignorevalidation"
+                                                          })
+                                    @Html.ValidationMessageFor(q => q.SearchReferralModel.Gender)
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                @*<label class="control-label">Region</label>*@
+                                <div class="">
+                                    @Html.DropDownListFor(p => p.SearchReferralModel.RegioinID, Model.RegionList.ToSelectList(Model.SearchReferralModel.RegioinID.ToString() ?? "", "RegionName", "RegionID", @Resource.AllRegion, ""),
+                                                          new
+                                                          {
+                                                              data_ng_model = "TempSearchReferralModel.RegioinID",
+                                                              data_ng_init = "TempSearchReferralModel.RegioinID=TempSearchReferralModel.RegioinID==''?null:TempSearchReferralModel.RegioinID.toString()",
+                                                              @class = "form-control input-sm ignorevalidation"
+                                                          })
+                                    @Html.ValidationMessageFor(q => q.SearchReferralModel.RegioinID)
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                @*<label class="control-label">Frequency</label>*@
+                                <div class="">
+                                    @Html.DropDownListFor(p => p.SearchReferralModel.FrequencyCodeID,
+                                                          Model.FrequencyCodes.ToSelectList(Model.SearchReferralModel.FrequencyCodeID.ToString() ?? "", "Code", "FrequencyCodeID", @Resource.AllFrequencies, ""),
+                                                          new
+                                                          {
+                                                              data_ng_model = "TempSearchReferralModel.FrequencyCodeID",
+                                                              data_ng_init = "TempSearchReferralModel.FrequencyCodeID=TempSearchReferralModel.FrequencyCodeID==''?null:TempSearchReferralModel.FrequencyCodeID.toString()",
+                                                              @class = "form-control input-sm ignorevalidation"
+                                                          })
+                                    @Html.ValidationMessageFor(q => q.SearchReferralModel.FrequencyCodeID)
+                                </div>
+                            </div>
+
+
+                            @*<div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                @Html.TextBoxFor(q => q.SearchReferralModel.MaxAge,
+                                                 new
+                                                 {
+                                                     @class = "form-control input-sm ignorevalidation",
+                                                     range_slider = "",
+                                                     ng_from = "TempSearchReferralModel.MinAge",
+                                                     ng_to = "TempSearchReferralModel.MaxAge",
+                                                     ng_max = @Constants.MaxHCReferalAge,
+                                                     ng_min = "0",
+                                                     ng_prefix = "",
+                                                     ng_postfix = "y",
+                                                     data_val = false
+                                                 })
+                                @Html.ValidationMessageFor(q => q.SearchReferralModel.MaxAge)
+
+                            </div>*@
+
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                @*<label class="control-label">@Resource.PageSize</label>*@
+
+                                <button class="btn btn-sm blue" data-ng-click="SearchReferral()">@Resource.SearchClients</button>
+
+                            </div>
+
+
+
+                            <hr class="clearfix">
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="row">
+                    <div class="row padding-left-right-10">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="portlet-body compact">
+
+                                <div id="windowTable" class="windowTable dataTables_wrapper external-events-group schedule-assignment-list table-scrollable">
+                                    <table class="table schAssignment_table table-advance table-bordered table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th class="width-10px"></th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ClientName',true)">@Resource.ClientLabel</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                    <div class="pull-right top pagination-sm" data-ng-show="AjaxStart">
+                                                        @*@Resource.Loading*@
+                                                        <img src="~/Assets/images/lazyload.gif" />
+                                                    </div>
+                                                </th>
+                                                <th class="width-40px">
+                                                    <div class="pull-right btn-group">
+                                                        <a class="btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                            @Resource.Sort <i class="fa fa-angle-down"></i>
+                                                        </a>
+                                                        <ul class="dropdown-menu pull-right">
+                                                            <li>
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Gender',true)">@Resource.Sex
+                                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Gender'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Age',true)">@Resource.Age
+                                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Age'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                                </a>
+                                                            </li>
+                                                            @* <li>
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Payor',true)">@Resource.Payor
+                                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Payor'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                                </a>
+                                                            </li>
+                                                            <li>
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Region',true)">@Resource.Region
+                                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Region'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                                </a>
+                                                            </li>*@
+
+                                                        </ul>
+
+                                                    </div>
+                                                </th>
+                                                @*<th></th>*@
+                                                <th title="Remaining Hours">Hrs</th>
+                                                @* <th class="width-75px">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ReqDate',true)">@Resource.ReqDt</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'LastAtt'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                </th>*@
+                                                <th class="width-10px">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('LastAtt',true)">@Resource.LastAtt</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'LastAtt'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-10px">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('NextAtt',true)">@Resource.NextAtt</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'NextAtt'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-50px"></th>
+                                            </tr>
+                                        </thead>
+                                        <span class="hello">
+                                            <tbody data-ng-repeat="referral in ReferralList">
+                                                <tr data-ng-class="{'bg-gray-color':$index%2==1,'table-row-selected': referral.ReferralID==ScheduleSearchModel.ReferralID}">
+                                                    @*<td><span data-ng-click="CollapseSourceClick()" class="collapseSource curser-pointer font-size-14 font-grey-salsa fa fa-plus-circle pull-left"
+                                                        data-toggle="collapse" data-ng-attr-data-target="{{'#ReferralDetails-'+referral.ReferralID }}"></span></td>*@
+
+                                                    <td >
+                                                        <input type="checkbox" id="{{'#ReferralRadio-'+referral.ReferralID }}" name="group1" 
+                                                            class="margin-left-right-3 uniformControls" title="@Resource.PatientEmpFilter" 
+                                                            data-ng-model="referral.IsChecked"
+                                                            data-ng-change="OnReferralSelection(referral.IsChecked,referral.ReferralID )"/>
+
+                                                    </td>
+
+                                                    <td>
+                                                        <a class="text-decoration-none font-size-14" referral-detail-popup data-ng-referal-id="referral.ReferralID"  data-ng-url="ReferralDetailUrl"
+                                                           data-ng-template-selector="#referraldetail-popover" data-popover-cloasble="true" data-ng-header="@Resource.ClientDetail">{{referral.Name}}</a>
+
+                                                        @*<strong class="badge badge-success pull-right" data-ng-show="referral.PlacementRequirement" title="{{referral.PlacementRequirement ? referral.PlacementRequirement:'@Resource.NA'}}">@Resource.PR</strong>*@
+
+                                                    </td>
+
+                                                    <td>{{referral.Gender}}|{{referral.Age}}</td>
+                                                    @*<td>{{referral.ShortName}}</td>*@
+                                                    @*<td>{{referral.ReqDate}} </td>*@
+                                                    <td>
+
+                                                        <span class="badge badge-info pull-right margin-right-05" title="Remaining Hours" data-ng-show="referral.NewRemainingHrs <= 0">{{referral.NewRemainingHrs ?referral.NewRemainingHrs:'0'}}</span>
+
+                                                        <span class="badge badge-danger pull-right margin-right-05" title="Remaining Hours" data-ng-hide="referral.NewRemainingHrs <= 0">{{referral.NewRemainingHrs ?referral.NewRemainingHrs:'0'}}</span>
+                                                    </td>
+                                                    @* <td>{{referral.RequestDate ? referral.RequestDate : '@Resource.NA'}} </td>*@
+                                                    <td>{{ referral.LastAttendedDate ? (referral.LastAttendedDate|orgdate) : '@Resource.NA' }}</td>
+                                                    <td data-ng-class="{'yellow-info-bg':referral.NextAttDate}">{{ referral.NextAttDate ? (referral.NextAttDate|orgdate) : '@Resource.NA' }}</td>
+                                                    <td>
+                                                        <div class="external-event dragRef" calender-dropper="referral" data-ng-click="CollapseSourceClick()">
+                                                            <a href="#" class="" title="@Resource.ScheduleClient"><i class="glyphicon glyphicon-move"></i></a>
+                                                        </div>
+
+                                                         <div class=" float-left recurringSch" data-ng-click="ReferralScheduleClick(referral)">
+                                                            <a href="#" class="" title="@Resource.RecurringSchedule"><i class="fa fa-calendar"></i></a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr ng-class="{'bg-gray-color':$index%2==1}" data-ng-attr-id="{{'ReferralDetails-'+referral.ReferralID }}" class="collapse collapseDestination schRef">
+                                                    <td colspan="9">
+                                                        <div class="padding-2">
+                                                            <div>
+                                                                <span>{{referral.Code}}| {{referral.RegionCode}} </span>
+                                                                @*<strong data-ng-show="referral.PlacementRequirement">&nbsp; @Resource.PR: </strong><span>{{referral.PlacementRequirement ?referral.PlacementRequirement:'@Resource.NA'}}</span>*@
+                                                                <span class="badge badge-primary pull-right" title="@Resource.UsedHours">{{referral.UsedRespiteHours ?referral.UsedRespiteHours:'0'}} @Resource.hrs</span>
+                                                            </div>
+                                                            <div class="">
+                                                            </div>
+
+                                                            @* <div>
+                                                        <span><strong>@Resource.Payor: </strong>{{referral.ShortName}}</span>
+                                                        <span class="padding-left-5"><strong>@Resource.Code: </strong>{{referral.Code}}</span>
+                                                        <span class="padding-left-5"><strong>@Resource.Region: </strong>{{referral.RegionName}}</span>
+                                                        <span class="badge badge-primary pull-right">{{referral.UsedRespiteHours ?referral.UsedRespiteHours:'0'}} @Resource.hrs</span>
+                                                        <span class="badge badge-danger pull-right margin-right-05" data-ng-if="referral.NeedPrivateRoom" title="@Resource.NeedPrivateRoom">P</span>
+                                                    </div>
+                                                    <div class="">
+                                                        <strong>@Resource.PR: </strong><span>{{referral.PlacementRequirement ?referral.PlacementRequirement:'@Resource.NA'}}</span>
+                                                        &nbsp;
+                                                        <strong data-ng-show="referral.ReferralSiblingMapping!='' ">@Resource.Siblings:</strong>
+                                                        <span data-ng-repeat="item in referral.ReferralSiblingMapping">
+                                                            <span>{{$first ? '' : ', '}}<a href="#" class="text-decoration-none" data-ng-href="/referral/addreferral/{{item.EncryptedReferralID}}" data-ng-bind="item.ClientName" target="_blank"></a>
+                                                            </span>
+                                                        </span>
+                                                    </div>*@
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </span>
+                                    </table>
+
+                                </div>
+                                <div class="space10">
+                                    <hr />
+                                </div>
+                                <div class="row">
+
+                                    <div class="col-sm-12 " data-ng-if="ReferralList.length > 0">
+                                        <span>
+                                            @Resource.Showing <span data-ng-bind="ReferralList.length "></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                            <span class="pull-right top pagination-sm" data-ng-show="AjaxStart">
+                                                @Resource.Loading
+                                                <img src="~/Assets/images/lazyload.gif" />
+                                            </span>
+                                        </span>
+                                        <button class="btn btn-xs margin-left-20 yellow-gold-stripe border-default border-grey-gallery" data-ng-click="LoadMoreReferral()" data-ng-show="!AjaxStart">@Resource.LoadMore</button>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div data-ng-if="ReferralList.length == 0">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="alert alert-danger" data-ng-show="!AjaxStart">
+                                                        @Html.Raw(Resource.NoRecordsFound)
+                                                    </div>
+                                                    <div class="pull-right top pagination-sm" data-ng-show="AjaxStart">
+                                                        @Resource.Loading
+                                                        <img src="~/Assets/images/lazyload.gif" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+
+
+
+        <div class="col-sm-12 " ng-class="{'col-lg-8 col-md-88 ': ShowReferralList }">
+            <!--<div class="portlet light portlet-fit  calendar">-->
+            @*<div class="portlet light portlet-fit" style="min-height: 700px; overflow-y: visible; overflow-x: hidden">*@
+            <div class="portlet light portlet-fit">
+                <div class="col-sm-12 no-padding">
+                    <div class="col-lg-12">
+                        <div>
+                            <form id="frmScheduleSearch">
+
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                    <div class="input-group date date-picker pull-right"
+                                        datepicker="ScheduleSearchModel.StartDate" ng-dateval="ScheduleSearchModel.StartDate" data-val="true">
+                                        <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50"/>
+                                        @*<span class="input-group-addon"><i class="fa fa-calendar"></i></span>*@
+                                    </div>
+                                </div>
+
+
+                                @*<div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                    <div class="input-group date date-picker pull-right"
+                                        datepicker="ScheduleSearchModel.EndDate" ng-dateval="ScheduleSearchModel.EndDate" data-ng-mindate="ScheduleSearchModel.StartDate">
+                                        <input class="form-control input-sm dateInputMask" maxlength="50" />
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>*@
+
+                                <div class="form-group col-lg-3 col-md-4col-sm-4 no-left-padding">
+                                    <input class="form-control input-sm filterEmp" placeholder='Search Employee...' data-ng-model="ScheduleSearchModel.EmployeeName" data-ng-change="setFilter()" maxlength="50" />
+                                </div>
+
+                                <div class="form-group col-lg-3 col-md-4 col-sm-4 no-left-padding" data-ng-show="ScheduleSearchModel.ReferralID>0">
+                                    <span class="badge-default badge-success  btn btn-sm ng-binding font-white">{{ScheduleSearchModel.ReferralName}}
+                                    <a href="javascript:void(0)" data-ng-click="RemoveReferral()" class="fa fa-times font-white padding-left-2" aria-hidden="true"></a>
+                                    </span>
+                                </div>
+
+                                <div class="form-group col-lg-1 col-md-2 col-sm-3">
+                                    <button class="btn btn-sm blue" data-ng-click="SeachAndGenerateCalenders()">@Resource.Search</button>
+                                </div>
+
+                            </form>
+
+                            @*<div class="btn-group pull-right">
+                                <button type="button" class="btn btn-sm green-jungle-stripe btn-default letter-space" data-toggle="dropdown" aria-expanded="false">
+                                    <i class="fa fa-ellipsis-horizontal"></i>@Resource.Action
+                                    <i class="fa fa-angle-down"></i>
+                                </button>
+                                <ul class="dropdown-menu pull-right">
+                                    <li>
+                                        <a href="javascript:void(0);" data-ng-click="ViewReferralList()"><i class="fa fa-calendar-plus-o"></i>@Resource.FullView</a>
+                                    </li>
+                                   
+                                </ul>
+                            </div>*@
+
+                            <button type="button" class="btn btn-default border-grey-cascade margin-right-05 btn-sm pull-right" data-ng-click="ViewReferralList()" title="@Resource.ResizeCalender">
+                                <i class="fa " data-ng-class="{'fa-expand':ShowReferralList,'fa-compress':!ShowReferralList}"
+                                    aria-hidden="true"></i>
+                            </button>
+                            <button type="button" class="btn btn-default border-grey-cascade margin-right-05 btn-sm pull-right" data-ng-click="CalenderRefresh()"  title="@Resource.Refresh">
+                                <i class="fa fa-refresh" aria-hidden="true"></i>
+                            </button>
+
+                        </div>
+                        <br class="clear-both" />
+                        <hr />
+                    </div>
+
+
+
+                </div>
+
+                <div id="print-content-assignment">
+                    @*<div class="col-sm-12 schedule-calendar-assignment-list" >*@
+                    <div class="col-sm-12">
+                        @*<div id='calendar'></div>*@
+                        <div class="margin-bottom-15 sclenders" data-ng-repeat="calenderItem in CalendarList">
+
+                            <div data-ng-scalender="calenderItem" class="has-toolbar customCalender" data-ng-show="ShowCalenders"
+                                 data-ng-startdate="ScheduleSearchModel.StartDate"
+                                 data-ng-weekstartday="@Common.GetCalWeekStartDay()"
+                                 data-ng-get-event-list="GetScheduleList"
+                                 data-ng-resourcelist="GetResourcesList"
+                                
+                                 data-ng-on-drop="OnReferralDrop"
+                                 data-ng-on-event-change="OnEventChange"
+                                 data-ng-on-event-render="EventRender"
+                                 
+                                 data-ng-on-resource-render="ResourceRender"
+
+                                
+                                 @*
+                                 data-ng-on-event-order="EventOrder"
+                                 data-ng-on-day-render="DayRender"
+                                 ng-after-all-event-render="AllEventRender"
+                                 data-ng-startdate="SelectedWeekObj.StartDate"
+                                 data-ng-hiddendays="SelectedWeekObj.WeekDaysToHide"*@
+                                >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*@Html.Partial("Partial/_CreateWeekMaster", Model.WeekMaster)*@
+
+    <div class="modal fade" id="EditSchedule" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="EditSchdule"><span>@Resource.EditSchedule</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmScheduleEdit">
+                        <div class="row">
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.Status</label>
+                                @Html.DropDownListFor(m => m.ScheduleMaster.ScheduleStatusID, Model.ScheduleStatuses.ToSelectList(Model.ScheduleMaster.ScheduleStatusID.ToString() ?? "", "ScheduleStatusName", "ScheduleStatusID", "Select", ""),
+                                                      new
+                                                      {
+                                                          convert_to_number = "",
+                                                          data_ng_model = "ScheduleDetail.ScheduleStatusID",
+                                                          data_ng_init = "ScheduleDetail.ScheduleStatusID=(ScheduleDetail.ScheduleStatusID == null || ScheduleDetail.ScheduleStatusID==0)?'':ScheduleDetail.ScheduleStatusID",
+                                                          @class = "form-control input-sm",
+                                                      })
+                                @Html.ValidationMessageFor(m => m.ScheduleMaster.ScheduleStatusID)
+                            </div>
+                            <div data-ng-show="ScheduleDetail.ScheduleStatusID.toString() != CnclStatus">
+                                @*<div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.PickUp</label>
+                                    <select class="form-control input-sm"
+                                            data-ng-init="ScheduleDetail.PickUpLocation=(ScheduleDetail.PickUpLocation == null || ScheduleDetail.PickUpLocation==0)?'':ScheduleDetail.PickUpLocation"
+                                            data-ng-model="ScheduleDetail.PickUpLocation"
+                                            data-val="true" data-val-required="@Resource.PickUpLocationRequired"
+                                            id="PickUpLocation"
+                                            name="ScheduleDetail.PickUpLocation"
+                                            convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in TransportLocation | filter:PickUpLocationFilter(ScheduleDetail.PickUpLocation)" value="{{option.TransportLocationID}}">{{option.Location}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.PickUpLocation)
+                                </div>
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ScheduleDetail.ScheduleStatusID.toString() != CnclStatus">
+                                    <label class="control-label required">@Resource.DropOff</label>
+                                    <select class="form-control input-sm"
+                                            data-ng-init="ScheduleDetail.DropOffLocation=(ScheduleDetail.DropOffLocation == null || ScheduleDetail.DropOffLocation==0)?'':ScheduleDetail.DropOffLocation"
+                                            data-ng-model="ScheduleDetail.DropOffLocation"
+                                            data-val="true" data-val-required="@Resource.DropOffLocationRequired"
+                                            id="DropOffLocation"
+                                            name="ScheduleDetail.DropOffLocation"
+                                            convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in TransportLocation | filter:PickUpLocationFilter(ScheduleDetail.DropOffLocation)" value="{{option.TransportLocationID}}">{{option.Location}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.DropOffLocation)
+                                </div>*@
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-if="(ScheduleDetail.ScheduleStatusID.toString() !='@((int)ScheduleStatus.ScheduleStatuses.Cancelled)' &&ScheduleDetail.ScheduleStatusID.toString() != '@((int)ScheduleStatus.ScheduleStatuses.No_Show)' && ScheduleDetail.ScheduleStatusID.toString() != '@((int)ScheduleStatus.ScheduleStatuses.No_Confirmation)')">
+                                    <label class="control-label required">@Resource.Employee</label>
+                                    <select class="form-control input-sm"
+                                            data-ng-init="ScheduleDetail.EmployeeID=(ScheduleDetail.EmployeeID == null || ScheduleDetail.EmployeeID==0)?'':ScheduleDetail.EmployeeID"
+                                            data-ng-model="ScheduleDetail.EmployeeID"
+                                            data-val="true" data-val-required="@Resource.FacilityRequired"
+                                            id="EditFacilityID"
+                                            name="ScheduleDetail.FacilityID"
+                                            convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in EmployeeList | filter:EmployeeListFilter(ScheduleDetail.EmployeeID)" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.DropOffLocation)
+                                </div>
+                                <div class="form-group col-lg-11 col-md-8 col-sm-8">
+                                    <label class="control-label">@Resource.Comment</label>
+                                    @Html.TextAreaFor(m => m.ScheduleMaster.Comments, new
+                               {
+                                   data_ng_model = "ScheduleDetail.Comments",
+                                   @class = "form-control input-sm",
+                                   maxlength = 500,
+                                   @rows = 5
+                               })
+                                </div>
+                            </div>
+                            <div data-ng-if="ScheduleDetail.ScheduleStatusID.toString() == CnclStatus">
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.WhoCancel</label>
+                                    @Html.DropDownListFor(m => m.ScheduleMaster.WhoCancelled, Model.CancellationReasons.ToSelectList(Model.ScheduleMaster.WhoCancelled ?? "", "Name", "Value", "Select", ""),
+                                                          new
+                                                          {
+                                                              data_ng_model = "ScheduleDetail.WhoCancelled",
+                                                              data_ng_init = "ScheduleDetail.WhoCancelled=(ScheduleDetail.WhoCancelled == null || ScheduleDetail.WhoCancelled==0)?'':ScheduleDetail.WhoCancelled",
+                                                              @class = "form-control input-sm",
+                                                          })
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.WhoCancelled)
+                                </div>
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.WhenCancel</label>
+                                    <div datepicker="ScheduleDetail.WhenCancelled" ng-dateval="ScheduleDetail.WhenCancelled" class="input-group date">
+                                        @Html.TextBoxFor(m => m.ScheduleMaster.WhenCancelled,
+                                                         new
+                                                         {
+                                                             @class = "form-control input-sm",
+                                                             placeholder = Resource.WhenCancel,
+                                                             date_input_mask = ""
+                                                         })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        @Html.ValidationMessageFor(m => m.ScheduleMaster.WhenCancelled)
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                                    <label class="control-label required">@Resource.CancellationReason</label>
+                                    @Html.TextAreaFor(m => m.ScheduleMaster.CancelReason, new { data_ng_model = "ScheduleDetail.CancelReason", @class = "form-control input-sm", maxlength = 500 })
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.CancelReason)
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Cancel</button>@*data-ng-click="ResetReferralInternamMessage()"*@
+                                <button type="submit" data-ng-click="UpdateScheduleStatus(ScheduleDetail)" class="btn green-jungle">@Resource.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+</div>
+
+
+@*<script id="clientcountAtLocations-popover" type="text/ng-template">
+    @Html.Partial("Partial/_ClientCountAtLocationsPopover")
+</script>
+
+
+<script id="facilitydetailpopover" type="text/ng-template">
+    @Html.Partial("Partial/_FacilityDetailPopover")
+</script>*@
+
+
+
+<script id="empReource" type="text/ng-template">
+    <span>
+        <a class="text-decoration-none font-size-12" ajax-detail-popup data-ng-id="DataModel.resourceObj.ID" data-ng-url="DataModel.resourceObj.Url"
+        popover-trigger="hover"
+     data-ng-template-selector="#employeedetail-popover" data-popover-cloasble="true" data-ng-header="@Resource.EmployeeDetails" data-ng-bind="DataModel.resourceObj.EmployeeName"></a>
+    
+    
+
+    <span style="padding: 8px;float: left;" data-ng-style="{'background-color':DataModel.resourceObj.eventColor}"></span>
+    
+    @*<span data-ng-click="DataModel.resourceObj.EmpRefSchModal()"><i class="fa fa-calendar cursor-pointer"></i></span>*@
+    <span style="cursor: pointer;" data-ng-click="DataModel.resourceObj.EmpRefSchModal()"><i class="fa fa-calendar"></i></span>
+
+    
+    <span class='prg lineProgressbar'  data-reamininghours="{{DataModel.resourceObj.EmployeeRemainingHours}}"
+                       data-totalhours="{{DataModel.resourceObj.TotalHours}}"  ><sapn>
+    </span>
+
+</script>
+
+
+
+@Html.Partial("Partial/_EmpRefSchDetailPopover")
+
+<script id="employeedetail-popover" type="text/ng-template">
+    @Html.Partial("Partial/_EmployeeDetailPopover")
+</script>
+
+<script id="referraldetail-popover" type="text/ng-template">
+    @Html.Partial("Partial/_ReferralDetailPopover")
+</script>
+<script id="calendereventmarker" type="text/ng-template">
+        @Html.Partial("Partial/_CalenderEventMarker")
+</script>
+<script id="eventdetailpopover" type="text/ng-template">
+    @Html.Partial("Partial/_EventDetailPopover")
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/scheduleassignmentInHome")
+
+    <script src="/Assets/js/sitejs/freewall.js"></script>
+    <script type="text/javascript">
+        var DeleteConfirmationMessageForSchedule = '@string.Format(@Resource.DeleteConfirmationMessage, "Schedule Master")';
+        var DeleteConfirmationMessageFromFacility = '@string.Format(@Resource.DeleteConfirmationMessageFromFacility)';
+        var ScheduleStartEndDateBetweenWeekStartEndDate = '@string.Format(@Resource.ScheduleStartEndDateBetweenWeekStartEndDate)';
+        var ScheduleStartEndDateMustSevenDay = '@string.Format(@Resource.ScheduleStartEndDateMustSevenDay)';
+        
+        var CancelStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Cancelled)';
+        var UnconfirmedStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Unconfirmed)';
+        var ConfirmedStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Confirmed)';
+        
+        var AlreadyRescheduleConfirm = '@Resource.AlreadyRescheduleConfirm';
+        var ScheduleBatchServiceConfirmation = '@Resource.ScheduleBatchServiceConfirmation';
+        var RescheduleConfirm = '@Resource.RescheduleConfirm';
+
+        var TransportationAssignmentRemoveAction = @Constants.TransportationAssignmentRemoveAction;
+        var TransportationAssignmentKeepAction = @Constants.TransportationAssignmentKeepAction;
+
+        var TransportationAssignmentConfirmationTitle = '@Resource.TransportationAssignmentConfirmationTitle';
+        var TransportationAssignmentConfirmationMessage = '@Resource.TransportationAssignmentConfirmationMessage';
+        var RemoveAssignedTransportion = '@Resource.RemoveAssignedTransportion';
+        var KeepTransportion = '@Resource.KeepTransportion';
+        var IsAttandancePage = @(IsAttandancePage ? "true" : "false");
+
+    </script>
+}

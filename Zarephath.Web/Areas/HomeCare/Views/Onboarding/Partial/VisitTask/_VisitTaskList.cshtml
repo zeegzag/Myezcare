@@ -1,0 +1,306 @@
+﻿@model SetVisitTaskListPage
+@Html.Hidden("hdnSetVisitTaskListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="VisitTaskListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.VisitTaskList &nbsp;
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchVisitTaskListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchVisitTaskListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempSearchVisitTaskListPage.IsDeleted",
+                                                                          data_ng_init = "TempSearchVisitTaskListPage.IsDeleted = TempSearchVisitTaskListPage.IsDeleted==null?'-1':TempSearchVisitTaskListPage.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchVisitTask()"
+                                                                      })
+            </div>
+            @if (Common.HasPermission(Constants.HC_Permission_VisitTask_Delete))
+            {
+                <div class="btn-group" data-ng-if="SelectedVisitTaskIds.length > 0">
+                    <button type="button" data-ng-click="DeleteVisitTask()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchVisitTaskListPage.IsDeleted==0 ?'@Resource.DisableSelected' :(TempSearchVisitTaskListPage.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                    </button>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.HC_Permission_VisitTask_AddUpdate))
+            {
+                <div class="btn-group padding-left-15">
+                    <a data-ng-click="OpenAddVTModal();" class="btn btn-sm letter-space green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.VisitTask</a>
+                </div>
+            }
+
+            <div class="inline-block" data-ng-show="SelectedVisitTaskIds.length > 0">
+                <select ng-model="selectedBulkType.Name" class="form-control input-sm btn blue btn-sm grey border-grey-cascade">
+                    <option selected value="">Select Bulk Type</option>
+                    <option ng-repeat="item in BulkType" value="{{item.value}}">{{item.name}}</option>
+                </select>
+            </div>
+
+            <div class="inline-block" data-ng-show="SelectedVisitTaskIds.length > 0 && selectedBulkType.Name== 'Category' ">
+                @Html.DropDownListFor(p => p.SearchVisitTaskListPage.VisitTaskCategoryID, Model.VisitTaskCategory.ToSelectList(Model.SearchVisitTaskListPage.VisitTaskCategoryID.ToString() ?? "", "VisitTaskCategoryName", "VisitTaskCategoryID", @Resource.SelectCategory, ""),
+                    new
+                    {
+                        data_ng_model = "selectedBulkType.Category",
+                        @class = "form-control input-sm",
+
+                    })
+            </div>
+
+            <div class="inline-block" data-ng-show="SelectedVisitTaskIds.length > 0 && selectedBulkType.Name== 'VisitType' ">
+                @Html.DropDownListFor(p => p.SearchVisitTaskListPage.VisitTaskVisitTypeID, Model.VisitTypeList.ToSelectList(Model.SearchVisitTaskListPage.VisitTaskVisitTypeID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                       new
+                       {
+                           data_ng_model = "selectedBulkType.Category",
+                           @class = "form-control input-sm",
+                       })
+
+            </div>
+
+            <div class="inline-block" data-ng-show="SelectedVisitTaskIds.length > 0 && selectedBulkType.Name== 'VisitTaskType'">
+
+
+                @Html.DropDownListFor(p => p.SearchVisitTaskListPage.VisitTaskType, Model.VisitTaskTypes.ToSelectList(Model.SearchVisitTaskListPage.VisitTaskType ?? "", "Name", "Value", @Resource.SelectTaskType, ""),
+                            new
+                            {
+                                data_ng_model = "selectedBulkType.Category",
+                                @class = "form-control input-sm",
+                            })
+            </div>
+
+            <div class="inline-block" data-ng-show="SelectedVisitTaskIds.length > 0 && selectedBulkType.Name== 'CareType'">
+                @Html.DropDownListFor(p => p.SearchVisitTaskListPage.VisitTaskCareTypeID, Model.CareTypeList.ToSelectList(Model.SearchVisitTaskListPage.VisitTaskCareTypeID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                        new
+                        {
+                            data_ng_model = "selectedBulkType.Category",
+                            @class = "form-control input-sm",
+                        })
+            </div>
+
+            <div class="inline-block" data-ng-show="SelectedVisitTaskIds.length > 0 && (selectedBulkType.Name== 'IsRequired' || selectedBulkType.Name== 'IsDefault')">
+                <select ng-model="selectedBulkType.Category" class="form-control input-sm btn blue btn-sm grey border-grey-cascade">
+                    <option selected value="">Select</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                </select>
+            </div>
+
+
+
+
+            <div class="inline-block" data-ng-show="SelectedVisitTaskIds.length > 0">
+                <button type="button" data-ng-click="BulkUpdateDetail()" class="btn blue btn-sm  border-grey-cascade">Bulk Update</button>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmVisitTaskList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.HC_Permission_VisitTask_Delete))
+                                        {
+                                            <th class="width-20px"></th>
+                                        }
+                                        <th class="width-200px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('TaskDetail')">@Resource.TaskDetail</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'TaskDetail'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-200px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('Category')">@Resource.Category</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'Category'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-85px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('TaskType')">@Resource.TaskType</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'TaskType'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-90px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('VisitType')">@Resource.VisitType</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'VisitType'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-90px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('CareType')">@Resource.CareType</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'CareType'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-150px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('ServiceCode')">@Resource.ServiceCode</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'ServiceCode'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>
+                                        @*<th class="width-90px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('IsDefault')">@Resource.IsDefault</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'IsDefault'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-100px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('IsRequired')">@Resource.IsRequired</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'IsRequired'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>*@
+                                        @*<th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('MinimumTimeRequired')">@Resource.MinimumTimeRequired</a>
+                                            <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'MinimumTimeRequired'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                        </th>*@
+                                        <th class="width-115px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.HC_Permission_VisitTask_Delete))
+                                        {
+                                            <td class="text-align-center">
+                                                <input id="SelectAllDxCode" class="unicheckbox text-align-center" data-ng-show="VisitTaskList.length > 0" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                            </td>
+                                        }
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchVisitTaskListPage.VisitTaskDetail, new { data_ng_model = "TempSearchVisitTaskListPage.VisitTaskDetail", @class = "form-control input-sm", placeholder = Resource.TaskDetail, maxlength = 100 })
+
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchVisitTaskListPage.VisitTaskCategoryID, Model.VisitTaskCategory.ToSelectList(Model.SearchVisitTaskListPage.VisitTaskCategoryID.ToString() ?? "", "VisitTaskCategoryName", "VisitTaskCategoryID", @Resource.SelectCategory, ""),
+                                                                      new
+                                                                      {
+                                                                          data_ng_model = "TempSearchVisitTaskListPage.VisitTaskCategoryID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_ng_change= "SearchVisitTaskChange('VisitTaskCategoryID')"
+                                                                      })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchVisitTaskListPage.VisitTaskType, Model.VisitTaskTypes.ToSelectList(Model.SearchVisitTaskListPage.VisitTaskType ?? "", "Name", "Value", @Resource.SelectTaskType, ""),
+                                                                      new
+                                                                      {
+                                                                          data_ng_model = "TempSearchVisitTaskListPage.VisitTaskType",
+                                                                          @class = "form-control input-sm",
+                                                                          data_ng_change = "SearchVisitTaskChange('VisitTaskType')"
+                                                                      })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchVisitTaskListPage.VisitTaskVisitTypeID, Model.VisitTypeList.ToSelectList(Model.SearchVisitTaskListPage.VisitTaskVisitTypeID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                                      new
+                                                                      {
+                                                                          data_ng_model = "TempSearchVisitTaskListPage.VisitTaskVisitTypeID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_ng_change = "SearchVisitTaskChange('VisitTaskVisitTypeID')"
+                                                                      })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchVisitTaskListPage.VisitTaskCareTypeID, Model.CareTypeList.ToSelectList(Model.SearchVisitTaskListPage.VisitTaskCareTypeID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                                      new
+                                                                      {
+                                                                          data_ng_model = "TempSearchVisitTaskListPage.VisitTaskCareTypeID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_ng_change = "SearchVisitTaskChange('VisitTaskCareTypeID')"
+                                                                      })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchVisitTaskListPage.ServiceCode,
+                                                            new
+                                                            {
+                                                                data_ng_model = "TempSearchVisitTaskListPage.ServiceCode",
+                                                                @class = "form-control input-sm",
+                                                                placeholder = Resource.ServiceCode,
+                                                                maxlength = 100
+                                                            })
+                                        </td>
+                                        @*<td></td>
+                                        <td></td>*@
+                                        @*<td></td>*@
+                                        <td class="text-align-center visittask-td">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchVisitTask()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':VisitTask.IsDeleted}" dir-paginate="VisitTask in VisitTaskList | itemsPerPage: VisitTaskListPager.pageSize" total-items="VisitTaskListPager.totalRecords" current-page="VisitTaskListPager.currentPage" pagination-id="VisitTaskListPager_ID">
+                                        @if (Common.HasPermission(Constants.HC_Permission_VisitTask_Delete))
+                                        {
+                                            <td class="text-align-center">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="VisitTask.IsChecked" data-ng-change="SelectVisitTask(VisitTask)" val="VisitTask.IsChecked">
+                                            </td>
+                                        }
+                                        <td data-ng-bind="VisitTask.VisitTaskDetail"></td>
+                                        <td>{{VisitTask.VisitTaskCategoryName==null ? '@Resource.NA' : VisitTask.VisitTaskCategoryName}}</td>
+                                        <td data-ng-bind="VisitTask.VisitTaskType"></td>
+                                        <td>
+                                            {{VisitTask.VisitType==null ? '@Resource.NA' : VisitTask.VisitType}}
+                                        </td>
+                                        <td>
+                                            {{VisitTask.CareType==null ? '@Resource.NA' : VisitTask.CareType}}
+                                        </td>
+                                        <td>
+                                            {{VisitTask.ServiceCode==null ? '@Resource.NA' : VisitTask.ServiceCode}}
+                                        </td>
+                                        @*<td>
+                                            {{VisitTask.IsDefault?'@Resource.Yes':'@Resource.No'}}
+                                        </td>
+                                        <td>
+                                            {{VisitTask.IsRequired?'@Resource.Yes':''}}
+                                        </td>*@
+                                        @*<td>
+                                            {{VisitTask.MinimumTimeRequired>0?VisitTask.MinimumTimeRequired +'&nbsp;@Resource.Mins':''}}
+                                        </td>*@
+                                        <td class="text-align-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_VisitTask_AddUpdate))
+                                            {
+                                                <a data-ng-click="OpenAddVTModal(VisitTask.EncryptedVisitTaskID)" class="btn btn-xs blue">@Resource.Edit </a>
+                                            }
+                                            @if (Common.HasPermission(Constants.HC_Permission_VisitTask_Delete))
+                                            {
+                                                <a href="javascript:void(0);" data-ng-show="VisitTask.IsDeleted" data-ng-click="DeleteVisitTask(VisitTask.VisitTaskID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!VisitTask.IsDeleted" data-ng-click="DeleteVisitTask(VisitTask.VisitTaskID,'@Resource.Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="VisitTaskList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(VisitTaskListPager.pageSize * VisitTaskListPager.currentPage) - VisitTaskListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(VisitTaskListPager.pageSize == VisitTaskListPager.currentPageSize) ? (VisitTaskListPager.pageSize * VisitTaskListPager.currentPage) :(VisitTaskListPager.pageSize * VisitTaskListPager.currentPage) - VisitTaskListPager.pageSize  + VisitTaskListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="VisitTaskListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="VisitTaskListPager.maxSize" on-page-change="VisitTaskListPager.pageChanged(newPageNumber)" pagination-id="VisitTaskListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="VisitTaskList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Action("AddVisitTask")
+</div>
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/visittask/visittasklist")
+<script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.VisitTask)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.VisitTask)';
+</script>

@@ -1,0 +1,90 @@
+﻿@model SetCustomerEsignModel
+
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.CustomerEsign);
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_CustomerEsign;
+    bool isEditMode = Model.CustomerEsignDetails.OrganizationID > 0;
+}
+
+<div>
+    @if (!Model.IsSuccess)
+    {
+        <div class="row">
+            <div class="col-sm-12">
+                @Resource.OppsLinkExpiredContactOffice
+            </div>
+        </div>
+    }
+    else
+    {
+        @Html.Hidden("hdnCustomerEsignModel", Common.SerializeObject(Model))
+        <div id="wizard-container" data-ng-controller="CustomerEsignController">
+            <div class="page-bar">
+                <h2 class="page-title">
+                    @Resource.CustomerEsign
+                </h2>
+            </div>
+
+            <div data-ng-show="!IsFinalPage" class="row">
+                <div class="col-md-12">
+                    <div class="mt-element-step">
+                        <div class="row step-thin">
+                            <a class="col-md-4 bg-grey-steel mt-step-col" data-ng-class="{'active':step.step == currentStep,'done':step.isDone,'disabled-anchor':step.step>currentStep}" data-ng-repeat="step in steps" data-ng-click="gotoStep(step.step)">
+                                <div class="mt-step-number bg-white font-grey">{{step.step}}</div>
+                                <div class="mt-step-title uppercase font-grey-cascade">{{step.name}}</div>
+                                <div class="mt-step-content font-grey-cascade">{{step.desc}}</div>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div id="wizard-content-container" class="row">
+                        <div class="col-md-12">
+                            <div class="row pull-right margin-bottom-10">
+                                <button data-ng-hide="currentStep <= 1" class="btn btn-default" name="previous" type="button" data-ng-click="gotoStep(currentStep - 1)"><i class="fa fa-arrow-left"></i>&nbsp;Previous step</button>
+                                <button data-ng-hide="currentStep >= steps.length || SelectedClients.length==0" class="btn btn-primary" name="next" type="button" data-ng-click="gotoStep(currentStep + 1)">Next step <i class="fa fa-arrow-right"></i></button>
+                                <button data-ng-hide="currentStep != steps.length || SelectedClients.length==0" class="btn btn-success" name="next" type="button" data-ng-click="Save()"><i class="fa fa-floppy-o"></i>&nbsp;Save</button>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 customer-esign">
+                            <div id="customeresign-step1" data-ng-show="currentStep==1">
+                                @Html.Partial("Partial/_Step1", Model)
+                            </div>
+                            <div id="customeresign-step2" data-ng-show="currentStep==2">
+                                @Html.Partial("Partial/_Step2", Model.OrganizationFormPageModel)
+                            </div>
+                        </div>
+
+                        <div class="col-md-12">
+                            <div class="row pull-right margin-bottom-10">
+                                <button data-ng-hide="currentStep <= 1" class="btn btn-default" name="previous" type="button" data-ng-click="gotoStep(currentStep - 1)"><i class="fa fa-arrow-left"></i>&nbsp;Previous step</button>
+                                <button data-ng-hide="currentStep >= steps.length || SelectedClients.length==0" class="btn btn-primary" name="next" type="button" data-ng-click="gotoStep(currentStep + 1)">Next step <i class="fa fa-arrow-right"></i></button>
+                                <button data-ng-hide="currentStep != steps.length || SelectedClients.length==0" class="btn btn-success" name="next" type="button" data-ng-click="Save()"><i class="fa fa-floppy-o"></i>&nbsp;Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div data-ng-if="IsFinalPage">
+                @Html.Partial("Partial/_EsignSuccess")
+            </div>
+        </div>
+    }
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        var FirstStep = "@Resource.FirstStep";
+        var SecondStep = "@Resource.SecondStep";
+        var ThirdStep = "@Resource.ThirdStep";
+        var BasicInformation = '@Resource.BasicInformation';
+        var Esign = '@Resource.CustomerEsign';
+        var pleaseSelectPlan = '@Resource.PleaseSelectPlan';
+
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.FormList)';
+        var CanNotSave = '@Resource.CanNotSave';
+
+    </script>
+    @Scripts.Render("~/assets/js/viewjs/siteapp/organization/customeresign")
+}

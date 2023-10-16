@@ -1,0 +1,920 @@
+﻿@model SetNoteListModel
+@{
+    ViewBag.Title = Resource.NoteReview;
+    var addClearFixToPartial = "";
+    var addClearFixToMain = "";
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    if (!Model.IsPartial)
+    {
+        ViewBag.SelectedMenuItem = Resource.SMI_AddBillingNoteGC;
+        addClearFixToMain = "clear-both";
+    }
+    else
+    {
+        addClearFixToPartial = "clear-both";
+
+    }
+}
+
+
+@Html.Hidden("hdnSetNoteListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="NoteController">
+    <!--#region Page Header -->
+    @if (!Model.IsPartial)
+    {
+        <div class="page-bar">
+            <h3 class="page-title">@Resource.NoteReview
+
+                <div class="btn-group pull-right btn-group-xs btn-group-devided">
+                    <button type="button" class="btn collapsed grey border-grey-cascade btn-xs" data-toggle="collapse" data-target="#filter-panel">
+                        <i class="fa fa-sliders" aria-hidden="true"></i>&nbsp; @Resource.AdditionalFilters
+                    </button>
+
+
+                    <a href="#" data-ng-click="OpenAddNoteModel()" class="btn blue  border-blue-sharp" data-toggle="modal">
+                        <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddNote
+                    </a>
+                    @if (!Model.IsPartial && Common.HasPermission(Constants.Permission_GroupNote))
+                    {
+                        <a href="@Constants.AddGroupNote" target="_blank" class="btn blue  border-blue-sharp">
+                            <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddGroupNote
+                        </a>
+                    }
+                </div>
+
+
+            </h3>
+        </div>
+    }
+    <!--#endregion-->
+
+    <!--#region Upper Search Panel  -->
+    <div class="row">
+        <div class="col-sm-12 table-responsive overflow-i">
+            <div>
+                <div>
+                    <div class="col-md-12 col-sm-12 no-padding ">
+                        <form id="frm_clientNote">
+                            <input id="hideErrorContent" type="text" class="hideErrorContent">
+                            <div class=" form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
+                                <label class="control-label">@Resource.ServiceFromDate</label>
+                                <div class="input-group date" datepicker="TempSearchNoteModel.ServiceDateStart" ng-dateval="TempSearchNoteModel.ServiceDateStart" data-ng-maxdate="TempSearchNoteModel.ServiceDateEnd">
+                                    @Html.TextBoxFor(q => q.SearchNoteListModel.ServiceDateStart,
+                                new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    placeholder = Constants.GlobalDateFormat,
+                                    @maxlength = "10"
+                                })
+                                    @Html.ValidationMessageFor(q => q.SearchNoteListModel.ServiceDateStart)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group  col-lg-2 col-md-4 col-sm-4 col-xs-6">
+                                <label class="control-label">@Resource.ServiceToDate</label>
+                                <div class="input-group date" datepicker="TempSearchNoteModel.ServiceDateEnd" ng-dateval="TempSearchNoteModel.ServiceDateEnd" data-ng-mindate="TempSearchNoteModel.ServiceDateStart">
+                                    @Html.TextBoxFor(q => q.SearchNoteListModel.ServiceDateEnd,
+                                new
+                                {
+                                    @class = "form-control input-sm dateInputMask",
+                                    placeholder = Constants.GlobalDateFormat,
+                                    @maxlength = "10"
+                                })
+                                    @Html.ValidationMessageFor(q => q.SearchNoteListModel.ServiceDateEnd)
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group  col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                <label class="control-label">@Resource.Facility
+                                    <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.RenderingProvider" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                </label>
+                                @Html.DropDownListFor(p => p.SearchNoteListModel.BillingProviderID, Model.Facilities.ToSelectList(Model.SearchNoteListModel.BillingProviderID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                new
+                                {
+                                    convert_to_number = "",
+                                    data_val = false,
+                                    id = "BillingProvider",
+                                    data_ng_model = "TempSearchNoteModel.BillingProviderID",
+                                    data_ng_init = "TempSearchNoteModel.BillingProviderID=TempSearchNoteModel.BillingProviderID==''?null:TempSearchNoteModel.BillingProviderID.toString()",
+                                    @class = "form-control input-sm",
+                                })
+                            </div>
+
+                            <div class="form-group  col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                <label class="control-label">@Resource.Region</label>
+                                @Html.DropDownListFor(p => p.SearchNoteListModel.RegionID, Model.Regions.ToSelectList(Model.SearchNoteListModel.RegionID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                new
+                                {
+                                    convert_to_number = "",
+                                    data_val = false,
+                                    id = "RegionID",
+                                    data_ng_model = "TempSearchNoteModel.RegionID",
+                                    data_ng_init = "TempSearchNoteModel.RegionID=TempSearchNoteModel.RegionID==''?null:TempSearchNoteModel.RegionID.toString()",
+                                    @class = "form-control input-sm",
+                                })
+                            </div>
+
+                            <div class="additionalFilters filter-panel collapse" id="filter-panel">
+                                @if (!Model.IsPartial)
+                                {
+                                    <div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.ClientLabel</label>
+                                        <div class="">
+                                            <input type="text"
+                                           token-input
+                                           ng-val="TempSearchNoteModel.ReferralID"
+                                           textfield='Name'
+                                           valuefield='ReferralID'
+                                           searchurl="{{GetReferralsURL}}"
+                                           placeholder="@Resource.SearchClientInformation"
+                                           tokenlimit='1'
+                                           onresultsformatter='ReferralDetailResultsFormatter'
+                                           ontokenformatter="ReferralTokenFormatter"
+                                           autoSelectFirstResult="false"
+                                           minChars="1"
+                                           tokeninputobj="ReferralTokenObj"
+                                           id="ReferralIDTkn"
+                                           customclass="form-control input-sm"
+                                           name="TempSearchNoteModel.ReferralID"/>
+                                        </div>
+                                    </div>
+                                }
+
+@*<div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6 display-none">
+                                    <label class="control-label">@Resource.ServiceCode</label>
+                                    <div>
+                                        <input type="text" token-input-local
+                                               ng-val="TempSearchNoteModel.ServiceCodeID"
+                                               textfield='ServiceCode'
+                                               valuefield='ServiceCodeID'
+                                               searchurl="{{GetBatchURL}}"
+                                               local-data="NoteModel.ServiceCodes | unique:'ServiceCodeID'"
+                                               placeholder="@Resource.EnterServiceCode"
+                                               tokenlimit='1'
+                                               onresultsformatter='ServiceCodeResultsFormatter'
+                                               ontokenformatter="ServiceCodeTokenFormatter"
+                                               id="SearchServiceCodeToken"
+                                               customclass="form-control input-sm "/>
+                                    </div>
+
+                                </div>*@
+
+                                <div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.ServiceCode</label>
+                                    <div class="transportation-dropdown">
+                                        <select class="form-control input-sm selectpicker" data-buttonstyle="btn-sm btn-default" multiple="multiple"
+                                            title="@Resource.ServiceCode" data-val="false" id="ServiceCodeID"
+                                            selectpicker="TempSearchNoteModel.ServiceCodeIDs" name="TempSearchNoteModel.ServiceCodeID">
+                                            <option data-ng-repeat="option in NoteModel.ServiceCodes  | unique:'ServiceCodeID'" value="{{option.ServiceCodeID}}">{{option.ServiceCode +' : '+ option.ServiceName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.Type</label>
+                                    @Html.DropDownListFor(p => p.SearchNoteListModel.ServiceCodeTypeID, Model.ServiceCodeTypes.ToSelectList(Model.SearchNoteListModel.ServiceCodeTypeID.ToString() ?? "", "ServiceCodeTypeName", "ServiceCodeTypeID", "All", "-1"),
+                                        new
+                                        {
+                                            convert_to_number = "",
+                                            id = "ServiceCodeTypeID",
+                                            data_ng_model = "TempSearchNoteModel.ServiceCodeTypeID",
+                                            data_ng_init = "TempSearchNoteModel.ServiceCodeTypeID=TempSearchNoteModel.ServiceCodeTypeID==''?null:TempSearchNoteModel.ServiceCodeTypeID",
+                                            @class = "form-control input-sm",
+                                            data_val = false
+                                        })
+
+                                </div>
+                                <div class="form-group col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.Payor</label>
+                                    @Html.DropDownListFor(p => p.SearchNoteListModel.PayorID, Model.PayorList.ToSelectList(Model.SearchNoteListModel.PayorID.ToString() ?? "", "Name", "Value", "All", "-1"),
+                                        new
+                                        {
+                                            convert_to_number = "",
+                                            id = "PayorID",
+                                            data_ng_model = "TempSearchNoteModel.PayorID",
+                                            data_ng_init = "TempSearchNoteModel.PayorID=TempSearchNoteModel.PayorID==''?null:TempSearchNoteModel.PayorID",
+                                            @class = "form-control input-sm",
+                                            data_val = false
+                                        })
+
+                                </div>
+                                <div class="form-group col-lg-1 col-md-4 col-sm-4 col-xs-6 @addClearFixToMain">
+                                    <label class="control-label">@Resource.BatchNumberLabel</label>
+                                    <div>
+                                        @Html.TextBoxFor(q => q.SearchNoteListModel.BatchID, new { @class = "form-control input-sm", data_ng_model = "TempSearchNoteModel.BatchID", placeholder = @Resource.BatchNumberLabel, maxlength = 6 })
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.NoteNew</label>
+                                    <div>
+                                        @Html.TextBoxFor(q => q.SearchNoteListModel.NoteID, new { @class = "form-control input-sm", data_ng_model = "TempSearchNoteModel.NoteID", placeholder = @Resource.NoteNew, maxlength = 6 })
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.NoteKind</label>
+                                    @Html.DropDownListFor(p => p.SearchNoteListModel.NoteKind, Model.NoteKinds.ToSelectList(Model.SearchNoteListModel.NoteKind ?? "", "Value", "Value", "All", ""),
+                                new
+                                {
+                                    id = "NoteKind",
+                                    data_ng_model = "TempSearchNoteModel.NoteKind",
+                                    data_ng_init = "TempSearchNoteModel.NoteKind=TempSearchNoteModel.NoteKind==''?null:TempSearchNoteModel.NoteKind",
+                                    @class = "form-control input-sm",
+                                    data_val = false
+                                })
+                                </div>
+
+                                <div class="form-group col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.NoteType</label>
+                                    @Html.DropDownListFor(p => p.SearchNoteListModel.IsBillable, Model.NoteTypes.ToSelectList(Model.SearchNoteListModel.IsBillable.ToString() ?? "", "Name", "Value"),
+                                new
+                                {
+                                    convert_to_number = "",
+                                    id = "IsBillable",
+                                    data_ng_model = "TempSearchNoteModel.IsBillable",
+                                    data_ng_init = "TempSearchNoteModel.IsBillable=TempSearchNoteModel.IsBillable==''?null:TempSearchNoteModel.IsBillable",
+                                    @class = "form-control input-sm",
+                                    data_val = false
+                                })
+                                </div>
+
+                                <div class="form-group col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.Completed?</label>
+                                    @Html.DropDownListFor(p => p.SearchNoteListModel.IsCompleted, Model.CompletedFilter.ToSelectList(Model.SearchNoteListModel.IsCompleted.ToString() ?? "", "Name", "Value"),
+                                new
+                                {
+                                    convert_to_number = "",
+                                    id = "IsCompleted",
+                                    data_ng_model = "TempSearchNoteModel.IsCompleted",
+                                    data_ng_init = "TempSearchNoteModel.IsCompleted=TempSearchNoteModel.IsCompleted==''?null:TempSearchNoteModel.IsCompleted",
+                                    @class = "form-control input-sm",
+                                    data_val = false
+                                })
+                                </div>
+
+
+
+
+                                <div class="form-group col-lg-1 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.Department</label>
+                                    @Html.DropDownListFor(p => p.SearchNoteListModel.DepartmentID, Model.Departments.ToSelectList(Model.SearchNoteListModel.DepartmentID.ToString() ?? "", "Name", "Value", @Resource.All, ""),
+                                new
+                                {
+                                    convert_to_number = "",
+                                    id = "Departments",
+                                    data_ng_model = "TempSearchNoteModel.DepartmentID",
+                                    data_ng_init = "TempSearchNoteModel.DepartmentID=TempSearchNoteModel.DepartmentID==''?null:TempSearchNoteModel.DepartmentID.toString()",
+                                    @class = "form-control input-sm",
+                                    data_val = false
+                                })
+                                </div>
+
+
+                                <div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
+                                    <label class="control-label">@Resource.CreatedBy</label>
+
+                                    <div class="transportation-dropdown">
+                                        <select class="form-control input-sm selectpicker" data-buttonstyle="btn-sm btn-default" multiple="multiple"
+                                            title="@Resource.CreatedBy" data-val="false" id="CreatedBy"
+                                            selectpicker="TempSearchNoteModel.CreatedByIDs" name="TempSearchNoteModel.CreatedByIDs">
+                                            <option data-ng-repeat="option in NoteModel.Employees  | unique:'Value'" value="{{option.Value}}">{{option.Name}}</option>
+                                        </select>
+                                    </div>
+
+
+                                    @*@Html.DropDownListFor(p => p.SearchNoteListModel.AssigneeID, Model.Employees.ToSelectList(Model.SearchNoteListModel.AssigneeID.ToString() ?? "", "Name", "Value"),
+                                        new
+                                        {
+                                            convert_to_number = "",
+                                            id = "EmployeeID",
+                                            data_ng_model = "TempSearchNoteModel.EmployeeID",
+                                            data_ng_init = "TempSearchNoteModel.EmployeeID=TempSearchNoteModel.EmployeeID==''?null:TempSearchNoteModel.EmployeeID.toString()",
+                                            @class = "form-control input-sm selectpicker",
+                                            @data_buttonstyle = "btn-sm btn-default",
+                                            @title = @Resource.CreatedBy,
+                                            @selectpicker = "TempSearchNoteModel.CreatedByIDs",
+                                            multiple = "multiple",
+                                            data_val = false
+                                        })*@
+                                </div>
+                                @if (Common.HasPermission(Constants.Permission_NoteList_ViewAll))
+                                {
+                                    <div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Assignee <small><b>(@Resource.ORConditionApplied)</b></small></label>
+                                        @Html.DropDownListFor(p => p.SearchNoteListModel.AssigneeID, Model.Assignees.ToSelectList(Model.SearchNoteListModel.AssigneeID.ToString() ?? "", "Name", "Value", @Resource.AllStaff, ""),
+                                             new
+                                             {
+                                                 convert_to_number = "",
+                                                 id = "EmployeeID",
+                                                 data_ng_model = "TempSearchNoteModel.AssigneeID",
+                                                 data_ng_init = "TempSearchNoteModel.AssigneeID=TempSearchNoteModel.AssigneeID==''?null:TempSearchNoteModel.AssigneeID.toString()",
+                                                 @class = "form-control input-sm",
+                                                 data_val = false
+                                             })
+                                    </div>
+                                }
+
+                            </div>
+
+
+
+                            <div class="form-group col-lg-2 col-md-4 col-sm-4 col-xs-6 padding-top-18">
+                                <div class="pull-left col-md-push-1 col-md-11 no-padding">
+                                    <div class="col-md-6 no-right-padding">
+                                        <button type="submit" class="btn btn-sm btn-primary form-control" data-ng-click="SearchNote()">
+                                            @Resource.Search
+                                        </button>
+                                    </div>
+                                    <div class="col-md-6 no-right-padding">
+                                        <button class="btn btn-sm grey border-grey-cascade form-control cancel" data-ng-click="ResetSearchFilter()">
+                                            @Resource.Reset
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--#endregion-->
+
+    <!--#region Upper Refresh, Action Button & Paging Panel  -->
+    <div class="space20"></div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @if (Common.HasPermission(Constants.Permission_ReferralDetails_View_AddUpdate))
+            {
+                <div class="btn-group" data-ng-show="NoteList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllNote" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllNote"></label>
+                    </span>
+                </div>            
+            }
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchNoteListModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchNoteListModel.IsDeleted), "Name", "Value", "", ""),
+                    new
+                    {
+                        id = "IsDeleted",
+                        data_ng_model = "TempSearchNoteModel.IsDeleted",
+                        data_ng_init = "TempSearchNoteModel.IsDeleted = TempSearchNoteModel.IsDeleted==null?'-1':TempSearchNoteModel.IsDeleted.toString()",
+                        @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                        data_ng_change = "SearchNote()"
+                    })
+            </div>
+
+            @if (Common.HasPermission(Constants.Permission_Snapshot_Review))
+            {
+                <div class="btn-group">
+                    <a class="btn btn-sm  green-dark   border-grey-cascade margin-left-10" target="_blank" href="@Constants.MonthalySummaryList">@Resource.ViewSnapShots</a>
+                </div>
+            }
+
+
+            <div class="btn-group" data-ng-if="SelectedNoteIds.length > 0">
+                <button type="button" data-ng-click="DeleteNote()" class="btn blue btn-sm grey border-grey-cascade">
+                    <i class="fa fa-random margin-right-10"></i>{{TempSearchNoteModel.IsDeleted==0?'@Constants.DisableSelected' :(TempSearchNoteModel.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}</button>
+            </div>
+
+
+
+            <div class="btn-group margin-left-20PR">
+                <div class="top pagination-sm" data-ng-show="GetNoteClientListAjaxCall">
+                    <b>@Resource.Loading</b>
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+            </div>
+
+            <div class="inline-block pull-right" data-ng-show="NoteClientList.length > 0">
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="NoteClientListPager.maxSize" on-page-change="NoteClientListPager.pageChanged(newPageNumber)" pagination-id="NoteClientListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+
+            <div class="pull-right excel-export">
+
+                <a data-ng-click="ExportNoteList()" title="@Resource.ExportToExcel">
+                    <i class="font-green-soft fa fa-file-excel-o" style="font-size: 25px;"></i></a>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <!--#endregion -->
+
+    <!--#region Note List Group By Client -->
+    <div class="row" data-ng-hide="GetNoteClientListAjaxCall">
+        <div class="col-sm-12" data-ng-if="NoteClientList.length != 0">
+            <div class="portlet-body compact" style="display: block;">
+                <div class="table-responsive tblCollpase">
+                    <form id="frmReferralTrackingList">
+                        <table class=" table table-bordered table-striped table-condensed flip-content">
+
+                            <thead class="">
+                                <tr>
+                                    <th class="width-25px"></th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteClientListPager.sortColumn('ReferralName')">@Resource.Name</a>
+                                        <span class="sortorder" data-ng-show="NoteClientListPager.sortIndex === 'ReferralName'" data-ng-class="{reverse:NoteClientListPager.reverse}"></span>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteClientListPager.sortColumn('AHCCCSID')">@Resource.AHCCCSID</a>
+                                        <span class="sortorder" data-ng-show="NoteClientListPager.sortIndex === 'AHCCCSID'" data-ng-class="{reverse:NoteClientListPager.reverse}"></span>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteClientListPager.sortColumn('CISNumber')">@Resource.CISLabel</a>
+                                        <span class="sortorder" data-ng-show="NoteClientListPager.sortIndex === 'CISNumber'" data-ng-class="{reverse:NoteClientListPager.reverse}"></span>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteClientListPager.sortColumn('Payor')">@Resource.Payor</a>
+                                        <span class="sortorder" data-ng-show="NoteClientListPager.sortIndex === 'Payor'" data-ng-class="{reverse:NoteClientListPager.reverse}"></span>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteClientListPager.sortColumn('Population')">@Resource.Population</a>
+                                        <span class="sortorder" data-ng-show="NoteClientListPager.sortIndex === 'Population'" data-ng-class="{reverse:NoteClientListPager.reverse}"></span>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteClientListPager.sortColumn('Title')">@Resource.Title</a>
+                                        <span class="sortorder" data-ng-show="NoteClientListPager.sortIndex === 'Title'" data-ng-class="{reverse:NoteClientListPager.reverse}"></span>
+                                    </th>
+                                    @*<th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteClientListPager.sortColumn('FacilityName')">@Resource.Facility</a>
+                                        <span class="sortorder" data-ng-show="NoteClientListPager.sortIndex === 'FacilityName'" data-ng-class="{reverse:NoteClientListPager.reverse}"></span>
+                                    </th>*@
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteClientListPager.sortColumn('StarDate')">@Resource.StarDate</a>
+                                        <span class="sortorder" data-ng-show="NoteClientListPager.sortIndex === 'StarDate'" data-ng-class="{reverse:NoteClientListPager.reverse}"></span>
+                                    </th>
+                                    <th class="width-80px">
+                                        <span>@Resource.Action</span>
+                                    </th>
+                                </tr>
+                            </thead>
+
+
+                            <tbody dir-paginate="item in NoteClientList | itemsPerPage: NoteClientListPager.pageSize" total-items="NoteClientListPager.totalRecords" current-page="NoteClientListPager.currentPage" pagination-id="NoteClientListPagerID">
+
+                                <tr>
+
+                                    <td>
+                                        <span class="collapseSource curser-pointer font-size-14 font-grey-salsa fa fa-plus-circle" data-toggle="collapse"
+                                            data-ng-attr-data-target="{{'#ReferralDetails-'+item.ReferralID }}"
+                                            data-ng-click="GetClientNoteDetailList(item,true,true)" data-ng-attr-id="{{'MEDocDetails-'+item.ReferralID }}"></span>
+                                    </td>
+
+                                    <td>
+                                        <a class="" data-ng-href="/referral/addreferral/{{item.EncryptedReferralID}}" target="_blank">{{item.ReferralName}}</a>
+                                    </td>
+                                    <td>{{item.AHCCCSID}}</td>
+                                    <td>{{item.CISNumber}}</td>
+                                    <td>{{item.Payor}}</td>
+                                    <td>{{item.Population}}</td>
+                                    <td>{{item.Title}}</td>
+                                    @*<td>{{item.FacilityName}}</td>*@
+                                    <td>{{item.StrStartDate}}</td>
+                                    <td>
+
+                                        <a href="#" class="btn btn-xs blue" data-ng-click="OpenAddNoteModel(item)">@Resource.AddNote </a>
+
+                                        @*<a class="btn btn-xs green-dark margin-left-10"  target="_blank" href="javascript:void(0);"
+                                            data-ng-href="/referral/addreferral/{{item.EncryptedReferralID}}#rm_ReferralsMonthlySummary">@Resource.ViewSnapShots</a>*@
+                                    </td>
+                                </tr>
+
+                                <tr data-ng-attr-id="{{'ReferralDetails-'+item.ReferralID }}" class="collapse collapseDestination schRef">
+                                    <!--#region Sub CLIENT NOTE Details-->
+                                    <td></td>
+                                    <td colspan="9">
+
+                                        <div class="row">
+                                            <div class="col-sm-12 ">
+                                                <div class="text-align-center margin-top-15">
+                                                    <div class="top pagination-sm" data-ng-show="item.GetNoteClientListAjaxCall">
+                                                        <b>@Resource.Loading</b>
+                                                        <img src="~/Assets/images/lazyload.gif" />
+                                                    </div>
+                                                </div>
+                                                <div class="portlet-body noteCompact padding-15" style="display: block;" data-ng-hide="item.GetNoteClientListAjaxCall">
+                                                    <div class="dataTables_wrapper" data-ng-if="item.ClientNoteDetailList.length > 0">
+                                                        <table class="table table-striped table-hover table-bordered table-condensed tblSubtable">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th></th>
+                                                                    <th>
+                                                                        <span class="anchor_color" href="javascript:void(0);" @*data-ng-click="item.NoteListPager.sortColumn('Batch')"*@>@Resource.NoteDetails</span>
+                                                                        @*<span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'Batch'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span>*@
+                                                                    </th>
+                                                                    <th class="width-15px">
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('StartDate',false,item)">@Resource.StartDate</a>
+                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th class="width-15px">
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('EndDate',false,item)">@Resource.EndDate</a>
+                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th colspan="2">
+                                                                        <span class="anchor_color">@Resource.Service</span>
+                                                                        <div class="pull-right btn-group">
+                                                                            <a class="btn-xs dropdown-toggle sort-by anchor_color" href="#" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                                                @Resource.Sortby
+                                                                                <i class="fa fa-angle-down"></i>
+                                                                            </a>
+                                                                            <ul class="dropdown-menu pull-right sort-list">
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('ServiceCode',false,item)">@Resource.ServiceCode
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'ServiceCode'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('ServiceType',false,item)">@Resource.ServiceType
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'ServiceType'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('BillingProvider',false,item)">@Resource.BillingProvider
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'BillingProvider'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('RenderingProvider',false,item)">@Resource.RenderingProvider
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'RenderingProvider'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('Payor',false,item)">@Resource.Payor
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'Payor'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                            </ul>
+
+                                                                        </div>
+                                                                    </th>
+                                                                    <th class="width-10px">
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('Unit',false,item)">@Resource.Units</a>
+                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'Unit'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span>
+                                                                    </th>
+                                                                    @if (Common.HasPermission(Constants.Permission_Additional_ViewNotesAmount))
+                                                                    {
+                                                                        <th class="width-10px">
+                                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('Amount',false,item)">@Resource.Amount</a>
+                                                                            <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'Amount'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span>
+                                                                        </th>
+                                                                    }
+                                                                    <th class="" colspan="2">
+                                                                        @Resource.NoteStatusSummary
+                                                                        <div class="pull-right btn-group">
+                                                                            <a class="btn-xs dropdown-toggle sort-by anchor_color" href="#" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                                                @Resource.Sortby
+                                                                                <i class="fa fa-angle-down"></i>
+                                                                            </a>
+                                                                            <ul class="dropdown-menu pull-right sort-list">
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('CreatedDate',false,item)">@Resource.CreatedDate
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('CreatedBy',false,item)">@Resource.CreatedBy
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'CreatedBy'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('ModifiedDate',false,item)">@Resource.UpdatedDate
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'ModifiedDate'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('UpdatedBy',false,item)">@Resource.UpdatedBy
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'UpdatedBy'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('SignatureDate',false,item)">@Resource.SignatureDate
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'SignatureDate'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                                <li>
+                                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="item.NoteListPager.sortColumn('SignatureBy',false,item)">@Resource.SignatureBy
+                                                                                        <span class="sortorder" data-ng-show="item.NoteListPager.sortIndex === 'SignatureBy'" data-ng-class="{reverse:item.NoteListPager.reverse}"></span></a>
+                                                                                </li>
+                                                                            </ul>
+
+                                                                        </div>
+                                                                    </th>
+
+                                                                    <th class="width-100px"><span class="anchor_color">@Resource.Action</span></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody dir-paginate="note in item.ClientNoteDetailList | itemsPerPage: item.NoteListPager.pageSize" total-items="item.NoteListPager.totalRecords" current-page="item.NoteListPager.currentPage" pagination-id="item.ReferralID">
+                                                                <tr data-ng-class="{'warning':!note.MarkAsComplete,'deleted':note.IsDeleted}">
+                                                                    <td>
+                                                                        @* @if (Common.HasPermission(Constants.Permission_CaseManager_AddUpdate))
+                                                                        {
+                                                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="note.IsChecked" data-ng-change="SelectNote(note)" val="note.IsChecked" />
+                                                                            <br />
+                                                                        }*@
+
+                                                                        <span class="badge purple-medium margin-top-5" data-ng-bind="note.IsBillable?'B':'NB'" title="{{note.IsBillable?'@Resource.BillableNote':'@Resource.NonBillableNote'}}"></span>
+                                                                        <br />
+                                                                        <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle margin-top-5" data-ng-click="NoteDetailsClick(note,'#NoteDetail-'+note.NoteID)" data-ng-attr-id="{{'NoteDetail-'+note.NoteID }}"
+                                                                            data-toggle="collapse" data-ng-attr-data-target="{{'#NoteDetailID-'+note.NoteID }}"></span>
+                                                                    </td>
+
+                                                                    <td>
+                                                                        <div class="">
+                                                                            <span>
+                                                                                <div class="td-note-summary">@Resource.Batch #</div>
+                                                                                : &nbsp;{{note.BatchDetails ? note.BatchDetails:'@Resource.NA'}}</span>
+                                                                            @if (!Model.IsPartial)
+                                                                            {
+                                                                                <span class="badge badge-danger" data-ng-if="note.IsSent">@Resource.Sent</span>
+                                                                            }
+                                                                            else
+                                                                            {
+                                                                                <span class="badge badge-default" data-ng-if="note.IsSent">@Resource.Sent</span>
+                                                                            }
+                                                                        </div>
+                                                                        <div class="">
+                                                                            <span>
+                                                                                <div class="td-note-summary">@Resource.Note #</div>
+                                                                                : &nbsp;{{note.NoteID}}</span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td data-ng-bind="note.StrStartDate"></td>
+                                                                    <td data-ng-bind="note.StrEndDate"></td>
+                                                                    <td data-ng-bind="note.ServiceCodeID>0?note.ServiceCode:'Other'"></td>
+                                                                    <td>
+                                                                        <span>{{note.ServiceCodeID>0?note.ServiceName:note.Source?note.Source:note.OtherNoteType?note.OtherNoteType:'@Resource.NA'}}</span>
+                                                                        <br />
+
+                                                                        <div data-ng-if="note.ServiceCodeID>0">
+                                                                            <div class="NoteSummaryDiv">
+                                                                                <div class="td-note-summary">@Resource.ServiceType:</div>
+                                                                                <div class="NoteServiceDesc">{{note.ServiceCodeTypeName}}</div>
+                                                                            </div>
+                                                                            <div class="clear-both">
+                                                                                <div class="td-note-summary">@Resource.BillingProvider:</div>
+                                                                                <div class="NoteServiceDesc">{{note.BillingProviderName}}</div>
+                                                                            </div>
+                                                                            <div class="clear-both">
+                                                                                <div class="td-note-summary">@Resource.RenderingProvider:</div>
+                                                                                <div class="NoteServiceDesc">{{note.RenderingProviderName}}</div>
+                                                                            </div>
+                                                                        </div>
+
+
+                                                                    </td>
+                                                                    <td class="text-align-center" data-ng-bind="note.CalculatedUnit"></td>
+                                                                    @*<td data-ng-bind="note.CalculatedAmount"></td>*@
+                                                                    @if (Common.HasPermission(Constants.Permission_Additional_ViewNotesAmount))
+                                                                    {
+                                                                        <td data-ng-bind="note.CalculatedAmount | currency:'@Resource.DollerSymbol'"></td>
+                                                                    }
+                                                                    <td>
+                                                                        <div>
+                                                                            <div class="NoteSummaryDiv">
+                                                                                <div class="td-note-summary">@Resource.CreatedBy:</div>
+                                                                                <div class="NoteServiceDesc">{{note.CreatedByUserName ? note.CreatedByUserName : @Resource.System}}</div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <div class="td-note-summary">@Resource.Date:</div>
+                                                                                <div class="NoteServiceDesc">{{note.CreatedDate | datetimeformat}}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                        <hr />
+                                                                        <div>
+                                                                            <div class="NoteSummaryDiv">
+                                                                                <div class="td-note-summary">@Resource.UpdatedBy:</div>
+                                                                                <div class="NoteServiceDesc">{{note.UpdatedByUserName ? note.UpdatedByUserName : @Resource.System}}</div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <div class="td-note-summary">@Resource.Date:</div>
+                                                                                <div class="NoteServiceDesc">{{note.UpdatedDate | datetimeformat}}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        <div>
+                                                                            <div class="NoteSummaryDiv">
+                                                                                <div class="td-note-summary">@Resource.SignatureBy:</div>
+                                                                                <div class="NoteServiceDesc">{{note.SignatureBy ? note.SignatureBy : '@Resource.NA'}}</div>
+                                                                            </div>
+                                                                            <div>
+                                                                                <div class="td-note-summary">@Resource.Date:</div>
+                                                                                <div class="NoteServiceDesc" data-ng-show="note.SignatureDate">{{note.SignatureDate | datetimeformat}}</div>
+                                                                                <div class="NoteServiceDesc" data-ng-show="!note.SignatureDate">@Resource.NA</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+
+                                                                        <a href="#" class="btn btn-xs blue" data-ng-click="OpenAddNoteModel(note,item)">@Resource.Edit </a>
+                                                                        <a href="javascript:void(0);" data-ng-show="note.IsDeleted" data-ng-click="DeleteNote(item,note,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                        <a href="javascript:void(0);" data-ng-show="!note.IsDeleted" data-ng-click="DeleteNote(item,note,'Disable')" class="btn btn-xs red">@Resource.Disable</a>
+
+                                                                    </td>
+                                                                </tr>
+                                                                <tr data-ng-attr-id="{{'NoteDetailID-'+note.NoteID }}" class="collapse border-grey-gallery collapseDestination">
+                                                                    <td></td>
+                                                                    <td colspan="11" class="">
+
+                                                                        <div class="col-sm-10 margin-top-10">
+                                                                            <div class="col-sm-12" data-ng-if="note.ServiceCodeType==OtherServiceCode">
+                                                                                <span><b>Spoke To: </b>{{note.SpokeTo?note.SpokeTo:'@Resource.NA'}} </span>
+                                                                                <span><b>Relationship: </b>{{note.Relation?note.Relation:'@Resource.NA'}} </span>
+                                                                                <span><b>Type: </b>{{note.OtherNoteType?note.OtherNoteType:'@Resource.NA'}}</span>
+                                                                            </div>
+                                                                            <div class="table-responsive col-sm-12">
+                                                                                <table class="table table-bordered table-condensed bg-gray-color">
+                                                                                    @*<thead>
+                                                <tr>
+                                                    <th colspan="2" class="text-align-left"><strong>@Resource.NoteDetails</strong></th>
+                                                </tr>
+                                            </thead>*@
+                                                                                    <tbody>
+                                                                                        <tr>
+                                                                                            <td class="width-20px text-align-left">@Resource.Note</td>
+                                                                                            <td>
+                                                                                                <div class="htmlContainer" html-bind="note.NoteDetails">
+                                                                                                </div>
+
+                                                                                            </td>
+                                                                                            @*<td data-ng-bind="note.NoteDetails | trustAsHtml"></td>*@
+                                                                                        </tr>
+                                                                                        <tr data-ng-if="note.MonthlySummaryIds">
+                                                                                            <td class="text-align-left">@Resource.AttachmentURL</td>
+                                                                                            <td>
+                                                                                                <a href="javascript:void(0);" class="moredark" data-ng-click="DownloadMonthlySummaryPdf(note.MonthlySummaryIds)">
+                                                                                                    <b>{{note.MonthlySummaryIds?'@Resource.DownloadAttachment' :'@Resource.NA'}}</b>
+                                                                                                </a>
+                                                                                            </td>
+                                                                                            @*<td>
+                                                                                                <div class="htmlContainer" data-ng-bind-html="note.AttachmentURL?note.AttachmentURL :'@Resource.NA'">
+                                                                                                </div>
+                                                                                            </td>*@
+                                                                                        </tr>
+                                                                                        <tr>
+                                                                                            <td class="text-align-left">@Resource.Assessment</td>
+                                                                                            <td data-ng-bind-html="note.Assessment?note.Assessment:'@Resource.NA'"></td>
+                                                                                        </tr>
+                                                                                        @*<tr>
+                                                                                            <td class="text-align-left">@Resource.ActionPlan</td>
+                                                                                            <td data-ng-bind-html="note.ActionPlan?note.ActionPlan:'@Resource.NA'"></td>
+                                                                                        </tr>*@
+                                                                                        <tr data-ng-if="note.NoteComments">
+                                                                                            <td class="text-align-left">@Resource.NoteComment</td>
+                                                                                            <td data-ng-bind-html="note.NoteComments?note.NoteComments:'@Resource.NA'"></td>
+                                                                                        </tr>
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </td>
+
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                        <div class="row">
+                                                            <div class="col-sm-12">
+                                                                <div class="col-md-4 no-padding pull-left">
+                                                                    @Resource.Showing <span data-ng-bind="(item.NoteListPager.pageSize * item.NoteListPager.currentPage) - item.NoteListPager.pageSize  + 1"></span>
+                                                                    &nbsp;@Resource.To <span data-ng-bind="(item.NoteListPager.pageSize == item.NoteListPager.currentPageSize) ? (item.NoteListPager.pageSize * item.NoteListPager.currentPage) :(item.NoteListPager.pageSize * item.NoteListPager.currentPage) - item.NoteListPager.pageSize  + item.NoteListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="item.NoteListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                                                                </div>
+                                                                <div class="inline-block pull-right" data-ng-show="item.ClientNoteDetailList.length > 0">
+                                                                    <div class="pull-right top pagination-sm">
+                                                                        <dir-pagination-controls boundary-links="true" max-size="item.NoteListPager.maxSize" on-page-change="item.NoteListPager.pageChanged(newPageNumber,item)" pagination-id="item.ReferralID"></dir-pagination-controls>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12">
+                                                <div data-ng-if="item.ClientNoteDetailList.length == 0">
+                                                    <div class="row">
+                                                        <div class="col-lg-12">
+                                                            <div class="alert alert-danger">
+                                                                @Html.Raw(Resource.NoRecordsFound)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </td>
+                                    <!--#endregion-->
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+
+
+                    </form>
+                </div>
+
+
+            </div>
+        </div>
+
+        <div class="col-sm-12" data-ng-if="NoteClientList.length == 0">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger">
+                        @Html.Raw(Resource.NoRecordsFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12" data-ng-show="!GetNoteClientListAjaxCall">
+            <div class="col-md-4 no-padding pull-left" data-ng-show="NoteClientList.length > 0">
+                @Resource.Showing <span data-ng-bind="(NoteClientListPager.pageSize * NoteClientListPager.currentPage) - NoteClientListPager.pageSize  + 1"></span>
+                &nbsp;@Resource.To <span data-ng-bind="(NoteClientListPager.pageSize == NoteClientListPager.currentPageSize) ? (NoteClientListPager.pageSize * NoteClientListPager.currentPage) :(NoteClientListPager.pageSize * NoteClientListPager.currentPage) - NoteClientListPager.pageSize  + NoteClientListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="NoteClientListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+            </div>
+            @*<div class="btn-group">
+                <div class="top pagination-sm" >
+                    <b>@Resource.Loading</b>
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+            </div>*@
+            <div class="inline-block pull-right" data-ng-show="NoteClientList.length > 0">
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="NoteClientListPager.maxSize" on-page-change="NoteClientListPager.pageChanged(newPageNumber)" pagination-id="NoteClientListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--#endregion-->
+
+
+
+
+
+
+    <script id="NoteDetailPopover" type="text/ng-template">
+    @Html.Partial("Partial/_NoteDetail")
+    </script>
+
+    <div class="modal fade modal-scroll outComeForm" id="model_AddBillalbeNote" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+
+                @Html.Partial("Partial/_AddNote", new NoteDetailModel())
+            </div>
+            <!-- /.modal-content -->
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @if (!Model.IsPartial)
+    {
+        @Scripts.Render("~/assets/js/viewjs/siteApp/note/clientnotes")
+    }
+
+}
+<script type="text/javascript">
+    var MaxUnit = "@Resource.MaxUnit";
+    var DailyUnitLimit = "@Resource.DailyUnitLimit";
+    var Billable = "@Resource.Billable";
+    var GroupOption = "@Resource.GroupOption";
+    var DistanceInMilesUnit = "@Convert.ToInt32(EnumUnitType.DistanceInMiles)";
+    var StopUnit = "@Convert.ToInt32(EnumUnitType.Stop)";
+    var OtherServiceCode = "@Convert.ToInt32(EnumServiceCodeType.Other)";
+    var OtherPOS = "@Convert.ToInt32(EnumPlaceOfServices.Confirmed)";
+    var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Note)';
+    var NoteExistMessage = '@string.Format(@Resource.NoteExistMessage, @Resource.Note)';
+    var NoteDeleteExistMessage = '@string.Format(@Resource.NoteDeleteExistMessage, @Resource.Note)';
+    var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.Note)';
+    var Name = "@Resource.Name";
+    var AHCCCSID = "@Resource.AHCCCSID";
+    var CISNumber = "@Resource.CISNumber";
+    var FacilityForOtherServiceCode = "@Constants.FacilityForOtherServiceCode";
+    var Phone = "@Resource.Phone";
+    var Address = "@Resource.Address";
+    var CommunityMentalHealthCenter = "@Resource.lblCommunityMentalHealthCenter";
+    var CanNotSave = '@Resource.CanNotSave';
+    var CanNotSaveNoteAssignmentMissing = '@Resource.CanNotSaveNoteAssignmentMissing';
+    var CreateGroupServiceConfrimation = '@Html.Raw(Resource.CreateGroupServiceConfrimation)';
+    var GroupServicesNotConfigured = "@Html.Raw(Resource.GroupServicesNotConfigured)";
+
+    var Missing = '@Resource.Missing';
+    var Services = '@Resource.Services';
+    var Assessment = '@Resource.Assessment';
+    var NoteAssignee = '@Resource.NoteAssignee';
+    var NoteComments = '@Resource.NoteComment';
+    var NoteIncomplete = '@Html.Raw(Resource.NoteIncomplete)';
+    var GroupCodelAlert = '@Html.Raw(Resource.GroupCodelAlert)';
+    var CloseNoteEntryAlert = '@Html.Raw(Resource.CloseNoteEntryAlert)';
+</script>

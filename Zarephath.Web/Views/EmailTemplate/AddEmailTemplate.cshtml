@@ -1,0 +1,160 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.EmailTemplate != null && Model.EmailTemplate.EmailTemplateID > 0 ? Resource.EditTemplate : @Resource.AddTemplate));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmailTemplateList;
+}
+
+@model AddEmailTemplateModel
+@Html.Hidden("hdnEmailTemplateModel", Common.SerializeObject(Model))
+<div data-ng-controller="AddEmailTemplateController">
+    <form class="form-horizontal" id="frmEmailTemplate">
+        <div class="page-bar">
+            <h3 class="page-title">
+                @(Model != null && Model.EmailTemplate != null && Model.EmailTemplate.EmailTemplateID > 0 ? Resource.EditTemplate : @Resource.AddTemplate)
+            <small>@Resource.EnterTemplateInformation</small>
+            <input type="submit" data-ng-click="SaveEmailTemplateDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model.EmailTemplate != null && Model.EmailTemplate.EmailTemplateID > 0 ? Resource.Update : @Resource.Save)" />
+            <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <div class="fscontainer">
+                        <div class="legend">
+                            @Resource.Template
+                        </div>
+                        <div class="col-sm-12 ">
+                            <div class="col-sm-12">
+
+                                <div class="col-md-12 form-group">
+                                    <label class="col-md-3 control-label">@Resource.TemplateName</label>
+                                    <div class="col-md-5">
+                                        @*<span data-ng-bind="EmailTemplateModel.EmailTemplate.EmailTemplateName" style="background: lightgrey; padding: 8px 100px 8px 15px;"></span>*@
+                                        @Html.TextBoxFor(q => q.EmailTemplate.EmailTemplateName, new
+                                        {
+                                            @class = "form-control input-sm",
+                                            data_ng_model = "EmailTemplateModel.EmailTemplate.EmailTemplateName",
+                                            placeholder = @Resource.TemplateName,
+
+                                        })
+                                        @Html.ValidationMessageFor(q => q.EmailTemplate.EmailTemplateSubject)
+                                        @*<label class="control-label" data-ng-bind="EmailTemplateModel.EmailTemplate.EmailTemplateName"></label>*@
+                                    </div>
+                                </div>
+
+                                <div class=" col-sm-12 form-group">
+                                    <label class="col-md-3 control-label required ">
+                                        @Resource.Subject
+                                    </label>
+                                    <div class="col-md-5 ">
+
+                                        @Html.TextBoxFor(q => q.EmailTemplate.EmailTemplateSubject, new
+                                        {
+                                            @class = "form-control input-sm",
+                                            data_ng_model = "EmailTemplateModel.EmailTemplate.EmailTemplateSubject",
+                                            placeholder = @Resource.Subject,
+                                            maxlength = 500
+                                        })
+                                        @Html.ValidationMessageFor(q => q.EmailTemplate.EmailTemplateSubject)
+                                    </div>
+                                </div>
+
+                                <div class=" col-sm-12 form-group">
+                                    <label class="col-md-3 control-label required ">
+                                        Email Type
+                                    </label>
+                                    <div class="col-md-5 ">
+                                        @Html.DropDownListFor(q => q.EmailTemplate.Email, new SelectList(ViewBag.EmailTypeList, "Value", "Title"), "Select", new { @id = "EmailTemplateTypeIDs", @class = "form-control input-sm requiredStrip" })
+                                    </div>
+                                </div>
+
+                                <div class=" col-sm-12 form-group">
+                                    <label class="col-md-3 control-label required ">
+                                        Module
+                                    </label>
+                                    <div class="col-md-5 ">
+                                        @Html.DropDownListFor(q => q.EmailTemplate.Module, new SelectList(ViewBag.ModuleList, "Value", "Title"), "Select", new { @id = "ddlModuleName", @class = "form-control input-sm requiredStrip" })
+
+                                    </div>
+                                </div>
+
+                                <div class=" col-sm-12 form-group">
+                                    <label class="col-md-3 control-label">
+                                        Insert Fields
+                                    </label>
+                                    <div class="col-md-5 ">
+                                        <select class="form-control input-sm" id="selectToken" onchange="SelectFields();">
+                                            <option value="0">@Resource.Select</option>
+                                            <option data-ng-repeat="option in TokenList" value="{{option.Tokens}}">{{option.Tokens}}</option>
+                                        </select>
+
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-3 control-label required">@Resource.Body</label>
+                                    @if (Model.EmailTemplate.EmailTemplateID == ((int)EnumEmailType.Schedule_Notification_SMS) || Model.EmailTemplate.EmailTemplateID == ((int)EnumEmailType.Schedule_Reminder_SMS))
+                                    {
+                                        <div class="col-md-9">
+                                            @Html.TextAreaFor(q => q.EmailTemplate.EmailTemplateBody,
+new
+{
+data_ng_model = "te",
+@class = "form-control input-sm",
+id = "EmailBody",
+rows = "10",
+})
+                                            @Html.ValidationMessageFor(x => x.EmailTemplate.EmailTemplateBody)
+                                        </div>
+                                    }
+
+                                    else
+                                    {
+                                        <div class="col-md-7">
+                                            @Html.TextAreaFor(q => q.EmailTemplate.EmailTemplateBody,
+new
+{
+data_ng_model = "EmailTemplateModel.EmailTemplate.EmailTemplateBody",
+@class = "dirSummerNoteEditor form-control",
+@min_Height = "400",
+id = "EmailBody1"
+})
+                                            @Html.ValidationMessageFor(x => x.EmailTemplate.EmailTemplateBody)
+                                        </div>
+                                    }
+
+                                </div>
+
+                                @*<div class="col-md-12 form-group">
+                                        <label class="col-md-3 control-label">@Resource.Token</label>
+                                        <div class="col-md-8">
+
+                                            <label class="control-label " style="display:inline" data-ng-bind="EmailTemplateModel.EmailTemplate.Token"></label>
+                                        </div>
+                                    </div>*@
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 form-group no-margin no-padding">
+                <input type="submit" data-ng-click="SaveEmailTemplateDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model.EmailTemplate != null && Model.EmailTemplate.EmailTemplateID > 0 ? Resource.Update : @Resource.Save)" />
+                <a href="@Constants.EmailTemplateListURL">
+                    <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                </a>
+            </div>
+
+        </div>
+    </div>
+</form>
+</div>
+
+<script>
+
+    @section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/emailtemplate/addemailtemplate")
+    }
+</script>

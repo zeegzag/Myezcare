@@ -1,0 +1,169 @@
+﻿@model ChangeServiceCodeModel
+<div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 no-padding margin-top-minus-10">
+    <h3 class="inline col-md-8 padding-left-0">@Resource.EnterNewServiceCodeDetail</h3>
+
+</div>
+<hr class="clearfix" />
+<div class="row">
+
+    <div id="filter-panel" class="filter-panel col-md-12 clearfix no-padding">
+        <form id="searchCSC2">
+            <div class="form-group col-lg-2 col-md-2 col-sm-3">
+                <label class="control-label">@Resource.Payor</label>
+                @Html.DropDownListFor(p => p.SearchNote.PayorID, Model.Payors.ToSelectList(Model.SearchNote.PayorID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                    new
+                    {
+                        convert_to_number = "",
+                        id = "PayorID",
+                        data_ng_model = "SearchNoteModel.PayorID",
+                        data_ng_init = "SearchNoteModel.PayorID=SearchNoteModel.PayorID==''?null:SearchNoteModel.PayorID",
+                        @class = "form-control input-sm",
+                        disabled = "disabled"
+                    })
+                @Html.ValidationMessageFor(p => p.Payors)
+            </div>
+            <div class="form-group col-lg-2 col-md-1 col-sm-2  col-sm-3">
+                <label class="control-label">@Resource.POS</label>
+                <div>
+                    @Html.DropDownListFor(p => p.SearchNote.PosID, Model.POSList.ToSelectList(Model.SearchNote.PosID.ToString() ?? "", "PosName", "PosID", @Resource.Select, ""),
+                        new
+                        {
+                            convert_to_number = "",
+                            id = "PosID",
+                            data_ng_model = "SearchNoteModel.PosID",
+                            data_ng_init = "SearchNoteModel.PosID=SearchNoteModel.PosID==''?null:SearchNoteModel.PosID",
+                            @class = "form-control input-sm",
+                            disabled = "disabled"
+                        })
+                </div>
+            </div>
+            <div class="form-group col-lg-2 col-md-2 col-sm-3">
+                <label class="control-label">@Resource.ServiceCode</label>
+                @Html.DropDownListFor(p => p.SearchNote.ServiceCodeID, Model.ServiceCodes.ToSelectList(Model.SearchNote.ServiceCodeID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                    new
+                    {
+                        convert_to_number = "",
+                        id = "ServiceCodeID",
+                        data_ng_model = "SearchNoteModel.ServiceCodeID",
+                        data_ng_init = "SearchNoteModel.ServiceCodeID=SearchNoteModel.ServiceCodeID==''?null:SearchNoteModel.ServiceCodeID",
+                        @class = "form-control input-sm",
+                        disabled = "disabled"
+                    })
+            </div>
+
+
+
+            <div class="form-group  col-lg-12 space15 margin-top-30">
+                <span class="font-size-18 bold inline col-lg-12 padding-left-0">@Resource.SelectNewServiceCode</span>
+            </div>
+
+
+            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                <label class="control-label">@Resource.NewServiceCode</label>
+                <div>
+                    @Html.DropDownListFor(p => p.SearchNote.NewServiceCodeID, Model.ServiceCodes.ToSelectList(Model.SearchNote.NewServiceCodeID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                        new
+                        {
+                            convert_to_number = "",
+                            id = "NewServiceCodeID",
+                            data_ng_model = "SearchNoteModel.NewServiceCodeID",
+                            data_ng_init = "SearchNoteModel.NewServiceCodeID=SearchNoteModel.NewServiceCodeID==''?null:SearchNoteModel.NewServiceCodeID",
+                            @class = "form-control input-sm"
+                        })
+                </div>
+            </div>
+
+            <div class="form-group col-lg-2 col-md-2 col-sm-3">
+                <label class="control-label">@Resource.NewServiceStartDate
+                    <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.NewServiceStartDateHelp" data-ng-custom-class="tooltip-extra-z-index"></i>
+                </label>
+                <div class="input-group date no-focus" datepicker="SearchNoteModel.ServiceStartDate" ng-dateval="SearchNoteModel.ServiceStartDate">
+                    @Html.TextBoxFor(m => m.SearchNote.ServiceStartDate, new
+                    {
+                        @class = "no-focus form-control input-sm dateInputMask",
+                        placeholder = @Resource.ServiceStartDate,
+                        disabled = "disabled"
+                    })
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+
+
+            <div>
+                <div class="form-group col-lg-2 clearfix">
+                    <button class="form-control btn btn-sm red" data-ng-click="ValidateServiceCode()">@Resource.ValidateServiceCode</button>
+                </div>
+                <div class="form-group col-lg-6">
+                    <i data-ng-show="SearchNoteModel.ValidateServiceCodePassed==2"><span class="font-red font-weight-600">@Resource.Failed:&nbsp;</span>
+                        <span class="" data-ng-bind-html="SearchNoteModel.ValidateServiceCodeMsg"></span></i>
+                    <span data-ng-show="SearchNoteModel.ValidateServiceCodePassed==1" class="badge badge-success">@Resource.Passed</span>
+                </div>
+            </div>
+
+
+
+
+        </form>
+    </div>
+</div>
+
+
+<div class="space50"></div>
+
+<div class="row" data-ng-show="currentStep == 2 && SearchNoteModel.ValidateServiceCodePassed==1">
+    <div class="row padding-left-right-10">
+        <div class="col-lg-8 col-md-8 col-sm-12">
+            <div class="portlet-body">
+                <div class=" dataTables_wrapper" data-ng-if="SelectedServiceCode.length > 0">
+                    <span>@Resource.ConfirmServiceCode <span class="font-red">**</span></span>
+                    <table class="table table-advance table-bordered table-striped table-condensed">
+                        <thead>
+                        <tr>
+                            <th>
+                                <strong>@Resource.ServiceCode</strong>
+                            </th>
+                            <th>
+                                <strong>@Resource.Payor</strong>
+                            </th>
+                            <th>
+                                <strong>@Resource.POS</strong>
+                            </th>
+                            <th>
+                                <strong>@Resource.Rate</strong>
+                            </th>
+                            <th>
+                                <strong>@Resource.StartDate</strong>
+                            </th>
+                            <th>
+                                <strong>@Resource.EndDate</strong>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody>
+
+                        <tr data-ng-repeat="item in SelectedServiceCode">
+                            <td>{{item.ServiceCode}}</td>
+                            <td>{{item.Payor}}</td>
+                            <td>{{item.PosID}}</td>
+                            <td>{{item.Rate | currency:'@Resource.DollerSymbol'}}</td>
+                            <td>{{item.POSStartDate}}</td>
+                            <td>{{item.POSEndDate}}</td>
+                        </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-lg-12 col-md-12 col-sm-12 margin-top-15">
+            <div class="form-group col-lg-2 clearfix no-left-padding">
+                <button class="form-control btn btn-sm btn-success" data-ng-click="ReplaceServiceCode()">Replace Service Code</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+

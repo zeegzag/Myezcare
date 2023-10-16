@@ -1,0 +1,46 @@
+@{
+    ViewBag.Title = "FormLoad";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+    string url = string.Format("{0}/fr/{1}&orbeon-embeddable=true&EmployeeID={2}&ReferralID={3}&OrganizationID={4}", ConfigSettings.OrbeonBaseUrl, @Request.QueryString["FormURL"], @Request.QueryString["EmployeeID"], @Request.QueryString["ReferralID"], @Request.QueryString["OrganizationId"]);
+}
+
+
+@model SaveNewEBFormModel
+@Html.Hidden("hdn_Model", Common.SerializeObject(Model))
+
+<style>
+    iframe .navbar-inner { display: none !important; }
+</style>
+<div>
+    <div id="form-container">
+        <iframe id="myIFrame"
+        src="@string.Format("{0}/resources/forms/ezcare/embed.html?formURL={1}", ConfigSettings.OrbeonBaseUrl, HttpUtility.UrlEncode(url))"
+        style="position: absolute;  top: 0px; left: 0px; bottom:50px; right: 0px; width: 100%; height: 100%; border: none; margin: 0; padding: 0; overflow: hidden; z-index: 999999;"></iframe>
+    </div>
+</div>
+
+@section scriptsHeads{
+    <script type="text/javascript">
+        var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+        var eventer = window[eventMethod];
+        var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+        // Listen to message from child window
+        eventer(messageEvent, function (e) {
+            console.log('message', e.data);
+            if (e.data.indexOf('ClearFrame:true') >= 0) {
+                var _myIframe = document.getElementById('myIFrame');
+                _myIframe.src = "@string.Format("{0}/resources/forms/ezcare/embed.html?logout=1", ConfigSettings.OrbeonBaseUrl)";
+                setTimeout(() => { window.parent.postMessage('ClearFrameCompleted:true', "*"); }, 1000);
+            } else {
+                if (window.parent && window.parent.opener) {
+                    window.parent.opener.postMessage(e.data, "*");
+                }
+                else {
+                    window.parent.postMessage(e.data, "*");
+                }
+                
+            }
+        }, false);
+    </script>
+
+}

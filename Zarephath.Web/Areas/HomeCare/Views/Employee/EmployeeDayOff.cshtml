@@ -1,0 +1,327 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.EmployeePTOList);
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmployeeDayOff;
+}
+
+@model SetEmpDayOffListPage
+
+@Html.Hidden("hdnSetEmployeeDayOffListPage", Common.SerializeObject(Model))
+<div data-ng-controller="EmployeeDayOffListController">
+    @*<div class="page-bar">
+        <h3 class="page-title">@Resource.EmployeeDayOffList &nbsp;<small>@Resource.EmployeeDayOffInformation</small>
+            <button class="letter-space btn btn-sm green-jungle pull-right"
+                data-ng-click="OpenEmpDayOffModal()">
+                <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.EmployeeDayOff</button>
+        </h3>
+    </div>*@
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @*@if (Common.HasPermission(Constants.Permission_Employee_AddUpdate))
+            {
+                <div class="btn-group" data-ng-show="EmployeeDayOffList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllEmployeeDayOff" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllEmployeeDayOff"></label>
+                    </span>
+                </div>
+            }*@
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchEmployeeDayOffModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchEmployeeDayOffModel.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempSearchEmployeeDayOffModel.IsDeleted",
+                                                                          data_ng_init = "TempSearchEmployeeDayOffModel.IsDeleted = TempSearchEmployeeDayOffModel.IsDeleted==null?'-1':TempSearchEmployeeDayOffModel.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchEmployeeDayOff()"
+                                                                      })
+            </div>
+            @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeePTO_Delete)))
+            {
+                <div class="btn-group" data-ng-if="SelectedEmployeeDayOffIds.length > 0">
+                    <button type="button" data-ng-click="DeleteEmployeeDayOff()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchEmployeeDayOffModel.IsDeleted==0?'@Resource.DisableSelected' :(TempSearchEmployeeDayOffModel.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                    </button>
+                </div>
+            }
+
+            @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeePTO_Add)))
+            {
+                <div class="btn-group pull-right">
+                    <button class="letter-space btn btn-sm green-jungle"
+                        data-ng-click="OpenEmpDayOffModal()">
+                        <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.PersonalTimeOff
+                    </button>
+                </div>
+            }
+            <div class="inline-block pull-right" data-ng-show="EmployeeDayOffList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="EmployeeDayOffListPager.maxSize" on-page-change="EmployeeDayOffListPager.pageChanged(newPageNumber)" pagination-id="EmployeeDayOffListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space10"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive tabbable-custom">
+                        <form id="frmEmployeeDayOfflist">
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                                        {
+                                            <th class="width-20px"></th>
+                                        }
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('Employee')">@Resource.Employee</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'Employee'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('StartTime')">@Resource.StartTime</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'StartTime'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('EndTime')">@Resource.EndTime</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'EndTime'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('SubmittedBy')">@Resource.SubmittedBy</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'SubmittedBy'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('SubmittedDate')">@Resource.SubmittedDate</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'SubmittedDate'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('Status')">@Resource.Status</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'IsApproved'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('DayOffTypeID')">@Resource.Type</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'DayOffTypeID'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="hidden">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('ActionTakenByName')">@Resource.ActionTakenByName</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'ActionTakenByName'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="col-sm-3 col-md-3 col-lg-3">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeDayOffListPager.sortColumn('Comment')">@Resource.CommentReason</a>
+                                            <span class="sortorder" data-ng-show="EmployeeDayOffListPager.sortIndex === 'Comment'" data-ng-class="{reverse:EmployeeDayOffListPager.reverse}"></span>
+                                        </th>
+
+
+                                        <th width="200">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                                        {
+                                            <td>
+                                                <div class="btn-group" data-ng-show="EmployeeDayOffList.length > 0">
+                                                    <input id="SelectAllEmployeeDayOff" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                    <label for="SelectAllEmployeeDayOff"></label>
+                                                </div>
+                                            </td>
+                                        }
+                                        <td>
+                                            @*@Html.TextBoxFor(m => m.SearchEmployeeDayOffModel.Employee, new { data_ng_model = "TempSearchEmployeeDayOffModel.Employee", @class = "form-control input-sm", placeholder = Resource.EmployeeName, maxlength = 100 })*@
+
+                                            <div>
+                                                <select class="form-control input-sm"
+                                                    data-ng-init="TempSearchEmployeeDayOffModel.EmployeeID=TempSearchEmployeeDayOffModel.EmployeeID==''?null:TempSearchEmployeeDayOffModel.EmployeeID.toString()"
+                                                    data-ng-model="TempSearchEmployeeDayOffModel.EmployeeID"
+                                                    name="ETSModelEmployee"
+                                                    disabled="@(Model.IsPartial == true && Model.SearchEmployeeDayOffModel.EmployeeID > 0)"
+                                                    >
+                                                    <option value="">@Resource.SelectEmployee</option>
+                                                    <option data-ng-repeat="option in EmployeeDayOffModel.EmployeeList" value="{{option.EmployeeID}}">{{option.Name}}</option>
+                                                </select>
+                                            </div>
+
+                                        </td>
+                                        <td>
+                                            <div class="input-group date date-picker pull-right" datepicker="TempSearchEmployeeDayOffModel.StartTime"
+                                                ng-dateval="TempSearchEmployeeDayOffModel.StartTime" data-ng-maxdate="TempSearchEmployeeDayOffModel.EndTime">
+                                                @Html.TextBoxFor(m => m.SearchEmployeeDayOffModel.StartTime, new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask",
+                                                    maxlength = "50",
+                                                    placeholder = Resource.DateFormat
+                                                })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                @Html.ValidationMessageFor(m => m.SearchEmployeeDayOffModel.StartTime)
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group date date-picker pull-right" datepicker="TempSearchEmployeeDayOffModel.EndTime"
+                                                ng-dateval="TempSearchEmployeeDayOffModel.EndTime" data-ng-mindate="TempSearchEmployeeDayOffModel.StartTime">
+                                                @Html.TextBoxFor(m => m.SearchEmployeeDayOffModel.EndTime, new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask",
+                                                    maxlength = "50",
+                                                    placeholder = Resource.DateFormat
+                                                })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                @Html.ValidationMessageFor(m => m.SearchEmployeeDayOffModel.EndTime)
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchEmployeeDayOffModel.SubmittedBy, new { data_ng_model = "TempSearchEmployeeDayOffModel.SubmittedBy", @class = "form-control input-sm", placeholder = Resource.SubmittedBy, maxlength = 100 })
+                                        </td>
+                                        <td>
+                                            <div class="input-group date date-picker pull-right"
+                                                datepicker="TempSearchEmployeeDayOffModel.SubmittedDate" ng-dateval="TempSearchEmployeeDayOffModel.SubmittedDate">
+                                                @Html.TextBoxFor(m => m.SearchEmployeeDayOffModel.SubmittedDate, new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask",
+                                                    maxlength = "50",
+                                                    placeholder = Resource.DateFormat
+                                                })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </td>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="hidden"></td>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs float-left" data-ng-click="SearchEmployeeDayOff()"/>
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in EmployeeDayOffList | itemsPerPage: EmployeeDayOffListPager.pageSize" total-items="EmployeeDayOffListPager.totalRecords" current-page="EmployeeDayOffListPager.currentPage" pagination-id="EmployeeDayOffListPagerID">
+                                        @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                                        {
+                                            <td class="text-align-center">
+                                                <div @*data-ng-show="item.DayOffStatus=='@EmployeeDayOff.EmployeeDayOffStatus.InProgress'"*@>
+                                                    <input type="checkbox" class="unicheckbox text-align-center"
+                                                        data-ng-model="item.IsChecked" data-ng-change="SelectEmployeeDayOff(item)" val="item.IsChecked">
+                                                </div>
+                                            </td>
+                                        }
+                                        <td>
+                                            <span data-ng-bind="item.EmployeeName"></span>
+                                        </td>
+                                        <td data-ng-bind="item.StrStartTime | orgtime"></td>
+                                        <td data-ng-bind="item.StrEndTime | orgtime"></td>
+                                        <td data-ng-bind="item.SubmittedBy"></td>
+                                        <td data-ng-bind="item.CreatedDate|dateformat | orgdate"></td>
+                                        <td title="{{item.DayOffStatus  +' by '+ item.ActionTakenByName}}">
+                                            <span data-ng-bind="item.DayOffStatus" class="badge"
+                                                data-ng-class="{
+                                                'badge-danger':item.DayOffStatus=='@EmployeeDayOff.EmployeeDayOffStatus.Denied',
+                                                'badge-success':item.DayOffStatus=='@EmployeeDayOff.EmployeeDayOffStatus.Approved',
+                                                'badge-default':item.DayOffStatus=='@EmployeeDayOff.EmployeeDayOffStatus.InProgress'
+                                                }"
+                                                ></span>
+                                        </td>
+                                        <td data-ng-bind="item.StrDayOffTypeID"></td>
+                                        <td class="hidden" data-ng-bind="item.ActionTakenByName"></td>
+                                        <td>
+                                            @*<span id="pop-assignee" data-toggle="popover" popover-html="#popover-assingee" data-ng-bind="item.EmployeeComment" ng-value="item.EmployeeComment" savecallback="SaveAssignee" ng-header="Assignee" ng-width="350">
+                                                {{item.EmployeeComment.length>50 ? item.EmployeeComment.substr(0,50)+'...' :  item.EmployeeComment}}
+                                            </span>*@
+                                            <span href="javascript:void(0);" class="display-block pull-left cursor-pointer" common-detail-popover="ABC" popover-trigger="click" data-content="{{item.EmployeeComment}}"
+                                               ng-header="@Resource.CommentReason">{{item.EmployeeComment.length>50 ? item.EmployeeComment.substr(0,50)+'...' :  item.EmployeeComment}}</span>
+                                        </td>
+                                        <td>
+
+                                            <div data-ng-show="item.DayOffStatus=='@EmployeeDayOff.EmployeeDayOffStatus.InProgress'">
+                                                @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeePTO_Add)))
+                                                {
+                                                    <a href="javascript:void(0);" data-ng-click="OpenEmpDayOffModal(item,true)" class="btn btn-xs yellow-crusta" title="@Resource.ApproveDenied"><i class="fa fa-adjust"></i></a>
+                                                    <a href="javascript:void(0);" data-ng-click="OpenEmpDayOffModal(item)" class="btn btn-xs blue" title="@Resource.Edit"><i class="fa fa-edit"></i></a>
+                                                }
+                                                @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeePTO_Delete)))
+                                                {
+                                                    <a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteEmployeeDayOff(item.EmployeeDayOffID,'@Resource.Enable')" class="btn btn-xs green" title="@Resource.Enable"><i class="fa fa-edit"></i></a>
+                                                    <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteEmployeeDayOff(item.EmployeeDayOffID,'@Resource.Disable')" class="btn btn-xs red" title="@Resource.Disable"><i class="fa fa-trash"></i></a>
+                                                }
+
+                                            </div>
+                                            <div data-ng-hide="item.DayOffStatus=='@EmployeeDayOff.EmployeeDayOffStatus.InProgress'">
+                                                @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeePTO_Add)))
+                                                {
+                                                    <a href="javascript:void(0);" data-ng-click="OpenEmpDayOffModal(item,true,true)" class="btn btn-xs  grey-cascade" title="@Resource.ViewDetails"><i class="fa fa-eye"></i></a>
+                                                }
+                                                @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeePTO_Delete)))
+                                                {
+                                                    <a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteEmployeeDayOff(item.EmployeeDayOffID,'@Resource.Enable')" class="btn btn-xs green" title="@Resource.Enable"><i class="fa fa-edit"></i></a>
+                                                    <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteEmployeeDayOff(item.EmployeeDayOffID,'@Resource.Disable')" class="btn btn-xs red" title="@Resource.Disable"><i class="fa fa-trash"></i></a>
+                                                }
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="EmployeeList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(EmployeeDayOffListPager.pageSize * EmployeeDayOffListPager.currentPage) - EmployeeDayOffListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(EmployeeDayOffListPager.pageSize == EmployeeDayOffListPager.currentPageSize) ? (EmployeeDayOffListPager.pageSize * EmployeeDayOffListPager.currentPage) :(EmployeeDayOffListPager.pageSize * EmployeeDayOffListPager.currentPage) - EmployeeDayOffListPager.pageSize  + EmployeeDayOffListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeDayOffListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="EmployeeDayOffListPager.maxSize" on-page-change="EmployeeDayOffListPager.pageChanged(newPageNumber)" pagination-id="EmployeeDayOffListPager"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="EmployeeDayOffList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @Html.Partial("Partial/_AddEMPDayOff", Model)
+
+    @Html.Partial("/Areas/HomeCare/Views/Schedule/Partial/01/_EmpRefSchDetailPopover.cshtml")
+
+
+</div>
+@section Scripts{
+    @if (!Model.IsPartial)
+    {
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/employeedayofflist")
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/emprefschoptions")
+         
+    }
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.PersonalTimeOff)';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.PersonalTimeOff)';
+    </script>
+}

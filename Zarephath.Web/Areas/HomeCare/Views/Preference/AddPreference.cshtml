@@ -1,0 +1,111 @@
+﻿@{
+    var IsEdit = Model != null && Model.Preference.PreferenceID> 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (IsEdit ? Resource.EditPereferenceSkill : Resource.AddPereferenceSkill));
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_PreferenceAdd;
+}
+
+@model AddPreferenceModel
+
+@if (Model != null)
+{
+    @Html.Hidden("hdnPreferenceModel", Common.SerializeObject(Model))
+    <div data-ng-controller="AddPreferenceController">
+        <form class="form-horizontal" id="frmPreference">
+            <div class="page-bar">
+                <h3 class="page-title">
+                    @(IsEdit ? Resource.EditPereferenceSkill : Resource.AddPereferenceSkill)
+                    @*<small>@Resource.AddPereferenceInformation</small>*@
+                    @*<input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(IsEdit ? Resource.Update : Resource.Save)" />
+                    <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />*@
+                </h3>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div class="fscontainer">
+                                <div class="legend">
+                                    @Resource.PreferenceSkillDetail
+                                </div>
+
+                                <div class="col-sm-push-2 col-sm-7 no-padding">
+                                    <div class="col-sm-12">
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.Type</label>
+                                            <div class="col-md-8 col-sm-12">
+                                                @if (IsEdit)
+                                                {
+                                                    @Html.DropDownListFor(p => p.Preference.KeyType, Model.PreferenceTypes.ToSelectList(Model.Preference.KeyType ?? "", "Name", "Value", @Resource.SelectType, ""),
+                                                        new
+                                                        {
+                                                            data_ng_model = "Preference.KeyType",
+                                                            data_ng_init = "Preference.KeyType=Preference.KeyType==''?null:Preference.KeyType",
+                                                            @class = "form-control input-sm requiredStrip",
+                                                            disabled = ""
+
+                                                        })
+                                                    @Html.ValidationMessageFor(q => q.Preference.KeyType)
+                                                }
+                                                else
+                                                {
+  
+                                                    @Html.DropDownListFor(p => p.Preference.KeyType, Model.PreferenceTypes.ToSelectList(Model.Preference.KeyType ?? "", "Name", "Value", @Resource.SelectType, ""),
+                                                        new
+                                                        {
+                                                            data_ng_model = "Preference.KeyType",
+                                                            data_ng_init = "Preference.KeyType=Preference.KeyType==''?null:Preference.KeyType",
+                                                            @class = "form-control input-sm",
+
+                                                        })
+                                                    @Html.ValidationMessageFor(q => q.Preference.KeyType)
+                                                }
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.Name</label>
+                                            <div class="col-md-8 col-sm-12">
+                                                @Html.TextBoxFor(q => q.Preference.PreferenceName, new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "Preference.PreferenceName",
+                                                    placeholder = Resource.EnterName,
+                                                    maxlength = 100
+                                                })
+                                                @Html.ValidationMessageFor(q => q.Preference.PreferenceName)
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 form-group text-center">
+                        <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle " value="@(IsEdit ? Resource.Update : Resource.Save)" />
+                        <a>
+                            <input type="button" class="btn btn-sm red-mint " data-ng-click="Cancel()" value="@Resource.Cancel" />
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+
+        </form>
+    </div>
+}
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/preference/addpreference")
+}

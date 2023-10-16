@@ -1,0 +1,85 @@
+﻿@model DDMasterModel
+<div class="modal fade" id="addDDMasterModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false"
+     aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="font-size-20">@Resource.ParentChildMapping</span>
+                <button type="button" class="close" aria-label="Close" data-ng-click="ShowMappingPopup(false)"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <form id="frmDDMasterModelPopup">
+                            <div class="col-md-12 col-md-12 no-padding">
+                                <div class="col-lg-1 col-md-1 col-sm-1"></div>
+                                <div class="col-lg-10 col-md-10 col-sm-10">
+                                    <label class="control-label required margin-bottom-5">@Resource.ParentItemType</label>
+                                    @Html.DropDownListFor(m => m.MappingDDMaster.LuDDTypesParent, Model.MappingDDMaster.ParentTypeList.ToSelectList("", "Name", "DDMasterTypeID", @Resource.Select, ""),
+                                       new
+                                       {
+                                           @class = "form-control input-sm",
+                                           data_ng_model = "MappingDDMaster.LuDDTypesParent"
+                                       })
+                                    @Html.ValidationMessageFor(m => m.MappingDDMaster.LuDDTypesParent)
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-1"></div>
+                            </div>
+                            <div class="col-md-12 col-md-12 no-padding margin-top-10">
+                                <div class="col-lg-1 col-md-1 col-sm-1"></div>
+                                <div class="col-lg-10 col-md-10 col-sm-10">
+                                    <label class="control-label required margin-bottom-5">@Resource.ChildItemType</label>
+                                    @Html.DropDownListFor(m => m.MappingDDMaster.LuDDTypesChild, new List<SelectListItem>() { new SelectListItem() { Value = "", Text = "Select" } },
+                                       new
+                                       {
+                                           @class = "form-control input-sm",
+                                           data_ng_model = "MappingDDMaster.LuDDTypesChild",
+                                           data_ng_options = "dd.DDMasterTypeID as dd.Name for dd in ChildItemType"
+                                       })
+                                    @Html.ValidationMessageFor(m => m.MappingDDMaster.LuDDTypesChild)
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-1"></div>
+                            </div>
+                            <div class="col-md-12 col-md-12 no-padding margin-top-10">
+                                <div class="col-lg-1 col-md-1 col-sm-1"></div>
+                                <div class="col-lg-10 col-md-10 col-sm-10">
+                                    <label class="control-label required margin-bottom-5">@Resource.ParentTask</label>
+                                    @Html.DropDownListFor(m => m.MappingDDMaster.DDMasterIDParent, new List<SelectListItem>() { new SelectListItem() { Value = "", Text = "Select" } },
+                                       new
+                                       {
+                                           @class = "form-control input-sm",
+                                           data_ng_model = "MappingDDMaster.DDMasterIDParent",
+                                           data_ng_options = "dd.DDMasterID as dd.Title for dd in DDParentMasterList"
+                                       })
+                                    @Html.ValidationMessageFor(m => m.MappingDDMaster.DDMasterIDParent)
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-1"></div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12 no-padding margin-top-10">
+                                <div class="col-lg-1 col-md-1 col-sm-1"></div>
+                                @Html.TextBoxFor(m => m.MappingDDMaster.DDMasterIDChild, new { data_ng_model = "DDMasterIDChild", @class = "form-control input-sm hideErrorContent replaceErrorSource" })
+                                @Html.ValidationMessageFor(m => m.MappingDDMaster.DDMasterIDChild)
+                                <div class="col-lg-10 col-md-10 col-sm-10">
+                                    <label class="control-label required margin-bottom-5">@Resource.ChildTask</label>
+                                    <div class="replaceErrorDest">
+                                        <select class="form-control input-sm" multiple="multiple" title="@Resource.ChildTask"
+                                                data-val="true" selectpicker="DDMasterIDChild" name="DDMasterIDChild">
+                                            <option data-ng-repeat="option in DDChildMasterList" value="{{option.DDMasterID}}">{{option.Title}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-1 col-md-1 col-sm-1"></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="pull-right">
+                    <button type="submit" data-ng-click="ShowMappingPopup(false)" class="btn btn-sm red-mint">@Resource.Cancel</button>
+                    <button type="submit" data-ng-click="SaveGeneralDDTasks()" class="btn btn-sm green-jungle">@Resource.Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

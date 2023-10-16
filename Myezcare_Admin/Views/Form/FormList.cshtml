@@ -1,0 +1,224 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.FormList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_FormList;
+}
+@model FormPageModel
+@Html.Hidden("hdnFormListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="FormListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.FormList
+
+            <a href="javascript:void(0)" class="btn btn-sm green-jungle letter-space pull-right"
+                data-ng-click="SyncFormList()"><i class="fa fa-refresh">&nbsp;&nbsp;</i>@Resource.SyncFormList</a>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchFormModel.IsDeleted, Common.SetDeleteFilter().ToSelectList(Convert.ToString(Model.SearchFormModel.IsDeleted), "Name", "Value", "", ""),
+                    new
+                    {
+                        id = "IsDeleted",
+                        data_ng_model = "TempSearchFormModel.IsDeleted",
+                        data_ng_init = "TempSearchFormModel.IsDeleted = TempSearchFormModel.IsDeleted==null?'-1':TempSearchFormModel.IsDeleted.toString()",
+                        @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                        data_ng_change = "SearchFormList()"
+                    })
+            </div>
+            <div class="btn-group" data-ng-if="SelectedFormIds.length > 0">
+                <button type="button" data-ng-click="DeleteForm()" class="btn blue btn-sm grey border-grey-cascade">
+                    <i class="fa fa-random margin-right-10"></i>{{TempSearchFormModel.IsDeleted==0 ?'@Resource.DisableSelected' :(TempSearchFormModel.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                </button>
+
+
+                
+            </div>
+            
+            <div class="btn-group">
+                <div class="padding-left-15">
+                    @Html.DropDownListFor(p => p.SearchFormModel.MarketID, Model.MarketList.ToSelectList(Model.SearchFormModel.MarketID.ToString() ?? "", "Name", "Id", Resource.AllMarket, ""),
+                        new
+                        {
+                            id = "MarketID",
+                            convert_to_number = "",
+                            data_ng_model = "TempSearchFormModel.MarketID",
+                            data_ng_init = "TempSearchFormModel.MarketID=TempSearchFormModel.MarketID==''?null:TempSearchFormModel.MarketID",
+                            @class = "form-control input-sm",
+                            data_val = "false",
+                            data_ng_change = "SearchFormList()"
+                        })
+                </div>
+
+            </div>
+
+
+            <div class="inline-block pull-right" data-ng-show="FormList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" on-page-change="FormListPager.pageChanged(newPageNumber)" pagination-id="FormListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="">
+                        <form id="frmFormlist">
+                            <table class="table table-pinned table-bordered table-striped table-condensed">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-50px text-align-center">
+                                            <div class="btn-group" data-ng-show="FormList.length > 0">
+                                                <input id="SelectAllForm" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll(SelectAllCheckbox)" val="SelectAllCheckbox">
+                                                <label for="SelectAllForm"></label>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('Name')">@Resource.FormNumber</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'Name'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('FormLongName')">@Resource.FormName</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormLongName'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('Version')">@Resource.Version</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'Version'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('FormCategory')">@Resource.Category</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormCategory'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.sortColumn('FormPrice')">@Resource.Price</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormPrice'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-140px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        <td></td>
+                                        <td class="">
+                                            @Html.TextBoxFor(m => m.SearchFormModel.FormNumber, new { data_ng_model = "TempSearchFormModel.FormNumber", delete_if_empty = "", @class = "form-control input-sm", placeholder = Resource.FormNumber, maxlength = 20 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchFormModel.FormName, new { data_ng_model = "TempSearchFormModel.FormName", delete_if_empty = "", @class = "form-control input-sm", placeholder = Resource.FormName, maxlength = 20 })
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchFormModel.FormCategoryID, Model.FormCategoryList.ToSelectList(Model.SearchFormModel.FormCategoryID.ToString() ?? "", "Name", "Id", Resource.Select, ""),
+                                                new
+                                                {
+                                                    id = "FormCategoryID",
+                                                    convert_to_number = "",
+                                                    data_ng_model = "TempSearchFormModel.FormCategoryID",
+                                                    data_ng_init = "TempSearchFormModel.FormCategoryID=TempSearchFormModel.FormCategoryID==''?null:TempSearchFormModel.FormCategoryID",
+                                                    @class = "form-control input-sm",
+                                                    data_val = "false"
+                                                })
+                                        </td>
+
+
+                                        <td></td>
+
+                                        <td class="text-align-center">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchFormList()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':form.IsDeleted}" dir-paginate="form in FormList | itemsPerPage: FormListPager.pageSize" total-items="FormListPager.totalRecords" current-page="FormListPager.currentPage" pagination-id="FormListPagerID">
+                                        <td  class="text-align-center">
+                                            <span>
+                                                <input type="checkbox" class="unicheckbox" data-ng-model="form.IsChecked" data-ng-change="SelectForm(form)" val="form.IsChecked">
+                                            </span>
+                                        </td>
+                                        <td>{{ form.Name }}</td>
+                                        <td>{{ form.FormLongName }}</td>
+                                        <td>{{ form.Version }}</td>
+                                        <td>{{ form.FormCategory }}</td>
+                                        <td>
+                                            <span data-ng-if="!form.IsEditable">{{form.FormPrice | currency }}</span>
+                                            @*<span data-ng-if="form.IsEditable">$</span>*@
+                                            @Html.TextBoxFor(m => m.SearchFormModel.FormPrice,
+                                                new
+                                                {
+                                                    ng_model = "form.FormPrice",
+                                                    @class = "form-control input-xs width-100px",
+                                                    placeholder = @Resource.Price,
+                                                    ng_if = "form.IsEditable",
+                                                    id = "FormPrice{{$index}}",
+                                                    maxlength="7"
+                                                })
+                                            @Html.ValidationMessageFor(m => m.SearchFormModel.FormPrice)
+
+
+                                        </td>
+                                        <td class="text-align-center">
+
+                                            <a href="javascript:void(0);" data-ng-click="EditFormPrice(form,'#FormPrice'+$index)" class="btn btn-xs blue" data-ng-if="!form.IsEditable">@Resource.Edit </a>
+                                            <a href="javascript:void(0);" data-ng-click="SaveFormPrice(form,'#FormPrice'+$index)" class="btn btn-xs green-jungle" data-ng-if="form.IsEditable">@Resource.Save</a>
+                                            <a href="javascript:void(0);" data-ng-click="CancelFormPrice(form)" class="btn btn-xs btn-default grey border-grey-cascade" data-ng-if="form.IsEditable">@Resource.Cancel</a>
+
+
+
+
+                                            <a href="javascript:void(0);" data-ng-show="form.IsDeleted" data-ng-click="DeleteForm(form,'@Resource.Enable')" class="btn btn-xs green servicePlan-enbl-cls"  data-ng-if="!form.IsEditable">@Resource.Enable</a>
+                                            <a href="javascript:void(0);" data-ng-show="!form.IsDeleted" data-ng-click="DeleteForm(form,'@Resource.Disable')" class="btn btn-xs red "  data-ng-if="!form.IsEditable">@Resource.Disable</a>
+
+                                            <a href="javascript:void(0)" class="btn btn-xs green"   data-ng-if="!form.IsEditable" data-ng-click="OpenNewHtmlForm(form)"    title="@Resource.FormPreview"><i class="fa fa-eye"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="FormList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(FormListPager.pageSize * FormListPager.currentPage) - FormListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(FormListPager.pageSize == FormListPager.currentPageSize) ? (FormListPager.pageSize * FormListPager.currentPage) :(FormListPager.pageSize * FormListPager.currentPage) - FormListPager.pageSize  + FormListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="FormListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" on-page-change="FormListPager.pageChanged(newPageNumber)" pagination-id="FormListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="FormList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/form/formlist")
+
+    <script type="text/javascript">
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.FormList)';
+        var CanNotSave = '@Resource.CanNotSave';
+    </script>
+}

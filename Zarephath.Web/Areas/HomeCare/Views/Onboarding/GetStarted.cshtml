@@ -1,0 +1,209 @@
+﻿@{
+    CacheHelper _cacheHelper = new CacheHelper();
+}
+@model OnboardingModel
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+    <meta name="viewport" content="width=device-width" />
+    <title>Organization Onboarding</title>
+    <link rel='shortcut icon' href='@_cacheHelper.FavIcon' class="favicon-logo" type='image/x-icon' />
+    @Styles.Render("~/sitelayout/css")
+    @Styles.Render("~/onboarding/css")
+
+    <script src="https://maps.google.com/maps/api/js?sensor=false&key=AIzaSyA_Pc8Ldr4NbtKti-rQsf5g0PVa4K9VsMs&libraries=places" type="text/javascript"></script>
+
+    @Scripts.Render("~/assets/sitelayout/js")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/generalmaster/_addgeneralmastermodel")
+    @Scripts.Render("~/assets/js/viewjs/siteapp/areas/homecare/onboarding")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/setting/organizationsetting")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/generalmaster/addgeneralmaster")
+
+</head>
+<body data-ng-app="myApp" data-ng-controller="ParentController">
+    <link href="~/Assets/fontawesome/css/all.min.css" rel="stylesheet" />
+    <input type="hidden" id="IsWizard" name="IsWizard" value="True" />
+    <div class="wizardForm">
+        <div class="container">
+            <div class="logo">
+                <img src="~/Assets/images/logo2.png" height="70" alt="logo" />
+            </div>
+            <div class="wizardContainer" data-ng-controller="WizardController">
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="wizardWrap">
+                            @foreach (KeyValuePair<string, string[]> item in Model.Wizard)
+                            {
+                                if (item.Key.Contains("organizationsetting"))
+                                {
+                                    <ul id="organizationsettingul">
+                                        <li id="organizationsettingli" class="title">
+                                            <a href="#"><span><i class="fas fa-cog"></i></span> Organization Settings</a>
+                                        </li>
+                                        <li id="organizationsetting">
+                                            <ul>
+                                                @foreach (var child in item.Value)
+                                                {
+                                                    <li class="@(Model.CurrentStep == child ? "ongoing" : (Model.ActiveSteps.Contains(child) ? "completed" : ""))">
+                                                        <a href="@Url.Action("getstarted","onboarding", new { id = child })"><i class="@(Model.CurrentStep == child ? "fa fa-play" : (Model.ActiveSteps.Contains(child) ? "fa fa-check" : "fa fa-circle"))"></i>	@child</a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+
+                                }
+                                else if (item.Key.Contains("addservicecode"))
+                                {
+                                    <ul id="addservicecodeul">
+                                        <li id="addservicecodeli" class="title">
+                                            <a href="#"><span><i class="fas fa-user-cog"></i></span> Service Code</a>
+                                        </li>
+                                        <li id="addservicecode">
+                                            <ul>
+                                                @foreach (var child in item.Value)
+                                                {
+                                                    <li class="@(Model.CurrentStep == child ? "ongoing" : (Model.ActiveSteps.Contains(child) ? "completed" : ""))">
+                                                        <a href="@Url.Action("getstarted","onboarding", new { id = child })"><i class="@(Model.CurrentStep == child ? "fa fa-play" : (Model.ActiveSteps.Contains(child) ? "fa fa-check" : "fa fa-circle"))"></i>	@child</a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                }
+                                else if (item.Key.Contains("addpayor"))
+                                {
+                                    <ul id="addpayorul">
+                                        <li id="addpayorli" class="title">
+                                            <a href="#"><span><i class="fas fa-user-tag"></i></span> Payors </a>
+                                        </li>
+                                        <li id="addpayor">
+                                            <ul>
+                                                @foreach (var child in item.Value)
+                                                {
+                                                    <li class="@(Model.CurrentStep == child ? "ongoing" : (Model.ActiveSteps.Contains(child) ? "completed" : ""))">
+                                                        <a href="@Url.Action("getstarted","onboarding", new { id = child })"><i class="@(Model.CurrentStep == child ? "fa fa-play" : (Model.ActiveSteps.Contains(child) ? "fa fa-check" : "fa fa-circle"))"></i>	@child</a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                }
+                                else if (item.Key.Contains("generalmasterdetail"))
+                                {
+                                    <ul id="generalmasterdetailul">
+                                        <li id="generalmasterdetailli" class="title">
+                                            <a href="#"><span><i class="fas fa-users"></i></span> Item Types </a>
+                                        </li>
+                                        <li id="generalmasterdetail">
+                                            <ul>
+                                                @foreach (var child in item.Value)
+                                                {
+                                                    <li class="@(Model.CurrentStep == child ? "ongoing" : (Model.ActiveSteps.Contains(child) ? "completed" : ""))">
+                                                        <a href="@Url.Action("getstarted","onboarding", new { id = child })"><i class="@(Model.CurrentStep == child ? "fa fa-play" : (Model.ActiveSteps.Contains(child) ? "fa fa-check" : "fa fa-circle"))"></i>	@child</a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+
+                                }
+                                else if (item.Key.Contains("addvisittask"))
+                                {
+                                    <ul id="addvisittaskul" class="last-nav">
+                                        <li id="addvisittaskli" class="title">
+                                            <a href="#"><span><i class="fas fa-tasks"></i></span> Visit Task </a>
+                                        </li>
+                                        <li id="addvisittask">
+                                            <ul>
+                                                @foreach (var child in item.Value)
+                                                {
+                                                    <li class="@(Model.CurrentStep == child ? "ongoing" : (Model.ActiveSteps.Contains(child) ? "completed" : ""))">
+                                                        <a href="@Url.Action("getstarted","onboarding", new { id = child })"><i class="@(Model.CurrentStep == child ? "fa fa-play" : (Model.ActiveSteps.Contains(child) ? "fa fa-check" : "fa fa-circle"))"></i>	@child</a>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                }
+                            }
+
+                        </div>
+                    </div>
+                    <div class="col-md-9">
+                        <div class="formWrap">
+
+                            @*<div class="navigator">
+                                    <ul>
+                                        <li><a href="#" class="btn btn-primary text-uppercase"><i class="fa fa-angle-left"></i> Prev</a></li>
+                                        <li><a href="#" class="btn btn-primary text-uppercase">Next <i class="fa fa-angle-right"></i></a></li>
+                                    </ul>
+                                </div>*@
+                            <div class="navigator">
+                                <a class="btn btn-primary buttons rounded-0 mr-2 mb-2 float-left" name="next" href="@Url.Action("movenext", "onboarding", new { id = "Add Visit Task" })">Go to dashboard <i class="fa fa-arrow-right"></i></a>
+                                <ul>
+                                    <li>
+                                        @if (Model.CurrentStep != "Organization Details")
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="previous" href="@Url.Action("moveprevious", "onboarding", new { current = Model.CurrentStep })"><i class="fa fa-arrow-left"></i> Previous step</a> }
+                                        else
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="previous" href="#" disabled><i class="fa fa-arrow-left"></i> Previous step</a>}
+                                    </li>
+                                    <li>
+                                        <a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="skip" href="@Url.Action("movenext", "onboarding", new { current = Model.CurrentStep })">Skip step</a>
+                                    </li>
+                                    <li>
+                                        @if (Model.CurrentStep == "Organization Details")
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="next" data-ng-click="save('Organization Details')">Next step <i class="fa fa-arrow-right"></i></a>}
+                                        else if (Model.CurrentStep == "Billing Settings")
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="next" data-ng-click="save('Billing Settings')">Next step <i class="fa fa-arrow-right"></i></a>}
+                                        else if (Model.CurrentStep == "Add Visit Task")
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="next" href="@Url.Action("movenext", "onboarding", new { id = Model.CurrentStep })">Go to dashboard <i class="fa fa-arrow-right"></i></a>}
+                                        else
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="next" href="@Url.Action("movenext", "onboarding", new { id = Model.CurrentStep })">Next step <i class="fa fa-arrow-right"></i></a>}
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="formContent">
+
+                                @if (Model.CurrentStep == "Organization Details")
+                                {@Html.Action("OrganizationDetails")}
+                                @if (Model.CurrentStep == "Billing Settings")
+                                {@Html.Action("BillingSettings")}
+                                @if (Model.CurrentStep == "Add Service Code")
+                                {@Html.Action("ServiceCodeList")}
+                                @if (Model.CurrentStep == "Payor Details")
+                                {@Html.Action("PayorList")}
+                                @if (Model.CurrentStep == "Visit Types")
+                                {@Html.Action("VisitType")}
+                                @if (Model.CurrentStep == "Care Types")
+                                {@Html.Action("CareType")}
+                                @if (Model.CurrentStep == "Add Visit Task")
+                                {@Html.Action("VisitTaskList")}
+
+                            </div>
+
+                            @*<div class="navigator">
+                                <ul>
+                                    <li>
+                                        @if (Model.CurrentStep == "Organization Details")
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="next" data-ng-click="save('Organization Details')">Next step <i class="fa fa-arrow-right"></i></a>}
+                                        else if (Model.CurrentStep == "Billing Settings")
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="next" data-ng-click="save('Billing Settings')">Next step <i class="fa fa-arrow-right"></i></a>}
+                                        else if (Model.CurrentStep == "Add Visit Task")
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="next" href="@Url.Action("movenext", "onboarding", new { id = Model.CurrentStep })">Go to dashboard <i class="fa fa-arrow-right"></i></a>}
+                                        else
+                                        {<a class="btn btn-primary buttons rounded-0 mr-2 mb-2" name="next" href="@Url.Action("movenext", "onboarding", new { id = Model.CurrentStep })">Next step <i class="fa fa-arrow-right"></i></a>}
+                                    </li>
+                                </ul>
+                            </div>*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+
+</html>

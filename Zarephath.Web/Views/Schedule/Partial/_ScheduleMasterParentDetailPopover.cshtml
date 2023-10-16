@@ -1,0 +1,83 @@
+﻿@model ScheduleMasterModel
+<div class="col-sm-12 no-padding">
+    <div class="dataTables_wrapper margin-top-5 ">
+        
+        <span class="pull-left"><b><a data-ng-click="commonDetailPopover.OpenScheduleNotificationLogModel(commonDetailPopover)" data-dismiss="modal">@Resource.ScheduleNotificationLogDetails</a></b></span>
+
+        <div class="pull-right margin-bottom-5">
+
+            <span class="badge badge-default badge-roundless"  data-ng-class="{'badge-success':commonDetailPopover.PCMVoiceMail}"
+                  data-ng-attr-title="{{commonDetailPopover.PCMVoiceMail?'@Resource.PreferredPermissionForVoiceMail':'@Resource.PermissionforVoiceMail'}}"
+                 data-ng-show="commonDetailPopover.PermissionForVoiceMail">@Resource.PhonePermissionShort</span>
+
+
+            <span class="badge badge-default badge-roundless" title="@Resource.PermissionForEmail" data-ng-class="{ 'badge-success':commonDetailPopover.PCMEmail}"
+                  data-ng-attr-title="{{commonDetailPopover.PCMEmail ? '@Resource.PreferredPermissionForEmail':'@Resource.PermissionForEmail'}}"
+                  data-ng-show="commonDetailPopover.PermissionForEmail">@Resource.EmailPermissionShort</span>
+
+            <span class="badge badge-default badge-roundless" title="@Resource.PermissionForSMS"  data-ng-class="{'badge-success':commonDetailPopover.PCMSMS}"
+                  data-ng-attr-title="{{commonDetailPopover.PCMSMS?'@Resource.PreferredPermissionForSMS':'@Resource.PermissionForSMS'}}"
+                  data-ng-show="commonDetailPopover.PermissionForSMS">@Resource.SMSPermissionShort</span>
+
+
+            <span class="badge badge-default badge-roundless" title="@Resource.PermissionForNotice"  data-ng-class="{'badge-success':commonDetailPopover.PCMMail}"
+                data-ng-attr-title="{{commonDetailPopover.PCMMail ? '@Resource.PreferredPermissionForGenrateNotice':'@Resource.PermissionForNotice'}}"
+                  data-ng-if="commonDetailPopover.PermissionForMail">@Resource.NoticePermissionShort</span>
+        </div>
+        <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+            <tbody>
+            <tr>
+                <td>@Resource.Name</td>
+                <td>{{commonDetailPopover.ParentName}}</td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>@Resource.Phone</td>
+                <td>
+                    @*data-phone-format="commonDetailPopover.Phone2 ? commonDetailPopover.Phone2 : '@Resource.NA'"*@
+                    <span data-ng-bind="commonDetailPopover.Phone1 ? commonDetailPopover.Phone1 :'@Resource.NA'" class="display-block"></span>
+                </td>
+                <td>
+                    @*<a data-ng-show="commonDetailPopover.Phone1" href="#" title="Phase 2">Send SMS</a>*@
+                    <a data-ng-if="commonDetailPopover.PermissionForSMS && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.Cancelled) && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Confirmation)  && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Show)" data-ng-click="commonDetailPopover.OpenSMSPopup(commonDetailPopover,commonDetailPopover.Phone1)">@Resource.SendSMS</a>
+                    <span class="badge badge-default pull-right margin-top-2" data-ng-show="commonDetailPopover.SMSSent"  title="@Resource.SMSAlreadySent"><small><b>@Resource.Sent</b></small></span>
+                </td>
+            </tr>
+
+            <tr>
+                <td>@Resource.Phone2</td>
+                <td>
+                    @*data-phone-format="commonDetailPopover.Phone2 ? commonDetailPopover.Phone2 : '@Resource.NA'"*@
+                    <span data-ng-bind="commonDetailPopover.Phone2 ? commonDetailPopover.Phone2 :'@Resource.NA'" class="display-block"></span>
+                </td>
+                <td>
+                <a data-ng-if="commonDetailPopover.Phone2 && commonDetailPopover.PermissionForSMS && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.Cancelled) && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Confirmation)  && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Show)" data-ng-click="commonDetailPopover.OpenSMSPopup(commonDetailPopover,commonDetailPopover.Phone2)" title="Phase 2">@Resource.SendSMS</a>
+                <span class="badge badge-default pull-right margin-top-2" data-ng-show="commonDetailPopover.SMSSent" title="@Resource.SMSAlreadySent"><small><b>@Resource.Sent</b></small></span>
+            </tr>
+            <tr>
+                <td>@Resource.Email</td>
+                <td>
+                    <span data-ng-bind="commonDetailPopover.Email?commonDetailPopover.Email:'@Resource.NA'" class="display-block"></span>
+                </td>
+                <td>
+                    <a data-ng-if="commonDetailPopover.PermissionForEmail && commonDetailPopover.Email && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.Cancelled) && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Confirmation)  && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Show)" data-ng-click="commonDetailPopover.OpenEmailPopup(commonDetailPopover)">@Resource.SendEmail </a>
+                    <span class="badge badge-default pull-right margin-top-2" data-ng-show="commonDetailPopover.EmailSent"  title="@Resource.EmailAlreadySent"><small><b>@Resource.Sent</b></small></span>
+                </td>
+            </tr>
+            <tr data-ng-if="commonDetailPopover.PermissionForMail && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.Cancelled) && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Confirmation)  && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Show)">
+                <td></td>
+                <td></td>
+                <td>
+                    <a data-ng-if=" commonDetailPopover.PermissionForMail && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.Cancelled) && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Confirmation)  && commonDetailPopover.ScheduleStatusID !=@((int) ScheduleStatus.ScheduleStatuses.No_Show)" data-ng-click="commonDetailPopover.PrintNoticeScheduleNotification(commonDetailPopover.ScheduleID)">@Resource.GenerateNotice</a>
+                    <span class="badge badge-default pull-right margin-top-2" data-ng-show="commonDetailPopover.NoticeSent"  title="@Resource.NoticeAlreadyGenerated"><small><b>@Resource.Genrated</b></small></span>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+

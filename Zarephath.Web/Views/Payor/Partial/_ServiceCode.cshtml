@@ -1,0 +1,387 @@
+﻿@model AddPayorModel
+
+@*@Html.Hidden("hdnSetServiceCodeModel", Common.SerializeObject(Model))*@
+
+<div class="col-sm-12">
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group row">
+                <div class="fscontainer">
+                    <div class="legend">
+                        @Resource.PayorServiceCodeMapping
+                    </div>
+
+                    <form id="FrmServiceCode">
+                        <div class="col-sm-12 no-padding">
+                            <div class="col-sm-12">
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                    <label class="control-label required">@Resource.ServiceCode</label>
+                                    <div class="replaceErrorDest">
+                                        <input type="text"
+                                               token-input
+                                               ng-val="ServiceCodeModel.PayorServiceCodeMapping.ServiceCodeID"
+                                               textfield='ServiceCode'
+                                               valuefield='ServiceCodeID'
+                                               searchurl="{{GetServiceCodeListURL}}"
+                                               placeholder="@Resource.EnterServiceCode"
+                                               tokenlimit='1'
+                                               onresultsformatter='ServiceCodeResultsFormatter'
+                                               ontokenformatter="ServiceCodeTokenFormatter"
+                                               id="SearchContactToken"
+                                               customclass="form-control input-sm" />
+                                    </div>
+                                    @Html.TextBoxFor(q => q.PayorServiceCodeMapping.ServiceCodeID,
+                                                     new
+                                                         {
+                                                             data_ng_model = "ServiceCodeModel.PayorServiceCodeMapping.ServiceCodeID",
+                                                             @class = "form-control hideErrorContent replaceErrorSource"
+                                                         })
+                                    @Html.ValidationMessageFor(q => q.PayorServiceCodeMapping.ServiceCodeID)
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                    <label class="control-label required">@Resource.StartDate</label>
+                                    <div class="input-group date" datepicker="ServiceCodeModel.PayorServiceCodeMapping.POSStartDate"
+                                         data-ng-dateval="ServiceCodeModel.PayorServiceCodeMapping.POSStartDate"
+                                        @* data-ng-maxdate="ServiceCodeModel.PayorServiceCodeMapping.POSEndDate"*@
+                                        >
+                                        @Html.TextBoxFor(q => q.PayorServiceCodeMapping.POSStartDate,
+                                                         new
+                                                             {
+                                                                 @class = "form-control input-sm dateInputMask",
+                                                                 placeholder = Resource.StartDate
+                                                             })
+                                        @Html.ValidationMessageFor(q => q.PayorServiceCodeMapping.POSStartDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                    <label class="control-label required">@Resource.EndDate</label>
+                                    <div class="input-group date" datepicker="ServiceCodeModel.PayorServiceCodeMapping.POSEndDate" 
+                                        data-ng-dateval="ServiceCodeModel.PayorServiceCodeMapping.POSEndDate"
+                                        @* data-ng-mindate="DatePickerDate(ServiceCodeModel.PayorServiceCodeMapping.POSStartDate)"*@
+                                        >
+                                        @Html.TextBoxFor(q => q.PayorServiceCodeMapping.POSEndDate,
+                                            new
+                                            {
+                                                @class = "form-control input-sm dateInputMask",
+                                                placeholder = Resource.EndDate
+                                            })
+                                        @Html.ValidationMessageFor(q => q.PayorServiceCodeMapping.POSEndDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-1 col-md-3 col-sm-3">
+                                    <label class="control-label ">@Resource.Modifier</label>
+                                    @Html.DropDownListFor(p => p.PayorServiceCodeMapping.ModifierID, Model.ModifierList.ToSelectList("", "ModifierName", "ModifierID", @Resource.SelectModifier, ""),
+                                              new
+                                                  {
+                                                      data_ng_model = "ServiceCodeModel.PayorServiceCodeMapping.ModifierID",
+                                                      data_ng_init = "ServiceCodeModel.PayorServiceCodeMapping.ModifierID=ServiceCodeModel.PayorServiceCodeMapping.ModifierID==''?null:ServiceCodeModel.PayorServiceCodeMapping.ModifierID.toString()",
+                                                      @class = "form-control input-sm",
+                                                      convert_to_number = ""
+                                                  })
+                                    @Html.ValidationMessageFor(q => q.PayorServiceCodeMapping.ModifierID)
+                                </div>
+
+                                <div class="form-group col-lg-1 col-md-3 col-sm-3">
+                                    <label class="control-label required">@Resource.POS</label>
+                                    @Html.DropDownListFor(p => p.PayorServiceCodeMapping.PosID, Model.POSList.ToSelectList("", "PosName", "PosID", @Resource.SelectPOS, ""),
+                                              new
+                                                  {
+                                                      data_ng_model = "ServiceCodeModel.PayorServiceCodeMapping.PosID",
+                                                      data_ng_init = "ServiceCodeModel.PayorServiceCodeMapping.PosID=ServiceCodeModel.PayorServiceCodeMapping.PosID==''?null:ServiceCodeModel.PayorServiceCodeMapping.PosID.toString()",
+                                                      @class = "form-control input-sm",
+                                                      convert_to_number = ""
+                                                  })
+                                    @Html.ValidationMessageFor(q => q.PayorServiceCodeMapping.PosID)
+                                </div>
+
+                                <div class="form-group col-lg-1 col-md-3 col-sm-3">
+                                    <label class="control-label required">@Resource.Rate</label>
+                                    @Html.TextBoxFor(q => q.PayorServiceCodeMapping.Rate, new { @class = "form-control input-sm", data_ng_model = "ServiceCodeModel.PayorServiceCodeMapping.Rate", placeholder = @Resource.Rate, maxlength = 6 })
+                                    @Html.ValidationMessageFor(q => q.PayorServiceCodeMapping.Rate)
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label">@Resource.BillingUnitLimit</label>
+                                        <div>
+                                            @Html.TextBoxFor(q => q.PayorServiceCodeMapping.BillingUnitLimit,
+                                                        new
+                                                        {
+                                                            @class = "form-control input-sm",
+                                                            data_ng_model = "ServiceCodeModel.PayorServiceCodeMapping.BillingUnitLimit",
+                                                            placeholder = @Resource.BillingUnitLimit,
+                                                            maxlength = 50
+                                                        })
+                                            @Html.ValidationMessageFor(q => q.PayorServiceCodeMapping.BillingUnitLimit)
+                                        </div>
+                                    </div>
+
+
+                                <div class="form-group col-lg-1 col-md-3 col-sm-3">
+                                    <label class="control-label"></label>
+                                    <div>
+                                        <a href="#" data-ng-click="SaveServiceCodeDetails()" class="btn btn-sm grey border-grey-cascade"><i class="fa fa-save"></i></a>
+                                        <a href="#" data-ng-click="ClearServiceCodeDetails()" class="btn btn-sm grey border-grey-cascade"><i class="fa fa-remove"></i></a>
+                                    </div>
+                                </div>
+
+                                <div class="space1"></div>
+                                <hr />
+                                <div class="space1"></div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div>
+                        <div class="row">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+
+                                <div class="btn-group" data-ng-show="PayorServiceCodeMappingList.length > 0">
+                                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                                        <input id="SelectAllServiceCode" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                        <label for="SelectAllServiceCode"></label>
+                                    </span>
+                                </div>
+
+                                <div class="btn-group">
+                                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                                    </button>
+                                </div>
+
+                                <div class="btn-group">
+                                    @if (Common.HasPermission(Constants.Permission_Payor_ServiceCode_Mapping))
+                                    {
+                                        @Html.DropDownListFor(m => m.SearchServiceCodeMappingList.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchServiceCodeMappingList.IsDeleted), "Name", "Value", "", ""),
+                                                          new
+                                                              {
+                                                                  id = "IsDeleted",
+                                                                  data_ng_model = "TempPayorServiceCodeMappingList.IsDeleted",
+                                                                  data_ng_init = "TempPayorServiceCodeMappingList.IsDeleted = TempPayorServiceCodeMappingList.IsDeleted==null?'-1':TempPayorServiceCodeMappingList.IsDeleted.toString()",
+                                                                  @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                  data_ng_change = "SearchPayorServiceCodeMapping()"
+                                                              })
+                                    }
+                                </div>
+
+                                <div class="btn-group" data-ng-if="SelectedPayorServiceCodeMappingIds.length > 0">
+                                    <button type="button" data-ng-click="DeletePayorCodeMapping()" class="btn blue btn-sm grey border-grey-cascade">
+                                        <i class="fa fa-random margin-right-10"></i>{{SearchServiceCodeMappingList.IsDeleted==0?'@Constants.DisableSelected' :(SearchServiceCodeMappingList.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}</button>
+                                </div>
+
+                                <div class="inline-block pull-right" data-ng-show="PayorServiceCodeMappingList.length > 0">
+                                    <div class="inline-block pull-right" data-ng-show="PayorServiceCodeMappingList.length > 0">
+                                        <div class="pull-right margin-left-5">
+                                            <dir-pagination-controls boundary-links="true" max-size="PayorServiceCodeMappingListPager.maxSize" on-page-change="PayorServiceCodeMappingListPager.pageChanged(newPageNumber)" pagination-id="PayorServiceCodeMappingListPagerID"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="space20"></div>
+
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-15">
+                                    <div class="portlet-body" style="display: block;">
+                                        <form id="FrmServiceCodeList">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="portlet-body compact">
+                                                    <div class="dataTables_wrapper">
+                                                        <table class="table table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                            <thead class="flip-content">
+                                                                <tr>
+                                                                    @if (Common.HasPermission(Constants.Permission_Payor_ServiceCode_Mapping))
+                                                                    {
+                                                                        <th class="width-20px"></th>
+                                                                    }
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorServiceCodeMappingListPager.sortColumn('ServiceCode')">@Resource.ServiceCode</a>
+                                                                        <span class="sortorder" data-ng-show="PayorServiceCodeMappingListPager.sortIndex === 'ServiceCode'" data-ng-class="{reverse:PayorServiceCodeMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorServiceCodeMappingListPager.sortColumn('ModifierName')">@Resource.Modifier</a>
+                                                                        <span class="sortorder" data-ng-show="PayorServiceCodeMappingListPager.sortIndex === 'ModifierName'" data-ng-class="{reverse:PayorServiceCodeMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorServiceCodeMappingListPager.sortColumn('PosName')">@Resource.POS</a>
+                                                                        <span class="sortorder" data-ng-show="PayorServiceCodeMappingListPager.sortIndex === 'PosName'" data-ng-class="{reverse:PayorServiceCodeMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorServiceCodeMappingListPager.sortColumn('Rate')">@Resource.Rate</a>
+                                                                        <span class="sortorder" data-ng-show="PayorServiceCodeMappingListPager.sortIndex === 'Rate'" data-ng-class="{reverse:PayorServiceCodeMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                     <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorServiceCodeMappingListPager.sortColumn('BillingUnitLimit')">@Resource.UnitLimit</a>
+                                                                        <span class="sortorder" data-ng-show="PayorServiceCodeMappingListPager.sortIndex === 'BillingUnitLimit'" data-ng-class="{reverse:PayorServiceCodeMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorServiceCodeMappingListPager.sortColumn('POSStartDate')">@Resource.StartDate</a>
+                                                                        <span class="sortorder" data-ng-show="PayorServiceCodeMappingListPager.sortIndex === 'POSStartDate'" data-ng-class="{reverse:PayorServiceCodeMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorServiceCodeMappingListPager.sortColumn('POSEndDate')">@Resource.EndDate</a>
+                                                                        <span class="sortorder" data-ng-show="PayorServiceCodeMappingListPager.sortIndex === 'POSEndDate'" data-ng-class="{reverse:PayorServiceCodeMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th style="text-align:center">@Resource.Action</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>
+                                                                        <div class="btn-group" data-ng-show="PayorServiceCodeMappingList.length > 0">
+                                                                            <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                                                                                <input id="SelectAllServiceCode" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                                                <label for="SelectAllServiceCode"></label>
+                                                                            </span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.TextBoxFor(m => m.SearchServiceCodeMappingList.ServiceCode, new { data_ng_model = "TempPayorServiceCodeMappingList.ServiceCode", @class = "form-control input-sm", placeholder = Resource.ServiceCode, maxlength = 50 })
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.DropDownListFor(p => p.PayorServiceCodeMapping.ModifierID, Model.ModifierList.ToSelectList("", "ModifierName", "ModifierID", @Resource.SelectModifier, "0"),
+                                                                                              new
+                                                                                                  {
+                                                                                                      data_ng_model = "TempPayorServiceCodeMappingList.ModifierID",
+                                                                                                      data_ng_init = "TempPayorServiceCodeMappingList.ModifierID=TempPayorServiceCodeMappingList.ModifierID==null?'':TempPayorServiceCodeMappingList.ModifierID.toString()",
+                                                                                                      @class = "form-control input-sm",
+
+                                                                                                  })
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.DropDownListFor(p => p.PayorServiceCodeMapping.PosID, Model.POSList.ToSelectList("", "PosName", "PosID", @Resource.SelectPOS, "0"),
+                                                                                              new
+                                                                                                  {
+                                                                                                      data_ng_model = "TempPayorServiceCodeMappingList.PosID",
+                                                                                                      data_ng_init = "TempPayorServiceCodeMappingList.PosID=TempPayorServiceCodeMappingList.PosID==null?'':TempPayorServiceCodeMappingList.PosID.toString()",
+                                                                                                      @class = "form-control input-sm",
+
+                                                                                                  })
+                                                                    </td>
+                                                                    <td></td>
+                                                                    <td></td>
+                                                                    <td>
+                                                                        <div class="input-group date" datepicker="TempPayorServiceCodeMappingList.POSStartDate" data-ng-dateval="TempPayorServiceCodeMappingList.POSStartDate"
+                                                                            @* data-ng-mindate="DatePickerDate(TempPayorServiceCodeMappingList.POSStartDate,NewDate)"*@
+                                                                            >
+                                                                            @Html.TextBoxFor(q => q.SearchServiceCodeMappingList.POSStartDate,
+                                                                                             new
+                                                                                                 {
+                                                                                                     @class = "form-control input-sm dateInputMask",
+                                                                                                     placeholder = Resource.StartDate
+                                                                                                 })
+                                                                            @* <span class="input-group-addon"><i class="fa fa-calendar"></i></span>*@
+                                                                        </div>
+
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="input-group date" datepicker="TempPayorServiceCodeMappingList.POSEndDate" data-ng-dateval="TempPayorServiceCodeMappingList.POSEndDate"
+                                                                            @* data-ng-mindate="DatePickerDate(ServiceCodeModel.SearchServiceCodeMapping.POSEndDate,ServiceCodeModel.SearchServiceCodeMapping.POSStartDate)"*@
+                                                                            >
+                                                                            @Html.TextBoxFor(q => q.SearchServiceCodeMappingList.POSEndDate,
+                                                                                             new
+                                                                                                 {
+                                                                                                     @class = "form-control input-sm dateInputMask",
+                                                                                                     placeholder = Resource.EndDate
+                                                                                                 })
+                                                                            @*<span class="input-group-addon"><i class="fa fa-calendar"></i></span>*@
+                                                                        </div>
+
+                                                                    </td>
+                                                                    <td>
+                                                                        <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchPayorServiceCodeMapping()"/>
+                                                                        <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr data-ng-class="{'deleted':payorServiceCodeMappingList.IsDeleted}" dir-paginate="payorServiceCodeMappingList in PayorServiceCodeMappingList | itemsPerPage: PayorServiceCodeMappingListPager.pageSize" total-items="PayorServiceCodeMappingListPager.totalRecords" current-page="PayorServiceCodeMappingListPager.currentPage" pagination-id="PayorServiceCodeMappingListPagerID">
+                                                                    @if (Common.HasPermission(Constants.Permission_Payor_ServiceCode_Mapping))
+                                                                    {<td>
+
+                                                                        <input type="checkbox" class="unicheckbox" data-ng-model="payorServiceCodeMappingList.IsChecked" data-ng-change="SelectPayor(payorServiceCodeMappingList)" val="payorServiceCodeMappingList.IsChecked">
+                                                                    </td>}
+                                                                    <td>
+                                                                        <a href="javascript:void(0);" class="text-decoration-none" data-ng-bind="payorServiceCodeMappingList.ServiceCode" popover-closeable="true" popover-trigger="click" common-detail-popover="payorServiceCodeMappingList" ng-template-selector="#ServiceCodeDetailPopover"></a>
+                                                                        <span class="badge badge-danger" data-ng-if="payorServiceCodeMappingList.ServiceCodeExpired" title="@Resource.ServiceCodeExpired">{{payorServiceCodeMappingList.StrServiceCodeExpired}}</span>
+                                                                    </td>
+                                                                    <td>{{payorServiceCodeMappingList.ModifierName  ? payorServiceCodeMappingList.ModifierName:'@Resource.NA'}} </td>
+                                                                    <td>{{payorServiceCodeMappingList.PosName   ? payorServiceCodeMappingList.PosName:'@Resource.NA'}} </td>
+                                                                    <td>{{payorServiceCodeMappingList.Rate | orgcurrency }} </td>
+                                                                    <td>{{payorServiceCodeMappingList.BillingUnitLimit}} </td>
+                                                                    <td>
+                                                                        <span data-ng-class="{'strike font-red':payorServiceCodeMappingList.ServiceCodeMappingExpired}">{{payorServiceCodeMappingList.POSStartDate ? (payorServiceCodeMappingList.POSStartDate | orgdate) : '@Resource.NA'}}</span>
+                                                                    </td>
+                                                                    <td>
+                                                                        <span data-ng-class="{'strike font-red':payorServiceCodeMappingList.ServiceCodeMappingExpired}">{{payorServiceCodeMappingList.POSEndDate ? (payorServiceCodeMappingList.POSEndDate | orgdate) : '@Resource.NA' }}</span>
+                                                                    </td>
+                                                                    <td>@if (Common.HasPermission(Constants.Permission_Payor_ServiceCode_Mapping))
+                                                                        {
+                                                                        <a href="#" data-ng-click="EditPayorCodeMapping(payorServiceCodeMappingList)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                        <a href="javascript:void(0);" data-ng-show="payorServiceCodeMappingList.IsDeleted" data-ng-click="DeletePayorCodeMapping(payorServiceCodeMappingList.PayorServiceCodeMappingID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                        <a href="javascript:void(0);" data-ng-show="!payorServiceCodeMappingList.IsDeleted" data-ng-click="DeletePayorCodeMapping(payorServiceCodeMappingList.PayorServiceCodeMappingID,'Disable')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                                        }
+
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div data-ng-if="PayorServiceCodeMappingList.length == 0">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div class="alert alert-danger">
+                                                                        @Html.Raw(Resource.NoRecordsFound)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12" data-ng-if="PayorServiceCodeMappingList.length > 0">
+                                    <div class="pull-left col-sm-3 no-padding">
+                                        @Resource.Showing <span data-ng-bind="(PayorServiceCodeMappingListPager.pageSize * PayorServiceCodeMappingListPager.currentPage) - PayorServiceCodeMappingListPager.pageSize  + 1"></span>
+                                        &nbsp;@Resource.To <span data-ng-bind="(PayorServiceCodeMappingListPager.pageSize == PayorServiceCodeMappingListPager.currentPageSize) ? (PayorServiceCodeMappingListPager.pageSize * PayorServiceCodeMappingListPager.currentPage) :(PayorServiceCodeMappingListPager.pageSize * PayorServiceCodeMappingListPager.currentPage) - PayorServiceCodeMappingListPager.pageSize  + PayorServiceCodeMappingListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PayorServiceCodeMappingListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                    </div>
+                                    <div class="pull-right top pagination-sm">
+                                        <dir-pagination-controls boundary-links="true" max-size="PayorServiceCodeMappingListPager.maxSize" on-page-change="PayorServiceCodeMappingListPager.pageChanged(newPageNumber)" pagination-id="PayorServiceCodeMappingListPagerID"></dir-pagination-controls>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="ServiceCodeDetailPopover" type="text/ng-template">
+    @Html.Partial("Partial/_ServiceCodeDetailPopover")
+</script>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/payor/addpayor")
+}

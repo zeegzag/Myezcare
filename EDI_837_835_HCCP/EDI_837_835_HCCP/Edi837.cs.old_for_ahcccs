@@ -1,0 +1,650 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Web;
+using System.Xml;
+using System.Xml.Xsl;
+using OopFactory.Edi835Parser.Models;
+using OopFactory.X12.Parsing;
+using OopFactory.X12.Parsing.Model;
+using OopFactory.X12.Parsing.Model.Typed;
+using OopFactory.X12.Validation;
+using OopFactory.Edi835Parser.Models;
+using OopFactory.X12.Parsing.Model;
+using OopFactory.X12.Parsing.Model.Typed;
+using TypedLoopNM1 = OopFactory.X12.Parsing.Model.Typed.TypedLoopNM1;
+
+namespace EDI_837_835_HCCP
+{
+    public class Edi837
+    {
+        #region CORE METHODS
+
+        public string GenerateEdi837File(Edi837Model model,string filePath, string fileName)
+        {
+            #region Generate 837 File
+            long  controlNumber =Convert.ToInt64(model.InterchangeControlHeader.InterchangeControlNumber);
+            int a = 0;
+            string md = "|G9";
+
+            string strInterchangeDate = model.InterchangeControlHeader.InterchangeDate;
+            DateTime date = new DateTime(Convert.ToInt16("20" + strInterchangeDate.Substring(0, 2)), Convert.ToInt32(strInterchangeDate.Substring(2, 2)), Convert.ToInt32(strInterchangeDate.Substring(2, 2)));
+
+
+            //var message = new Interchange(date, Convert.ToInt32(model.InterchangeControlHeader.InterchangeControlNumber), model.InterchangeControlHeader.UsageIndicator == "P")
+
+            model.InterchangeControlHeader.SegmentTerminator = string.IsNullOrEmpty(model.InterchangeControlHeader.SegmentTerminator) ? "~" : model.InterchangeControlHeader.SegmentTerminator;
+            model.InterchangeControlHeader.ElementSeparator = string.IsNullOrEmpty(model.InterchangeControlHeader.ElementSeparator) ? "*" : model.InterchangeControlHeader.ElementSeparator;
+
+            var message = new Interchange(date, Convert.ToInt32(model.InterchangeControlHeader.InterchangeControlNumber), model.InterchangeControlHeader.UsageIndicator == "P",
+                Convert.ToChar(model.InterchangeControlHeader.SegmentTerminator),
+                Convert.ToChar(model.InterchangeControlHeader.ElementSeparator),
+                Convert.ToChar(model.InterchangeControlHeader.ComponentElementSeparator))
+            {
+                InterchangeSenderIdQualifier = model.InterchangeControlHeader.InterchangeSenderIdQualifier,
+                InterchangeSenderId = model.InterchangeControlHeader.InterchangeSenderId,
+                InterchangeReceiverIdQualifier = model.InterchangeControlHeader.InterchangeReceiverIdQualifier,
+                InterchangeReceiverId = model.InterchangeControlHeader.InterchangeReceiverId,
+                SecurityInfo = model.InterchangeControlHeader.SecurityInformation,
+                SecurityInfoQualifier = model.InterchangeControlHeader.SecurityInformationQualifier,
+                AuthorInfo = model.InterchangeControlHeader.AuthorizationInformation,
+                AuthorInfoQualifier = model.InterchangeControlHeader.AuthorizationInformationQualifier
+            };
+            message.SetElement(10, model.InterchangeControlHeader.InterchangeTime);
+            message.SetElement(11, model.InterchangeControlHeader.RepetitionSeparator);
+            message.SetElement(12, model.InterchangeControlHeader.InterchangeControlVersionNumber);
+            message.SetElement(14, model.InterchangeControlHeader.AcknowledgementRequired);
+            message.SetElement(15, model.InterchangeControlHeader.UsageIndicator);
+            message.SetElement(16, model.InterchangeControlHeader.ComponentElementSeparator);
+
+
+
+            var group = message.AddFunctionGroup(model.FunctionalGroupHeader.FunctionalIdentifierCode, date,
+                Convert.ToInt32(controlNumber), model.FunctionalGroupHeader.VersionOrReleaseOrNo);
+            group.ApplicationSendersCode = model.InterchangeControlHeader.InterchangeSenderId.Trim();
+            group.ApplicationReceiversCode = model.InterchangeControlHeader.InterchangeReceiverId.Trim();
+            group.ResponsibleAgencyCode = model.FunctionalGroupHeader.ResponsibleAgencyCode;
+            //group.Date = Convert.ToDateTime("12/31/1999");
+            //group.ControlNumber = 1;
+            group.SetElement(5, model.InterchangeControlHeader.InterchangeTime);
+
+            var transaction = group.AddTransaction(model.TransactionSetHeader.TransactionSetIdentifier, string.Format("{0:0000}", controlNumber));
+            transaction.SetElement(3, model.FunctionalGroupHeader.VersionOrReleaseOrNo);
+
+            var bhtSegment = transaction.AddSegment(new TypedSegmentBHT());
+            bhtSegment.BHT01_HierarchicalStructureCode = model.BeginningOfHierarchicalTransaction.HierarchicalStructureCode;
+            bhtSegment.BHT02_TransactionSetPurposeCode = model.BeginningOfHierarchicalTransaction.TransactionSetPurposeCode;
+            bhtSegment.BHT03_ReferenceIdentification = model.BeginningOfHierarchicalTransaction.ReferenceIdentification;
+            bhtSegment.BHT04_Date = DateTime.Now;
+            bhtSegment.BHT05_Time = DateTime.Now.ToString("HHmm");
+            bhtSegment.BHT06_TransactionTypeCode = model.BeginningOfHierarchicalTransaction.TransactionTypeCode;
+
+            var submitterLoop = transaction.AddLoop(new TypedLoopNM1(model.SubmitterName.EntityIdentifierCodeEnum)); //submitter identifier code
+            submitterLoop.NM102_EntityTypeQualifier = GetEntityTypeQualifier(model.SubmitterName.EntityTypeQualifier);
+            submitterLoop.NM103_NameLastOrOrganizationName = model.SubmitterName.NameLastOrOrganizationName;
+            //submitterLoop.NM104_NameFirst = model.SubmitterName.NameFirst;
+            submitterLoop.NM108_IdCodeQualifier = model.SubmitterName.IdCodeQualifier;
+            submitterLoop.NM109_IdCode = model.SubmitterName.IdCodeQualifierEnum;
+
+
+            int count = model.SubmitterEDIContact.Count > 2 ? 2 : model.SubmitterEDIContact.Count;
+            for (int i = 0; i < count; i++)
+            {
+                var perSegment = submitterLoop.AddSegment(new TypedSegmentPER());
+                perSegment.PER01_ContactFunctionCode = model.SubmitterEDIContact[i].ContactFunctionCode; //information contact function code
+                perSegment.PER02_Name = model.SubmitterEDIContact[i].Name;
+                perSegment.PER03_CommunicationNumberQualifier = GetCommunicationNumberQualifer(model.SubmitterEDIContact[i].CommunicationNumberQualifier1);
+                perSegment.PER04_CommunicationNumber = model.SubmitterEDIContact[i].CommunicationNumber1;
+                perSegment.PER05_CommunicationNumberQualifier = GetCommunicationNumberQualifer(model.SubmitterEDIContact[i].CommunicationNumberQualifier2);
+                perSegment.PER06_CommunicationNumber = model.SubmitterEDIContact[i].CommunicationNumber2;
+                perSegment.PER07_CommunicationNumberQualifier = GetCommunicationNumberQualifer(model.SubmitterEDIContact[i].CommunicationNumberQualifier3);
+                perSegment.PER08_CommunicationNumber = model.SubmitterEDIContact[i].CommunicationNumber3;
+            }
+
+
+            var submitterLoop2 = transaction.AddLoop(new TypedLoopNM1(model.ReceiverName.EntityIdentifierCodeEnum));
+            submitterLoop2.NM102_EntityTypeQualifier = GetEntityTypeQualifier(model.ReceiverName.EntityTypeQualifier);
+            submitterLoop2.NM103_NameLastOrOrganizationName = model.ReceiverName.NameLastOrOrganizationName;
+            //submitterLoop2.NM104_NameFirst = model.ReceiverName.NameFirst;
+            submitterLoop2.NM108_IdCodeQualifier = model.ReceiverName.IdCodeQualifier;
+            submitterLoop2.NM109_IdCode = model.ReceiverName.IdCodeQualifierEnum;
+
+            if (model.BillingProviders.Count > 0)
+            {
+                int hlLoop = 0;
+                foreach (var billingProvider in model.BillingProviders)
+                {
+                    bool hasChild = billingProvider.Subscribers.Count > 0;
+
+                    #region Billing Provider HL
+
+                    var provider2000AHLoop = transaction.AddHLoop(Convert.ToString(++hlLoop), billingProvider.HeirarchicalLevelCode, hasChild); //*********HL 1 ******
+
+                    #region Billing Provider HL > Billing Provider Name
+
+                    var provider2010ACLoop = provider2000AHLoop.AddLoop(new TypedLoopNM1(billingProvider.EntityIdentifierCode));
+                    provider2010ACLoop.NM102_EntityTypeQualifier = GetEntityTypeQualifier(billingProvider.EntityTypeQualifier);
+                    provider2010ACLoop.NM103_NameLastOrOrganizationName = billingProvider.NameLastOrOrganizationName;
+                    provider2010ACLoop.NM108_IdCodeQualifier = billingProvider.IdCodeQualifier;
+                    provider2010ACLoop.NM109_IdCode = billingProvider.IdCodeQualifierEnum;
+
+                    var provider2010AC_N3Segment = provider2010ACLoop.AddSegment(new TypedSegmentN3());
+                    provider2010AC_N3Segment.N301_AddressInformation = billingProvider.AddressInformation;
+
+                    var provider2010AC_N4Segment = provider2010ACLoop.AddSegment(new TypedSegmentN4());
+                    provider2010AC_N4Segment.N401_CityName = billingProvider.CityName;
+                    provider2010AC_N4Segment.N402_StateOrProvinceCode = billingProvider.StateOrProvinceCode;
+                    provider2010AC_N4Segment.N403_PostalCode = billingProvider.PostalCode;
+
+                    var provider2010AC_REFSegment = provider2010ACLoop.AddSegment(new TypedSegmentREF());
+                    provider2010AC_REFSegment.REF01_ReferenceIdQualifier = billingProvider.ReferenceIdentificationQualifier;
+                    provider2010AC_REFSegment.REF02_ReferenceId = billingProvider.ReferenceIdentification;
+
+                    #endregion Billing Provider HL > Billing Provider Name
+
+                    #endregion Billing Provider HL
+
+                    #region Subscriber HL
+
+                    if (billingProvider.Subscribers.Count > 0)
+                    {
+                        foreach (var subscriber in billingProvider.Subscribers)
+                        {
+                            a = a + 1;
+                            var subscriber2000BHLoop = provider2000AHLoop.AddHLoop(Convert.ToString(++hlLoop), subscriber.HeirarchicalLevelCode, false);  // **** HL 2  ******
+
+                            #region Subscriber HL > SBR
+
+                            var segmentSBR = subscriber2000BHLoop.AddSegment(new TypedSegmentSBR());
+                            segmentSBR.SBR01_PayerResponsibilitySequenceNumberCode = subscriber.PayerResponsibilitySequenceNumber;
+                            segmentSBR.SBR02_IndividualRelationshipCode = subscriber.IndividualRelationshipCode;
+                            segmentSBR.SBR09_ClaimFilingIndicatorCode = subscriber.ClaimFilingIndicatorCode;
+                            
+                            if (a == 1)
+                            {
+                                segmentSBR.SBR01_PayerResponsibilitySequenceNumberCode = "S";// subscriber.PayerResponsibilitySequenceNumber;//TODO:REMOVE
+                                segmentSBR.SBR09_ClaimFilingIndicatorCode = "CI";//MB ;// subscriber.ClaimFilingIndicatorCode; //TODO:REMOVE
+                                
+                            }
+
+
+                            #endregion Subscriber HL > SBR
+
+                            #region Subscriber HL > Subscriber Name
+
+                            var subscriberName2010BALoop = subscriber2000BHLoop.AddLoop(new TypedLoopNM1(subscriber.SubmitterEntityIdentifierCode));
+                            subscriberName2010BALoop.NM102_EntityTypeQualifier = GetEntityTypeQualifier(subscriber.SubmitterEntityTypeQualifier);
+                            subscriberName2010BALoop.NM103_NameLastOrOrganizationName = subscriber.SubmitterNameLastOrOrganizationName;
+                            subscriberName2010BALoop.NM104_NameFirst = subscriber.SubmitterNameFirst;
+                            subscriberName2010BALoop.NM108_IdCodeQualifier = subscriber.SubmitterIdCodeQualifier;
+                            subscriberName2010BALoop.NM109_IdCode = subscriber.SubmitterIdCodeQualifierEnum;
+
+                            var subscriberName2010BA_N3Segment = subscriberName2010BALoop.AddSegment(new TypedSegmentN3());
+                            subscriberName2010BA_N3Segment.N301_AddressInformation = subscriber.SubmitterAddressInformation;
+
+                            var subscriberName2010BA_N4Segment = subscriberName2010BALoop.AddSegment(new TypedSegmentN4());
+                            subscriberName2010BA_N4Segment.N401_CityName = subscriber.SubmitterCityName;
+                            subscriberName2010BA_N4Segment.N402_StateOrProvinceCode = subscriber.SubmitterStateOrProvinceCode;
+                            subscriberName2010BA_N4Segment.N403_PostalCode = subscriber.SubmitterPostalCode;
+
+                            var subscriber_DMGSegment = subscriberName2010BALoop.AddSegment(new TypedSegmentDMG());
+                            subscriber_DMGSegment.DMG01_DateTimePeriodFormatQualifier = subscriber.SubmitterDateTimePeriodFormatQualifier;
+                            subscriber_DMGSegment.DMG02_DateOfBirth = DateTime.ParseExact(subscriber.SubmitterDateTimePeriod, "yyyyMMdd", CultureInfo.InvariantCulture, DateTimeStyles.None);
+                            subscriber_DMGSegment.DMG03_Gender = GetGender(subscriber.SubmitterGenderCode);
+
+                            #endregion Subscriber HL > Subscriber Name
+
+                            #region Subscriber HL > Payer Name
+
+                            var subscriberName2010BALoop2 = subscriber2000BHLoop.AddLoop(new TypedLoopNM1(subscriber.PayerEntityIdentifierCode));
+                            subscriberName2010BALoop2.NM102_EntityTypeQualifier = GetEntityTypeQualifier(subscriber.PayerEntityTypeQualifier);
+                            subscriberName2010BALoop2.NM103_NameLastOrOrganizationName = subscriber.PayerNameLastOrOrganizationName;
+                            subscriberName2010BALoop2.NM108_IdCodeQualifier = subscriber.PayerIdCodeQualifier;
+                            subscriberName2010BALoop2.NM109_IdCode = subscriber.PayerIdCodeQualifierEnum;
+
+                            var subscriberName2010BA_N3Segment2 = subscriberName2010BALoop2.AddSegment(new TypedSegmentN3());
+                            subscriberName2010BA_N3Segment2.N301_AddressInformation = subscriber.PayerAddressInformation;
+
+                            var subscriberName2010BA_N4Segment2 = subscriberName2010BALoop2.AddSegment(new TypedSegmentN4());
+                            subscriberName2010BA_N4Segment2.N401_CityName = subscriber.PayerCityName;
+                            subscriberName2010BA_N4Segment2.N402_StateOrProvinceCode = subscriber.PayerStateOrProvinceCode;
+                            subscriberName2010BA_N4Segment2.N403_PostalCode = subscriber.PayerPostalCode;
+
+                            //var refSegment2 = subscriberName2010BALoop2.AddSegment(new TypedSegmentREF());
+                            //refSegment2.REF01_ReferenceIdQualifier = "G2";
+                            //refSegment2.REF02_ReferenceId = "KA6663";
+
+                            #endregion Subscriber HL > Payer Name
+
+                            #region Claim Information
+
+                            if (subscriber.Claims.Count > 0)
+                            {
+                                foreach (var claim in subscriber.Claims)
+                                {
+                                    #region Claim Information > CLM
+
+                                    var claim2300Loop = subscriber2000BHLoop.AddLoop(new TypedLoopCLM());
+                                    //claim2300Loop.CLM01_PatientControlNumber = claim.PatientControlNumber;
+                                    claim2300Loop.CLM01_PatientControlNumber = claim.ClaimSubmitterIdentifier;
+                                    claim2300Loop.CLM02_TotalClaimChargeAmount =Convert.ToDecimal(String.Format("{0:0.00}", Math.Round(Convert.ToDecimal(claim.TotalClaimChargeAmount), 2)));
+                                    claim2300Loop.CLM05._1_FacilityCodeValue = claim.FacilityCodeValue;
+                                    claim2300Loop.CLM05._2_FacilityCodeQualifier = claim.FacilityCodeQualifier;
+                                    claim2300Loop.CLM05._3_ClaimFrequencyTypeCode = "8";// claim.ClaimFrequencyTypeCode; //TODO:REMOVE
+                                    claim2300Loop.CLM06_ProviderOrSupplierSignatureIndicator = GetBoolean(claim.ProviderOrSupplierSignatureIndicator);
+                                    claim2300Loop.CLM07_ProviderAcceptAssignmentCode = claim.ProviderAcceptAssignmentCode;
+                                    claim2300Loop.CLM08_BenefitsAssignmentCerficationIndicator = claim.BenefitsAssignmentCerficationIndicator;
+                                    claim2300Loop.CLM09_ReleaseOfInformationCode = claim.ReleaseOfInformationCode;
+                                    claim2300Loop.CLM10_PatientSignatureSourceCode = claim.PatientSignatureSourceCode;
+
+
+
+                                    //TODO:REMOVE START
+                                    var refSegment12 = claim2300Loop.AddSegment(new TypedSegmentREF());
+                                    refSegment12.REF01_ReferenceIdQualifier = "F8";
+                                    refSegment12.REF02_ReferenceId = claim.ReferenceIdentification;
+                                    //TODO:REMOVE END
+                                    //TODO:REMOVE START
+                                    var refSegment13 = claim2300Loop.AddSegment(new TypedSegmentREF());
+                                    refSegment13.REF01_ReferenceIdQualifier = "F5";
+                                    refSegment13.REF02_ReferenceId = "Y";
+                                    //TODO:REMOVE END
+
+
+
+                                    #endregion Claim Information > CLM
+
+                                    #region Claim Information > Reference > REF
+
+                                    var refSegment = claim2300Loop.AddSegment(new TypedSegmentREF());
+                                    refSegment.REF01_ReferenceIdQualifier = claim.ReferenceIdentificationQualifier;
+                                    refSegment.REF02_ReferenceId = claim.ReferenceIdentification;
+
+                                    #endregion Claim Information > Reference > REF
+
+                                    #region Claim Information > HI
+
+                                    var hiSegment = claim2300Loop.AddSegment(new TypedSegmentHI());
+
+                                    hiSegment.HI01_HealthCareCodeInformation = claim.HealthCareCodeInformation01 ?? "";
+                                    hiSegment.HI02_HealthCareCodeInformation = claim.HealthCareCodeInformation02 ?? "";
+                                    hiSegment.HI03_HealthCareCodeInformation = claim.HealthCareCodeInformation03 ?? "";
+                                    hiSegment.HI04_HealthCareCodeInformation = claim.HealthCareCodeInformation04 ?? "";
+                                    hiSegment.HI05_HealthCareCodeInformation = claim.HealthCareCodeInformation05 ?? "";
+                                    hiSegment.HI06_HealthCareCodeInformation = claim.HealthCareCodeInformation06 ?? "";
+                                    hiSegment.HI07_HealthCareCodeInformation = claim.HealthCareCodeInformation07 ?? "";
+                                    hiSegment.HI08_HealthCareCodeInformation = claim.HealthCareCodeInformation08 ?? "";
+                                    hiSegment.HI09_HealthCareCodeInformation = claim.HealthCareCodeInformation09 ?? "";
+                                    hiSegment.HI10_HealthCareCodeInformation = claim.HealthCareCodeInformation10 ?? "";
+                                    hiSegment.HI11_HealthCareCodeInformation = claim.HealthCareCodeInformation11 ?? "";
+                                    hiSegment.HI12_HealthCareCodeInformation = claim.HealthCareCodeInformation12 ?? "";
+
+
+                                    #endregion Claim Information > HI
+
+                                    #region Claim Information > Provider
+
+                                    if (!string.IsNullOrEmpty(claim.RenderingProviderIdCodeQualifierEnum))
+                                    {
+                                        var renderingProvider2310BLoop = claim2300Loop.AddLoop(new TypedLoopNM1(claim.RenderingProviderEntityIdentifierCode));
+                                        renderingProvider2310BLoop.NM102_EntityTypeQualifier = GetEntityTypeQualifier(claim.RenderingProviderEntityTypeQualifier);
+                                        renderingProvider2310BLoop.NM103_NameLastOrOrganizationName = claim.RenderingProviderNameLastOrOrganizationName;
+                                        renderingProvider2310BLoop.NM108_IdCodeQualifier = claim.RenderingProviderIdCodeQualifier;
+                                        renderingProvider2310BLoop.NM109_IdCode = claim.RenderingProviderIdCodeQualifierEnum;
+
+                                        var serviceFacilityLocation2310CLoop = claim2300Loop.AddLoop(new TypedLoopNM1(claim.ServiceFacilityLocationEntityIdentifierCode));
+                                        serviceFacilityLocation2310CLoop.NM102_EntityTypeQualifier = GetEntityTypeQualifier(claim.ServiceFacilityLocationEntityTypeQualifier);
+                                        serviceFacilityLocation2310CLoop.NM103_NameLastOrOrganizationName = claim.ServiceFacilityLocationNameLastOrOrganizationName;
+                                        serviceFacilityLocation2310CLoop.NM108_IdCodeQualifier = claim.ServiceFacilityLocationIdCodeQualifier;
+                                        serviceFacilityLocation2310CLoop.NM109_IdCode = claim.ServiceFacilityLocationIdCodeQualifierEnum;
+
+                                        var serviceFacilityLocation2310CLoop_N3Segment = serviceFacilityLocation2310CLoop.AddSegment(new TypedSegmentN3());
+                                        serviceFacilityLocation2310CLoop_N3Segment.N301_AddressInformation = claim.ServiceFacilityLocationAddressInformation;
+
+                                        var serviceFacilityLocation2310CLoop_N4Segment = serviceFacilityLocation2310CLoop.AddSegment(new TypedSegmentN4());
+                                        serviceFacilityLocation2310CLoop_N4Segment.N401_CityName = claim.ServiceFacilityLocationCityName;
+                                        serviceFacilityLocation2310CLoop_N4Segment.N402_StateOrProvinceCode = claim.ServiceFacilityLocationStateOrProvinceCode;
+                                        serviceFacilityLocation2310CLoop_N4Segment.N403_PostalCode = claim.ServiceFacilityLocationPostalCode;
+                                    }
+                                    #endregion Claim Information > Provider
+
+
+                                    if (a ==1)
+                                    {
+                                        //TODO:REMOVE START
+
+                                        #region Subscriber HL > Other Subscriber Information
+
+                                        var othersubscriber2020BLoop = claim2300Loop.AddLoop(new TypedLoopSBR());
+                                        othersubscriber2020BLoop.SBR01_PayerResponsibilitySequenceNumberCode = "P";
+                                        othersubscriber2020BLoop.SBR02_IndividualRelationshipCode = "18";
+                                        othersubscriber2020BLoop.SBR03_PolicyOrGroupNumber = "AU9837345";
+                                        //othersubscriber2020BLoop.SBR05_InsuranceTypeCode = "15";
+                                        //othersubscriber2020BLoop.SBR06_CoordinationOfBenefitsCode = "1";
+                                        othersubscriber2020BLoop.SBR09_ClaimFilingIndicatorCode = "13";
+
+
+
+                                        var otherAMT282020BSegment =
+                                            othersubscriber2020BLoop.AddSegment(new TypedSegmentAMT());
+                                        otherAMT282020BSegment.AMT01_AmountQualifierCode = "D";
+                                        otherAMT282020BSegment.AMT02_MonetaryAmount = (claim2300Loop.CLM02_TotalClaimChargeAmount - 12).ToString();
+                                           // claim2300Loop.CLM02_TotalClaimChargeAmount.ToString();
+
+
+                                        //var otherAMT302020BSegment = othersubscriber2020BLoop.AddSegment(new TypedSegmentAMT());
+                                        //otherAMT302020BSegment.AMT01_AmountQualifierCode = "AB";
+                                        //otherAMT302020BSegment.AMT02_MonetaryAmount = "2";
+
+
+                                        //var otherAMT292020BSegment = othersubscriber2020BLoop.AddSegment(new TypedSegmentAMT());
+                                        //otherAMT292020BSegment.AMT01_AmountQualifierCode = "EAF";
+                                        //otherAMT292020BSegment.AMT02_MonetaryAmount = "200";
+
+                                        //var otherAMT302020BSegment = othersubscriber2020BLoop.AddSegment(new TypedSegmentAMT());
+                                        //otherAMT302020BSegment.AMT01_AmountQualifierCode = "A8";
+                                        //otherAMT302020BSegment.AMT02_MonetaryAmount = "200";
+
+                                        var otherInsurance2020BSegment =
+                                            othersubscriber2020BLoop.AddSegment(new TypedSegmentOI());
+                                        otherInsurance2020BSegment.OI03_BenefitsAssignmentCertificationIndicator = "N";
+                                        otherInsurance2020BSegment.OI06_ReleaseOfInformationCode = "I";
+
+                                        //var otherMedicare2020BSegment = othersubscriber2020BLoop.AddSegment(new TypedSegmentMIA());
+                                        //otherMedicare2020BSegment.MIA01_Quantity = "01";
+
+                                        #region Other Subscriber
+
+                                        var OthersubscriberName2010BALoop =
+                                            othersubscriber2020BLoop.AddLoop(
+                                                new TypedLoopNM1(subscriber.SubmitterEntityIdentifierCode));
+                                        OthersubscriberName2010BALoop.NM102_EntityTypeQualifier =
+                                            GetEntityTypeQualifier(subscriber.SubmitterEntityTypeQualifier);
+                                        OthersubscriberName2010BALoop.NM103_NameLastOrOrganizationName =
+                                            subscriber.SubmitterNameLastOrOrganizationName;
+                                        OthersubscriberName2010BALoop.NM104_NameFirst = subscriber.SubmitterNameFirst;
+                                        OthersubscriberName2010BALoop.NM108_IdCodeQualifier =
+                                            subscriber.SubmitterIdCodeQualifier;
+                                        OthersubscriberName2010BALoop.NM109_IdCode =
+                                            subscriber.SubmitterIdCodeQualifierEnum;
+
+                                        var OthersubscriberName2010BA_N3Segment =
+                                            OthersubscriberName2010BALoop.AddSegment(new TypedSegmentN3());
+                                        OthersubscriberName2010BA_N3Segment.N301_AddressInformation =
+                                            subscriber.SubmitterAddressInformation;
+
+                                        var OthersubscriberName2010BA_N4Segment =
+                                            OthersubscriberName2010BALoop.AddSegment(new TypedSegmentN4());
+                                        OthersubscriberName2010BA_N4Segment.N401_CityName = subscriber.SubmitterCityName;
+                                        OthersubscriberName2010BA_N4Segment.N402_StateOrProvinceCode =
+                                            subscriber.SubmitterStateOrProvinceCode;
+                                        OthersubscriberName2010BA_N4Segment.N403_PostalCode =
+                                            subscriber.SubmitterPostalCode;
+
+                                        #endregion Subscriber HL > Subscriber Name
+
+
+
+
+                                        var otherPayor2030BLoop =
+                                            othersubscriber2020BLoop.AddLoop(
+                                                new TypedLoopNM1(subscriber.PayerEntityIdentifierCode));
+                                        otherPayor2030BLoop.NM102_EntityTypeQualifier =
+                                            GetEntityTypeQualifier(subscriber.PayerEntityTypeQualifier);
+                                        otherPayor2030BLoop.NM103_NameLastOrOrganizationName =
+                                            subscriber.PayerNameLastOrOrganizationName;
+                                        otherPayor2030BLoop.NM108_IdCodeQualifier = subscriber.PayerIdCodeQualifier;
+                                        otherPayor2030BLoop.NM109_IdCode = subscriber.PayerIdCodeQualifierEnum;
+
+                                        var otherPayor2030BLoop_N3Segment2 =
+                                            otherPayor2030BLoop.AddSegment(new TypedSegmentN3());
+                                        otherPayor2030BLoop_N3Segment2.N301_AddressInformation =
+                                            subscriber.PayerAddressInformation;
+
+                                        var otherPayor2030BLoop_N4Segment2 =
+                                            otherPayor2030BLoop.AddSegment(new TypedSegmentN4());
+                                        otherPayor2030BLoop_N4Segment2.N401_CityName = subscriber.PayerCityName;
+                                        otherPayor2030BLoop_N4Segment2.N402_StateOrProvinceCode =
+                                            subscriber.PayerStateOrProvinceCode;
+                                        otherPayor2030BLoop_N4Segment2.N403_PostalCode = subscriber.PayerPostalCode;
+
+                                        //var otherPayor2030BLoop_DMGSegment =
+                                        //    otherPayor2030BLoop.AddSegment(new TypedSegmentDTP());
+                                        //otherPayor2030BLoop_DMGSegment.DTP01_DateTimeQualifier = GetDtpQualifier("573");
+                                        //otherPayor2030BLoop_DMGSegment.DTP02_DateTimePeriodFormatQualifier =
+                                        //    GetDtpFormatQualifier("D8");
+
+                                        //var strDateTimePeriod12 = "20161208";
+                                        //DateTime startDate12 = DateTime.ParseExact(strDateTimePeriod12.Substring(0, 8),
+                                        //                                           "yyyyMMdd", null);
+                                        //otherPayor2030BLoop_DMGSegment.DTP03_Date = new DateTimePeriod(startDate12);
+
+
+
+                                        //var refSegment2 = subscriberName2010BALoop2.AddSegment(new TypedSegmentREF());
+                                        //refSegment2.REF01_ReferenceIdQualifier = "G2";
+                                        //refSegment2.REF02_ReferenceId = "KA6663";
+
+                                        #endregion
+
+                                        //TODO:REMOVE END
+                                    }
+
+                                    #region Claim Information > Service Line Number
+
+                                    if (claim.ServiceLines.Count > 0)
+                                    {
+                                        foreach (var serviceLine in claim.ServiceLines)
+                                        {
+                                            #region Claim Information > Service Line Number > LX
+
+                                            var lxLoop = claim2300Loop.AddLoop(new TypedLoopLX(ConstantsEdi.ServiceLineNode));
+                                            lxLoop.LX01_AssignedNumber = serviceLine.AssignedNumber;
+
+                                            #endregion Claim Information > Service Line Number > LX
+
+                                            #region Claim Information > Service Line Number > SV1
+
+                                            var sv1Segment = lxLoop.AddSegment(new TypedSegmentSV1());
+                                            sv1Segment.SV101_CompositeMedicalProcedure = serviceLine.CompositeMedicalProcedureIdentifier + md; //TODO:REMOVE
+                                            sv1Segment.SV102_MonetaryAmount = serviceLine.MonetaryAmount;
+                                            sv1Segment.SV103_UnitBasisMeasCode = serviceLine.UnitOrBasisForMeasurementCode;
+                                            sv1Segment.SV104_Quantity = serviceLine.Quantity;
+                                            sv1Segment.SV107_CompDiagCodePoint = serviceLine.CompositeDiagnosisCodePointer;
+
+                                            #endregion Claim Information > Service Line Number > SV1
+
+                                            #region Claim Information > Service Line Number > Dates > DTP
+
+                                            var dtpSegment = lxLoop.AddSegment(new TypedSegmentDTP());
+                                            dtpSegment.DTP01_DateTimeQualifier = GetDtpQualifier(serviceLine.DateTimeQualifier);
+                                            dtpSegment.DTP02_DateTimePeriodFormatQualifier = GetDtpFormatQualifier(serviceLine.DateTimePeriodFormatQualifier);
+
+                                            var strDateTimePeriod = "20161119-20161121";// serviceLine.DateTimePeriod; //TODO REMOVE
+                                            DateTime startDate = DateTime.ParseExact(strDateTimePeriod.Substring(0, 8), "yyyyMMdd", null);
+                                            DateTime endDate = DateTime.ParseExact(strDateTimePeriod.Substring(9, 8), "yyyyMMdd", null);
+                                            dtpSegment.DTP03_Date = new DateTimePeriod(startDate, endDate);
+
+                                            //TODO REMOVE
+                                            //var dtpSegment1 = lxLoop.AddSegment(new TypedSegmentDTP());
+                                            //dtpSegment1.DTP01_DateTimeQualifier = GetDtpQualifier("471");
+                                            //dtpSegment1.DTP02_DateTimePeriodFormatQualifier = GetDtpFormatQualifier("D8");
+
+                                            //var strDateTimePeriod1 = "20161118";
+                                            //DateTime startDate1 = DateTime.ParseExact(strDateTimePeriod1.Substring(0, 8), "yyyyMMdd", null);
+                                            //dtpSegment1.DTP03_Date = new DateTimePeriod(startDate1);
+
+                                            //var dtpSegment2 = lxLoop.AddSegment(new TypedSegmentDTP());
+                                            //dtpSegment2.DTP01_DateTimeQualifier = GetDtpQualifier("454");
+                                            //dtpSegment2.DTP02_DateTimePeriodFormatQualifier = GetDtpFormatQualifier("D8");
+
+                                            //var strDateTimePeriod2 = "20161118";
+                                            //DateTime startDate2 = DateTime.ParseExact(strDateTimePeriod2.Substring(0, 8), "yyyyMMdd", null);
+                                            //dtpSegment1.DTP03_Date = new DateTimePeriod(startDate2);
+                                            ; //TODO REMOVE
+                                            #endregion Claim Information > Service Line Number > Dates > DTP
+
+                                            #region Claim Information > Service Line Number > Reference > REF
+
+                                            //var lxRefSegment = lxLoop.AddSegment(new TypedSegmentREF());
+                                            //lxRefSegment.REF01_ReferenceIdQualifier = serviceLine.ReferenceIdentificationQualifier;
+                                            //lxRefSegment.REF02_ReferenceId = serviceLine.ReferenceIdentification;
+
+                                            #endregion Claim Information > Service Line Number > Reference > REF
+
+                                            if (a == 1)
+                                            {
+                                                #region Claim Information > Service Line Number > Coordination of Benefits — Service Line Level
+                                                var svdLoop = lxLoop.AddLoop(new TypedLoopSVD());
+                                                svdLoop.SVD01_OtherPayerPrimaryIdentifier = subscriber.PayerIdCodeQualifierEnum;
+                                                svdLoop.SVD02_MonetaryAmount = (claim2300Loop.CLM02_TotalClaimChargeAmount - 12).ToString();
+                                                svdLoop.SVD03_ProductOrServiceIDComposite = serviceLine.CompositeMedicalProcedureIdentifier;
+                                                svdLoop.SVD05_PaidServiceUnitCount = serviceLine.Quantity;
+
+                                                var svdCAS = svdLoop.AddSegment(new TypedSegmentCAS());
+                                                svdCAS.CAS01_ClaimAdjustmentGroupCode = "PI";
+                                                svdCAS.CAS02_ClaimAdjustmentReasonCode = "10";
+                                                svdCAS.CAS03_MonetaryAmount = "12";
+
+                                                var dtpSegment2 = svdLoop.AddSegment(new TypedSegmentDTP());
+                                                dtpSegment2.DTP01_DateTimeQualifier = GetDtpQualifier("573");
+                                                dtpSegment2.DTP02_DateTimePeriodFormatQualifier = GetDtpFormatQualifier("D8");
+                                                var strDateTimePeriod2 = "20161118";
+                                                DateTime startDate2 = DateTime.ParseExact(strDateTimePeriod2.Substring(0, 8), "yyyyMMdd", null);
+                                                dtpSegment2.DTP03_Date = new DateTimePeriod(startDate2);
+
+
+                                                var svdAMT = svdLoop.AddSegment(new TypedSegmentAMT());
+                                                svdAMT.AMT01_AmountQualifierCode = "EAF";
+                                                svdAMT.AMT02_MonetaryAmount = "1";
+
+                                                #endregion
+                                            }
+                                        }
+                                    }
+
+                                    #endregion Claim Information > Service Line Number
+                                }
+                            }
+
+                            #endregion Claim Information
+                        }
+                    }
+
+                    #endregion Subscriber HL
+                }
+            }
+
+            var x12 = message.SerializeToX12(false);
+            x12 = RemoveLineEndings(x12);
+            {
+
+                //x12 = x12.Replace("\r\n", "");
+                string fileServerPath = HttpContext.Current.Server.MapPath(filePath);
+                if (!Directory.Exists(fileServerPath))
+                    Directory.CreateDirectory(fileServerPath);
+                string fullFileName = fileServerPath + fileName;
+
+                using (Stream outputStream = new FileStream(fullFileName, FileMode.Create, FileAccess.Write))
+                {
+                    using (StreamWriter writer = new StreamWriter(outputStream))
+                    {
+                        writer.Write(x12);
+                        writer.Flush();
+                        writer.Close();
+                        writer.Dispose();
+                        
+                    }
+                    //outputStream.Flush();
+                    outputStream.Close();
+                    outputStream.Dispose();
+                    
+                }
+                return fullFileName;
+            }
+
+            //File.WriteAllText(fullFileName, x12);
+            
+
+
+
+
+            #endregion Generate 837 File
+        }
+
+
+        public static string RemoveLineEndings(string value)
+        {
+            if (String.IsNullOrEmpty(value))
+            {
+                return value;
+            }
+            string lineSeparator = ((char)0x2028).ToString();
+            string paragraphSeparator = ((char)0x2029).ToString();
+
+            return value.Replace("\r\n", string.Empty).Replace("\n", string.Empty).Replace("\r", string.Empty)
+                        .Replace(lineSeparator, string.Empty).Replace(paragraphSeparator, string.Empty);//.Replace("\\s+", "");
+        }
+
+        #endregion
+
+        #region 837 SUPPORTING METHODS
+
+        public  CommunicationNumberQualifer GetCommunicationNumberQualifer(string value)
+        {
+            switch (value)
+            {
+                case "EM": return CommunicationNumberQualifer.ElectronicMail;
+                case "EX": return CommunicationNumberQualifer.TelephoneExtension;
+                case "FX": return CommunicationNumberQualifer.Facsimile;
+                case "TE": return CommunicationNumberQualifer.Telephone;
+                default: return CommunicationNumberQualifer.Undefined;
+            }
+        }
+        public  EntityTypeQualifier GetEntityTypeQualifier(string value)
+        {
+            return value == "1" ? EntityTypeQualifier.Person : EntityTypeQualifier.NonPersonEntity;
+        }
+        public  Gender GetGender(string value)
+        {
+            switch (value)
+            {
+                case "F": return Gender.Female;
+                case "M": return Gender.Male;
+                case "U": return Gender.Unknown;
+                default: return Gender.Undefined;
+            }
+        }
+        public  bool GetBoolean(string value)
+        {
+            return value == "Y";
+        }
+        public  DTPQualifier GetDtpQualifier(string value)
+        {
+            switch (value)
+            {
+                case "454": return DTPQualifier.InitialTreatment;
+                case "471": return DTPQualifier.Prescription;
+                case "472": return DTPQualifier.Service;
+                case "573": return DTPQualifier.DateClaimPaid;
+                default: return DTPQualifier.Service;
+            }
+        }
+        public  DTPFormatQualifier GetDtpFormatQualifier(string value)
+        {
+            switch (value)
+            {
+                case "RD8": return DTPFormatQualifier.CCYYMMDD_CCYYMMDD;
+                case "D8": return DTPFormatQualifier.CCYYMMDD;
+                default: return DTPFormatQualifier.CCYYMMDD_CCYYMMDD;
+            }
+        }
+
+        #endregion
+
+    }
+}

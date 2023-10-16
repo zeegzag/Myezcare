@@ -1,0 +1,935 @@
+﻿@model AddReferralModel
+@Html.Hidden("hdnIsMonthlySummaryListView", Common.SerializeObject(Model.ReferralMonthlySummary.IsMonthlySummaryListView))
+<div class="form-group row">
+    <div class="col-sm-12">
+
+        <form id="frmSearchReferralMonthlySummery">
+
+            <div class="row">
+                <div class="form-group col-lg-10 col-md-10 col-sm-10 no-padding">
+
+                    <input id="hideErrorContent" type="text" class="hideErrorContent">
+
+                    <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.StarDate</label>
+                        <div class="input-group date" datepicker="TempSearchReferralMonthlySummary.StartDate" ng-dateval="TempSearchReferralMonthlySummary.StartDate">
+                            <input
+                            class="form-control input-sm  dateInputMask" placeholder="@Resource.StarDate"
+                            id="TempSearchReferralMonthlySummary_StartDate" maxlength="50" name="TempSearchReferralMonthlySummary.StartDate"
+                            type="text"/>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.EndDate</label>
+                        <div class="input-group date" datepicker="TempSearchReferralMonthlySummary.EndDate" ng-dateval="TempSearchReferralMonthlySummary.EndDate">
+                            <input
+                            class="form-control input-sm dateInputMask" placeholder="@Resource.EndDate"
+                            id="TempSearchReferralMonthlySummary_EndDate" maxlength="50" name="TempSearchReferralMonthlySummary.EndDate"
+                            type="text"/>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.Facility</label>
+                        <div class="">
+                            <select class="form-control input-sm"
+                                data-ng-init="TempSearchReferralMonthlySummary.FacilityID=SearchReferralMonthlySummary.FacilityID==''?null:TempSearchReferralMonthlySummary.FacilityID.toString()"
+                                data-ng-model="TempSearchReferralMonthlySummary.FacilityID"
+                                id="TempSearchReferralMonthlySummary"
+                                name="TempSearchReferralMonthlySummary.FacilityID"
+                                convert-to-number="">
+                                <option value="">@Resource.SelectFacility</option>
+                                <option data-ng-repeat="option in FacilityList" value="{{option.Value}}">{{option.Name}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    @if (Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                    {
+                        <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                            <label class="control-label">@Resource.Region</label>
+                            @Html.DropDownListFor(p => p.SearchReferralMonthlySummary.RegionID, Model.RegionList.ToSelectList(Model.SearchReferralMonthlySummary.RegionID.ToString() ?? "", "RegionName", "RegionID", Resource.Select, ""),
+                            new
+                            {
+                                convert_to_number = "",
+                                id = "RegionID",
+                                data_ng_model = "TempSearchReferralMonthlySummary.RegionID",
+                                data_ng_init = "TempSearchReferralMonthlySummary.RegionID=TempSearchReferralMonthlySummary.RegionID==''?null:TempSearchReferralMonthlySummary.RegionID",
+                                @class = "form-control input-sm",
+                                data_val = false
+                            })
+                        </div>
+
+                        <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                            <label class="control-label">@Resource.ClientLabel</label>
+                            @Html.TextBoxFor(m => m.SearchReferralMonthlySummary.ClientName, new
+                        {
+                            data_ng_model = "TempSearchReferralMonthlySummary.ClientName",
+                            @class = "form-control input-sm",
+                            placeholder = @Resource.Name,
+                            maxlength = 100
+                        })
+                        </div>
+
+                        <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                            <label class="control-label">@Resource.CreatedBy</label>
+                            @Html.DropDownListFor(p => p.SearchReferralMonthlySummary.CreatedBy, Model.EmployeeList.ToSelectList(Model.SearchReferralMonthlySummary.CreatedBy.ToString() ?? "", "EmployeeName", "EmployeeID", Resource.Select, ""),
+                            new
+                            {
+                                convert_to_number = "",
+                                id = "EmployeeID",
+                                data_ng_model = "TempSearchReferralMonthlySummary.CreatedBy",
+                                data_ng_init = "TempSearchReferralMonthlySummary.CreatedBy=TempSearchReferralMonthlySummary.CreatedBy==''?null:TempSearchReferralMonthlySummary.CreatedBy",
+                                @class = "form-control input-sm",
+                                data_val = false
+                            })
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-lg-2 col-md-4 col-sm-4 padding-top-18">
+                            <label class="control-label"></label>
+                            <button type="submit" class="btn btn-sm btn-primary " data-ng-click="SearchReferralMonthly()">
+                                @Resource.Search
+                            </button>
+                            <a class="btn btn-sm grey border-grey-cascade" data-ng-click="ResetReferralMonthlySummary()">
+                                @Resource.Reset
+                            </a>
+                        </div>
+                    }
+
+
+                </div>
+                @if (Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                {
+                    <div class="col-lg-2 col-md-4 col-sm-4 padding-top-18">
+                        <label class="control-label"></label>
+                        <button type="submit" class="btn btn-sm btn-primary " data-ng-click="SearchReferralMonthly()">
+                            @Resource.Search
+                        </button>
+                        <a class="btn btn-sm grey border-grey-cascade" data-ng-click="ResetReferralMonthlySummary()">
+                            @Resource.Reset
+                        </a>
+                    </div>
+                }
+
+                @if (!Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                {
+                    <div class="col-lg-2 col-md-2 col-sm-2">
+                        <a href="javascript:void(0);" class="btn btn-xs green-jungle pull-right" data-ng-click="OpenReferralMonthlySummary()">
+                            <i class="fa fa-plus">&nbsp;&nbsp;</i> @Resource.MonthlySummary
+                        </a>
+                    </div>
+                }
+
+            </div>
+        </form>
+
+        <div>
+            <div class="row padding-left-right-10 ">
+                @if (!Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                {
+                    <div class="col-md-12">
+                        <div class="scroller1" data-rail-visible="1" data-rail-color="yellow" data-handle-color="#a1b2bd">
+                            <span><strong>@Resource.Name: </strong><span>{{Referral.FullName}}</span></span>
+                            <span class="padding-left-15"><strong>@Resource.AHCCCSNumber: </strong><span>#{{Referral.AHCCCSID}}</span></span>
+                            <span class="padding-left-15"><strong>@Resource.CIS: </strong><span>#{{Referral.CISNumber}}</span></span>
+                        </div>
+                        <div class="space10"></div>
+                    </div>
+                }
+
+
+                <div class="">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                         @if (Common.HasPermission(Constants.Permission_ReviewMeasurement_MonthlySummary_AddUpdate))
+                         {
+                             <div class="btn-group" data-ng-show="ReferralMonthlySummaryList.length > 0">
+                                 <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                                <input id="SelectAllDxCode" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                            </span>
+                             </div>
+                         }
+                        <div class="btn-group">
+                            <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                                <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                            </button>
+                        </div>
+                        <div class="btn-group">@*{{TempSearchReferralMonthlySummary.IsDeleted}}*@
+                            @Html.DropDownListFor(m => m.SearchReferralMonthlySummary.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchReferralMonthlySummary.IsDeleted), "Name", "Value", "", ""),
+                                new
+                                {
+                                    id = "IsDeleted",
+                                    data_ng_model = "TempSearchReferralMonthlySummary.IsDeleted",
+                                    data_ng_init = "TempSearchReferralMonthlySummary.IsDeleted = TempSearchReferralMonthlySummary.IsDeleted==null?'-1':TempSearchReferralMonthlySummary.IsDeleted.toString()",
+                                    @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                    data_ng_change = "SearchReferralMonthly()"
+                                })
+                        </div>
+                         @if (Common.HasPermission(Constants.Permission_ReviewMeasurement_MonthlySummary_AddUpdate))
+                         {
+                             <div class="btn-group" data-ng-if="SelectedReferralMSIds.length > 0">
+                                 <button type="button" data-ng-click="DeleteReferralMS()" class="btn blue btn-sm grey border-grey-cascade">
+                                     <i class="fa fa-random margin-right-10"></i>{{TempSearchReferralMonthlySummary.IsDeleted==0 ?'@Constants.DisableSelected' :(TempSearchReferralMonthlySummary.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                                 </button>
+                             </div>
+                         }
+
+                        <div class="inline-block pull-right" data-ng-show="ReferralMonthlySummaryList.length > 0">
+                            <div class="pull-right margin-left-5">
+                                <dir-pagination-controls boundary-links="true" max-size="ReferralMonthlySummaryListPager.maxSize" on-page-change="ReferralMonthlySummaryListPager.pageChanged(newPageNumber)" pagination-id="ReferralMonthlySummaryListPagerID"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space20"></div>
+                </div>
+
+
+                <div class="col-md-12 compact" data-ng-if="ReferralMonthlySummaryList.length > 0">
+                    <div class="table-responsive">
+                        <form id="frmReferralMS">
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                <tr>
+                                     @if (Common.HasPermission(Constants.Permission_ReviewMeasurement_MonthlySummary_AddUpdate))
+                                     {
+                                         <th class="width-20px"></th>
+                                     }
+                                    @if (Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                                    {
+                                        <th class="width-180px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralMonthlySummaryListPager.sortColumn('ClientName')">@Resource.Name</a>
+                                            <span class="sortorder" data-ng-show="ReferralMonthlySummaryListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:ReferralMonthlySummaryListPager.reverse}"></span>
+                                        </th>
+                                    }
+                                    <th class="width-160px">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralMonthlySummaryListPager.sortColumn('ServiceDates')">@Resource.ServiceDates</a>
+                                        <span class="sortorder" data-ng-show="ReferralMonthlySummaryListPager.sortIndex === 'ServiceDates'" data-ng-class="{reverse:ReferralMonthlySummaryListPager.reverse}"></span>
+                                    </th>
+                                    <th class="col-sm-1">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralMonthlySummaryListPager.sortColumn('FacilityName')">@Resource.Facility</a>
+                                        <span class="sortorder" data-ng-show="ReferralMonthlySummaryListPager.sortIndex === 'FacilityName'" data-ng-class="{reverse:ReferralMonthlySummaryListPager.reverse}"></span>
+                                    </th>
+                                    @if (Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                                    {
+                                        <th class="width-180px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralMonthlySummaryListPager.sortColumn('Region')">@Resource.Region</a>
+                                            <span class="sortorder" data-ng-show="ReferralMonthlySummaryListPager.sortIndex === 'Region'" data-ng-class="{reverse:ReferralMonthlySummaryListPager.reverse}"></span>
+                                        </th>
+                                    }
+                                    <th class="col-sm-1">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralMonthlySummaryListPager.sortColumn('CreatedBy')">@Resource.CreatedBy</a>
+                                        <span class="sortorder" data-ng-show="ReferralMonthlySummaryListPager.sortIndex === 'CreatedBy'" data-ng-class="{reverse:ReferralMonthlySummaryListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralMonthlySummaryListPager.sortColumn('CreatedDate')">@Resource.CreatedDate</a>
+                                        <span class="sortorder" data-ng-show="ReferralMonthlySummaryListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:ReferralMonthlySummaryListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralMonthlySummaryListPager.sortColumn('TreatmentPlan')">@Resource.ProgressChallenges</a>
+                                        <span class="sortorder" data-ng-show="ReferralMonthlySummaryListPager.sortIndex === 'TreatmentPlan'" data-ng-class="{reverse:ReferralMonthlySummaryListPager.reverse}"></span>
+                                    </th>
+                                    <th class="width-145px">@Resource.Action</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-class="{'deleted':referralMS.IsDeleted}" dir-paginate="referralMS in ReferralMonthlySummaryList | itemsPerPage: ReferralMonthlySummaryListPager.pageSize"
+                                        total-items="ReferralMonthlySummaryListPager.totalRecords" current-page="ReferralMonthlySummaryListPager.currentPage" pagination-id="ReferralMonthlySummaryListPagerID">
+                                        @if (Common.HasPermission(Constants.Permission_ReviewMeasurement_MonthlySummary_AddUpdate))
+                                        {
+                                            <td>
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="referralMS.IsChecked" data-ng-change="SelectReferralMS(referralMS)" val="referralMS.IsChecked">
+                                            </td>
+                                        }
+                                        @if (Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                                        {
+                                             
+                                            <td><a class="" data-ng-href="/referral/addreferral/{{referralMS.EncryptedReferralID}}" target="_blank">{{referralMS.ClientName }}</a></td>
+                                        }
+                                        <td>{{referralMS.MonthlySummaryStartDate |dateformat}} - {{referralMS.MonthlySummaryEndDate |dateformat}}</td>
+                                        <td>{{referralMS.FacilityName}}</td>
+                                        @if (Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                                        {
+                                            <td>{{referralMS.RegionName}}</td>
+                                        }
+                                        <td>{{referralMS.CreatedName}}</td>
+                                        <td>{{referralMS.CreatedDate |dateformat}}</td>
+                                        <td>{{referralMS.TreatmentPlan}}</td>
+                                        <td>
+
+                                            <a href="javascript:void(0);" class="btn btn-xs blue" data-ng-click="OpenReferralMonthlySummary(referralMS.ReferralMonthlySummariesID,referralMS.ReferralID)">@Resource.Edit</a>
+                                            @if (Common.HasPermission(Constants.Permission_ReviewMeasurement_MonthlySummary_AddUpdate))
+                                            {
+                                                <a href="javascript:void(0);" data-ng-show="referralMS.IsDeleted" data-ng-click="DeleteReferralMS(referralMS.ReferralMonthlySummariesID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!referralMS.IsDeleted" data-ng-click="DeleteReferralMS(referralMS.ReferralMonthlySummariesID,'@Resource.Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                            }
+                                            <a href="javascript:void(0);" class="btn btn-xs yellow" type="button" data-ng-click="GetSnapshotPrintReport(referralMS.ReferralMonthlySummariesID)">@Resource.Print</a>
+                                            @*grey-cascade*@
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+
+                <div>
+                    <div class="col-sm-12" data-ng-if="ReferralMonthlySummaryList.length > 0">
+                        <div class="col-sm-3 pull-left no-padding">
+                            @Resource.Showing <span data-ng-bind="(ReferralMonthlySummaryListPager.pageSize * ReferralMonthlySummaryListPager.currentPage) - ReferralMonthlySummaryListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(ReferralMonthlySummaryListPager.pageSize == ReferralMonthlySummaryListPager.currentPageSize) ? (ReferralMonthlySummaryListPager.pageSize * ReferralMonthlySummaryListPager.currentPage) :(ReferralMonthlySummaryListPager.pageSize * ReferralMonthlySummaryListPager.currentPage) - ReferralMonthlySummaryListPager.pageSize  + ReferralMonthlySummaryListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralMonthlySummaryListPager.totalRecords"></span>&nbsp;@Resource.Records
+                        </div>
+                        <div class="pull-right top pagination-sm">
+                            <dir-pagination-controls boundary-links="true" max-size="ReferralMonthlySummaryListPager.maxSize" on-page-change="ReferralMonthlySummaryListPager.pageChanged(newPageNumber)" pagination-id="ReferralMonthlySummaryListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div data-ng-if="ReferralMonthlySummaryList.length == 0">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+<div class="modal fade modal-scroll outComeForm" id="model_MonthlySummery" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="frmModelMS">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title text-center"><strong>@Resource.SNAPSHOT</strong></h4>
+                </div>
+
+                <div class="modal-body">
+                    @*  @if (!Model.ReferralMonthlySummary.IsMonthlySummaryListView)
+                     {
+                         <div class="row">
+                             <div class="col-sm-12 no-padding padding-bottom-10px">
+
+                                 <div class="col-sm-6 no-right-padding">
+                                     <strong class="col-sm-4 no-right-padding">@Resource.ClientName</strong>
+                                     <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                         <input type="text" class="form-control input-sm height-19px" id="Text59" name="inputMiddleName" readonly="readonly" data-ng-value="Referral.LastName+', '+Referral.FirstName">
+                                     </div>
+                                 </div>
+
+
+                                 <div class="col-sm-6 no-right-padding">
+                                     <strong class="col-sm-4 no-right-padding">@Resource.AHCCCSID:</strong>
+                                     <div class="col-sm-8  form-group form-md-line-input no-left-padding">
+                                         <input type="text" class="form-control input-sm height-19px" id="Text76" name="inputMiddleName" readonly="readonly" data-ng-value="Referral.AHCCCSID">
+                                     </div>
+                                 </div>
+
+                             </div>
+                         </div>
+                     }
+                     else
+                     {
+                          <div class="row">
+                             <div class="col-sm-12 no-padding padding-bottom-10px">
+
+                                 <div class="col-sm-6 no-right-padding">
+                                     <strong class="col-sm-4 no-right-padding">@Resource.ClientName</strong>
+                                     <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                         <input type="text" class="form-control input-sm height-19px" id="Text59" name="inputMiddleName" readonly="readonly" data-ng-value="ReferralMonthlySummaryModel.ClientName">
+                                     </div>
+                                 </div>
+
+
+                                 <div class="col-sm-6 no-right-padding">
+                                     <strong class="col-sm-4 no-right-padding">@Resource.AHCCCSID:</strong>
+                                     <div class="col-sm-8  form-group form-md-line-input no-left-padding">
+                                         <input type="text" class="form-control input-sm height-19px" id="Text76" name="inputMiddleName" readonly="readonly" data-ng-value="ReferralMonthlySummaryModel.AHCCCSIdNumber">
+                                     </div>
+                                 </div>
+
+                             </div>
+                         </div>
+                     }*@
+
+                    <div class="row">
+                        <div class="col-sm-12 no-padding padding-bottom-10px">
+
+                            <div class="col-sm-6 no-right-padding">
+                                <strong class="col-sm-4 no-right-padding">@Resource.ClientName</strong>
+                                <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                    <input type="text" class="form-control input-sm height-19px" id="Text59" name="inputMiddleName" readonly="readonly" data-ng-value="ReferralMonthlySummaryModel.ClientName">
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-6 no-right-padding">
+                                <strong class="col-sm-4 no-right-padding">@Resource.AHCCCSID:</strong>
+                                <div class="col-sm-8  form-group form-md-line-input no-left-padding">
+                                    <input type="text" class="form-control input-sm height-19px" id="Text76" name="inputMiddleName" readonly="readonly" data-ng-value="ReferralMonthlySummaryModel.AHCCCSIdNumber">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12 no-padding">
+                            <div class="col-sm-6 no-right-padding">
+                                <strong class="col-sm-4 no-right-padding required">@Resource.ServiceDates:</strong>
+                                <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                    <div class="col-sm-5 input-group date  pull-left" datepicker="ReferralMonthlySummaryModel.MonthlySummaryStartDate" data-ng-dateval="ReferralMonthlySummaryModel.MonthlySummaryStartDate">
+                                        @Html.TextBoxFor(q => q.ReferralMonthlySummary.MonthlySummaryStartDate,
+                                                         new
+                                                             {
+                                                                 @class = "form-control input-sm dateInputMask height-19px",
+                                                                 placeholder = Constants.GlobalDateFormat,
+                                                                 @maxlength = "10"
+                                                             })
+                                        @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.MonthlySummaryStartDate)
+                                        <span class="input-group-addon no-padding"><i class="fa fa-calendar"></i></span>
+                                    </div>
+
+                                    <div class="col-sm-push-1 col-sm-5 input-group date   pull-left" datepicker="ReferralMonthlySummaryModel.MonthlySummaryEndDate" data-ng-dateval="ReferralMonthlySummaryModel.MonthlySummaryEndDate">
+                                        @Html.TextBoxFor(q => q.ReferralMonthlySummary.MonthlySummaryEndDate,
+                                                         new
+                                                             {
+                                                                 @class = "form-control input-sm dateInputMask height-19px",
+                                                                 placeholder = Constants.GlobalDateFormat,
+                                                                 @maxlength = "10"
+                                                             })
+                                        @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.MonthlySummaryEndDate)
+
+                                        <span class="input-group-addon no-padding"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 no-right-padding">
+                                <strong class="col-sm-4 no-right-padding">@Resource.CaseManager</strong>
+                                <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                    @*<input type="text" class="form-control input-sm height-19px" id="Text56" name="inputMiddleName" readonly="readonly" data-ng-value="Referral.CaseManager">*@
+                                    <input type="text" class="form-control input-sm height-19px" id="Text56" name="inputMiddleName" readonly="readonly" data-ng-value="ReferralMonthlySummaryModel.CaseManager">
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="space25"></div>
+                    </div>
+
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-5 margin-bottom-10">
+                            <div class="col-sm-4">
+                                <label class="control-label bold required ">@Resource.Facility</label>
+                            </div>
+                            <div class="col-sm-8">
+                                <select class="col-lg-12  form-group form-md-line-input no-left-padding" style="padding: 4px !important;"
+                                    data-ng-init="ReferralMonthlySummaryModel.FacilityID=ReferralMonthlySummaryModel.FacilityID==''?null:ReferralMonthlySummaryModel.FacilityID.toString()"
+                                    data-ng-model="ReferralMonthlySummaryModel.FacilityID"
+                                    data-val="true" data-val-required="@Resource.FacilityRequired"
+                                    id="ReferralMonthlySummaryModelFacilityID"
+                                    name="ReferralMonthlySummaryModel.FacilityID"
+                                    convert-to-number="">
+                                    <option value="">@Resource.SelectFacility</option>
+                                    <option data-ng-repeat="option in FacilityList" value="{{option.Value}}">{{option.Name}}</option>
+                                </select>
+                                @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.FacilityID)
+                            </div>
+
+                        </div>
+                        <div class="col-sm-7" data-ng-show="ReferralMonthlySummaryModel.FaciltyAndServiceDateMappingIsValide==false">
+                            <div class="alert alert-danger" style="margin-bottom: 0px !important;">
+                                @Html.Raw(Resource.FaciltyAndServiceDateMappingInvalid)
+                            </div>
+                        </div>
+
+                        <br class="clear-both" />
+                        <hr />
+                    </div>
+
+
+                    <div class="col-sm-12">
+                        <div class="col-sm-push-4 col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                            <div class="row">
+                                <div class="mt-checkbox-inline">
+                                    <strong class="">@Resource.Medication</strong>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input data-ng-model="ReferralMonthlySummaryModel.Medication"
+                                            class="uniformControls" data-uniform-value="ReferralMonthlySummaryModel.Medication"
+                                            data-ng-true-value="true" data-ng-false-value="false"
+                                            type="checkbox">@Resource.Yes<span></span>
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input data-ng-model="ReferralMonthlySummaryModel.Medication"
+                                            class="uniformControls" data-uniform-value="!ReferralMonthlySummaryModel.Medication"
+                                            data-ng-true-value="false" data-ng-false-value="true"
+                                            type="checkbox">@Resource.No<span></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input text-align-center ">
+                            <label class="col-md-12 col-sm-12 control-label padding-top-10"><u>@Resource.participateinthenextCFT</u></label>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input  ">
+
+                            <div class="row">
+                                <label class="col-md-12 col-sm-12 control-label padding-top-10 text-align-center"><strong>@Resource.MealsandSummaryofFood</strong></label>
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12  text-align-left  margin-bottom-0">
+                                    <strong class="inline">@Resource.Breakfast:</strong>
+
+                                    <div class="mt-checkbox-inline inline">
+
+                                        <div style="display: inline-block;" class="mt-checkbox-inline inline padding-left-16 ">
+                                            @foreach (var item5 in Model.SummaryofFood)
+                                            {
+                                                <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                                    <div class="checker">
+                                                        <span class="musthave">
+                                                            <input name="attribure" id="@item5.Value" value="@item5.Value" checklist-model="ReferralMonthlySummaryModel.BreakfastIds" type="checkbox"/>
+                                                        </span>
+                                                    </div>
+                                                    @item5.Name
+                                                </label>
+                                            }
+                                        </div>
+                                        <label>
+                                            @Html.TextBoxFor(q => q.ReferralMonthlySummary.BreakfastTxt, new
+                                    {
+                                        @class = "form-control input-sm width440px",
+                                        data_ng_model = "ReferralMonthlySummaryModel.BreakfastTxt",
+                                    })
+                                            @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.BreakfastTxt)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row ">
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12  text-align-left  margin-bottom-0">
+                                    <strong class="inline">@Resource.Lunch:</strong>
+
+                                    <div class="mt-checkbox-inline inline padding-left-right-23">
+                                        <div style="display: inline-block;" class="mt-checkbox-inline inline padding-left-16 ">
+                                            @foreach (var item6 in Model.SummaryofFood)
+                                            {
+                                                <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                                    <div class="checker">
+                                                        <span class="musthave">
+                                                            <input name="attribure" id="@item6.Value" value="@item6.Value" checklist-model="ReferralMonthlySummaryModel.LunchIds" type="checkbox"/>
+                                                        </span>
+                                                    </div>
+                                                    @item6.Name</label>
+                                            }
+                                        </div>
+                                        <label>
+                                            @Html.TextBoxFor(q => q.ReferralMonthlySummary.LunchTxt, new
+                                    {
+                                        @class = "form-control input-sm width440px",
+                                        data_ng_model = "ReferralMonthlySummaryModel.LunchTxt",
+                                    })
+                                            @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.LunchTxt)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row ">
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 text-align-left  margin-bottom-0">
+                                    <strong class="inline">@Resource.Dinner:</strong>
+                                    <div class="mt-checkbox-inline inline padding-left-right-20 ">
+                                        <div style="display: inline-block;" class="mt-checkbox-inline inline padding-left-16 ">
+                                            @foreach (var item7 in Model.SummaryofFood)
+                                            {
+                                                <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                                    <div class="checker">
+                                                        <span class="musthave">
+                                                            <input name="attribure" id="@item7.Value" value="@item7.Value" checklist-model="ReferralMonthlySummaryModel.DinnerIds" type="checkbox"/>
+                                                        </span>
+                                                    </div>
+                                                    @item7.Name
+                                                </label>
+                                            }
+                                        </div>
+                                        <label>
+                                            @Html.TextBoxFor(q => q.ReferralMonthlySummary.DinnerTxt, new
+                                    {
+                                        @class = "form-control input-sm width440px",
+                                        data_ng_model = "ReferralMonthlySummaryModel.DinnerTxt",
+                                    })
+                                            @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.DinnerTxt)
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input  ">
+                            <div class="row ">
+                                <div class="col-md-push-4 col-md-6 form-md-line-input form-row-seperated padding-top-10">
+                                    <strong class="required">@Resource.MyMoodThroughoutWeekend</strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 form-md-line-input form-row-seperated">
+                                    @Html.TextBoxFor(q => q.ReferralMonthlySummary.MoodforThroughoutWeekendIds, new
+                            {
+                                @class = "hideErrorContent replaceErrorSource",
+                                data_ng_model = "ReferralMonthlySummaryModel.MoodforThroughoutWeekendIds",
+                            })
+                                    <div class="replaceErrorDest">
+                                        <div class="mt-checkbox-inline inline">
+                                            @foreach (var item2 in Model.BindMealsandSummaryofFood)
+                                            {
+                                                <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                                    <div class="checker">
+                                                        <span class="musthave">
+                                                            <input name="attribure" id="@item2.Value" value="@item2.Value" checklist-model="ReferralMonthlySummaryModel.MoodforThroughoutWeekendIds" type="checkbox"/>
+                                                        </span>
+                                                    </div>
+                                                    @item2.Name
+                                                </label>
+                                            }
+                                        </div>
+                                        <label class="form-group form-md-line-input">
+                                            @Html.TextBoxFor(q => q.ReferralMonthlySummary.MoodforThroughoutWeekendTxt, new
+                                    {
+                                        @class = "form-control input-sm width-450px",
+                                        data_ng_model = "ReferralMonthlySummaryModel.MoodforThroughoutWeekendTxt",
+                                    })
+                                            @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.MoodforThroughoutWeekendTxt)
+                                        </label>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                            <div class="row">
+                                <div class="col-md-8 form-md-line-input form-row-seperated  padding-top-10">
+                                    <strong class="required">@Resource.OutingDetails:</strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 form-md-line-input form-row-seperated">
+                                    @Html.TextAreaFor(q => q.ReferralMonthlySummary.OutingDetails, new
+                            {
+                                @class = "form-control input-sm ",
+                                data_ng_model = "ReferralMonthlySummaryModel.OutingDetails",
+                                row=1
+                            })
+                                    @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.OutingDetails)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                            <div class="row ">
+                                <div class="col-md-8 form-md-line-input form-row-seperated padding-top-10">
+                                    <strong class="required">@Resource.promotecommunityintegration</strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 form-md-line-input form-row-seperated">
+                                    @Html.TextAreaFor(q => q.ReferralMonthlySummary.PCIInformation, new
+                            {
+                                @class = "form-control input-sm",
+                                data_ng_model = "ReferralMonthlySummaryModel.PCIInformation",
+                            })
+                                    @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.PCIInformation)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                            <div class="row ">
+                                <div class="col-md-8 form-md-line-input form-row-seperated padding-top-10">
+                                    <strong class="required">@Resource.treatmentplan:</strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 form-md-line-input form-row-seperated">
+                                    @Html.TextAreaFor(q => q.ReferralMonthlySummary.TreatmentPlan, new
+                            {
+                                @class = "form-control input-sm",
+                                data_ng_model = "ReferralMonthlySummaryModel.TreatmentPlan",
+                            })
+                                    @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.TreatmentPlan)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                            <div class="row">
+                                <div class="col-md-8 form-md-line-input form-row-seperated  padding-top-10">
+                                    <div class="mt-checkbox-inline">
+                                        <strong class="">@Resource.MedicationsDispensed:</strong>
+                                        <label class="mt-checkbox mt-checkbox-outline">
+                                            <input data-ng-model="ReferralMonthlySummaryModel.MedicationsDispensed"
+                                                class="uniformControls" data-uniform-value="!ReferralMonthlySummaryModel.MedicationsDispensed"
+                                                data-ng-true-value="false" data-ng-false-value="true"
+                                                type="checkbox">@Resource.No<span></span>
+                                        </label>
+                                        <label class="mt-checkbox mt-checkbox-outline">
+                                            <input data-ng-model="ReferralMonthlySummaryModel.MedicationsDispensed"
+                                                class="uniformControls" data-uniform-value="ReferralMonthlySummaryModel.MedicationsDispensed"
+                                                data-ng-true-value="true" data-ng-false-value="false"
+                                                type="checkbox">@Resource.Yes<span></span>
+                                        </label>
+                                        @Resource.Yesexplain:
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 form-md-line-input form-row-seperated">
+                                    @Html.TextAreaFor(q => q.ReferralMonthlySummary.MedicationsDispensedTxt, new
+                            {
+                                @class = "form-control input-sm",
+                                data_ng_model = "ReferralMonthlySummaryModel.MedicationsDispensedTxt",
+
+                            })
+                                    @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.MedicationsDispensedTxt)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                            <div class="row ">
+                                <div class="col-md-8 form-md-line-input form-row-seperated padding-top-10">
+                                    <strong class="">@Resource.Nextvisit:</strong>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 form-md-line-input form-row-seperated">
+                                    @Html.TextAreaFor(q => q.ReferralMonthlySummary.Nextvisit, new
+                            {
+                                @class = "form-control input-sm",
+                                data_ng_model = "ReferralMonthlySummaryModel.Nextvisit",
+
+                            })
+                                    @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.Nextvisit)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input ">
+                            <div class="row ">
+                                <div class="col-md-10 form-md-line-input form-row-seperated padding-top-10">
+                                    <div class="mt-checkbox-inline">
+                                        <strong class="">@Resource.CurrentServicePlan</strong>
+
+                                        <label class="mt-checkbox mt-checkbox-outline">
+                                            <input data-ng-model="ReferralMonthlySummaryModel.CurrentServicePlan"
+                                                class="uniformControls" data-uniform-value="ReferralMonthlySummaryModel.CurrentServicePlan"
+                                                data-ng-true-value="true" data-ng-false-value="false"
+                                                type="checkbox">@Resource.Yes<span></span>
+                                        </label>
+                                        <label class="mt-checkbox mt-checkbox-outline">
+                                            <input data-ng-model="ReferralMonthlySummaryModel.CurrentServicePlan"
+                                                class="uniformControls" data-uniform-value="!ReferralMonthlySummaryModel.CurrentServicePlan"
+                                                data-ng-true-value="false" data-ng-false-value="true"
+                                                type="checkbox">@Resource.No<span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-12 col-sm-12 form-md-line-input form-row-seperated padding-top-10">
+                            <div class="row ">
+                                <div class="mt-checkbox-inline">
+                                    <strong class="">@Resource.BelongingsMedicationsReturned </strong>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input data-ng-model="ReferralMonthlySummaryModel.BelongingsandMedicationsReturned"
+                                            class="uniformControls" data-uniform-value="ReferralMonthlySummaryModel.BelongingsandMedicationsReturned"
+                                            data-ng-true-value="true" data-ng-false-value="false"
+                                            type="checkbox">@Resource.Yes<span></span>
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input data-ng-model="ReferralMonthlySummaryModel.BelongingsandMedicationsReturned"
+                                            class="uniformControls" data-uniform-value="!ReferralMonthlySummaryModel.BelongingsandMedicationsReturned"
+                                            data-ng-true-value="false" data-ng-false-value="true"
+                                            type="checkbox">@Resource.No<span></span>
+                                    </label>
+                                </div>
+                                <label class="form-group form-md-line-input col-sm-12">
+                                    <small>(@Resource.ZarephathNotManageClientFunds) </small>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated padding-top-30">
+                            <div class="row">
+
+                                <div>
+                                    @Html.TextBoxFor(q => q.ReferralMonthlySummary.CoordinationofCareatPickup, new
+                            {
+                                @class = "hideErrorContent replaceErrorSource",
+                                data_ng_model = "ReferralMonthlySummaryModel.CoordinationofCareatPickup",
+                            })
+                                    <strong class="col-md-4 col-sm-4 no-padding required">@Resource.CoordinationofCareatPickup</strong>
+                                    <div class="replaceErrorDest">
+                                        <span class="padding-5" data-ng-repeat="item in ReferralModel.Coordinationofcare">
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="CoordinationofCareatPickup" id="Radio1" data-ng-model="ReferralMonthlySummaryModel.CoordinationofCareatPickup" data-ng-value="item.Value">
+                                                {{item.Name}}
+                                            <span></span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <br />
+                                <div>
+                                    @Html.TextBoxFor(q => q.ReferralMonthlySummary.CoordinationofCareatPickupIds, new
+                            {
+                                @class = "hideErrorContent replaceErrorSource",
+                                data_ng_model = "ReferralMonthlySummaryModel.CoordinationofCareatPickupIds",
+                            })
+
+                                    <div class="replaceErrorDest">
+                                        <div style="display: inline-block;" class="mt-checkbox-inline inline  ">
+                                            @foreach (var item3 in Model.EnumCoordinationofCare)
+                                            {
+                                                <label class="">
+                                                    <div class="checker">
+                                                        <span class="musthave">
+                                                            <input name="attribure"  
+                                                   id="@item3.Value" value="@item3.Value" class="" checklist-model="ReferralMonthlySummaryModel.CoordinationofCareatPickupIds"  type="checkbox" />
+
+                                                        </span>
+                                                    </div>
+                                                    @item3.Name</label>
+                                            }
+                                        </div>
+
+                                        <label class="padding-5 form-group form-md-line-input ">
+                                            @Html.TextBoxFor(q => q.ReferralMonthlySummary.CoordinationofCareatPickupTxt, new
+                                    {
+                                        @class = "form-control input-sm width-450px",
+                                        data_ng_model = "ReferralMonthlySummaryModel.CoordinationofCareatPickupTxt",
+                                    })
+                                            @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.CoordinationofCareatPickupTxt)
+                                        </label>
+                                    </div>
+                                </div>
+
+
+
+                            </div>
+                        </div>
+
+                        <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated padding-top-10">
+                            <div class="row">
+
+                                <div>
+                                    @Html.TextBoxFor(q => q.ReferralMonthlySummary.CoordinationofCareatDropOff, new
+                            {
+                                @class = "hideErrorContent replaceErrorSource",
+                                data_ng_model = "ReferralMonthlySummaryModel.CoordinationofCareatDropOff",
+                            })
+                                    <strong class="col-md-4 col-sm-4 no-padding required">@Resource.CoordinationofCareatDropOff</strong>
+                                    <div class="replaceErrorDest">
+                                        <span class="padding-5" data-ng-repeat="item in ReferralModel.Coordinationofcare">
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="CoordinationofCareatDropOff" id="Radio1" data-ng-model="ReferralMonthlySummaryModel.CoordinationofCareatDropOff" data-ng-value="item.Value">
+                                                {{item.Name}}
+                                            <span></span>
+                                            </label>
+                                        </span>
+                                    </div>
+                                </div>
+                                <br />
+                                <div>
+                                    @Html.TextBoxFor(q => q.ReferralMonthlySummary.CoordinationofCareatDropOffIds, new
+                            {
+                                @class = "hideErrorContent replaceErrorSource",
+                                data_ng_model = "ReferralMonthlySummaryModel.CoordinationofCareatDropOffIds",
+                            })
+                                    <div class="replaceErrorDest">
+                                        <div style="display: inline-block;" class="mt-checkbox-inline inline">
+                                            @foreach (var item4 in Model.EnumCoordinationofCare)
+                                            {
+                                                <label class="">
+                                                    <div class="checker">
+                                                        <span class="musthave">
+                                                            <input name="attribure"
+                                                   id="@item4.Value" value="@item4.Value" class="" checklist-model="ReferralMonthlySummaryModel.CoordinationofCareatDropOffIds" type="checkbox"/>
+                                                        </span>
+                                                    </div>
+                                                    @item4.Name
+                                                </label>
+                                            }
+                                        </div>
+
+                                        <label class="padding-5 form-group form-md-line-input ">
+                                            @Html.TextBoxFor(q => q.ReferralMonthlySummary.CoordinationofCareatDropOffTxt, new
+                                    {
+                                        @class = "form-control input-sm width-450px",
+                                        data_ng_model = "ReferralMonthlySummaryModel.CoordinationofCareatDropOffTxt",
+                                    })
+                                            @Html.ValidationMessageFor(q => q.ReferralMonthlySummary.CoordinationofCareatDropOffTxt)
+                                        </label>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                        </div>
+
+                        <div class="form-group col-md-12 col-sm-12 form-md-line-input ">
+                            <div class="row">
+                                <div class="col-sm-12  ">
+                                    <div class="col-sm-6 no-right-padding padding-top-65">
+                                        <strong class="col-sm-2 no-right-padding">@Resource.Name:</strong>
+                                        <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                            <input type="text" class="form-control input-sm height-19px " id="Text60" name="inputMiddleName" readonly="readonly" data-ng-value="ReferralMonthlySummaryModel.CompletedBy">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-6 col-md-6 col-sm-6 pull-left padding-top-15">
+                                        <div class="col-md-12">
+                                            <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{'@(ConfigSettings.AmazonS3Url + ConfigSettings.ZarephathBucket)/'+ReferralMonthlySummaryModel.Signature}}"/>
+                                            @*<img class="img-responsive signature-image" id="imgDisplay" src="https://s3.amazonaws.com/zarephath-stage/uploads/EmpSignatures/1/89180000-114517-10102016.png" data-ng-src="https://s3.amazonaws.com/zarephath-stage/uploads/EmpSignatures/1/89180000-114517-10102016.png">*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    @if (Common.HasPermission(Constants.Permission_ReviewMeasurement_MonthlySummary_AddUpdate))
+                    {
+                        <span class="text-align-center padding-right-100">
+                            @Resource.ReferralMonthlySummaryDesc</span>
+                        <button class="btn btn-sm red" data-dismiss="modal">@Resource.Cancel</button>
+                        <button class="btn btn-sm green-jungle" data-ng-click="SaveReferralMonthlySummary()">@Resource.Save</button>
+                    }
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>
+

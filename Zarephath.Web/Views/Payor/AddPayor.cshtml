@@ -1,0 +1,54 @@
+﻿@model AddPayorModel
+
+
+@{
+    bool isEditMode = !string.IsNullOrEmpty(Model.Payor.EncryptedPayorID) || Model.Payor.PayorID > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, isEditMode ? Resource.EditPayorDetail : Resource.AddPayorDetail);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_PayorAdd;
+}
+
+@Html.Hidden("hdnAddPayorModel", Common.SerializeObject(Model))
+
+<div class="page-bar">
+    <h3 class="page-title">@(isEditMode ? Resource.EditPayorDetail : @Resource.AddPayorDetail)
+        <small>@Resource.EnterPayorDetail</small>
+    </h3>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="tabbable tabbable-custom boxless">
+            <ul class="nav nav-tabs" id="loanDetailTopTabs">
+                <li class="active">
+                    <a id="addPayorDetail" data-target="#tab_PayorDetail" data-toggle="tab">@Resource.Payor</a>
+                </li> 
+                <li class="@(isEditMode && Common.HasPermission(Constants.Permission_Payor_ServiceCode_Mapping) ? "" : "disabled")">
+                    <a id="ServiceCode"  data-target="#tab_ServiceCode" data-toggle="@(isEditMode && Common.HasPermission(Constants.Permission_Payor_ServiceCode_Mapping) ? "tab" : "")">@Resource.ServiceCode</a>
+                </li>
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane active" id="tab_PayorDetail" data-ng-controller="AddParyorDetailController">
+                    @Html.Partial("Partial/_PayorDetail")
+                </div>
+                <div class="tab-pane" id="tab_ServiceCode" data-ng-controller="AddServiceCodeController">
+                    @Html.Partial("Partial/_ServiceCode")
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/payor/addpayor") 
+}
+
+<script type="text/javascript">
+    var EncryptedPayorID = "@Model.Payor.EncryptedPayorID";
+    var MaxUnit = "@Resource.MaxUnit";
+    var DailyUnitLimit = "@Resource.DailyUnitLimit";
+    var Billable = "@Resource.Billable";
+    var GroupOption = "@Resource.GroupOption";
+    var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.PayorServiceCodeMappingDetail)';
+</script>

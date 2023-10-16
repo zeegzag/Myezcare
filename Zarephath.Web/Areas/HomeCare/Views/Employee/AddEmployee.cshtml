@@ -1,0 +1,227 @@
+﻿﻿@{
+    bool isEditMode = Model != null && Model.Employee.EmployeeID > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (isEditMode ? Resource.EditEmployee : @Resource.AddEmployee));
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmployeeAdd;
+    DDMasterModel model = ViewBag.DDMasterModel != null ? (DDMasterModel)ViewBag.DDMasterModel : new DDMasterModel();
+    model.IsPartial = true;
+    const int legalGuardianContactTypeID = (int)@Common.ContactTypes.LegalGuardian;
+    const int primaryContactTypeID = (int)@Common.ContactTypes.EmployeePrimaryPlacement;
+}
+@model HC_AddEmployeeModel
+@section Styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/schedule/scheduleassignmentinhome")
+}
+
+@Html.Hidden("hdnEmployeeModel", Common.SerializeObject(Model))
+@*<style>
+    .bootstrap-select.width100:not([class*="col-"]) {
+        width: 100% !important;
+    }
+</style>*@
+
+<div data-ng-controller="AddEmployeeController">
+    @*<div class="page-bar">
+            <h3 class="page-title">
+                @(isEditMode ? Resource.EditEmployee : @Resource.AddEmployee)
+                @if (isEditMode)
+                {
+                    @Html.Raw(string.Format(" - <span class='font-size-18 font-weight-400 font-style-oblique'>{0}, {1}&nbsp;</span>" +
+                                                 "<small>/  #<b>{2}</b> &nbsp;/&nbsp; {3}: <b>{4}</b></small>",
+                                                 Model.Employee.LastName,
+                                                 Model.Employee.FirstName,
+                                                 Model.Employee.EmployeeUniqueID,
+                                                 Resource.Email,
+                                                 Model.Employee.Email ?? Resource.NA))
+                }
+
+
+            </h3>
+        </div>*@
+    <div class="asideBar-content">
+        <div class="tabbable tabbable-custom boxless">
+            <ul class="nav nav-tabs">
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeInfo_View))
+                {
+                    <li class="asideBarWidthEmp active"><a data-toggle="tab" id="addEmployee" data-target="#tab_AddEmployee" href="#addEmployee">@Resource.EmployeeInformation</a></li>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeDocuments_View))
+                {
+                    <li class="asideBarWidthEmp @(isEditMode ? " " : " disabled")">
+                        <a id="employeeDocuments" data-target="#tab_employeeDocuments" href="#employeeDocuments" data-toggle="@(isEditMode ? "tab" : "")">@Resource.Employee @Resource.Document</a>
+                    </li>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeSchedule_View))
+                {
+                    <li class="asideBarWidthEmp @(isEditMode ? "" : "disabled")">
+                        <a id="employeeTimeSlots" data-target="#tab_EmployeeTimeSlots" href="#employeeTimeSlots" data-toggle="@(isEditMode ? "tab" : "")">@Resource.EmployeeSchedule</a>
+                    </li>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeePTO_View))
+                {
+                    <li class="asideBarWidthEmp @(isEditMode ? "" : "disabled")">
+                        <a id="employeeDayOff" data-target="#tab_EmployeeDayOff" href="#employeeDayOff" data-toggle="@(isEditMode ? "tab" : "")">@Resource.PersonalTimeOff</a>
+                    </li>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeCalendar))
+                {
+                    <li class="asideBarWidthEmp @(isEditMode ? "" : "disabled")">
+                        <a id="empCalender" data-target="#tab_EmployeeCalender" href="#empCalender" data-toggle="@(isEditMode ? "tab" : "")">@Resource.Calendar</a>
+                    </li>
+                }
+                @*@if (Common.HasPermission(Constants.HC_Permission_Empoyee_TimeSheet_View))
+                    {
+                        <li class="asideBarWidthEmp @(isEditMode ? "" : "disabled")">
+                            <a id="employeeTimeSheet" data-target="#tab_EmployeeTimeSheet" href="#employeeTimeSheet" data-toggle="@(isEditMode ? "tab" : "")">@Resource.TimeSheet</a>
+                        </li>
+                    }*@
+                @if (Common.HasPermission(Constants.HC_Permission_Empoyee_Notes_View))
+                {
+                    <li class="asideBarWidthEmp @(isEditMode ? "" : "disabled")">
+                        <a id="employeeNote" data-target="#tab_EmployeeNotes" href="#employeeNote" data-toggle="@(isEditMode ? "tab" : "")">@Resource.Notes</a>
+                    </li>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_Certificate_View))
+                {
+                    <li class="asideBarWidthEmp @(isEditMode ? "" : "disabled")">
+                        <a id="referralCertificate" data-target="#tab_EmployeeCertificate" href="#referralCertificate" data-toggle="@(isEditMode ? "tab" : "")">@Resource.Certificate</a>
+                    </li>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_Checklist_View))
+                {
+                    <li class="asideBarWidthEmp @(isEditMode ? "" : "disabled")">
+                        <a id="employeeChecklist" data-target="#tab_EmployeeChecklist" href="#employeeChecklist" data-toggle="@(isEditMode ? "tab" : "")">@Resource.ChecklistTitle</a>
+                    </li>
+                }
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_Notification_Preferences_View))
+                {
+                    <li class="asideBarWidthEmp @(isEditMode ? "" : "disabled")">
+                        <a id="employeeNotificationPrefs" data-target="#tab_EmployeeNotificationPrefs" href="#employeeNotificationPrefs" data-toggle="@(isEditMode ? "tab" : "" )">@Resource.Preferences</a>
+                    </li>
+                }
+
+               
+            </ul>
+
+            <div class="tab-content">
+                @if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeInfo_View))
+                {
+                    @Html.Partial("Partial/_AddEmployee", Model)
+                }
+                @if (isEditMode)
+                {
+                    if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeDocuments_View))
+                    {
+                        ViewBag.DocumentFrom = "EMPLOYEE";
+                        <div class="tab-pane" id="tab_employeeDocuments" data-ng-controller="ReferralDocumentController">
+                            @Html.Partial("~/Areas/HomeCare/Views/Referral/Partial/ReferralDocuments/_tabReferralDocuments1.cshtml")
+                        </div>
+                    }
+
+                    if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeSchedule_View))
+                    {
+                        <div id="tab_EmployeeTimeSlots" class="tab-pane fade">
+                            @Html.Action("PartialEmployeeTimeSlots", "Employee", new { id = Model.Employee.EmployeeID })
+                        </div>
+                    }
+
+                    if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeePTO_View))
+                    {
+                        <div id="tab_EmployeeDayOff" class="tab-pane fade">
+                            @Html.Action("PartialEmployeeDayOff", "Employee", new { id = Model.Employee.EmployeeID })
+                        </div>
+                    }
+
+                    if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeCalendar))
+                    {
+                        <div id="tab_EmployeeCalender" class="tab-pane fade">
+                            @Html.Action("PartialEmployeeCalender", "Employee", new { id = Model.Employee.EmployeeID })
+                        </div>
+                    }
+
+                    @*if (Common.HasPermission(Constants.HC_Permission_Empoyee_TimeSheet_View))
+                        {
+                            <div id="tab_EmployeeTimeSheet" class="tab-pane fade">
+                                @Html.Action("PartialEmployeeTimeSheet", "Report", new { id = Model.Employee.EmployeeID })
+                            </div>
+                        }*@
+
+                    if (Common.HasPermission(Constants.HC_Permission_Empoyee_Notes_View))
+                    {
+                        ViewBag.NoteFrom = "EMPLOYEE";
+                        <div class="tab-pane" id="tab_EmployeeNotes" data-ng-controller="ReferralNoteController">
+                            @Html.Partial("~/Areas/HomeCare/Views/Referral/Partial/ReferralDetails/_ReferralNote.cshtml")
+                        </div>
+                    }
+
+                    if (Common.HasPermission(Constants.HC_Permission_Employee_Certificate_View))
+                    {
+                        <div class="tab-pane" id="tab_EmployeeCertificate" data-ng-controller="ReferralCertificateController">
+                            @Html.Partial("~/Areas/HomeCare/Views/Referral/Partial/ReferralDetails/_ReferralCertificate.cshtml")
+                        </div>
+                    }
+
+                    if (Common.HasPermission(Constants.HC_Permission_Employee_Checklist_View))
+                    {
+                        <div class="tab-pane" id="tab_EmployeeChecklist" data-ng-controller="EmployeeChecklistController">
+                            @Html.Partial("Partial/_EmployeeChecklist", Model)
+                        </div>
+                    }
+                    if (Common.HasPermission(Constants.HC_Permission_Employee_Notification_Preferences_View))
+                    {
+                        <div class="tab-pane" id="tab_EmployeeNotificationPrefs" data-ng-controller="EmployeeNotificationPrefsController">
+                            @Html.Partial("Partial/_EmployeeNotificationPrefs", Model)
+                        </div>
+                    }
+
+                    
+                }
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+@*<script src="~/Assets/js/viewjs/siteApp/Areas/HomeCare/employee/employeesignature.js"></script>*@
+@section Scripts{
+
+    @*<script src="https://maps.google.com/maps/api/js?sensor=false&key=AIzaSyA_Pc8Ldr4NbtKti-rQsf5g0PVa4K9VsMs" type="text/javascript"></script>*@
+    @Scripts.Render("~/assets/js/viewjs/siteApp/signature")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/addemployee")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/employeecalender")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/emprefschoptions")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/employeevisitlist")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/employeechecklist")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/employeenotificationprefs")
+    @*@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/employeesignature")*@
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/referral/referraldocument1")
+    @*@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/employeedocument")*@
+    <script type="text/javascript">
+        var AddressMissingMessage = '@Resource.AddressMissingMessage';
+        var GeoCodeError = '@Resource.GeoCodeError';
+        var EmpFutureSchDeleteConfirmation = '@Resource.EmpFutureSchDeleteConfirmation';
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.PersonalTimeOff)';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.PersonalTimeOff)';
+        var EmpFutureSchDeleteConfirmationMaster = '@Resource.EmpFutureSchDeleteConfirmationMaster';
+        var InvalidImageUploadMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.InvalidImageUploadMessage))';
+        var MaximumUploadImageSizeMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage5MB))';
+        var DeleteNoteMessage = '@Resource.DeleteNoteMessage';
+        var TimeSlotForceUpdateConfirmation = '@Resource.EmployeeTimeSlotForceUpdateConfirmation';
+        var ReferralDocumentPageId = '@Resource.ReferralDocumentPageId';
+        var PrimaryPlacementContactTypeID = '@primaryContactTypeID';
+        var LegalGuardianContactTypeID = '@legalGuardianContactTypeID';
+        var loggedInUserName = '@SessionHelper.LastName' + ', ' + '@SessionHelper.FirstName';
+        var LegalGuardian = '@Constants.LegalGuardianType';
+        var CaontactTypeAlreadyExist = GetHtmlString('@Resource.CaontactTypeAlreadyExist');
+        var CanNotUpdateLegalGuardianInformation = GetHtmlString('@Resource.CanNotUpdateLegalGuardianInformation');
+        var DeleteDxCodeConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.DXCode)';
+        var GeoCodeError = '@Resource.GeoCodeError';
+        var AddressMissingMessage = '@Resource.AddressMissingMessage';
+        var defaultStateCode = '@Constants.DefaultStateCode';
+        var LegalGuardianExists = '@Resource.LegalGuardianExists';
+        var AddLegalGuardian = '@Resource.AddLegalGuardian';
+
+        var NotEditableComplianceIDs = [@Constants.PatientAuthorizationsComplianceID, @Constants.VisitsComplianceID];
+    </script>
+}

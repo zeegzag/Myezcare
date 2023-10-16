@@ -1,0 +1,276 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.PendingSchedules);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_PendingSchedules;
+}
+
+@model PendingSchedulesPageModel
+@Html.Hidden("hdnSetPendingScheduleListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="PendingScheduleController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.PendingSchedules &nbsp;@*<small>@Resource.PendingScheduleListInformation</small>*@
+
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchPendingScheduleListPage.IsDeleted, Common.SetDeleteFilter().ToSelectList(Convert.ToString(Model.SearchPendingScheduleListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                           new
+                                                                           {
+                                                                               id = "IsDeleted",
+                                                                               data_ng_model = "TempSearchPendingScheduleListPage.IsDeleted",
+                                                                               data_ng_init = "TempSearchPendingScheduleListPage.IsDeleted = TempSearchPendingScheduleListPage.IsDeleted==null?'-1':TempSearchPendingScheduleListPage.IsDeleted.toString()",
+                                                                               @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                               data_ng_change = "SearchPendingSchedule()"
+                                                                           })
+            </div>
+
+            <div class="btn-group" data-ng-if="SelectedPendingScheduleIds.length > 0">
+                <button type="button" data-ng-click="DeletePendingSchedule()" class="btn blue btn-sm grey border-grey-cascade">
+                    <i class="fa fa-random margin-right-10"></i>{{TempSearchPendingScheduleListPage.IsDeleted==0 ?'@Resource.DisableSelected' :(TempSearchPendingScheduleListPage.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                </button>
+            </div>
+
+            <div class="inline-block pull-right" data-ng-show="PendingScheduleList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="PendingScheduleListPager.maxSize" on-page-change="PendingScheduleListPager.pageChanged(newPageNumber)" pagination-id="PendingScheduleListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-20px"></th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PendingScheduleListPager.sortColumn('PatientName')">@Resource.Patient</a>
+                                            <span class="sortorder" data-ng-show="PendingScheduleListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:PendingScheduleListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-150px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PendingScheduleListPager.sortColumn('EmplyeName')">@Resource.Employee</a>
+                                            <span class="sortorder" data-ng-show="PendingScheduleListPager.sortIndex === 'EmplyeName'" data-ng-class="{reverse:PendingScheduleListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="PendingScheduleListPager.sortColumn('StartDate',true)">@Resource.ClockInTime</a>
+                                                <span class="sortorder" data-ng-show="PendingScheduleListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:PendingScheduleListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PendingScheduleListPager.sortColumn('EndDate',true)">@Resource.ClockOutTime</a>
+                                            <span class="sortorder" data-ng-show="PendingScheduleListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:PendingScheduleListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-150px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PendingScheduleListPager.sortColumn('AddedBy')">@Resource.AddedBy</a>
+                                            <span class="sortorder" data-ng-show="PendingScheduleListPager.sortIndex === 'AddedBy'" data-ng-class="{reverse:PendingScheduleListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PendingScheduleListPager.sortColumn('AddedDate')">@Resource.AddedDate</a>
+                                            <span class="sortorder" data-ng-show="PendingScheduleListPager.sortIndex === 'AddedDate'" data-ng-class="{reverse:PendingScheduleListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="width-130px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        <td class="text-align-center">
+                                            <input id="SelectAllDxCode" class="unicheckbox text-align-center" data-ng-show="PendingScheduleList.length > 0" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchPendingScheduleListPage.PatientName, new { data_ng_model = "TempSearchPendingScheduleListPage.PatientName", @class = "form-control input-sm", placeholder = Resource.PatientName, maxlength = 100 })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchPendingScheduleListPage.EmployeeID, Model.EmployeeList.ToSelectList(Model.SearchPendingScheduleListPage.EmployeeID.ToString() ?? "", "Name", "EmployeeID", Resource.Select, ""),
+                                                                      new
+                                                                      {
+                                                                          id = "EmployeeID",
+                                                                          data_ng_model = "TempSearchPendingScheduleListPage.EmployeeID",
+                                                                          data_ng_init = "TempSearchPendingScheduleListPage.EmployeeID=TempSearchPendingScheduleListPage.EmployeeID==''?null:TempSearchPendingScheduleListPage.EmployeeID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = "false",
+                                                                          convert_to_number = ""
+
+                                                                      })
+                                        </td>
+                                        <td>
+                                            <div class="input-group date no-focus" datepicker="TempSearchPendingScheduleListPage.StartDate"
+                                                ng-dateval="TempSearchPendingScheduleListPage.StartDate">
+                                                @Html.TextBoxFor(m => m.SearchPendingScheduleListPage.StartDate,
+                                                                 new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.StartDate
+                                                                 })
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group date no-focus" datepicker="TempSearchPendingScheduleListPage.EndDate"
+                                                 ng-dateval="TempSearchPendingScheduleListPage.EndDate">
+                                                @Html.TextBoxFor(m => m.SearchPendingScheduleListPage.EndDate,
+                                                    new
+                                                    {
+                                                        @class = "no-focus form-control input-sm dateInputMask",
+                                                        placeholder = Resource.EndDate
+                                                    })
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchPendingScheduleListPage.CreatedBy, Model.EmployeeList.ToSelectList(Model.SearchPendingScheduleListPage.CreatedBy.ToString() ?? "", "Name", "EmployeeID", Resource.Select, ""),
+                                                new
+                                                {
+                                                    id = "CreatedBy",
+                                                    data_ng_model = "TempSearchPendingScheduleListPage.CreatedBy",
+                                                    data_ng_init = "TempSearchPendingScheduleListPage.CreatedBy=TempSearchPendingScheduleListPage.CreatedBy==''?null:TempSearchPendingScheduleListPage.CreatedBy",
+                                                    @class = "form-control input-sm",
+                                                    data_val = "false",
+                                                    convert_to_number = ""
+
+                                                })
+
+                                        </td>
+                                        <td></td>
+                                        <td>
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchPendingSchedule()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':PendingSchedule.IsDeleted}" dir-paginate="PendingSchedule in PendingScheduleList | itemsPerPage: PendingScheduleListPager.pageSize" total-items="PendingScheduleListPager.totalRecords" current-page="PendingScheduleListPager.currentPage" pagination-id="PendingScheduleListPager_ID">
+                                        <td class="text-align-center">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="PendingSchedule.IsChecked" data-ng-change="SelectPendingSchedule(PendingSchedule)" val="PendingSchedule.IsChecked">
+                                        </td>
+                                        <td>{{PendingSchedule.PatientName}}</td>
+                                        <td>{{PendingSchedule.EmployeeName}}</td>
+                                        <td>{{PendingSchedule.ClockInTime | orgdatetime}}</td>
+                                        <td>{{(PendingSchedule.ClockOutTime) ? (PendingSchedule.ClockOutTime | orgdatetime) : '@Resource.NA' }}</td>
+                                        <td>{{PendingSchedule.CreatedBy}}</td>
+                                        <td>{{PendingSchedule.CreatedDate | orgdatetime}}</td>
+                                        <td class="">
+                                            <a href="javascript:void(0);" data-ng-show="PendingSchedule.ScheduleID==0" data-ng-click="OpenProcessSchedule(PendingSchedule)" class="btn btn-xs blue">@Resource.ProcessSchedule</a>
+                                            <a href="javascript:void(0);" data-ng-show="PendingSchedule.ScheduleID>0" class="badge badge-green cursor-none">@Resource.Processed</a>
+                                            <a href="javascript:void(0);" data-ng-show="PendingSchedule.IsDeleted" data-ng-click="DeletePendingSchedule(PendingSchedule.PendingScheduleID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                            <a href="javascript:void(0);" data-ng-show="!PendingSchedule.IsDeleted" data-ng-click="DeletePendingSchedule(PendingSchedule.PendingScheduleID,'@Resource.Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="PendingScheduleList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(PendingScheduleListPager.pageSize * PendingScheduleListPager.currentPage) - PendingScheduleListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(PendingScheduleListPager.pageSize == PendingScheduleListPager.currentPageSize) ? (PendingScheduleListPager.pageSize * PendingScheduleListPager.currentPage) :(PendingScheduleListPager.pageSize * PendingScheduleListPager.currentPage) - PendingScheduleListPager.pageSize  + PendingScheduleListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PendingScheduleListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="PendingScheduleListPager.maxSize" on-page-change="PendingScheduleListPager.pageChanged(newPageNumber)" pagination-id="PendingScheduleListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="PendingScheduleList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    
+<div id="processPendingScheduleModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-md">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseModal()">&times;</button>
+
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span>@Resource.ProcessSchedule</span>
+                </h4>
+
+            </div>
+            <div class="modal-body">
+
+                <div class="col-lg-12">
+                    <ul>
+                        <li>@Resource.PendingScheduleProcessStep1</li>
+                        
+                       @* <li>@Resource.PendingScheduleProcessStep2<br/><br/></li>
+                        
+                        <li>@Resource.PendingScheduleProcessStep3</li>*@
+                    </ul>
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseModal()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="ProcessPendingSchedule()">@Resource.YesContinue</button>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/pendingschedules")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.PendingSchedule)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.PendingSchedule)';
+    </script>
+}

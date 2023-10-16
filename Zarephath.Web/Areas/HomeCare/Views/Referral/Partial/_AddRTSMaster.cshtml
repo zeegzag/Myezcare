@@ -1,0 +1,1009 @@
+﻿@model HC_RTSModel
+<style>
+    .holder {
+        width: auto;
+        display: inline-block;
+    }
+    .bootstrap-select.dayTime:not([class*="col-"]) {
+        width: 100% !important;
+    }
+
+        .holder img {
+            width: 30%; /* Will shrink image to 30% of its original width */
+            height: auto;
+        }
+
+    .alert {
+        padding: 7px;
+        background-color: #f44336;
+        color: white;
+        opacity: 1;
+        transition: opacity 0.6s;
+        margin-bottom: 15px;
+    }
+
+        .alert.success {
+            background-color: #04AA6D;
+        }
+
+        .alert.info {
+            background-color: #2196F3;
+        }
+
+        .alert.warning {
+            background-color: #ff9800;
+        }
+
+    .closebtn {
+        margin-left: 15px;
+        color: white;
+        font-weight: bold;
+        float: right;
+        font-size: 22px;
+        line-height: 20px;
+        cursor: pointer;
+        transition: 0.3s;
+    }
+
+        .closebtn:hover {
+            color: black;
+        }
+
+    .toggle {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        width: 44px;
+        height: 20px;
+        display: inline-block;
+        position: relative;
+        border-radius: 50px;
+        overflow: hidden;
+        outline: none;
+        border: none;
+        cursor: pointer;
+        background-color: #26C281;
+        transition: background-color ease 0.3s;
+        border: none !important;
+    }
+
+        .toggle:before {
+            content: "";
+            display: block;
+            position: absolute;
+            z-index: 2;
+            width: 23px;
+            height: 15px;
+            background: #fff;
+            left: 2px;
+            top: 2px;
+            border-radius: 50%;
+            font: 8px/28px Helvetica;
+            text-transform: uppercase;
+            font-weight: bold;
+            text-indent: -22px;
+            word-spacing: 37px;
+            color: #fff;
+            text-shadow: -1px -1px rgba(0,0,0,0.15);
+            white-space: nowrap;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            transition: all cubic-bezier(0.3, 1.5, 0.7, 1) 0.3s;
+            border: none !important;
+        }
+
+        .toggle:checked {
+            background-color: #707070;
+            border: none !important;
+        }
+
+            .toggle:checked:before {
+                left: 32px;
+                border: none !important;
+            }
+
+
+    table#demotable {
+        margin-left: 15px;
+        /*width: 97%;*/
+        border-collapse: collapse;
+        border: 1px #ccc solid;
+        overflow: scroll;
+    }
+
+    #demotable th {
+        background-color: navy;
+        color: white;
+        height: 30px;
+    }
+
+    td {
+        border: 1px #ccc solid;
+    }
+
+    table#demotable td {
+        border: 1px #fff solid;
+        text-align: center
+    }
+
+    table#demotable th {
+        border: 1px #fff solid;
+        text-align: center
+    }
+</style>
+<div class="modal fade" id="rtsMasterModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-lg" role="document" data-ng-if="toggle">
+        <div class="modal-content" style="width:100%">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="H1" data-ng-hide="RTSMaster.ReferralTimeSlotMasterID>0">@Resource.AddReferralSchedule</h4>
+                <h4 class="modal-title" id="H1" data-ng-show="RTSMaster.ReferralTimeSlotMasterID>0">@Resource.UpdateReferralSchedule</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 no-padding">
+                        <form id="frmRTSMaster">
+                            <div class="col-md-12 col-md-12 no-padding">
+
+                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                    <label class="control-label required margin-bottom-5">@Resource.Referral</label>
+
+                                    @Html.DropDownListFor(p => p.RTSMaster.ReferralID, Model.ReferralList.ToSelectList(Model.RTSMaster.ReferralID.ToString() ?? "", "Name", "Value", Resource.SelectPatient, ""),
+                                      new
+                                          {
+                                              id = "RTSMasterReferralID",
+                                              data_ng_model = "RTSMaster.ReferralID",
+                                              data_ng_init = "RTSMaster.ReferralID=RTSMaster.ReferralID==''?null:RTSMaster.ReferralID.toString()",
+                                              @class = "form-control input-sm requiredStrip",
+                                              disabled = ""
+                                          })
+                                    @Html.ValidationMessageFor(m => m.RTSMaster.ReferralID)
+                                </div>
+
+                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                    {{RTSMaster.currentDate}}
+                                    <label class="control-label required margin-bottom-5">@Resource.StarDate</label>
+
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="RTSMaster.StartDate" ng-dateval="RTSMaster.StartDate" data-ng-maxdate="RTSMaster.EndDate">
+                                        @Html.TextBoxFor(m => m.RTSMaster.StartDate, new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask requiredStrip",
+                                                    maxlength = "50",
+                                                    placeholder = Resource.DateFormat,
+                                                    @required = "true"
+                                                })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        @Html.ValidationMessageFor(m => m.RTSMaster.StartDate)
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-3 col-sm-3 margin-top-25">
+                                    <input type="radio" class="radio radio-inline timeslot-radio" data-ng-model="RTSMaster.IsEndDateAvailable" data-ng-value="false" data-ng-change="resetEndDate()" /><span class="margin-right-15">@Resource.NoEndDate</span>
+                                    <input type="radio" class="radio radio-inline timeslot-radio" data-ng-model="RTSMaster.IsEndDateAvailable" data-ng-value="true" data-ng-change="resetEndDate()" /><span class="margin-right-15">@Resource.EndBy</span>
+                                </div>
+
+                                <div class="col-lg-3 col-md-3 col-sm-3" data-ng-if="RTSMaster.IsEndDateAvailable">
+                                    <label class="control-label required margin-bottom-5">@Resource.EndDate</label>
+
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="RTSMaster.EndDate" ng-dateval="RTSMaster.EndDate" data-ng-mindate="RTSMaster.StartDate">
+                                        @Html.TextBoxFor(m => m.RTSMaster.EndDate, new
+                                   {
+                                       @class = "form-control input-sm dateInputMask requiredStrip",
+                                       maxlength = "50",
+                                       placeholder = Resource.DateFormat,
+                                       @required = "true"
+                                   })
+                                        @Html.ValidationMessageFor(m => m.RTSMaster.EndDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 margin-top-10">
+                                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveRTSMasterOld()" data-ng-disabled="!IsMasterChange()" data-ng-show="RTSMaster.ReferralTimeSlotMasterID > 0">@Resource.UpdateSchedule</button>
+                                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveRTSMasterOld()" data-ng-hide="RTSMaster.ReferralTimeSlotMasterID > 0">@Resource.SaveAddTimeSlot</button>
+                                    @*<button type="button" class="btn btn-default" data-dismiss="modal" data-ng-click="OnCloseModel()">@Resource.Cancel</button>*@
+                                </div>
+                            </div>
+                        </form>
+                        <hr style="display: inline-block; width: 100%;" />
+
+                        <form id="frmRTSDetail" data-ng-show="RTSMaster.ReferralTimeSlotMasterID > 0">
+
+                            <div>
+                                <div class="">
+                                    <div class="col-md-12">
+                                        <h4 class="modal-title" id="H1" data-ng-hide="RTSDetail.ReferralTimeSlotDetailID>0">@Resource.AddTimeSlot</h4>
+                                        <h4 class="modal-title" id="H1" data-ng-show="RTSDetail.ReferralTimeSlotDetailID>0">@Resource.UpdateTimeSlot</h4>
+                                    </div>
+                                    <div>
+                                        <div class="col-sm-12 no-padding">
+                                            <div class="col-md-12 mt-15 no-padding">
+                                                <div class="col-lg-4 col-md-4 col-sm-4">
+                                                    <label class="control-label required">@Resource.CareType</label>
+                                                    @Html.DropDownListFor(p => p.RTSDetail.CareTypeId, Model.CareTypeList.ToSelectList(Model.RTSDetail.CareTypeId.ToString() ?? "", "Name", "Value", Resource.Select, ""),
+                                                    new
+                                                    {
+                                                        id = "CareTypeId",
+                                                        data_ng_model = "RTSDetail.CareTypeId",
+                                                        data_ng_init = "RTSDetail.CareTypeId=RTSDetail.CareTypeId==''?null:RTSDetail.CareTypeId.toString()",
+                                                        @class = "form-control input-sm required requiredStrip",
+                                                        data_ng_change = "OnCareTypeChange()",
+                                                        convert_to_number = ""
+                                                    })
+                                                    @Html.ValidationMessageFor(m => m.RTSDetail.CareTypeId)
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-sm-4">
+                                                    <label class="control-label">@Resource.BillingPriorAuthorization</label><br>
+                                                    <div class=" dropdown" style="border: solid 1px #8080805c; width: 100% ">
+                                                        <button class="btn  dropdown-toggle custom-Rdd" type="button" data-toggle="dropdown" style="width:100%">
+                                                            <span style="margin-top: -2px; color: #949494; position: static; float: left; font-size: 12px;">{{RTSDetail.AuthorizationCode}}</span>
+                                                            <span class="caret pull-right"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li data-ng-repeat="item in ReferralBillingAuthorizations">
+                                                                <a href="#" style="font-size:11px" data-ng-click="OnReferralBillingAuthorizationChange_Old(item)">
+                                                                    <span><b style="color: #c41212;">AuthCode:</b>{{item.AuthorizationCode}} &nbsp;<b style="color: #c41212;">CareType:</b>{{item.CareType}}</span> &nbsp;<span><b style="color: #c41212;">ServiceCode:</b>{{item.ServiceCode}}</span><br />
+                                                                    <span><b style="color: #c41212;">StartDate:</b>{{item.StartDate |orgdate }} &nbsp;<b style="color: #c41212;">EndDate:</b>{{item.EndDate| orgdate}}</span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-sm-4" ng-if="RTSDetail.ReferralTimeSlotDetailID > 0">
+                                                    <label class="control-label required">@Resource.Day</label>
+                                                    @Html.DropDownListFor(p => p.RTSDetail.Day, Model.WeekDaysList.ToSelectList(Model.RTSDetail.Day.ToString() ?? "", "Name", "Value", Resource.SelectDay, ""),
+                                                    new
+                                                    {
+                                                        id = "RTSDetailDayID",
+                                                        data_ng_model = "RTSDetail.Day",
+                                                        data_ng_init = "RTSDetail.Day=RTSDetail.Day==''?null:RTSDetail.Day.toString()",
+                                                        @class = "form-control input-sm requiredStrip",
+                                                        convert_to_number = "",
+                                                        data_val = "true",
+                                                        @required = "true"
+                                                    })
+                                                    @Html.ValidationMessageFor(m => m.RTSDetail.Day)
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-sm-4" ng-if="RTSDetail.ReferralTimeSlotDetailID == 0">
+                                                    <label class="control-label required">@Resource.Day</label>
+
+                                                    @Html.TextBoxFor(p => p.RTSDetail.SelectedDays,
+                                                        new
+                                                        {
+                                                            data_ng_model = "RTSDetail.SelectedDays",
+                                                            @class = "form-control hideErrorContent replaceErrorSource",
+                                                            id = "SelectedDay"
+                                                        })
+                                                    @Html.ValidationMessageFor(p => p.RTSDetail.SelectedDays)
+                                                    <div class="replaceErrorDest requiredStrip">
+                                                        <select class="form-control input-sm selectpicker" multiple="multiple" data-buttonstyle="btn-sm btn-default"
+                                                                selectpicker="RTSDetail.SelectedDays" name="RTSDetail.SelectedDays" required data-val="true" id="SelectedDays"
+                                                                data-val-required="@Resource.DayRequired" title="@Resource.SelectDay"
+                                                                data-ng-model="RTSDetail.SelectedDays">
+                                                            <option ng-repeat="day in RTSModel.WeekDaysList" value="{{day.Value}}">{{day.Name}}</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="col-md-12 margin-top-10 no-padding">
+
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label required">@Resource.StartTime</label>
+                                                    @Html.TextBoxFor(x => x.RTSDetail.StrStartTime,
+                                                        new
+                                                        {
+                                                            ng_model = "RTSDetail.StrStartTime",
+                                                            @class = "form-control input-sm time requiredStrip",
+                                                            placeholder = @Resource.StartTime,
+                                                            @required = "true"
+                                                        })
+                                                    @Html.ValidationMessageFor(m => m.RTSDetail.StrStartTime)
+                                                </div>
+
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label required">@Resource.EndTime</label>
+                                                    @Html.TextBoxFor(x => x.RTSDetail.StrEndTime,
+                                                        new
+                                                        {
+                                                            ng_model = "RTSDetail.StrEndTime",
+                                                            @class = "form-control input-sm time requiredStrip",
+                                                            placeholder = @Resource.EndTime,
+                                                            compare_with = "#RTSDetail_StrStartTime",
+                                                            validation_timecompare = "",
+                                                            @required = "true"
+                                                        })
+                                                    <label id="lblDayAdded" class="text-info hide">1 day added</label>
+
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label">Anytime ClockIn</label>
+                                                    <div class="height-28 flex align-items-center">
+                                                        <input type="checkbox" class="checkbox m-0" ng-model="RTSDetail.IsChecked" ng-change="SetTime(RTSDetail);" />
+                                                    </div>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label">@Resource.UsedInScheduling</label>
+                                                    <div class="height-28 flex align-items-center">
+                                                        <input type="checkbox" class="checkbox m-0" data-ng-model="RTSDetail.UsedInScheduling" />
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-sm-4">
+                                                    <label class="control-label">@Resource.Notes</label>
+                                                    @Html.TextBoxFor(x => x.RTSDetail.Notes,
+                                                        new
+                                                        {
+                                                            ng_model = "RTSDetail.Notes",
+                                                            @class = "form-control input-sm",
+                                                            placeholder = @Resource.Notes,
+                                                            maxlength = "1000"
+                                                        })
+                                                    @Html.ValidationMessageFor(m => m.RTSDetail.Notes)
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="col-sm-12 margin-top-10" data-ng-show="!!RTSDetail.SelectedRBA">
+                                            <b>@Resource.StartDate:</b> {{(RTSDetail.SelectedRBA.StartDate ? RTSDetail.SelectedRBA.StartDate.replace('/Date(','').replace(')/','') : RTSDetail.SelectedRBA.StartDate) | orgdate}},
+                                            <b>@Resource.EndDate:</b> {{(RTSDetail.SelectedRBA.EndDate ? RTSDetail.SelectedRBA.EndDate.replace('/Date(','').replace(')/','') : RTSDetail.SelectedRBA.EndDate) | orgdate}},
+                                            <b>@Resource.UnitType:</b> {{RTSDetail.SelectedRBA.UnitTypeText}},
+                                            <b>@Resource.MaxUnitLimit:</b> {{RTSDetail.SelectedRBA.MaxUnit}},
+                                            <b>@Resource.UnitLimit:</b> {{RTSDetail.SelectedRBA.DailyUnitLimit}} per {{RTSDetail.SelectedRBA.UnitLimitFrequencyText}}
+                                        </div>
+                                        <div class="margin-top-10 no-padding">
+                                            <div ng-class="{ 'col-lg-8 col-md-8 col-sm-8' : RTSDetail.ReferralTimeSlotDetailID > 0 , 'col-lg-1 col-md-1 col-sm-2' :  RTSDetail.ReferralTimeSlotDetailID == 0 }">
+                                                <button type="submit" class="btn btn-sm green-jungle margin-top-10" data-ng-click="SaveRTSDetail()" data-ng-hide="RTSDetail.ReferralTimeSlotDetailID > 0">@Resource.Add</button>
+                                                <button type="submit" class="btn btn-sm green-jungle" data-ng-click="UpdateRTSDetail()" data-ng-show="RTSDetail.ReferralTimeSlotDetailID > 0">@Resource.Update</button>
+                                                <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetRTSDetailModel()" data-ng-show="RTSDetail.ReferralTimeSlotDetailID > 0">@Resource.Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div data-ng-show="RTSMaster.ReferralTimeSlotMasterID>0">
+                            <div>
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+
+                                    <div class="inline-block pull-right" data-ng-show="RTSDetailList.length > 0">
+                                        <div class="pull-right margin-left-5">
+                                            <dir-pagination-controls boundary-links="true" max-size="RTSDetailListPager.maxSize" on-page-change="RTSDetailListPager.pageChanged(newPageNumber)" pagination-id="RTSDetailListPager"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space20"></div>
+                            </div>
+                            <div>
+                                <div>
+                                    <div class="col-sm-12">
+                                        <div class="portlet-body compact" style="display: block;">
+                                            <div class="table-responsive emp_timeslotstbl">
+                                                <div>
+                                                    <div class="col-md-6 mb-10 no-left-padding">
+                                                        <button type="button" class="btn btn-sm red" data-ng-if="RTSDetailList.length > 0" data-ng-click="DeleteRTSDetail($event,'@Resource.Enable')" data-ng-disabled="deleteButtonDisable">@Resource.DeleteSelected</button>
+                                                    </div>
+                                                </div>
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th class="width-20px"><input type="checkbox" ng-model="allItemsSelected" ng-change="selectAll()"></th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('Day')">@Resource.Day</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'Day'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('StartTime')">@Resource.StartTime</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'StartTime'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('EndTime')">@Resource.EndTime</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'EndTime'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-2">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('Title')">@Resource.CareType</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'Title'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('UsedInScheduling')">@Resource.UsedInScheduling</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'UsedInScheduling'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('UsedInScheduling')">Anytime ClockIn</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'UsedInScheduling'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-3">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('Notes')">@Resource.Notes</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'Notes'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="width-20px">@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        <tr data-ng-class="{'deleted':item.IsDeleted,'table-row-selected':RTSDetail.ReferralTimeSlotDetailID==item.ReferralTimeSlotDetailID }" dir-paginate="item in RTSDetailList | itemsPerPage: RTSDetailListPager.pageSize" total-items="RTSDetailListPager.totalRecords" current-page="RTSDetailListPager.currentPage" pagination-id="RTSDetailListPager"
+                                                            data-ng-click="RTSDetailClick(item)">
+                                                            <td><input type="checkbox" ng-model="item.isChecked" ng-change="selectEntity()"></td>
+                                                            <td data-ng-mouseover="OpenMouseMessage($event,item)">{{item.DayName != null ? item.DayName : '@Resource.NA'}}</td>
+                                                            <td>{{item.StrStartTime}}</td>
+                                                            <td>{{item.StrEndTime}}</td>
+                                                            <td>{{item.Title}}</td>
+                                                            <td class="text-center">
+                                                                <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.UsedInScheduling"></i>
+                                                                <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.UsedInScheduling"></i>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.AnyTimeClockIn"></i>
+                                                                <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.AnyTimeClockIn"></i>
+                                                            </td>
+                                                            <td>{{item.Notes}}</td>
+                                                            <td>
+
+                                                                <a href="javascript:void(0);" data-ng-click="OpenRTSDetailModal($event,item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+
+
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="col-sm-12" data-ng-if="RTSDetailList.length > 0">
+                                        <div class="col-sm-6 pull-left no-padding">
+                                            @Resource.Showing <span data-ng-bind="(RTSDetailListPager.pageSize * RTSDetailListPager.currentPage) - RTSDetailListPager.pageSize  + 1"></span>
+                                            &nbsp;@Resource.To <span data-ng-bind="(RTSDetailListPager.pageSize == RTSDetailListPager.currentPageSize) ? (RTSDetailListPager.pageSize * RTSDetailListPager.currentPage) :(RTSDetailListPager.pageSize * RTSDetailListPager.currentPage) - RTSDetailListPager.pageSize  + RTSDetailListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="RTSDetailListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                                        </div>
+                                        <div class="pull-right top pagination-sm">
+                                            <dir-pagination-controls boundary-links="true" max-size="RTSDetailListPager.maxSize" on-page-change="RTSDetailListPager.pageChanged(newPageNumber)" pagination-id="RTSDetailListPager"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div>
+                                <div class="col-sm-12">
+                                    <div data-ng-if="RTSDetailList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger mb-0">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-dialog modal-lg" role="document" data-ng-if="!toggle">
+        <div class="modal-content" style="width:100%; z-index:-1 !important; padding:0 !important">
+            <div class="modal-header" style="padding:0 !important">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                <h3 class="page-title" style="background-color:#ccc; padding:10px; padding-left:20px; margin-top:-15px !important" id="H1" data-ng-hide="RTSMaster.ReferralTimeSlotMasterID>0">@Resource.AddReferralSchedule</h3>
+                <h3 class="page-title" style="background-color: #ccc; padding: 10px; padding-left: 20px; margin-top: -15px !important" id="H1" data-ng-show="RTSMaster.ReferralTimeSlotMasterID>0">@Resource.UpdateReferralSchedule </h3>
+                <div class="modal-body" style="padding:20px">
+                    <div class="row">
+
+                        <div style="border: solid 1px #ccc; margin-left: 15px; margin-bottom: 10px; padding-top: 10px; padding-bottom:10px; width:95%">
+                            <span style=" padding-left:20px;" ng-if="IsEditMode==false">
+                                <input type="radio" id="radioStrictly" name="settings" value="true" ng-checked="RTSMaster.IsVisible" ng-click="RadioSelectChange(this)"> @Resource.ScheduleTypeStrictly
+                                <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.__SchedultTypeStrictly" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                &nbsp;&nbsp;&nbsp;
+
+                                <input type="radio" id="radioFlexible" name="settings" value="false" ng-checked="!RTSMaster.IsVisible" ng-click="RadioSelectChange(this)"> @Resource.ScheduleTypeFlexible
+                                <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.__SchedultTypeFlexible" data-ng-custom-class="tooltip-extra-z-index"></i>
+                            </span>
+                            <span style=" padding-left:20px;" ng-if="IsEditMode==true">
+
+                                <input type="radio" id="radioStrictly" name="settings" data-ng-disabled="!RTSMaster.IsVisible && RTSMaster.ReferralTimeSlotMasterID>0" value="true" ng-checked="RTSMaster.IsVisible" ng-click="RadioSelectChange(this)"> @Resource.ScheduleTypeStrictly
+                                <i class="fa fa-question-circle font-size-15"  data-ng-tooltip="@Resource.__SchedultTypeStrictly" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                &nbsp;&nbsp;&nbsp;
+
+                                <input type="radio" id="radioFlexible" name="settings" data-ng-disabled="RTSMaster.IsVisible && RTSMaster.ReferralTimeSlotMasterID>0" value="false" ng-checked="!RTSMaster.IsVisible" ng-click="RadioSelectChange(this)"> @Resource.ScheduleTypeFlexible
+                                <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.__SchedultTypeFlexible" data-ng-custom-class="tooltip-extra-z-index"></i>
+                            </span>
+                        </div>
+
+                        <div class="col-md-12 col-sm-12 no-padding" style="border:solid 1px #ccc; padding-top:10px !important; margin-left:15px; padding-bottom:15px !important; width:95%">
+
+                            <form id="frmRTSMaster">
+                                <div class="col-md-12 col-md-12 no-padding">
+                                    <div ng-show="RTSMaster.IsVisible">
+                                        <div class="col-lg-3 col-md-3 col-sm-6" style="margin-left:2px; width:99% !important">
+                                            <label class="control-label required">@Resource.ContractPADetails:</label>
+
+                                            <div class="dropdown" style="border: solid 1px #ccc; border-radius: 2px; width: 100% ">
+                                                <button id="btnddl1" class="form-control input-sm requiredStrip" type="button" data-val-required='@Resource.ContractPADetails' data-toggle="dropdown" style="width: 100%; font-size: 10px; text-align: left; color: #949494;font-weight:500">
+
+                                                    {{RTSMaster.AuthorizationCode}}    @*<span>{{SelectedAuthCode}}</span>*@
+                                                    <span class="caret pull-right"></span>
+                                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.PatientOnHoldReason" data-valmsg-replace="true"></span>
+
+                                                </button>
+
+
+                                                <ul class="dropdown-menu" id="ulPa">
+                                                    <li data-ng-repeat="item in ReferralBillingAuthorizations" style="box-shadow: 0px 1px 1px 1px lightgray; font-size: 11px; padding: 0px 1px 1px 1px;">
+                                                        <a href="#" data-ng-if="item.ReferralBillingAuthorizationID==0" style="font-size:11px" data-ng-click="OnReferralBillingAuthorizationChange(item,RTSMaster.IsVisible)">
+                                                            <span>Select (Optional)</span><br />
+                                                        </a>
+                                                        <a href="#" data-ng-if="item.ReferralBillingAuthorizationID>0" style="font-size:11px" data-ng-click="OnReferralBillingAuthorizationChange(item,RTSMaster.IsVisible)">
+                                                            <span><b style="color: #c41212;">AuthCode:</b>{{item.AuthorizationCode}} &nbsp;<b style="color: #c41212;">CareType:</b>{{item.CareType}}</span> &nbsp;<span><b style="color: #c41212;">ServiceCode:</b>{{item.ServiceCode}}</span><br />
+                                                            <span><b style="color: #c41212;">StartDate:</b>{{item.StartDate}} &nbsp;<b style="color: #c41212;">EndDate:</b>{{item.EndDate}}</span>
+
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+
+
+                                        </div><br /><br /><br /><br />
+                                        <div ng-show="EnableLabel" style="font-size:9px; box-shadow: 6px 3px 18px #ccc; border-radius: 5px; margin-left: 15px; margin-right: 25px; padding: 10px; width: 95%; border: solid 1px #ccc; ">
+                                            <table width="100%" style="font-size:11px; line-height:1.6">
+                                                <tr>
+                                                    <td>
+                                                        <b>@Resource.StarDate</b>:&nbsp;{{RTSMaster.StartDate }}<br />
+                                                    </td>
+                                                    <td>
+                                                        <b>@Resource.EndDate</b>:&nbsp;{{RTSMaster.EndDate}}<br />
+
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <b>@Resource.CarePlan</b>:&nbsp;{{RTSMaster.CareType}}
+                                                    </td>
+                                                    <td>
+                                                        <b>@Resource.ServiceCode</b>:&nbsp;{{RTSMaster.ServiceCode}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <b>@Resource.TotalUsedUnit</b>:&nbsp;
+                                                        {{TotalUnit}}
+                                                    </td>
+                                                    <td>
+                                                        <b>Allocated Unit</b>:&nbsp;{{PrioAuthorizationList.Allocated}}
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td> <b>@Resource.UsedUnit</b>:&nbsp;  {{PrioAuthorizationList.Used}}</td>
+                                                    <td> <b>Unused Unit</b>:&nbsp;{{PrioAuthorizationList.Remaining}}</td>
+                                                </tr>
+                                            </table>
+
+                                        </div>
+                                    </div>
+
+                                    <div ng-show="!RTSMaster.IsVisible" style=" padding: 0px 4px 0px 4px;">
+                                        @*<div class="col-md-12 col-sm-12 no-padding">*@
+                                        @*<form id="frmRTSMaster">*@
+                                        <div class="col-md-12 col-md-12 no-padding">
+                                            <div class="row col-md-12 col-md-12 no-padding">
+                                                <div class="col-lg-4 col-md-4 col-sm-4">
+                                                    <label class="control-label required margin-bottom-5">@Resource.Referral</label>
+
+                                                    @Html.DropDownListFor(p => p.RTSMaster.ReferralID, Model.ReferralList.ToSelectList(Model.RTSMaster.ReferralID.ToString() ?? "", "Name", "Value", Resource.SelectPatient, ""),
+                                                      new
+                                                          {
+                                                              id = "RTSMasterReferralID",
+                                                              data_ng_model = "RTSMaster.ReferralID",
+                                                              data_ng_init = "RTSMaster.ReferralID=RTSMaster.ReferralID==''?null:RTSMaster.ReferralID.toString()",
+                                                              @class = "form-control input-sm requiredStrip",
+                                                              disabled = ""
+                                                          })
+                                                    @*@Html.ValidationMessageFor(m => m.RTSMaster.ReferralID)*@
+                                                </div>
+                                                <div class="col-lg-4 col-md-4 col-sm-4">
+                                                    <label class="control-label required margin-bottom-5">@Resource.CareType</label>
+
+                                                    @Html.DropDownListFor(p => p.RTSDetail.CareTypeId, Model.CareTypeList.ToSelectList(Model.RTSDetail.CareTypeId.ToString() ?? "", "Name", "Value", Resource.Select, ""),
+                                                    new
+                                                    {
+
+                                                        id = "CareTypeId",
+                                                        data_ng_model = "RTSMaster.CareTypeID",
+                                                        data_ng_init = "RTSDetail.CareTypeId=RTSDetail.CareTypeId==''?null:RTSDetail.CareTypeId.toString()",
+                                                        @class = "form-control input-sm required requiredStrip",
+                                                        data_ng_change = "OnCareTypeChange()",
+                                                        convert_to_number = "",
+                                                        @required = "true",
+
+                                                    })
+                                                    {{RTSMaster.SelectedCareTypeName}}
+                                                    @Html.ValidationMessageFor(m => m.RTSDetail.CareTypeId)
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-sm-4">
+                                                    <label class="control-label required margin-bottom-5">@Resource.BillingPriorAuthorization</label>
+                                                    <div class=" dropdown" style="border: solid 1px #ccc; border-radius: 2px; width: 100%">
+                                                        @*"form-control input-sm dateInputMask requiredStrip" btn  dropdown-toggle custom-Rdd*@
+                                                        <button id="btnddl1" class="btn  dropdown-toggle custom-Rdd" type="button"
+                                                                data-toggle="dropdown" style="width:100%; font-size:11px; text-align:left;color: #949494;font-weight:500">
+
+                                                            {{RTSMaster.AuthorizationCode}}   <span>
+
+                                                                {{SelectedAuthCode}}
+                                                            </span>
+                                                            <span class="caret pull-right"></span>
+                                                        </button>
+                                                        <ul class="dropdown-menu" id="ulPa">
+                                                            <li data-ng-repeat="item in ReferralBillingAuthorizations" style="box-shadow: 0px 1px 1px 1px lightgray; font-size: 11px; padding: 0px 1px 1px 1px;">
+                                                                <a href="#" data-ng-if="item.ReferralBillingAuthorizationID==0" style="font-size:11px" data-ng-click="OnReferralBillingAuthorizationChange(item,RTSMaster.IsVisible)">
+                                                                    <span>Select (Optional)</span><br />
+
+                                                                </a>
+                                                                <a href="#" data-ng-if="item.ReferralBillingAuthorizationID>0" style="font-size:11px" data-ng-click="OnReferralBillingAuthorizationChange(item,RTSMaster.IsVisible)">
+                                                                    <span><b style="color: #c41212;">AuthCode:</b>{{item.AuthorizationCode}} &nbsp;<b style="color: #c41212;">CareType:</b>{{item.CareType}}</span> &nbsp;<span><b style="color: #c41212;">ServiceCode:</b>{{item.ServiceCode}}</span><br />
+                                                                    <span><b style="color: #c41212;">StartDate:</b>{{item.StartDate}} &nbsp;<b style="color: #c41212;">EndDate:</b>{{item.EndDate}}</span>
+                                                                </a>
+                                                            </li>
+                                                        </ul>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                            <div class="row col-md-12 col-md-12 no-padding">
+
+
+                                                <div class="col-lg-4 col-md-4 col-sm-4">
+                                                    {{RTSMaster.currentDate}}
+                                                    <label class="control-label required margin-bottom-5">@Resource.StarDate</label>
+
+                                                    <div class="input-group date date-picker pull-right"
+                                                         datepicker="RTSMaster.StartDate" ng-dateval="RTSMaster.StartDate" data-ng-maxdate="RTSMaster.EndDate">
+                                                        @Html.TextBoxFor(m => m.RTSMaster.StartDate, new
+                                                                {
+                                                                    @class = "form-control input-sm dateInputMask requiredStrip",
+                                                                    maxlength = "50",
+                                                                    placeholder = Resource.DateFormat,
+                                                                    @required = "true"
+                                                                })
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                        @Html.ValidationMessageFor(m => m.RTSMaster.StartDate)
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-sm-4 margin-top-25">
+                                                    @*<input type="radio" class="radio radio-inline timeslot-radio" data-ng-model="RTSMaster.IsEndDateAvailable" data-ng-value="false" data-ng-change="resetEndDate()" /><span class="margin-right-15">@Resource.NoEndDate</span>
+                                                    <input type="radio" class="radio radio-inline timeslot-radio" data-ng-model="RTSMaster.IsEndDateAvailable" data-ng-value="true" data-ng-change="resetEndDate()" /><span class="margin-right-15">@Resource.EndBy</span>*@
+                                               
+                                                    <input type="checkbox" data-ng-model="RTSMaster.IsEndDateAvailable" data-ng-change="resetEndDate()" /><span style="margin-left:15px">@Resource.EndBy</span>
+                                                </div>
+
+                                                <div class="col-lg-4 col-md-4 col-sm-4" data-ng-if="RTSMaster.IsEndDateAvailable">
+                                                    <label class="control-label required margin-bottom-5">@Resource.EndDate</label>
+
+                                                    <div class="input-group date date-picker pull-right"
+                                                         datepicker="RTSMaster.EndDate" ng-dateval="RTSMaster.EndDate" data-ng-mindate="RTSMaster.StartDate">
+                                                        @Html.TextBoxFor(m => m.RTSMaster.EndDate, new
+                                                   {
+                                                       @class = "form-control input-sm dateInputMask requiredStrip",
+                                                       maxlength = "50",
+                                                       placeholder = Resource.DateFormat,
+                                                       @required = "true"
+                                                   })
+                                                        @Html.ValidationMessageFor(m => m.RTSMaster.EndDate)
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="col-lg-12 col-md-12 col-sm-12 margin-top-10">
+                                        <br />
+                                        <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveRTSMaster()" @*data-ng-disabled="HideButton"*@ data-ng-show="RTSMaster.ReferralTimeSlotMasterID > 0">@Resource.UpdateSchedule</button>
+                                        <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveRTSMaster()" @*data-ng-disabled="HideButton"*@ data-ng-hide="(RTSMaster.ReferralTimeSlotMasterID > 0 || SaveAndAddTimeSlotsButton)">@Resource.SaveAddTimeSlot</button>
+                                    </div>
+                                </div>
+
+
+                            </form>
+                            <span style="display: inline-block; width: 100%;"></span>
+                            <form id="frmRTSDetail" data-ng-hide="RTSMaster.AuthorizationCode == ''" >
+
+                                <div data-ng-show="RTSMaster.ReferralTimeSlotMasterID>0">
+                                    <div class=""><hr />
+                                        <div class="col-md-12">
+                                            <h4 class="modal-title" id="H1" data-ng-hide="RTSDetail.ReferralTimeSlotDetailID>0">@Resource.AddTimeSlot</h4>
+                                            <h4 class="modal-title" id="H1" data-ng-show="RTSDetail.ReferralTimeSlotDetailID>0">@Resource.UpdateTimeSlot</h4>
+                                        </div>
+                                        <div>
+                                            <div class="col-sm-12 no-padding">
+                                                <div class="col-md-12 mt-15 no-padding">
+                                                    @*<div class="col-lg-4 col-md-4 col-sm-4">
+            <label class="control-label required">@Resource.CareType</label>
+            @Html.DropDownListFor(p => p.RTSDetail.CareTypeId, Model.CareTypeList.ToSelectList(Model.RTSDetail.CareTypeId.ToString() ?? "", "Name", "Value", Resource.Select, ""),
+            new
+            {
+                id = "CareTypeId",
+                data_ng_model = "RTSDetail.CareTypeId",
+                data_ng_init = "RTSDetail.CareTypeId=RTSDetail.CareTypeId==''?null:RTSDetail.CareTypeId.toString()",
+                @class = "form-control input-sm required requiredStrip",
+                data_ng_change = "OnCareTypeChange()",
+                convert_to_number = ""
+            })
+            @Html.ValidationMessageFor(m => m.RTSDetail.CareTypeId)
+        </div>
+
+        <div class="col-lg-4 col-md-4 col-sm-4">
+            <label class="control-label">@Resource.BillingPriorAuthorization</label>
+            <div class=" dropdown" style="border:solid 1px gray">
+                <button class="btn  dropdown-toggle custom-Rdd" type="button" data-toggle="dropdown">
+                    <span>{{RTSDetail.AuthorizationCode}}</span>
+                    <span class="caret pull-right"></span>
+                </button>
+                <ul class="dropdown-menu">
+                    <li data-ng-repeat="item in ReferralBillingAuthorizations">
+                        <a href="#" style="font-size:11px" data-ng-click="OnReferralBillingAuthorizationChange(item)">
+                            <span><b style="color: #c41212;">AuthCode:</b>{{item.AuthorizationCode}} &nbsp;<b style="color: #c41212;">CareType:</b>{{item.CareType}}</span> &nbsp;<span><b style="color: #c41212;">ServiceCode:</b>{{item.ServiceCode}}</span><br />
+                            <span><b style="color: #c41212;">StartDate:</b>{{item.StartDate |orgdate}} &nbsp;<b style="color: #c41212;">EndDate:</b>{{item.EndDate| orgdate}}</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>*@
+
+                                                    <div class="col-lg-5 col-md-5 col-sm-5" ng-if="RTSDetail.ReferralTimeSlotDetailID > 0">
+                                                        <label class="control-label required">@Resource.Day</label>
+                                                        @Html.DropDownListFor(p => p.RTSDetail.Day, Model.WeekDaysList.ToSelectList(Model.RTSDetail.Day.ToString() ?? "", "Name", "Value", Resource.SelectDay, ""),
+                                                        new
+                                                        {
+                                                            id = "RTSDetailDayID",
+                                                            data_ng_model = "RTSDetail.Day",
+                                                            data_ng_init = "RTSDetail.Day=RTSDetail.Day==''?null:RTSDetail.Day.toString()",
+                                                            @class = "form-control input-sm requiredStrip",
+                                                            convert_to_number = "",
+                                                            data_val = "true",
+                                                            @required = "true"
+                                                        })
+                                                        @Html.ValidationMessageFor(m => m.RTSDetail.Day)
+                                                    </div>
+
+                                                    <div class="col-lg-5 col-md-5 col-sm-5" ng-if="RTSDetail.ReferralTimeSlotDetailID == 0">
+                                                        <label class="control-label required">@Resource.Day</label>
+
+                                                        @Html.TextBoxFor(p => p.RTSDetail.SelectedDays,
+                                                            new
+                                                            {
+                                                                data_ng_model = "RTSDetail.SelectedDays",
+                                                                @class = "form-control hideErrorContent replaceErrorSource",
+                                                                id = "SelectedDay"
+                                                            })
+                                                        @Html.ValidationMessageFor(p => p.RTSDetail.SelectedDays)
+                                                        <div class="replaceErrorDest requiredStrip">
+                                                            <select class="form-control input-sm selectpicker dayTime" multiple="multiple" data-buttonstyle="btn-sm btn-default"
+                                                                    selectpicker="RTSDetail.SelectedDays" name="RTSDetail.SelectedDays" required data-val="true" id="SelectedDays"
+                                                                    data-val-required="@Resource.DayRequired" title="@Resource.SelectDay"
+                                                                    data-ng-model="RTSDetail.SelectedDays">
+                                                                <option ng-repeat="day in RTSModel.WeekDaysList" value="{{day.Value}}">{{day.Name}}</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-lg-3 col-md-3 col-sm-3">
+                                                        <label class="control-label required">@Resource.StartTime</label>
+                                                        @Html.TextBoxFor(x => x.RTSDetail.StrStartTime,
+                                                            new
+                                                            {
+                                                                ng_model = "RTSDetail.StrStartTime",
+                                                                @class = "form-control input-sm time requiredStrip",
+                                                                placeholder = @Resource.StartTime,
+                                                                @required = "true"
+                                                            })
+                                                        @Html.ValidationMessageFor(m => m.RTSDetail.StrStartTime)
+                                                    </div>
+
+                                                    <div class="col-lg-3 col-md-3 col-sm-3">
+                                                        <label class="control-label required">@Resource.EndTime</label>
+                                                        @Html.TextBoxFor(x => x.RTSDetail.StrEndTime,
+                                                            new
+                                                            {
+                                                                ng_model = "RTSDetail.StrEndTime",
+                                                                @class = "form-control input-sm time requiredStrip",
+                                                                placeholder = @Resource.EndTime,
+                                                                compare_with = "#RTSDetail_StrStartTime",
+                                                                validation_timecompare = "",
+                                                                @required = "true"
+                                                            })
+                                                        <label id="lblDayAdded" class="text-info hide">1 day added</label>
+
+                                                    </div>
+
+                                                </div>
+                                                <div class="col-md-12 margin-top-10 no-padding">
+
+
+                                                    <div style="margin-top:11%">
+                                                        <div class="col-lg-6 col-md-6 col-sm-6 height-28 flex align-items-center">
+                                                            <input type="checkbox" class="" ng-model="RTSDetail.IsChecked" ng-change="SetTime(RTSDetail);" />&nbsp;&nbsp; Anytime ClockIn
+                                                        </div>
+
+
+                                                        <div class=" col-lg-6 col-md-6 col-sm-6 height-28 flex align-items-center">
+                                                            <input type="checkbox" class="" data-ng-model="RTSDetail.UsedInScheduling" />&nbsp;&nbsp; @Resource.UsedInScheduling
+                                                        </div>
+
+
+
+                                                    </div>
+                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                        <label class="control-label">@Resource.Notes</label>
+                                                        @*@Html.TextBoxFor(x => x.RTSDetail.Notes,
+                                                                new
+                                                                {
+                                                                    ng_model = "RTSDetail.Notes",
+                                                                    @class = "form-control input-sm",
+                                                                    placeholder = @Resource.Notes,
+                                                                    maxlength = "1000"
+                                                                })
+                                                            @Html.ValidationMessageFor(m => m.RTSDetail.Notes)*@
+                                                        <textarea class="form-control input-sm" style="margin-bottom:8px;padding-bottom:13%" data-ng-model="RTSDetail.Notes"ng-maxlength="1000" placeholder="'@Resource.Notes'"></textarea>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-12 margin-top-10" data-ng-show="!!RTSDetail.SelectedRBA">
+                                                <b>@Resource.StartDate:</b> {{(RTSDetail.SelectedRBA.StartDate ? RTSDetail.SelectedRBA.StartDate.replace('/Date(','').replace(')/','') : RTSDetail.SelectedRBA.StartDate) | orgdate}},
+                                                <b>@Resource.EndDate:</b> {{(RTSDetail.SelectedRBA.EndDate ? RTSDetail.SelectedRBA.EndDate.replace('/Date(','').replace(')/','') : RTSDetail.SelectedRBA.EndDate) | orgdate}},
+                                                <b>@Resource.UnitType:</b> {{RTSDetail.SelectedRBA.UnitTypeText}},
+                                                <b>@Resource.MaxUnitLimit:</b> {{RTSDetail.SelectedRBA.MaxUnit}},
+                                                <b>@Resource.UnitLimit:</b> {{RTSDetail.SelectedRBA.DailyUnitLimit}} per {{RTSDetail.SelectedRBA.UnitLimitFrequencyText}}
+                                            </div>
+                                            <div class="margin-top-10 no-padding">
+                                                <div ng-class="{ 'col-lg-8 col-md-8 col-sm-8' : RTSDetail.ReferralTimeSlotDetailID > 0 , 'col-lg-1 col-md-1 col-sm-2' :  RTSDetail.ReferralTimeSlotDetailID == 0 }">
+                                                    <button type="submit" class="btn btn-sm green-jungle margin-top-10" data-ng-click="SaveRTSDetail()" data-ng-hide="RTSDetail.ReferralTimeSlotDetailID > 0">@Resource.Add</button>
+                                                    <button type="submit" class="btn btn-sm green-jungle" data-ng-click="UpdateRTSDetail()" data-ng-show="RTSDetail.ReferralTimeSlotDetailID > 0">@Resource.Update</button>
+                                                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetRTSDetailModel()" data-ng-show="RTSDetail.ReferralTimeSlotDetailID > 0">@Resource.Cancel</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+
+                        </div>
+
+
+                        <div  data-ng-if="RTSMaster.ReferralTimeSlotMasterID>0">
+
+                            <div>
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+
+                                    <div class="inline-block pull-right" data-ng-show="RTSDetailList.length > 0">
+                                        <div class="pull-right margin-left-5">
+                                            <dir-pagination-controls boundary-links="true" max-size="RTSDetailListPager.maxSize" on-page-change="RTSDetailListPager.pageChanged(newPageNumber)" pagination-id="RTSDetailListPager"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space20"></div>
+                            </div>
+                            <div>
+                                <div>
+                                    <div class="col-sm-12">
+                                        <div class="portlet-body compact" style="display: block;">
+                                            <div class="table-responsive emp_timeslotstbl">
+                                                <div>
+                                                    <div class="col-md-6 mb-10 no-left-padding">
+                                                        <button type="button" class="btn btn-sm red" data-ng-if="RTSDetailList.length > 0" data-ng-click="DeleteRTSDetail($event,'@Resource.Enable')" data-ng-disabled="deleteButtonDisable">@Resource.DeleteSelected</button>
+                                                    </div>
+                                                </div>
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th class="width-20px"><input type="checkbox" ng-model="allItemsSelected" ng-change="selectAll()"></th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('Day')">@Resource.Day</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'Day'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('StartTime')">@Resource.StartTime</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'StartTime'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('EndTime')">@Resource.EndTime</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'EndTime'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-2">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('Title')">@Resource.CareType</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'Title'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('UsedInScheduling')">@Resource.UsedInScheduling</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'UsedInScheduling'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('UsedInScheduling')">Anytime ClockIn</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'UsedInScheduling'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-3">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="RTSDetailListPager.sortColumn('Notes')">@Resource.Notes</a>
+                                                                <span class="sortorder" data-ng-show="RTSDetailListPager.sortIndex === 'Notes'" data-ng-class="{reverse:RTSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="width-20px">@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        <tr data-ng-class="{'deleted':item.IsDeleted,'table-row-selected':RTSDetail.ReferralTimeSlotDetailID==item.ReferralTimeSlotDetailID }" dir-paginate="item in RTSDetailList | itemsPerPage: RTSDetailListPager.pageSize" total-items="RTSDetailListPager.totalRecords" current-page="RTSDetailListPager.currentPage" pagination-id="RTSDetailListPager"
+                                                            data-ng-click="RTSDetailClick(item)">
+                                                            <td><input type="checkbox" ng-model="item.isChecked" ng-change="selectEntity()"></td>
+                                                            <td data-ng-mouseover="OpenMouseMessage($event,item)">{{item.DayName != null ? item.DayName : '@Resource.NA'}}</td>
+                                                            <td>{{item.StrStartTime}}</td>
+                                                            <td>{{item.StrEndTime}}</td>
+                                                            <td>{{item.Title}}</td>
+                                                            <td class="text-center">
+                                                                <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.UsedInScheduling"></i>
+                                                                <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.UsedInScheduling"></i>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.AnyTimeClockIn"></i>
+                                                                <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.AnyTimeClockIn"></i>
+                                                            </td>
+                                                            <td>{{item.Notes}}</td>
+                                                            <td>
+
+                                                                <a href="javascript:void(0);" data-ReferralTimeSlotDetailID="{{item.ReferralTimeSlotDetailID}}" data-ng-click="OpenRTSDetailModal($event,item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                @*<a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteRTSDetail($event,item.ReferralTimeSlotDetailID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>*@
+                                                                @*<a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="AlertOnDelete()" class="btn btn-xs red">@Resource.Delete</a>*@
+
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="col-sm-12" data-ng-if="RTSDetailList.length > 0">
+                                        <div class="col-sm-6 pull-left no-padding">
+                                            @Resource.Showing <span data-ng-bind="(RTSDetailListPager.pageSize * RTSDetailListPager.currentPage) - RTSDetailListPager.pageSize  + 1"></span>
+                                            &nbsp;@Resource.To <span data-ng-bind="(RTSDetailListPager.pageSize == RTSDetailListPager.currentPageSize) ? (RTSDetailListPager.pageSize * RTSDetailListPager.currentPage) :(RTSDetailListPager.pageSize * RTSDetailListPager.currentPage) - RTSDetailListPager.pageSize  + RTSDetailListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="RTSDetailListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                                        </div>
+                                        <div class="pull-right top pagination-sm">
+                                            <dir-pagination-controls boundary-links="true" max-size="RTSDetailListPager.maxSize" on-page-change="RTSDetailListPager.pageChanged(newPageNumber)" pagination-id="RTSDetailListPager"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div>
+                                <div class="col-sm-12">
+                                    <div data-ng-if="RTSDetailList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger mb-0">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

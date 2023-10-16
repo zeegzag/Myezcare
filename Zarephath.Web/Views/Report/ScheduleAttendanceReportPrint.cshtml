@@ -1,0 +1,562 @@
+﻿@{
+    Layout = null;
+}
+@model SceduleAttendanceModel
+<html>
+<head>
+    <title></title>
+    @Styles.Render("~/sitelayout/css")
+    <style>
+        body * {
+            font-size: 14px !important;
+        }
+
+        body {
+            font-size: 14px !important;
+            -webkit-print-color-adjust: exact;
+            margin: 0 10px;
+            background-color: white !important;
+            width: 100%;
+        }
+
+        table *, .table.table-bordered.table-striped.table-condensed.flip-content td, .table.table-bordered.table-striped.table-condensed.flip-content * {
+            border-color: #999 !important;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .table.table-bordered.table-striped.table-condensed.flip-content td, table.table-bordered.table-striped.table-condensed.flip-content th {
+            padding: 4px;
+        }
+
+        @@media print {
+            body {
+                -webkit-print-color-adjust: exact;
+            }
+
+            @@page {
+                size: A3 landscape;
+                margin: 0.25in;
+            }
+        }
+
+        .Width20 {
+            width: 20%;
+        }
+
+        .Width35 {
+            width: 35%;
+        }
+
+        .Width40 {
+            width: 40%;
+            padding-right: 10px;
+            padding-top: 20px;
+            font-size: 17px !important;
+        }
+
+        .DisplayFacility {
+            padding: 5px 4px;
+            margin: 5px 0;
+            font-size: 17px !important;
+        }
+
+        .Address {
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .Emergencycontact {
+            text-align: left;
+            color: red!important;
+        }
+
+        z .pageheadernew {
+            padding-left: 5px;
+            padding-top: 20px;
+            font-size: 17px !important;
+        }
+
+        .float-left {
+            float: left;
+        }
+
+        .float-right {
+            float: right;
+        }
+
+        .badge-danger {
+            background-color: #ed6b75 !important;
+            background-image: none;
+        }
+
+        .badge-warning {
+            background-color: #F1C40F !important;
+            background-image: none;
+        }
+
+        .badge-black {
+            font-size: 11px !important;
+            font-weight: 300;
+            text-align: center;
+            height: 18px;
+            color: #000;
+            padding: 3px 6px 3px 6px;
+            -webkit-border-radius: 12px !important;
+            -moz-border-radius: 12px !important;
+            border-radius: 12px !important;
+            text-shadow: none !important;
+            text-align: center;
+            /* vertical-align: middle; */
+        }
+
+        .badge {
+            font-size: 11px !important;
+            font-weight: 300;
+            text-align: center;
+            height: 18px;
+            color: #fff;
+            padding: 3px 6px 3px 6px;
+            -webkit-border-radius: 12px !important;
+            -moz-border-radius: 12px !important;
+            border-radius: 12px !important;
+            text-shadow: none !important;
+            text-align: center;
+            /* vertical-align: middle; */
+        }
+
+        .font-black {
+            color: #000 !important;
+        }
+
+        .bold {
+            font-weight: 700 !important;
+        }
+    </style>
+
+</head>
+<body>
+    @if (Model.SchedulAttendanceListModel.Count > 0)
+    {
+        <div>
+            <div class="page-content">
+                <div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="portlet-body compact">
+                                <div class="table-responsive tabbable-custom">
+                                    @{ int i = 1, k = 1;
+                                    }
+                                    @foreach (var item in Model.SchedulAttendanceFacilityNameListModel)
+                                    {
+                                        <table class="flip-content" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td class="Width20">
+                                                    <span class="pull-left" style="padding-top: 20px">
+                                                        <img alt="" src="/Assets/images/logo-zrpath.png" width="180px" />
+                                                    </span>
+                                                </td>
+                                                <td class="Width35">
+                                                    <span class="pageheadernew bold">Zarephath 24 Hour Availabilty Line: (480) 510-7013
+                                                    </span>
+                                                </td>
+                                                <td class="pull-right bold Width40">
+                                                    @Html.DisplayFor(modelItem => Model.SearchScheduleAttendanceModel.RegionName)
+                                                    Attendance List
+                                                     <br />
+                                                    @if (Model.SearchScheduleAttendanceModel.StrStartDate != null)
+                                                    {
+                                                        @Html.DisplayFor(modelItem => Model.SearchScheduleAttendanceModel.StrStartDate)
+                                                    }
+                                                    @if (Model.SearchScheduleAttendanceModel.StrStartDate != null && Model.SearchScheduleAttendanceModel.StrEndDate != null)
+                                                    {
+                                                        <span>- </span>
+                                                    }
+                                                    @if (Model.SearchScheduleAttendanceModel.StrEndDate != null)
+                                                    {
+                                                        @Html.DisplayFor(modelItem => Model.SearchScheduleAttendanceModel.StrEndDate)
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </table>
+                       
+                                        <div class="space20"></div>
+                                        <div style="page-break-after: always;margin-bottom: @((((9 - (item.SchedulFacilityListModel.Count % 9)) * 800)))px;">
+                                            <div class="col-sm-12 bold header DisplayFacility">@Html.DisplayFor(modelItem => item.FacilityHouseName) </div>
+                                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                                <tr>
+                                                    <th class="width-15px"></th>
+                                                    <th class="col-sm-2 ">Client</th>
+                                                    <th class="width-20px">AHCCCS_ID</th>
+                                                    <th class="">DX </th>
+                                                    <th class="">M/F</th>
+                                                    <th class="">Age</th>
+                                                    <th class="">D.O.B</th>
+                                                    <th class="width-20px">PU</th>
+                                                    <th class="width-20px">DO</th>
+                                                    <th class="width-20px">CON</th>
+                                                    <th class="col-sm-1">Phone #:</th>
+                                                    <th class="col-sm-1">2nd Ph #</th>
+                                                    <th class="">Days</th>
+                                                    <th class="col-sm-1">Parent/Guardian</th>
+                                                    <th class="">Agency</th>
+                                                    <th class="">Facilitator</th>
+                                                </tr>
+                                                @foreach (var model in item.SchedulFacilityListModel)
+                                                {
+                                                    <tr>
+                                                        <th rowspan="2">@i</th>
+                                                        <td>
+                                                            <span class="float-left">
+                                                                @Html.DisplayFor(modelItem => model.ClientName)
+                                                            </span>
+                                                            @if (model.NeedPrivateRoom)
+                                                            {
+                                                                <span class="float-right badge badge-danger">PR</span>
+                                                            }
+                                                        </td>
+                                                        <td>@Html.DisplayFor(modelItem => model.AHCCCSID)</td>
+                                                        <td>@Html.DisplayFor(modelItem => model.DXCodeName)</td>
+                                                        <td>@Html.DisplayFor(modelItem => model.Gender)</td>
+                                                        @if (model.Age >= 0 && model.Age <= 5)
+                                                        {
+                                                            <td style="background: #8E44AD !important">@Html.DisplayFor(modelItem => model.Age)</td>
+                                                        }
+                                                        @if (model.Age <= 8 && model.Age > 5)
+                                                        {
+                                                            <td style="background: #3598dc !important">@Html.DisplayFor(modelItem => model.Age)</td>
+                                                        }
+                                                        @if (model.Age > 8)
+                                                        {
+                                                            <td>@Html.DisplayFor(modelItem => model.Age)</td>
+                                                        }
+                                                        <td>@Html.DisplayFor(modelItem => model.Dob)</td>
+                                                        <td>@Html.DisplayFor(modelItem => model.PickUpLocationCode)</td>
+                                                        <td>@Html.DisplayFor(modelItem => model.DropOffLocationCode)</td>
+                                                        <td>@Html.DisplayFor(modelItem => model.ScheduleStatusName)</td>
+
+                                                        @if (model.PermissionForVoiceMail)
+                                                        {
+                                                            <td>@Html.DisplayFor(modelItem => model.StrParentPhone1)</td>
+                                                            <td>@Html.DisplayFor(modelItem => model.StrParentPhone2)</td>
+                                                        }
+                                                        else
+                                                        {
+                                                            <td style="background: #ffbdc7 !important">@Html.DisplayFor(modelItem => model.StrParentPhone1)</td>
+                                                            <td style="background: #ffbdc7 !important">@Html.DisplayFor(modelItem => model.StrParentPhone2)</td>
+                                                        }
+
+                                                        <td>@Html.DisplayFor(modelItem => model.Days)</td>
+                                                        <td>@Html.DisplayFor(modelItem => model.ParentName)</td>
+                                                        <td>@Html.DisplayFor(modelItem => model.Agency)
+                                                            <span class="badge-black badge-warning font-black bold pull-right">@Html.DisplayFor(modelItem => model.PayorName)</span>
+                                                        </td>
+                                                        <td>@Html.DisplayFor(modelItem => model.Facilitator)</td>
+                                                    </tr>
+                                                    <tr>
+                                                        <td colspan="15" class="col-sm-12 col-lg-12">
+                                                            <div class="col-md-12 no-padding">
+                                                                <span class="col-sm-4 no-padding Address">
+                                                                    @Html.DisplayFor(modelItem => model.ParentAddress),&nbsp;@Html.DisplayFor(modelItem => model.ParentCity),&nbsp;
+                                                                    @Html.DisplayFor(modelItem => model.ParentState)-@Html.DisplayFor(modelItem => model.ParentZipCode)
+                                                                </span>
+                                                                <span class="col-sm-4 no-padding Emergencycontact">
+                                                                    @Html.DisplayFor(modelItem => model.EmergencyContact)
+                                                                </span>
+                                                                <span class="col-sm-4 text-align-right">
+                                                                    @Html.DisplayFor(modelItem => model.StartDate) - @Html.DisplayFor(modelItem => model.EndDate)
+                                                                </span>
+                                                            </div>
+                                                            <div class="col-md-12 no-padding" style="height: 4px">&nbsp;</div>
+                                                            <div class="col-md-12 no-padding">
+                                                                @if (model.PlacementRequirement != null)
+                                                                {
+                                                                    <span class="col-sm-12 no-padding"><b>PR :</b> @Html.DisplayFor(modelItem => model.PlacementRequirement)
+                                                                    </span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    <span class="col-sm-12 no-padding"><b>PR :</b> @Resource.NA
+                                                                    </span>
+                                                                }
+                                                            </div>
+                                                            <div class="col-md-12 no-padding" style="height: 4px">&nbsp;</div>
+                                                            <div class="col-md-12 no-padding padding-top-5">
+                                                                <div class="col-sm-12 no-padding">
+                                                                    <b>BI  :</b>
+                                                                    @if (model.BehavioralIssue != null)
+                                                                    {
+                                                                        @Html.DisplayFor(modelItem => model.BehavioralIssue)
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @Resource.NA
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-12 no-padding" style="height: 4px">&nbsp;</div>
+                                                            <div class="col-md-12 no-padding padding-top-5">
+                                                                <div class="col-sm-12 no-padding">
+                                                                    <b>Comment :</b>
+                                                                    @if (model.Comments != null)
+                                                                    {
+                                                                        @(model.Comments)
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        @Resource.NA
+                                                                    }
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                                    i++;
+                                                }
+                                            </table>
+                                        </div>
+                                                {
+                                                    i = 1;
+                                                    k++;
+                                                }
+                                    }
+
+                                    @if (Model.SchedulAttendanceCancelListModel.Count > 0)
+                                    {
+                                        <table class="flip-content" border="0" cellpadding="0" cellspacing="0" width="100%">
+                                            <tr>
+                                                <td class="Width20">
+                                                    <span class="pull-left" style="padding-top: 20px">
+                                                        <img alt="" src="../../Assets/images/logo-zrpath.png" width="180px" />
+                                                    </span>
+                                                </td>
+                                                <td class="Width35">
+                                                    <span class="pageheadernew bold">Zarephath 24 Hour Availabilty Line: (480) 510-7013
+                                                    </span>
+                                                </td>
+                                                <td class="pull-right bold Width40">
+                                                    @Html.DisplayFor(modelItem => Model.SearchScheduleAttendanceModel.RegionName)
+                                                    Attendance List
+                                                     <br />
+                                                    @if (Model.SearchScheduleAttendanceModel.StrStartDate != null)
+                                                    {
+                                                        @Html.DisplayFor(modelItem => Model.SearchScheduleAttendanceModel.StrStartDate)
+                                                    }
+                                                    @if (Model.SearchScheduleAttendanceModel.StrStartDate != null && Model.SearchScheduleAttendanceModel.StrEndDate != null)
+                                                    {
+                                                        <span>- </span>
+                                                    }
+                                                    @if (Model.SearchScheduleAttendanceModel.StrEndDate != null)
+                                                    {
+                                                        @Html.DisplayFor(modelItem => Model.SearchScheduleAttendanceModel.StrEndDate)
+                                                    }
+                                                </td>
+                                            </tr>
+                                        </table>
+                       
+                                        <div class="space20"></div>
+                                        <div>
+
+                                            <div class="col-sm-12 bold header DisplayFacility">Cancelled, No Show, No Confirmation</div>
+                                            <table class="table table-bordered table-striped table-condensed flip-content ">
+                                                <thead class="flip-content">
+                                                    <tr>
+                                                        <th class="width-15px"></th>
+                                                        <th class="col-sm-2 ">Client</th>
+                                                        <th class="width-20px">AHCCCS_ID</th>
+                                                        <th class="">DX </th>
+                                                        <th class="">M/F</th>
+                                                        <th class="">Age</th>
+                                                        <th class="">D.O.B</th>
+                                                        <th class="width-20px">PU</th>
+                                                        <th class="width-20px">DO</th>
+                                                        <th class="width-20px">CON</th>
+                                                        <th class="col-sm-1">Phone #:</th>
+                                                        <th class="col-sm-1">2nd Ph #</th>
+                                                        <th class="">Days</th>
+                                                        <th class=" col-sm-1">Parent/Guardian</th>
+                                                        <th class="">Agency</th>
+                                                        <th class="">Facilitator</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    @{ int j = 1; }
+                                                    @foreach (var model in Model.SchedulAttendanceCancelListModel)
+                                                    {
+                                                        <tr>
+                                                            <th rowspan="2">@j</th>
+                                                            <td><span class="float-left">
+                                                                @Html.DisplayFor(modelItem => model.ClientName)
+                                                            </span>
+                                                                @if (model.NeedPrivateRoom)
+                                                                {
+                                                                    <span class="float-right badge badge-danger">PR</span>
+                                                                }
+                                                            </td>
+                                                            <td>@Html.DisplayFor(modelItem => model.AHCCCSID)</td>
+                                                            <td>@Html.DisplayFor(modelItem => model.DXCodeName)</td>
+                                                            <td>@Html.DisplayFor(modelItem => model.Gender)</td>
+                                                            @if (model.Age >= 0 && model.Age <= 5)
+                                                            {
+                                                                <td style="background: #8E44AD !important">@Html.DisplayFor(modelItem => model.Age)</td>
+                                                            }
+                                                            @if (model.Age <= 8 && model.Age > 5)
+                                                            {
+                                                                <td style="background: #3598dc !important">@Html.DisplayFor(modelItem => model.Age)</td>
+                                                            }
+                                                            @if (model.Age > 8)
+                                                            {
+                                                                <td>@Html.DisplayFor(modelItem => model.Age)</td>
+                                                            }
+                                                            <td>@Html.DisplayFor(modelItem => model.Dob)</td>
+                                                            <td>@Html.DisplayFor(modelItem => model.PickUpLocationCode)</td>
+                                                            <td>@Html.DisplayFor(modelItem => model.DropOffLocationCode)</td>
+                                                            <td>@Html.DisplayFor(modelItem => model.ScheduleStatusName)</td>
+
+                                                            @if (model.PermissionForVoiceMail)
+                                                            {
+                                                                <td>@Html.DisplayFor(modelItem => model.StrParentPhone1)</td>
+                                                                <td>@Html.DisplayFor(modelItem => model.StrParentPhone2)</td>
+                                                            }
+                                                            else
+                                                            {
+                                                                <td style="background: #ffbdc7 !important">@Html.DisplayFor(modelItem => model.StrParentPhone1)</td>
+                                                                <td style="background: #ffbdc7 !important">@Html.DisplayFor(modelItem => model.StrParentPhone2)</td>
+                                                            }
+                                                            <td>@Html.DisplayFor(modelItem => model.Days)</td>
+                                                            <td>@Html.DisplayFor(modelItem => model.ParentName)</td>
+                                                            <td>@Html.DisplayFor(modelItem => model.Agency)
+                                                                <span class="badge-black badge-warning font-black bold pull-right">@Html.DisplayFor(modelItem => model.PayorName)</span>
+                                                            </td>
+                                                            <td>@Html.DisplayFor(modelItem => model.Facilitator)</td>
+                                                        </tr>@*
+
+                                                        <tr>
+                                                            <td colspan="15" class="col-sm-12 col-lg-12">
+                                                                <div class="col-md-12 no-padding">
+                                                                    <span class="col-sm-3 no-padding Address">
+                                                                        @Html.DisplayFor(modelItem => model.ParentAddress),&nbsp;@Html.DisplayFor(modelItem => model.ParentCity),&nbsp;
+                                                                        @Html.DisplayFor(modelItem => model.ParentState)-@Html.DisplayFor(modelItem => model.ParentZipCode)
+                                                                    </span>
+                                                                    @if (model.PlacementRequirement != null)
+                                                                    {
+                                                                        <span class="col-sm-8 text-align-left">@Html.DisplayFor(modelItem => model.PlacementRequirement)
+                                                                        </span>
+                                                                    }
+                                                                </div>
+                                                                <div class="col-md-12" style="padding-left: 0;">
+                                                                    <div class="col-sm-3 no-padding Emergencycontact">
+                                                                        @Html.DisplayFor(modelItem => model.EmergencyContact)
+                                                                    </div>
+                                                                    <div class="col-sm-8 text-align-left">
+                                                                        @if (model.BehavioralIssue != null)
+                                                                        {@Html.DisplayFor(modelItem => model.BehavioralIssue)
+                                                                        }
+                                                                        <span class="pull-right">Schedule Start End Date - @Html.DisplayFor(modelItem => model.StartDate) - @Html.DisplayFor(modelItem => model.EndDate)</span>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>*@
+                                                        
+                                                        
+                                                        <tr>
+                                                            <td colspan="15" class="col-sm-12 col-lg-12">
+                                                                <div class="col-md-12 no-padding">
+                                                                    <span class="col-sm-3 no-padding Address">
+                                                                        @Html.DisplayFor(modelItem => model.ParentAddress),&nbsp;@Html.DisplayFor(modelItem => model.ParentCity),&nbsp;
+                                                                    @Html.DisplayFor(modelItem => model.ParentState)-@Html.DisplayFor(modelItem => model.ParentZipCode)
+                                                                    </span>
+                                                                    <span class="col-sm-5 no-padding Emergencycontact">
+                                                                        @Html.DisplayFor(modelItem => model.EmergencyContact)
+                                                                    </span>
+                                                                    <span class="col-sm-4 text-align-right">
+                                                                        @Html.DisplayFor(modelItem => model.StartDate) - @Html.DisplayFor(modelItem => model.EndDate)
+                                                                    </span>
+                                                                </div>
+
+                                                                <div class="col-md-12 no-padding" style="height: 4px">&nbsp;</div>
+                                                                <div class="col-md-12 no-padding">
+                                                                    @if (model.PlacementRequirement != null)
+                                                                    {
+                                                                        <span class="col-sm-12 no-padding"><b>PR :</b> @Html.DisplayFor(modelItem => model.PlacementRequirement)
+                                                                        </span>
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        <span class="col-sm-12 no-padding"><b>PR :</b> @Resource.NA
+                                                                        </span>
+                                                                    }
+                                                                </div>
+                                                                <div class="col-md-12 no-padding" style="height: 4px">&nbsp;</div>
+                                                                <div class="col-md-12 no-padding">
+                                                                    <div class="col-sm-12 no-padding">
+                                                                        <b>BI  :</b>
+                                                                        @if (model.BehavioralIssue != null)
+                                                                        {
+                                                                            @Html.DisplayFor(modelItem => model.BehavioralIssue)
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @Resource.NA
+                                                                        }
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-md-12 no-padding" style="height: 4px">&nbsp;</div>
+                                                                <div class="col-md-12 no-padding">
+                                                                    <div class="col-sm-12 no-padding">
+                                                                        <b>Comment :</b>
+                                                                        @if (model.Comments != null)
+                                                                        {
+                                                                            @(model.Comments)
+                                                                        }
+                                                                        else
+                                                                        {
+                                                                            @Resource.NA
+                                                                        }
+                                                                    </div>
+                                                                </div>
+
+                                                            </td>
+                                                        </tr>
+                                                                        j++;
+                                                    }
+
+                                                </tbody>
+                                            </table>
+
+                                        </div>   
+                                       
+                                    }
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+
+    @if (Model.SchedulAttendanceListModel.Count <= 0)
+    {
+        <div class="row">
+            <div class="col-lg-push-1 col-lg-pull-1 col-sm-5">
+                @* <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>*@
+
+                <div class="note note-warning">
+                    <h4 class="block">@Resource.NoRecordFound.ToUpper()</h4>
+                    <p>@Resource.NoRecordFoundMessage</p>
+                </div>
+            </div>
+        </div>
+    }
+</body>
+</html>

@@ -1,0 +1,102 @@
+﻿@model GroupMonthlySummaryModel
+
+@{
+    ViewBag.Title = Resource.GroupMonthlySummary;
+    ViewBag.SelectedMenuItem = Resource.SMI_AddGroupMonthlySummary;
+    
+}
+<div id="wizard-container" data-ng-controller="GroupMonthlySummaryController">
+    <div class="page-bar">
+        <h2 class="page-title">@Resource.GroupMonthlySummary
+        </h2>
+    </div>
+    @Html.Hidden("hdnGroupMonthlySummary", Common.SerializeObject(Model))
+
+
+    <div data-ng-if="!IsFinalPage">
+        <div class="mt-element-step">
+            <div class="row step-thin">
+
+                <a class="col-md-4 bg-grey-steel mt-step-col" data-ng-class="{'active':step.step == currentStep,'done':step.isDone,'disabled-anchor':step.step>currentStep && SelectedClients.length==0}" data-ng-repeat="step in steps" data-ng-click="gotoStep(step.step)">
+                    <div class="mt-step-number bg-white font-grey">{{step.step}}</div>
+                    <div class="mt-step-title uppercase font-grey-cascade">{{step.name}}</div>
+                    <div class="mt-step-content font-grey-cascade">{{step.desc}}</div>
+                </a>
+            </div>
+        </div>
+        <div id="wizard-content-container" class="row">
+            <div class="col-md-12 padding-left-right-30 margin-bottom-minus-33">
+                <div class="pull-right">
+                    <button data-ng-hide="currentStep <= 1" class="btn btn-default" name="previous" type="button" data-ng-click="gotoStep(currentStep - 1)"><i class="fa fa-arrow-left"></i>&nbsp;Previous step</button>
+                    <button data-ng-hide="currentStep >= steps.length || SelectedClients.length==0" class="btn btn-primary" name="next" type="button" data-ng-click="gotoStep(currentStep + 1)">Next step <i class="fa fa-arrow-right"></i></button>
+                    <button data-ng-hide="currentStep != steps.length || SelectedClients.length==0" class="btn btn-success" name="next" type="button" data-ng-click="SaveAllSummary()"><i class="fa fa-floppy-o"></i>&nbsp;Save</button>
+                </div>
+            </div>
+            <div class="padding-left-right-30">
+                {{currentStep}}
+                <form id="groupnote-step1" data-ng-if="currentStep==1">
+                    @Html.Partial("Partial/AddGroupMonthlySummary/_Step1", Model)
+                </form>
+                <form id="groupnote-step2" data-ng-show="currentStep==2">
+                    @Html.Partial("Partial/AddGroupMonthlySummary/_Step2", Model)
+                </form>
+                <div id="groupnote-step3" data-ng-show="currentStep==3">
+                    @Html.Partial("Partial/AddGroupMonthlySummary/_Step3", Model)
+
+                </div>
+            </div>
+
+            <div class="col-md-12 padding-left-right-30">
+                <div class="pull-right">
+                    <button data-ng-hide="currentStep <= 1" class="btn btn-default" name="previous" type="button" data-ng-click="gotoStep(currentStep - 1)"><i class="fa fa-arrow-left"></i>&nbsp;Previous step</button>
+                    <button data-ng-hide="currentStep >= steps.length || SelectedClients.length==0" class="btn btn-primary" name="next" type="button" data-ng-click="gotoStep(currentStep + 1)">Next step <i class="fa fa-arrow-right"></i></button>
+                    <button data-ng-hide="currentStep != steps.length || SelectedClients.length==0" class="btn btn-success" name="next" type="button" data-ng-click="SaveAllSummary()"><i class="fa fa-floppy-o"></i>&nbsp;Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+      <div data-ng-if="IsFinalPage">
+        @Html.Partial("Partial/AddGroupMonthlySummary/_GroupMonthlySummarySuccess")
+    </div>
+</div>
+
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/referral/groupmonthlysummary")
+    <script type="text/javascript">
+        var AHCCCSID = "@Resource.AHCCCSID";
+        var CISNumber = "@Resource.CISNumber";
+        var Address = "@Resource.Address";
+        var CommunityMentalHealthCenter = "@Resource.lblCommunityMentalHealthCenter";
+        var MaxUnit = "@Resource.MaxUnit";
+        var DailyUnitLimit = "@Resource.DailyUnitLimit";
+        var Billable = "@Resource.Billable";
+        var GroupOption = "@Resource.GroupOption";
+        var SearchClients = "@Resource.SearchClients";
+        var EnterMonthlySummaryDetail = "@Resource.EnterMonthlySummaryDetail";
+        var CompleteGroupMonthlySummary = "@Resource.CompleteMonthlySummary";
+        var FirstStep = "@Resource.FirstStep";
+        var SecondStep = "@Resource.SecondStep";
+        var ThirdStep = "@Resource.ThirdStep";
+        var FacilityForOtherServiceCode = "@Constants.FacilityForOtherServiceCode";
+
+        var ServiceDate = "@Resource.ServiceDate";
+        var ServiceCodeType = "@Resource.ServiceCodeType";
+        var ServiceCode = "@Resource.ServiceCode";
+        var POS = "@Resource.POS";
+        var FieldsRequired = '@Html.Raw(Resource.FieldsRequired)';
+        var Required = "@Resource.Required";
+        var ValidateServiceCodeInStep2 = '@Html.Raw(Resource.ValidateServiceCodeInStep2)';
+        var NeedUpdateFromStep2 = '@Html.Raw(Resource.NeedUpdateFromStep2)';
+
+        var DailyLimitExceedMsg = '@Resource.DailyLimitExceedMsg';
+        var CanNotSave = '@Resource.CanNotSave';
+
+    </script>
+
+
+
+}

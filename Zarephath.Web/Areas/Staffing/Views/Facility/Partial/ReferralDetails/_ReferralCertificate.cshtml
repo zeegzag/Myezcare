@@ -1,0 +1,337 @@
+﻿@{
+    ViewBag.Title = "";
+
+}
+
+
+@if (Common.HasPermission(Constants.HC_Permission_Employee_Certificate_AddUpdate))
+{
+    <div class="referal_note_head">
+        <div class="pull-right">
+            <a data-ng-click="OpenModel()" class="btn btn-xs green-jungle pull-right">
+                <i class="fa fa-plus">&nbsp;&nbsp;</i>Add Certificate
+            </a>
+        </div>
+    </div>
+}
+
+<div class="row">
+    <div class="col-md-10">
+        <div class="col-md-12">
+            <div class="portlet-body compact" style="display: block;">
+                <div>
+                    <table class="table table-bordered table-striped table-condensed flip-content">
+                        <thead class="">
+                            <tr>
+
+                                <th width="320">
+                                    <span>@Resource.Certificate</span>
+                                </th>
+                                <th>
+                                    <span>Valid From</span>
+                                </th>
+                                <th>
+                                    <span>Valid To</span>
+                                </th>
+                                <th>
+                                    <span>Added On</span>
+                                </th>
+                                <th>
+                                    <span>Certificate Authority</span>
+                                </th>
+
+                                <th width="130">@Resource.Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr ng-repeat="item in CList">
+
+                                <td>{{item.Name}}</td>
+                                <td>{{item.StartDate|dateformat|orgdate}}</td>
+                                <td>{{item.EndDate|dateformat|orgdate}}</td>
+                                <td>{{item.CreatedOn|dateformat|orgdate}}</td>
+                                <td>{{item.CertificateAuthority}}</td>
+                                <td>
+                                    <span>
+                                        <a class="btn btn-xs yellow" href="javascript:void(0);" data-ng-click="View(item)"><i class="fa fa-eye"></i> </a>
+                                    </span>
+                                    <span>
+                                         @if (Common.HasPermission(Constants.HC_Permission_Employee_Certificate_AddUpdate))
+                                         {
+                                             @*<a href="#AddReferralNoteModal" data-ng-click="EditCertificate(item)(item)" data-toggle="modal" class="btn btn-xs blue">
+                                                     <i class="fa fa-edit"></i>
+                                                 </a>*@
+                                         }
+                                         @if (Common.HasPermission(Constants.HC_Permission_Employee_Certificate_Delete))
+                                         {
+                                            <a class="btn btn-xs red" href="javascript:void(0);" data-ng-click="DeleteCertificate(item)"><i class="fa fa-trash"></i> </a>
+                                         }
+                                    </span>
+
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="row" data-ng-if="EmployeeCertificateList.length>0">
+   
+    <div class="col-md-10">
+        <div class="col-md-12">
+            <div class="portlet-body compact" style="display: block;">
+                <div data-ng-if="IsShow==true">
+                    <table class="table table-bordered table-striped table-condensed flip-content">
+                        <thead class="">
+                            <tr>
+                                <th width="320">
+                                    <span>@Resource.Certificate</span>
+                                </th>
+                                <th>
+                                    <span>@Resource.EnrollmentDate</span>
+                                </th>
+                                <th>
+                                    <span>@Resource.ValidFrom</span>
+                                </th>
+                                <th class="width-100px">
+                                    <span>@Resource.ValidTo</span>
+                                </th>
+                                <th width="100">@Resource.Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in EmployeeCertificateList">
+                                <td>{{item.CourseName}}</td>
+                                <td>{{item.EnrollDate|date:'@Resource._DateFormat'}}</td>
+                                <td>
+                                    <span> {{item.ExamTime |date:'@Resource._DateFormat'}} </span>
+                                    @**@
+                                </td>
+                                <td>
+                                    <span> {{item.ExpiredDateTime | date:'@Resource._DateFormat'}} </span>
+                                </td>
+                                <td>
+                                    @*ToDo: Add Permission Check here*@
+                                    <span ng-show="item.CertificateUrl!=null">
+                                        <a class="btn btn-xs green-dark" ng-click="OpenModelCaregiver(item.CertificateUrl)">@Resource.ViewCertification </a>
+                                    </span>
+                                    <span ng-show="item.CertificateUrl==null">
+                                        <a class="btn btn-xs red" ng-click="OpenModelCaregiver(item.CertificateUrl)">@Resource.GetCertification </a>
+                                    </span>
+
+                                </td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="IsShow==false">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="AddreferralCertificateModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-inner" ng-show="img!=null">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span data-ng-show="!IsEdit">@Resource.Certificate</span><span data-ng-show="IsEdit">Edit Note</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmNewReferralNote">
+                        <div class="row">
+                            <div class="col-sm-12" ng-show="img!=null">
+                                <img src="{{img}}" alt="Smiley face">
+                                <span class="field-validation-valid" data-valmsg-for="Notes" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-8" ng-show="img==null">
+
+        <div>
+            <div class="modal-dialog" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    </div>
+                    <div class="modal-body">
+
+                        <h4 style="text-align:center"><b>Are you sure?</b></h4> <h5 style="text-align:center">  to visit www.caregivertraininguniversity.com for Getting the Certificate.</h5>
+                    </div>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-sm-11">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Cancel</button>
+                                <a type="submit" href="https://www.caregivertraininguniversity.com/Home/Login" class="btn green-jungle">@Resource.YesContinue</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<!-- ADD CERTIFICATE MODAL STARTS-->
+<div class="modal fade ReferralNote" id="AddCertificateModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="H1"><span data-ng-show="!IsEdit">Add Certificate</span><span data-ng-show="IsEdit">Edit Note</span></h4>
+            </div>
+            <div class="modal-body">
+                <form name="frmCertificate" id="frmCertificate">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="row">
+                                <div class="form-group col-sm-12">
+                                    <div class="row">
+                                        <div class="col-sm-6">
+                                            <label class="control-label required">@Resource.Name</label>
+                                            <input type="text" class="form-control input-sm requiredStrip" placeholder="@Resource.Name" maxlength="100" ng-model="Certificate.Name" data-val-required="Requird" />
+                                            @*@Html.ValidationMessageFor(q => q.Employee.IsDepartmentSupervisor)*@
+
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label class="control-label required">@Resource.CertificateAuthority</label>
+                                            <select class="form-control input-sm requiredStrip" title="@Resource.CertificateAuthority"
+                                                    data-val="true" name="CertificateAuthority" data-ng-model="Certificate.CertificateAuthority" id="CertificateAuthority">
+                                                <option value="">@Resource.Select</option>
+                                                <option data-ng-repeat="option in CertificateAuthorityList" value="{{option.Value}}">{{option.Name}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <label class="control-label required">Valid From</label>
+                                    <div id="dateDOB" class="input-group date" datepicker="Certificate.StartDate" data-ng-dateval="Certificate.StartDate"
+                                         data-ng-maxdate="CurrentDate">
+                                        <input class="form-control input-sm validateElement dateInputMask" data-val="true"
+                                               data-val-required="@Resource.DateOfBirthRequired" placeholder="@Resource.DateTimeFormat" id="StartDate" maxlength="10" name="Certificate.StartDate" data-error-Count="ReferralErrorCount.ClientTab"
+                                               type="text">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+
+                                    @*<input type="date" class="form-control input-sm requiredStrip" ng-model="Certificate.selectStartDate" value="{{ date | date: 'yyyy/MM/dd' }}" />*@
+
+
+                                </div>
+                                <div class="col-sm-6">
+                                    <label class="control-label required">Valid To</label>
+                                    <div id="dateDOB" class="input-group date" datepicker="Certificate.EndDate" data-ng-dateval="Certificate.EndDate">
+                                        <input class="form-control input-sm validateElement dateInputMask" data-val="true"
+                                               data-val-required="@Resource.DateOfBirthRequired" placeholder="@Resource.DateTimeFormat" id="EndDate" maxlength="10" name="Certificate.EndDate" data-error-Count="ReferralErrorCount.ClientTab"
+                                               type="text">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                    @*<input type="date" class="form-control input-sm requiredStrip" ng-model="Certificate.selectEndDate" value="{{ date | date: 'yyyy/MM/dd' }}" />*@
+                                </div>
+                            </div>
+
+                            <br />
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    <div class="field">
+                                        <div class="field-box">
+                                            <div class="">
+                                                <div class="btn-group btn-block text-center">
+                                                    <div class="fileUpload btn btn-xs btn-primary margin-right-0">
+                                                        <span><i class="icon-plus"></i>&nbsp; @Resource.UploadCertificate</span>
+                                                        <div>
+                                                            <div class="">
+                                                                <input id="ProfileImageUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                                       @*amazonfileupload=""*@
+                                                                       fileupload
+                                                                       file-uploadurl="{{UploadCertificate}}"
+                                                                       beforesend="ProfileImageBeforeSend"
+                                                                       aftersend="ProfileImageAfterSend"
+                                                                       progress="ProfileImageProgress"
+                                                                       filelist="UploadingFileList"
+                                                                       onchange="loadFile(event)"
+                                                                       limitmultifileuploads="1"
+                                                                       @*data-ng-aws-settings-model="EmployeeModel.AmazonSettingModel"*@ />
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="font-sm col-md-12 no-padding margin-top-10">
+                                                    <b class="font-red-thunderbird">@Resource.NoteLabel</b><i>@Html.Raw(Resource.EmpCertificateNote)</i>
+                                                </div>
+                                                <div class="col-md-12 no-padding margin-top-20">
+                                                    <script>
+                                                        var loadFile = function (event) {
+                                                            var output = document.getElementById('img1');
+                                                            output.src = URL.createObjectURL(event.target.files[0]);
+                                                        };
+                                                    </script>
+                                                    <div class="col-sm-12 no-padding" data-ng-repeat="filedata in UploadingFileList">
+                                                        <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        <button type="button" class="btn btn-danger" data-ng-click="Reset()">@Resource.Cancel</button>
+                        <button type="submit" class="btn green-jungle" ng-click="InsertData()">@Resource.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!--ADD CERTIFICATE MODAL ENDS-->

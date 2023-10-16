@@ -1,0 +1,339 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.Employee != null && Model.Employee.EmployeeID > 0 ? Resource.EditEmployee : @Resource.AddEmployee));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmployeeAdd;
+}
+@model AddEmployeeModel
+
+
+
+@Html.Hidden("hdnEmployeeModel", Common.SerializeObject(Model))
+<div data-ng-controller="AddEmployeeController">
+    <form class="form-horizontal" id="frmAddEmployee">
+        <div class="page-bar">
+            <h3 class="page-title">@(Model != null && Model.Employee != null && Model.Employee.EmployeeID > 0 ? Resource.EditEmployee : @Resource.AddEmployee)
+                <small>@Resource.EnterEmployeeInformation</small>
+                <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.Employee != null && Model.Employee.EmployeeID > 0 ? Resource.Update : Resource.Save)"/>
+                @*<a href="@Constants.EmployeeListURL" class="btn btn-sm red-mint pull-right margin-right-10">@Resource.Cancel</a>*@
+                <a href="@Constants.EmployeeListURL">
+                    <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/></a>
+            </h3>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+
+                <div class="form-group row">
+                    <div class="col-sm-12">
+
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.EmployeeInformation
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.Department</label>
+                                        <div class="col-md-7 input-group-sm">
+
+                                            @if (Model != null && Model.Employee != null)
+                                            {
+                                                @Html.DropDownListFor(p => p.Employee.DepartmentID, Model.DepartmentList.ToSelectList(Model.Employee.DepartmentID.ToString() ?? "", "DepartmentName", "DepartmentID", @Resource.SelectDepartment, ""),
+                                                                    new
+                                                                        {
+                                                                            data_ng_model = "EmployeeModel.Employee.DepartmentID",
+                                                                            data_ng_init = "EmployeeModel.Employee.DepartmentID=EmployeeModel.Employee.DepartmentID==''?null:EmployeeModel.Employee.DepartmentID.toString()",
+                                                                            @class = "form-control",
+                                                                            data_ng_setname = "EmployeeModel.Employee.DepartmentName"
+
+                                                                        })
+                                                @Html.ValidationMessageFor(q => q.Employee.DepartmentID)
+                                            }
+
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" data-ng-show="EmployeeModel.Employee.DepartmentID > 0">
+                                        <label class="col-md-5 control-label">@Resource.IsDepartmentSupervisor?</label>
+                                        <div class="col-md-7">
+                                            <input type="checkbox" data-ng-model="EmployeeModel.Employee.IsDepartmentSupervisor" class="unicheckbox" val="EmployeeModel.Employee.IsDepartmentSupervisor" />
+                                            @Html.ValidationMessageFor(q => q.Employee.IsDepartmentSupervisor)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.FirstName</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Employee.FirstName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.FirstName", placeholder = @Resource.FirstName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Employee.FirstName)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.MiddleName</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Employee.MiddleName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.MiddleName", placeholder = @Resource.MiddleName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Employee.MiddleName)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.LastName</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Employee.LastName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.LastName", placeholder = @Resource.LastName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Employee.LastName)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.Email</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Employee.Email, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.Email", placeholder = @Resource.Email, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Employee.Email)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.WorkPhone</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Employee.PhoneWork, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.PhoneWork", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                            @Html.ValidationMessageFor(q => q.Employee.PhoneWork)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.HomePhone</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Employee.PhoneHome, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.PhoneHome", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                            @Html.ValidationMessageFor(q => q.Employee.PhoneHome)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Credential</label>
+                                        <div class="col-md-7 input-group-sm">
+                                            @Html.DropDownListFor(p => p.Employee.CredentialID, Model.CredentialList.ToSelectList(Model.Employee.CredentialID ?? "", "CredentialName", "CredentialID", @Resource.SelectCredential, ""),
+                                                                  new
+                                                                      {
+                                                                          data_ng_model = "EmployeeModel.Employee.CredentialID",
+                                                                          data_ng_init = "EmployeeModel.Employee.CredentialID=EmployeeModel.Employee.CredentialID==''?null:EmployeeModel.Employee.CredentialID.toString()",
+                                                                          @class = "form-control",
+                                                                      })
+                                            @Html.ValidationMessageFor(q => q.Employee.CredentialID)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.Degree</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Employee.Degree, new
+                                                {
+                                                    @class = "form-control input-sm",
+                                                    data_ng_model = "EmployeeModel.Employee.Degree",
+                                                    placeholder = @Resource.Degree,
+                                                    maxlength = 50
+                                                })
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Username</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Employee.UserName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.UserName", placeholder = @Resource.Username, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Employee.UserName)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label" data-ng-class="{'required' :!EmployeeModel.IsEditMode}">@Resource.Password</label>
+                                        <div class="col-md-7">
+
+                                            @if (Model != null && Model.Employee != null && Model.Employee.EmployeeID == 0)
+                                            {
+                                                @Html.PasswordFor(q => q.Employee.Password, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.Password", maxlength = 20, placeholder = @Resource.Password })
+                                                @Html.ValidationMessageFor(q => q.Employee.Password)
+                                            }
+                                            else if (Model != null && Model.Employee != null && Model.Employee.EmployeeID > 0)
+                                            {
+                                                @Html.PasswordFor(q => q.Employee.NewPassword, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.NewPassword", maxlength = 20, placeholder = @Resource.Password })
+                                                @Html.ValidationMessageFor(q => q.Employee.NewPassword)
+                                            }
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label class="col-md-5 control-label" data-ng-class="{'required' :!EmployeeModel.IsEditMode}">@Resource.ConfirmPassword</label>
+                                        <div class="col-md-7">
+                                            @if (Model != null && Model.Employee != null && Model.Employee.EmployeeID > 0)
+                                            {
+                                                @Html.PasswordFor(q => q.Employee.TempConfirmPassword, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.TempConfirmPassword", maxlength = 20, placeholder = @Resource.ConfirmPassword })
+                                                @Html.ValidationMessageFor(q => q.Employee.TempConfirmPassword)
+                                               
+                                            }
+                                            else
+                                            {
+                                                @Html.PasswordFor(q => q.Employee.ConfirmPassword, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.ConfirmPassword", maxlength = 20, placeholder = @Resource.ConfirmPassword })
+                                                @Html.ValidationMessageFor(q => q.Employee.ConfirmPassword)
+                                            }
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Role</label>
+                                        <div class="col-md-7 ">
+                                            @* @Html.DropDownListFor(p => p.Employee.RoleID, Model.RoleList.ToSelectList(Model.Employee.RoleID.ToString() ?? "", "RoleName", "RoleID", @Resource.SelectRole, ""),
+                                                                  new
+                                                                      {
+                                                                          data_ng_model = "EmployeeModel.Employee.RoleID",
+                                                                          data_ng_init = "EmployeeModel.Employee.RoleID=EmployeeModel.Employee.RoleID==''?null:EmployeeModel.Employee.RoleID.toString()",
+                                                                          @class = "form-control",
+                                                                          focus = "true",
+                                                                          data_ng_setname = "EmployeeModel.Employee.RoleName"
+                                                                          //@style = "position:absolute;z-index:-1 !important;",
+                                                                      })
+
+                                            @Html.ValidationMessageFor(q => q.Employee.RoleID)*@
+
+                                            <div class="validate-group input-group-sm">
+                                                @Html.DropDownListFor(p => p.Employee.RoleID, Model.RoleList.ToSelectList(Model.Employee.RoleID.ToString() ?? "", "RoleName", "RoleID", @Resource.SelectRole, ""),
+                                                                      new
+                                                                          {
+                                                                              data_ng_model = "EmployeeModel.Employee.RoleID",
+                                                                              data_ng_init = "EmployeeModel.Employee.RoleID=EmployeeModel.Employee.RoleID==''?null:EmployeeModel.Employee.RoleID.toString()",
+                                                                              @class = "form-control",
+                                                                              data_ng_setname = "EmployeeModel.Employee.RoleName",
+                                                                              data_ng_class = "{'valid': !(EmployeeModel.Employee.RoleID == null  || EmployeeModel.Employee.RoleID == '' )}"
+                                                                          })
+
+                                                @Html.DropDownListFor(p => p.Employee.RoleID, Model.RoleList.ToSelectList(Model.Employee.RoleID.ToString() ?? "", "RoleName", "RoleID", @Resource.SelectRole, ""),
+                                                                      new
+                                                                          {
+                                                                              data_ng_model = "EmployeeModel.Employee.RoleID",
+                                                                              data_ng_init = "EmployeeModel.Employee.RoleID=EmployeeModel.Employee.RoleID==''?null:EmployeeModel.Employee.RoleID.toString()",
+                                                                              @class = "form-control",
+                                                                              data_ng_setname = "EmployeeModel.Employee.RoleName",
+                                                                              @style = "position:absolute;z-index:-1 !important;",
+
+                                                                          })
+
+                                                @Html.ValidationMessageFor(q => q.Employee.RoleID)
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.IsActive?</label>
+                                        <div class="col-md-7">
+                                            <input type="checkbox" data-ng-model="EmployeeModel.Employee.IsActive" class="unicheckbox" val="EmployeeModel.Employee.IsActive" />
+                                            @Html.ValidationMessageFor(q => q.Employee.IsActive)
+                                        </div>
+                                    </div>
+
+                                    @if (Common.HasPermission(Constants.Permission_Additional_UploadSignature) &&  Model.Employee.EmployeeID > 0)
+                                    {
+                                        <div class="form-group">
+                                            <label class="col-md-5 control-label">Signature</label>
+                                            <div class="col-md-7">
+                                                @*@Html.TextBoxFor(q => q.Employee.TempSignaturePath,
+                                                    new
+                                                    {
+                                                        data_ng_model = "EmployeeModel.Employee.TempSignaturePath",
+                                                        @class = "form-control hideErrorContent replaceErrorSource"
+                                                    })
+                                                @Html.ValidationMessageFor(m => m.Employee.TempSignaturePath)*@
+                                                @*<div class="replaceErrorDest">*@
+                                                <div class="">
+                                                    <div class="btn-group btn-block text-center">
+                                                        <div data-ng-if="!IsFileUploading" class="fileUpload btn btn-xs btn-primary margin-right-0">
+                                                            <span><i class="icon-plus"></i>&nbsp; @Resource.UploadSignature</span>
+                                                            <div>
+
+                                                                <div class="">
+                                                                    <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                                           amazonfileupload=""
+                                                                           file-uploadurl="{{UploadFile}}"
+                                                                           beforesend="BeforeSend"
+                                                                           aftersend="AfterSend"
+                                                                           progress="Progress"
+                                                                           filelist="UploadingFileList"
+                                                                           onchange="loadFile(event)"
+                                                                           data-ng-aws-settings-model="EmployeeModel.AmazonSettingModel"/>
+                                                                </div>
+
+
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    <div class="font-sm col-md-12 no-padding margin-top-10"><b class="font-red-thunderbird">@Resource.NoteLabel</b><i>@Html.Raw(Resource.SignatureImageNote)</i>
+                                                    </div>
+                                                    <div class="margin-top-20">
+                                                        <script>
+                                                            var loadFile = function(event) {
+                                                                var output = document.getElementById('img1');
+                                                                output.src = URL.createObjectURL(event.target.files[0]);
+                                                            };
+                                                        </script>
+                                                        <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-show="!IsFileUploading && EmployeeModel.Employee.TempSignaturePath" data-ng-src="{{EmployeeModel.AmazonSettingModel.URL+'/'+EmployeeModel.Employee.TempSignaturePath}}"/>
+                                                        <img class="img-responsive signature-image" id="img1" src="" data-ng-show="IsFileUploading"/>
+                                                        <img class="img-responsive signature-image" id="defaultSignature" src="/Assets/images/signature.jpg" data-ng-show="!IsFileUploading && !EmployeeModel.Employee.TempSignaturePath"/>
+                                                        <div class="col-sm-12 no-padding" data-ng-repeat="filedata in UploadingFileList">
+                                                            <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+
+
+                                            </div>
+
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        if (Model.Employee.EmployeeSignatureID > 0)
+                                         {
+                                             <div class="form-group">
+                                                 <label class="col-md-5 control-label">Signature</label>
+                                                 <div class="col-md-7">
+                                                     <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{EmployeeModel.AmazonSettingModel.URL+'/'+EmployeeModel.Employee.TempSignaturePath}}"/>
+                                                 </div>
+                                             </div>
+                                         }
+                                    }
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-md-12 form-group no-margin no-padding">
+
+                    @*<button type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right">@(Model != null && Model.Employee.EmployeeID > 0 ? Resource.Update : @Resource.Save)</button>*@
+                    <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.Employee.EmployeeID > 0 ? Resource.Update : Resource.Save)"/>
+                    @*                    <a href="@Constants.EmployeeListURL" class="btn btn-sm red-mint pull-right margin-right-10">@Resource.Cancel</a>*@
+                    <a href="@Constants.EmployeeListURL">
+                        <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/></a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/signature")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/employee/addemployee")
+}

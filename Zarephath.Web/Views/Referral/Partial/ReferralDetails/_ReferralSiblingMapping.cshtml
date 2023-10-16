@@ -1,0 +1,110 @@
+﻿@model AddReferralModel
+@Html.Hidden("hdnAddReferralModel", Common.SerializeObject(Model))
+
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <div class="fscontainer">
+            <div class="legend">
+                @Resource.ReferralSiblingMappings
+            </div>
+
+            <div class="row ">
+
+                <div class="col-md-12 no-padding">
+                    @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                    {
+                        <div class="form-group col-lg-5 col-md-5 col-sm-6">
+                            <label class="control-label">@Resource.AddSibling</label>
+
+                            <div class="" id="ReferralAuotoComplete">
+                                <input token-input type='text'
+                                       ng-val='ReferralModel.ReferralSiblingMappings.ReferralID'
+                                       onresultsformatter='ReferralSiblingDetailResultsFormatter'
+                                       tokeninputobj='ReferralSiblingTokenInputObj'
+                                       additional-filter-text='ignoreIds'
+                                       additional-filter-value='TempSelectedReferralIDs.toString()'
+                                       textfield='Name'
+                                       valuefield='ReferralID'
+                                       tokenlimit='1'
+                                       onaddedcallback="OnReferralSiblingAdd"
+                                       autoSelectFirstResult="false"
+                                       minChars="1"
+                                       customClass="form-control input-sm"
+                                       searchurl='{{GetReferralSiblingURL}}'
+                                       placeholder='@Resource.SearchExistingClient' minChars="0"/>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="form-group col-lg-2 col-md-2 col-sm-4 margin-top-18" style="display: none">
+                        <button class="btn btn-sm blue" data-ng-click="SaveReferralReferalSiblingMapping()">
+                            <i class="fa fa-save ">&nbsp;&nbsp;</i>@Resource.Add
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class=" col-md-12">
+
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 table-responsive" data-ng-if="ReferralModel.ReferralSiblingMappingList.length > 0" data-ng-cloak>
+                    <label class="control-label"></label>
+                    <div>
+                        <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+
+                            <thead>
+                                <tr>
+                                    <th class="col-sm-2"><strong>@Resource.Name</strong></th>
+                                    <th class="col-sm-2"><strong>@Resource.Status</strong></th>
+                                    <th class="col-sm-2"><strong>@Resource.AHCCCSID</strong></th>
+                                    <th class="col-sm-1"><strong>@Resource.Sex</strong></th>
+                                    <th class="col-sm-1"><strong>@Resource.Age</strong></th>
+                                    <th class="col-sm-2"><strong>@Resource.ParentName</strong></th>
+                                    <th class="col-sm-2"><strong>@Resource.ParentPhone</strong></th>
+                                    <th class="col-sm-2"><strong>@Resource.Email</strong></th>
+                                    <th><strong>@Resource.Delete</strong></th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr data-ng-repeat="item in ReferralModel.ReferralSiblingMappingList">
+                                    <td>@*{{item.Name ? item.Name:'@Resource.NA'}}*@
+                                        <a href="#" data-ng-href="/referral/addreferral/{{item.EncryptedReferralID}}" data-ng-bind="item.Name" target="_blank"></a>
+                                    </td>
+                                    <td>{{item.Status ?item.Status :'@Resource.NA' }}</td>
+                                    <td>{{item.AHCCCSID?item.AHCCCSID:'@Resource.NA' }}</td>
+                                    <td>{{item.Gender?item.Gender: '@Resource.NA' }}</td>
+                                    <td>{{item.Age?item.Age :'@Resource.NA'  }}</td>
+                                    <td>{{item.ParentName ?item.ParentName :'@Resource.NA' }}</td>
+                                    <td>{{item.Phone1?item.Phone1 :'@Resource.NA'  }}</td>
+                                    <td>{{item.Email?item.Email :'@Resource.NA' }}</td>
+                                    <td class="text-center">
+                                        @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                                        {
+                                            <a data-ng-click="DeleteReferralSiblingMapping(item,'Delete Records')"><i class="fa fa-remove curser-pointer"></i></a>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+
+
+            <div class="col-sm-12 padding-top-10">
+                <div data-ng-if="ReferralModel.ReferralSiblingMappingList.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

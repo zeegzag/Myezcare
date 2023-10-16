@@ -1,0 +1,254 @@
+﻿@model HC_AddEmployeeModel
+@{
+    string clientSideDateFormat = ConfigSettings.ClientSideDateTimeFormat;
+    const int legalGuardianContactTypeID = (int)@Common.ContactTypes.LegalGuardian;
+    int primaryContactTypeID = (int)@Common.ContactTypes.EmployeePrimaryPlacement;
+    string isEditMode = !string.IsNullOrEmpty(Model.Employee.EmployeeID.ToString()) && Model.Employee.EmployeeID > 0 ? "1" : "0";
+
+
+}
+
+<div class="employee-billing-hours">
+    @if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeInfo_Add))
+    {
+        <div class="form-group row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="fscontainer groupErrorParent" id="ShowAddedContactList">
+                <div class="legend">
+                    @Resource.EmployeeWorkingHours_Rate
+                </div>
+                <div class="employee-billing-hours-inner">
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+                            <form id="frmEmpBillingReportlist">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-6">
+                                            <div class="field">
+                                                <label class="control-label">@Resource.RegularWorkingHours</label>
+                                                <div>
+                                                    <input type="text" data-ng-model="EmployeeModel.Employee.RegularHours" class="form-control input-sm inline-block" style="width: calc(100% - 110px);" />
+													<span>&nbsp;per&nbsp;</span>
+                                                    @Html.DropDownListFor(p => p.Employee.RegularHourType, Common.GetListFromEnum<Common.WorkingHourType>().ToSelectList(Convert.ToString(Model.Employee.RegularHourType), "Name", "Value"),
+                                                            new
+                                                            {
+                                                                data_ng_model = "EmployeeModel.Employee.RegularHourType",
+                                                                data_ng_init = "EmployeeModel.Employee.RegularHourType = (!EmployeeModel.Employee.RegularHourType ? '"+Convert.ToString((int)Common.WorkingHourType.Day)+"' : EmployeeModel.Employee.RegularHourType.toString())",
+                                                                @class = "form-control input-sm state-autocomplete inline-block width-auto pull-right"
+                                                            })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6">
+                                            <div class="field">
+                                                <label class="control-label">@Resource.RegularWorking_HourRate</label>
+                                                <div>
+                                                    <input type="text" data-ng-model="EmployeeModel.Employee.RegularPayHours" class="form-control input-sm" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @*<div class="col-md-3 col-sm-6">
+                                            <div class="field">
+                                                <label class="control-label">Overtime Hours</label>
+                                                <div>
+                                                    <input type="text" data-ng-model="EmployeeModel.Employee.OvertimeHours" class="form-control input-sm" />
+                                                </div>
+                                            </div>
+                                        </div>*@
+                                        <div class="col-md-3 col-sm-6">
+                                            <div class="field">
+                                                <label class="control-label">@Resource.Overtime_HourRate</label>
+                                                <div>
+                                                    <input type="text" data-ng-model="EmployeeModel.Employee.OvertimePayHours" class="form-control input-sm" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6">
+                                            <div class="field" style="padding-top:24px">
+                                                <input type="submit" data-ng-click="SaveRegularHours()" class="btn btn-sm green-jungle ea-triggers-bound" value="Save" autocomplete="autocomplete_off_hack_xfr4!k">
+                                                <button class="btn btn-sm red" data-ng-click="CancelRegularHours()">Cancel </button>
+                                            </div>
+                                        </div>
+                                    </div><!-- End row -->
+                                </div><!-- End col 12 -->
+
+                            </form>
+                        </div>
+                        <div class="space20"></div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    }
+	@if(1 == 2)
+	{
+    <div class="form-group row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="fscontainer groupErrorParent" id="ShowAddedContactList">
+                <div class="legend">
+                    Employee Billing Hours
+                </div>
+                <div class="employee-billing-hours-inner">
+                    @{ Html.EnableClientValidation(false); }
+                    <div class="row">
+                        <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+                            <form id="frmEmpBillingReportlist">
+                                @*<div class="col-md-3 padding-right-5">
+                        <label class="control-label">@Resource.EmployeeName</label>
+                        @Html.TextBoxFor(m => m.SetEmployeeBillingReportListPage.SearchEmployeeBillingReportListPage.EmployeeName, new { data_ng_model = "TempSearchEmployeeBillingReportListPage.EmployeeName", @class = "form-control input-sm", placeholder = Resource.EmployeeName, maxlength = 50 })
+                    </div>*@
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <div class="field">
+                                                <label class="control-label">@Resource.StartDate</label>
+                                                <div class="input-group date"
+                                                     datepicker="TempSearchEmployeeBillingReportListPage.StartDate"
+                                                     ng-dateval="TempSearchEmployeeBillingReportListPage.StartDate">
+                                                    @Html.TextBoxFor(q => q.SetEmployeeBillingReportListPage.SearchEmployeeBillingReportListPage.StartDate,
+                                                         new
+                                                         {
+                                                             @class = "form-control input-sm ",
+                                                             placeholder = Resource.DateFormat
+                                                         })
+                                                    @Html.ValidationMessageFor(q => q.SetEmployeeBillingReportListPage.SearchEmployeeBillingReportListPage.StartDate)
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="col-md-6 col-sm-6 col-xs-12">
+                                            <div class="field">
+                                                <label class="control-label">@Resource.EndDate</label>
+                                                <div class="input-group date"
+                                                     datepicker="TempSearchEmployeeBillingReportListPage.EndDate"
+                                                     ng-dateval="TempSearchEmployeeBillingReportListPage.EndDate">
+                                                    @Html.TextBoxFor(q => q.SetEmployeeBillingReportListPage.SearchEmployeeBillingReportListPage.EndDate,
+                                                         new
+                                                         {
+                                                             @class = "form-control input-sm",
+                                                             placeholder = Resource.DateFormat
+                                                         })
+                                                    @Html.ValidationMessageFor(q => q.SetEmployeeBillingReportListPage.SearchEmployeeBillingReportListPage.EndDate)
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- End row -->
+                                </div><!-- End col 12 -->
+                                <div class="col-md-12 col-sm-12 col-xs-12" style="margin-top:10px;">
+                                    <button class="btn btn-sm btn-primary" data-ng-click="SearchEmployeeBillingReport()">
+                                        <i class="fa fa-search"></i>&nbsp;&nbsp;@Resource.Search
+                                    </button>
+                                    <button class="btn btn-sm grey border-grey-cascade" data-ng-click="ResetSearchFilter()">
+                                        <i class="fa fa-close"></i>&nbsp;&nbsp;@Resource.Reset
+                                    </button>
+                                </div>
+                            </form>
+                            @*<div class="btn-group">
+                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                    </button>
+                </div>*@
+                            <div class="inline-block pull-right" data-ng-show="EmployeeBillingReportList.length > 0">
+                                <div class="pull-right margin-left-5">
+                                    <dir-pagination-controls boundary-links="true" on-page-change="EmployeeBillingReportListPager.pageChanged(newPageNumber)" pagination-id="EmployeeBillingReportListPagerID"></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space20"></div>
+                    </div>
+                    <div>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="portlet-body compact" style="display: block;">
+                                    <div class="table-responsive">
+                                        <table class="table table-pinned table-bordered table-striped table-condensed">
+                                            <thead class="flip-content">
+                                                <tr>
+                                                    @*@if (Common.HasPermission(Constants.HC_Permission_FacilityHouse_Delete))
+                                        {*@
+                                                    @*<th class="width-20px"></th>*@
+                                                    @*}*@
+                                                    <th class="">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('EmployeeName')">@Resource.EmployeeName</a>
+                                                        <span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'EmployeeName'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+                                                    </th>
+                                                    <th class="">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('AllocatedHour')">@Resource.AllocatedHrs</a>
+                                                        <span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'AllocatedHour'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+                                                    </th>
+                                                    <th class="">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('PTOHour')">PTO @Resource.Hours</a>
+                                                        <span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'PTOHour'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+                                                    </th>
+                                                    <th class="">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('WorkingHour')">Working @Resource.Hours</a>
+                                                        <span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'WorkingHour'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+                                                    </th>
+                                                    @*<th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeBillingReportListPager.sortColumn('BillableAmount')">@Resource.BillableAmount</a>
+                                            <span class="sortorder" data-ng-show="EmployeeBillingReportListPager.sortIndex === 'BillableAmount'" data-ng-class="{reverse:EmployeeBillingReportListPager.reverse}"></span>
+                                        </th>*@
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr data-ng-class="{'deleted':empbillingreport.IsDeleted}" dir-paginate="empbillingreport in EmployeeBillingReportList | itemsPerPage: EmployeeBillingReportListPager.pageSize" total-items="EmployeeBillingReportListPager.totalRecords" current-page="EmployeeBillingReportListPager.currentPage" pagination-id="EmployeeBillingReportListPagerID">
+                                                    @*@if (Common.HasPermission(Constants.HC_Permission_empbillingreport_Delete))
+                                        {
+                                            <td class="text-align-center">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="empbillingreport.IsChecked" data-ng-change="Selectempbillingreport(empbillingreport)" val="empbillingreport.IsChecked">
+                                            </td>
+                                        }*@
+                                                    <td data-ng-bind="empbillingreport.EmployeeName"></td>
+                                                    <td>
+                                                        {{(empbillingreport.AllocatedHour == null || empbillingreport.AllocatedHour =='') ? 'N/A' : empbillingreport.AllocatedHourInStr }}
+                                                    </td>
+                                                    <td>
+                                                        {{(empbillingreport.PTOHour == null || empbillingreport.PTOHour =='') ? 'N/A' : empbillingreport.PTOHourInStr }}
+                                                    </td>
+                                                    <td>
+                                                        {{(empbillingreport.WorkingHour == null || empbillingreport.WorkingHour =='') ? 'N/A' : empbillingreport.WorkingHourInStr }}
+                                                    </td>
+                                                    @*<td data-ng-bind="empbillingreport.BillableAmount"></td>*@
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row">
+                            <div class="col-sm-12" data-ng-if="EmployeeBillingReportList.length > 0">
+                                <div class="col-sm-3 pull-left no-padding">
+                                    @Resource.Showing <span data-ng-bind="(EmployeeBillingReportListPager.pageSize * EmployeeBillingReportListPager.currentPage) - EmployeeBillingReportListPager.pageSize  + 1"></span>
+                                    &nbsp;@Resource.To <span data-ng-bind="(EmployeeBillingReportListPager.pageSize == EmployeeBillingReportListPager.currentPageSize) ? (EmployeeBillingReportListPager.pageSize * EmployeeBillingReportListPager.currentPage) :(EmployeeBillingReportListPager.pageSize * EmployeeBillingReportListPager.currentPage) - EmployeeBillingReportListPager.pageSize  + EmployeeBillingReportListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeBillingReportListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                </div>
+                                <div class="pull-right top pagination-sm">
+                                    <dir-pagination-controls boundary-links="true" on-page-change="EmployeeBillingReportListPager.pageChanged(newPageNumber)" pagination-id="EmployeeBillingReportListPagerID"></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div data-ng-if="EmployeeBillingReportList.length == 0">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-danger">
+                                            @Html.Raw(Resource.NoRecordsFound)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+	}
+</div>

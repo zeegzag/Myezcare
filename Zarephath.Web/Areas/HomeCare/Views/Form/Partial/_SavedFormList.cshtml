@@ -1,0 +1,218 @@
+﻿@model FormPageModel
+<div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+
+            <div>
+
+
+                @if (Model.ForPatient && Model.IsPartial == false)
+                {
+                    <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                        @*<label class="control-label">@Resource.Patient</label>*@
+                        @Html.DropDownListFor(p => p.SearchFormModel.ReferralID, Model.ReferralList.ToSelectList(Model.SearchFormModel.ReferralID.ToString() ?? "", "Name", "Value", Resource.SelectPatient, ""),
+                        new
+                        {
+                            id = "SavedReferralID",
+                            convert_to_number = "",
+                            data_ng_model = "TempSearchSavedFormModel.ReferralID",
+                            data_ng_init = "TempSearchSavedFormModel.ReferralID=TempSearchSavedFormModel.ReferralID==''?null:TempSearchSavedFormModel.ReferralID",
+                            @class = "form-control input-sm",
+                            data_val = "false"
+
+                        })
+
+                    </div>
+                }
+
+                @if (Model.ForEmployee && Model.IsPartial == false)
+                {
+
+                    <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                        @*<label class="control-label">@Resource.Employee</label>*@
+                        @Html.DropDownListFor(p => p.SearchFormModel.EmployeeID, Model.EmployeeList.ToSelectList(Model.SearchFormModel.EmployeeID.ToString() ?? "", "Name", "Value", Resource.SelectEmployee, ""),
+                        new
+                        {
+                            id = "SavedEmployeeID",
+                            convert_to_number = "",
+                            data_ng_model = "TempSearchSavedFormModel.EmployeeID",
+                            data_ng_init = "TempSearchSavedFormModel.EmployeeID=TempSearchSavedFormModel.EmployeeID==''?null:TempSearchSavedFormModel.EmployeeID",
+                            @class = "form-control input-sm",
+                            data_val = "false"
+
+                        })
+
+                    </div>
+
+                }
+
+
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                    @*<label class="control-label">@Resource.Market</label>*@
+                    @Html.DropDownListFor(p => p.SearchFormModel.MarketID, Model.MarketList.ToSelectList(Model.SearchFormModel.MarketID.ToString() ?? "", "Name", "Id", Resource.AllMarket, ""),
+                        new
+                        {
+                            id = "SavedFormMarketID",
+                            convert_to_number = "",
+                            data_ng_model = "TempSearchSavedFormModel.MarketID",
+                            data_ng_init = "TempSearchSavedFormModel.MarketID=TempSearchSavedFormModel.MarketID==''?null:TempSearchSavedFormModel.MarketID",
+                            @class = "form-control input-sm",
+                            data_val = "false",
+                            data_ng_change = "SearchSavedFormList()"
+                        })
+                </div>
+
+
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                    @*<label class="control-label">@Resource.FormCategory</label>*@
+                    @Html.DropDownListFor(p => p.SearchFormModel.FormCategoryID, Model.FormCategoryList.ToSelectList(Model.SearchFormModel.FormCategoryID.ToString() ?? "", "Name", "Id", Resource.AllCategories, ""),
+                        new
+                        {
+                            id = "SavedFormCategoryID",
+                            convert_to_number = "",
+                            data_ng_model = "TempSearchSavedFormModel.FormCategoryID",
+                            data_ng_init = "TempSearchSavedFormModel.FormCategoryID=TempSearchSavedFormModel.FormCategoryID==''?null:TempSearchSavedFormModel.FormCategoryID",
+                            @class = "form-control input-sm",
+                            data_val = "false"
+                        })
+                </div>
+
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                    @*<label class="control-label">@Resource.FormNumber</label>*@
+                    @Html.TextBoxFor(m => m.SearchFormModel.FormNumber, new { id = "SavedFormNumber", data_ng_model = "TempSearchSavedFormModel.FormNumber", delete_if_empty = "", @class = "form-control input-sm", placeholder = Resource.FormNumber, maxlength = 20 })
+                </div>
+
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                    @*<label class="control-label">@Resource.FormName</label>*@
+                    @Html.TextBoxFor(m => m.SearchFormModel.FormName, new { id = "SavedFormName", data_ng_model = "TempSearchSavedFormModel.FormName", delete_if_empty = "", @class = "form-control input-sm", placeholder = Resource.FormName, maxlength = 20 })
+                </div>
+
+                <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                    @*<label class="control-label"></label>*@
+                    <div class="">
+                        <input type="submit" value="@Resource.Search" class="btn btn-sm btn-primary" data-ng-click="SearchSavedFormList()" />
+                        <a href="javascript:void(0);" class="btn btn-sm btn-default grey border-grey-cascade" data-ng-click="ResetSavedFormSearchFilter()">@Resource.Reset</a>
+                    </div>
+                </div>
+
+
+            </div>
+
+
+            <div class="inline-block pull-right" data-ng-show="SavedFormList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" on-page-change="SavedFormListPager.pageChanged(newPageNumber)" pagination-id="SavedFormListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="">
+                        <form id="frmSavedFormList">
+                            <table class="table table-pinned table-bordered table-striped table-condensed">
+                                <thead class="flip-content">
+                                    <tr>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SavedFormListPager.sortColumn('Name')">@Resource.FormNumber</a>
+                                            <span class="sortorder" data-ng-show="SavedFormListPager.sortIndex === 'Name'" data-ng-class="{reverse:SavedFormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SavedFormListPager.sortColumn('FormLongName')">@Resource.FormName</a>
+                                            <span class="sortorder" data-ng-show="SavedFormListPager.sortIndex === 'FormLongName'" data-ng-class="{reverse:SavedFormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SavedFormListPager.sortColumn('Version')">@Resource.Version</a>
+                                            <span class="sortorder" data-ng-show="SavedFormListPager.sortIndex === 'Version'" data-ng-class="{reverse:SavedFormListPager.reverse}"></span>
+                                        </th>
+                                        @*<th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SavedFormListPager.sortColumn('FormCategory')">@Resource.Category</a>
+                                            <span class="sortorder" data-ng-show="SavedFormListPager.sortIndex === 'FormCategory'" data-ng-class="{reverse:SavedFormListPager.reverse}"></span>
+                                        </th>*@
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SavedFormListPager.sortColumn('CreatedBy')">@Resource.CreatedBy</a>
+                                            <span class="sortorder" data-ng-show="SavedFormListPager.sortIndex === 'CreatedBy'" data-ng-class="{reverse:SavedFormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SavedFormListPager.sortColumn('CreatedDate')">@Resource.CreatedDate</a>
+                                            <span class="sortorder" data-ng-show="SavedFormListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:SavedFormListPager.reverse}"></span>
+                                        </th>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SavedFormListPager.sortColumn('UpdatedBy')">@Resource.UpdatedBy</a>
+                                            <span class="sortorder" data-ng-show="SavedFormListPager.sortIndex === 'UpdatedBy'" data-ng-class="{reverse:SavedFormListPager.reverse}"></span>
+                                        </th>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SavedFormListPager.sortColumn('UpdatedDate')">@Resource.UpdatedDate</a>
+                                            <span class="sortorder" data-ng-show="SavedFormListPager.sortIndex === 'UpdatedDate'" data-ng-class="{reverse:SavedFormListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-140px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-class="{'deleted':form.IsDeleted}" dir-paginate="form in SavedFormList | itemsPerPage: SavedFormListPager.pageSize" total-items="SavedFormListPager.totalRecords" current-page="SavedFormListPager.currentPage" pagination-id="SavedFormListPagerID">
+
+                                        <td>{{ form.Name }}</td>
+                                        <td>{{ form.FormLongName }}</td>
+                                        <td>{{ form.Version }}</td>
+                                        @*<td>{{ form.FormCategory }}</td>*@
+
+
+                                        <td>{{ form.SavedFormCreatedBy }}</td>
+                                        <td>{{ form.SavedFormCreatedDate | orgdatetime }}</td>
+                                        <td>{{ form.SavedFormUpdatedBy }}</td>
+                                        <td>{{ form.SavedFormUpdatedDate | orgdatetime}}</td>
+
+                                        <td class="">
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Forms_Add))
+                                            {
+                                                <a class="btn btn-xs btn-success" target="_blank" data-ng-show="form.HasHtml || form.IsInternalForm || form.IsOrbeonForm" data-ng-click="OpenSavedHtmlForm(form)">@Resource.Update</a>
+                                                <a class="btn btn-xs yellow-mint" target="_blank" data-ng-show="form.HasPDF" data-ng-click="OpenSavedPDFForm(form)">@Resource.PrintPDF</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="SavedFormList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(SavedFormListPager.pageSize * SavedFormListPager.currentPage) - SavedFormListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(SavedFormListPager.pageSize == SavedFormListPager.currentPageSize) ? (SavedFormListPager.pageSize * SavedFormListPager.currentPage) :(SavedFormListPager.pageSize * SavedFormListPager.currentPage) - SavedFormListPager.pageSize  + SavedFormListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="SavedFormListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" on-page-change="SavedFormListPager.pageChanged(newPageNumber)" pagination-id="SavedFormListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="SavedFormList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

@@ -1,0 +1,2 @@
+﻿CREATE USER [WIN-5A0FOP2PRB8\hirva];
+

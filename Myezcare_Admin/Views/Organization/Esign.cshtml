@@ -1,0 +1,144 @@
+﻿@model SetOrganizationEsignModel
+
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.OrganizationEsign);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_OrganizationEsign;
+    bool isEditMode = Model.OrganizationDetails.OrganizationID > 0;
+}
+
+@Html.Hidden("hdnOrganizationEsignModel", Common.SerializeObject(Model))
+<div data-ng-controller="OrganizationEsignController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.OrganizationEsign
+            <input type="submit" data-ng-click="SaveOrganizationEsign()" class="btn btn-sm green-jungle pull-right" value="@Resource.Save" />
+            <input type="button" data-ng-click="SaveOrganizationEsignDraft()" class="btn btn-sm pull-right margin-right-10" value="@Resource.SaveAsDraft" />
+            <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <form id="frmOrganizationEsign">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-sm-4 no-padding">
+                                <div class="form-group col-sm-6">
+                                    <label class="control-label required">
+                                        @Resource.CompanyName
+                                    </label>
+                                    @Html.TextBoxFor(m => m.OrganizationDetails.CompanyName, new { data_ng_model = "OrganizationDetails.CompanyName", @class = "form-control input-sm", placeholder = Resource.DisplayName, maxlength = 100 })
+                                    @Html.ValidationMessageFor(m => m.OrganizationDetails.CompanyName)
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="control-label required">
+                                        @Resource.DisplayName
+                                    </label>
+                                    @Html.TextBoxFor(m => m.OrganizationDetails.DisplayName, new { data_ng_model = "OrganizationDetails.DisplayName", @class = "form-control input-sm", placeholder = Resource.DisplayName, maxlength = 100 })
+                                    @Html.ValidationMessageFor(m => m.OrganizationDetails.DisplayName)
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="control-label required">
+                                        @Resource.Email
+                                    </label>
+                                    @Html.TextBoxFor(m => m.OrganizationDetails.Email, new { data_ng_model = "OrganizationDetails.Email", @class = "form-control input-sm", placeholder = Resource.DisplayName, maxlength = 100 })
+                                    @Html.ValidationMessageFor(m => m.OrganizationDetails.Email)
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="control-label required">
+                                        @Resource.Phone
+                                    </label>
+                                    @Html.TextBoxFor(m => m.OrganizationDetails.Phone, new { data_ng_model = "OrganizationDetails.Phone", @class = "form-control input-sm", placeholder = "(XXX) XXX-XXXX", maxlength = 15, phone_input = "" })
+                                    @Html.ValidationMessageFor(m => m.OrganizationDetails.Phone)
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="control-label required">
+                                        @Resource.WorkPhone
+                                    </label>
+                                    @Html.TextBoxFor(m => m.OrganizationDetails.WorkPhone, new { data_ng_model = "OrganizationDetails.WorkPhone", @class = "form-control input-sm", placeholder = "(XXX) XXX-XXXX", maxlength = 15, phone_input = "" })
+                                    @Html.ValidationMessageFor(m => m.OrganizationDetails.WorkPhone)
+                                </div>
+                                <div class="form-group col-sm-6">
+                                    <label class="control-label required">@Resource.OrganizationType</label>
+                                    @Html.DropDownListFor(m => m.OrganizationDetails.OrganizationTypeID, Model.OrganizationTypeList.ToSelectList(Convert.ToString(Model.OrganizationDetails.OrganizationTypeID), "Name", "Value", Resource.Select, ""), new
+                               {
+                                   id = "OrganizationTypeID",
+                                   data_ng_model = "OrganizationDetails.OrganizationTypeID",
+                                   data_ng_init = "OrganizationDetails.OrganizationTypeID=OrganizationDetails.OrganizationTypeID==''?null:OrganizationDetails.OrganizationTypeID.toString()",
+                                   @class = "form-control input-sm"
+                               })
+                                    @Html.ValidationMessageFor(q => q.OrganizationDetails.OrganizationTypeID)
+                                </div>
+                            </div>
+                            <div class="col-sm-8 no-padding">
+                                <div class="form-group col-sm-12">
+                                    <label class="control-label required">@Resource.EsignTerms</label>
+                                    @Html.TextAreaFor(m => m.OrganizationDetails.DefaultEsignTerms,
+                                    new
+                                    {
+                                        data_ng_model = "OrganizationDetails.DefaultEsignTerms",
+                                        @class = "form-control hideErrorContent replaceErrorSource",
+                                        tabindex = "-1"
+                                    })
+                                    @Html.ValidationMessageFor(x => x.OrganizationDetails.DefaultEsignTerms)
+                                    <div class="replaceErrorDest summerNoteEditor">
+                                        <summernote data-ng-model="OrganizationDetails.DefaultEsignTerms" height="400"></summernote>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-lg-12 col-sm-12 col-md-12">
+                                <h4><strong class="required">@Resource.ServicePlan</strong></h4>
+                                <hr class="clear-both" />
+                            </div>
+                            <div class="space15"></div>
+                            <div class="price-table-wrapper">
+                                <div data-ng-repeat="servicePlan in ServicePlans">
+                                    <div class="col-sm-3 margin-bottom-15">
+                                        <div class="{{servicePlan.PlanClass}}">
+                                            <div class="pricing-table__header" ng-click="SelectPlanDiv($index)">
+                                                <span>{{servicePlan.ServicePlanName}}</span>
+                                                <input type="checkbox" name="servicePlan" apply-uniform id="servicePlan_{{servicePlan.ServicePlanID}}" class="unicheckbox chk-plan input-sm" ng-model="servicePlan.IsSelected" ng-change="SelectPlan($index)" />
+                                                @*<i class="fa fa-check-circle fa-lg" aria-hidden="true" ng-show="servicePlan.IsSelected"></i>*@
+                                            </div>
+                                            <ul class="theplan">
+                                                <li><i class="fa fa-question-circle" data-ng-tooltip="@Resource.PatientAllowed" data-ng-custom-class="tooltip-extra-z-index"></i>@Resource.PatientAllowed: <b>{{servicePlan.Patient}}</b></li>
+                                                <li><i class="fa fa-question-circle" data-ng-tooltip="@Resource.FacilityAllowed" data-ng-custom-class="tooltip-extra-z-index"></i>@Resource.FacilityAllowed: <b>{{servicePlan.Facility}}</b></li>
+                                                <li><i class="fa fa-question-circle" data-ng-tooltip="@Resource.TaskAllowed" data-ng-custom-class="tooltip-extra-z-index"></i>@Resource.TaskAllowed: <b>{{servicePlan.Task}}</b></li>
+                                                <li><i class="fa fa-question-circle" data-ng-tooltip="@Resource.EmployeeAllowed" data-ng-custom-class="tooltip-extra-z-index"></i>@Resource.EmployeeAllowed: <b>{{servicePlan.Employee}}</b></li>
+                                                <li><i class="fa fa-question-circle" data-ng-tooltip="@Resource.BillingPercentage" data-ng-custom-class="tooltip-extra-z-index"></i>@Resource.BillingPercentage: <b>{{servicePlan.Billing}} %</b></li>
+                                                <li data-ng-if="servicePlan.SetupFees != null">@Resource.SetupFees: <b>{{servicePlan.SetupFees}}</b></li>
+                                                <li data-ng-repeat="item in $parent.ServicePlanComponents | filter : { ServicePlanID: servicePlan.ServicePlanID } : true">
+                                                    {{item.Title}}
+                                                </li>
+                                            </ul>
+                                            <h3 class="pricing-table__price">${{servicePlan.PerPatientPrice}}/@Resource.Patient/{{servicePlan.NumberOfDaysForBilling}} @Resource.Days</h3>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="space15"></div>
+                        <div class="col-md-12 form-group no-margin no-padding">
+                            <input type="submit" data-ng-click="SaveOrganizationEsign()" class="btn btn-sm green-jungle pull-right" value="@Resource.Save" />
+                            <input type="button" data-ng-click="SaveOrganizationEsignDraft()" class="btn btn-sm pull-right margin-right-10" value="@Resource.SaveAsDraft" />
+                            <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        var esignAlreadyProcessed = '@Resource.EsignAlreadyProcessed';
+        var pleaseSelectPlan = '@Resource.PleaseSelectPlan';
+    </script>
+    @Scripts.Render("~/assets/js/viewjs/siteapp/organization/organizationesign")
+}

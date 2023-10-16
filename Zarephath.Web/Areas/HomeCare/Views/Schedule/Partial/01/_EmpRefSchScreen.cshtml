@@ -1,0 +1,913 @@
+﻿<div class="emprefSchScreen">
+
+    @*<div class="col-sm-12 padding-bottom-10px padding-top-5">
+             <span class="font-size-24">{{PatientDetail.ReferralName}}</span>
+             <hr class="clear-both"/>
+        </div>*@
+
+    <div class="emprefpopup_left col-sm-9 ">
+        <div class="emprefsch_search">
+            <form>
+
+                <div class="row">
+                    <div class="form-group col-lg-3 col-md-5 col-sm-5 col-xs-7" style="display:none">
+                        @*{{SearchModel.StartDate}}*@
+                        <label>@Resource.StartDate</label>
+                        <div data-ng-if="SearchModel.TimePickerRequire">
+                            <div class="input-group date date-picker pull-right"
+                                 datetimepicker="SearchModel.StartDate" ng-dateval="SearchModel.StartDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask" placeholder='@Resource.StarDate' maxlength="50" disabled="" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+
+                        <div data-ng-if="!SearchModel.TimePickerRequire">
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="SearchModel.StartDate" ng-dateval="SearchModel.StartDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-5 col-sm-5 col-xs-7" style="display:none">
+                        <label>@Resource.EndDate</label>
+                        <div data-ng-if="SearchModel.TimePickerRequire">
+                            <div class="input-group date date-picker pull-right"
+                                 datetimepicker="SearchModel.EndDate" ng-dateval="SearchModel.EndDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" disabled="" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+
+                        <div data-ng-if="!SearchModel.TimePickerRequire">
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="SearchModel.EndDate" ng-dateval="SearchModel.EndDate" ng-maxdate="SearchModel.MaxEndDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-2 ">
+                        <label>@Resource.Employee</label>
+                        <div class="">
+                            <input class="form-control input-sm " placeholder='@Resource.Employee' maxlength="50" data-ng-model="SearchModel.EmployeeName" />
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-2 ">
+                        <label>
+                            @Resource.Skills
+                            <i class="fa fa-question-circle" data-ng-tooltip="@Resource.OrConditionSkillAndPreference" data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        @*<select class="form-control input-sm "
+                                    data-ng-init="SearchModel.SkillId=(SearchModel.SkillId==null || SearchModel.SkillId=='')?'':SearchModel.SkillId.toString()"
+                                    data-ng-model="SearchModel.SkillId"
+                                    id="SearchModelSkillId"
+                                    name="SearchModel.SkillId"
+                                    convert-to-number="">
+                                <option value="">@Resource.AllSkills</option>
+                                <option data-ng-repeat='item in Skills' value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                            </select>*@
+
+                        <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                selectpicker="EmpRefSkillList" name="EmpRefSkillList"
+                                title="@Resource.AllSkills">
+                            <option data-ng-repeat="item in Skills" value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                        </select>
+
+                    </div>
+
+
+                    <div class="form-group col-lg-2 ">
+                        <label>
+                            @Resource.Preference
+                            <i class="fa fa-question-circle" data-ng-tooltip="@Resource.OrConditionSkillAndPreference" data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        @* <select class="form-control input-sm "
+                                    data-ng-init="SearchModel.PreferenceId=(SearchModel.PreferenceId==null || SearchModel.PreferenceId=='')?'':SearchModel.PreferenceId.toString()"
+                                    data-ng-model="SearchModel.PreferenceId"
+                                    id="SearchModelPreferenceId"
+                                    name="SearchModel.PreferenceId"
+                                    convert-to-number="">
+                                <option value="">@Resource.AllPreferences</option>
+                                <option data-ng-repeat='item in Preferences' value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                            </select>*@
+
+                        <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                selectpicker="EmpRefPreferenceList" name="EmpRefPreferenceList"
+                                title="@Resource.AllPreferences">
+                            <option data-ng-repeat="item in Preference" value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                        </select>
+
+                    </div>
+
+                    <div class="form-group col-lg-2">
+                        <label>@Resource.MileRadius</label>
+                        <div class="">
+                            <input class="form-control input-sm " placeholder='@Resource.MileRadius' maxlength="5"
+                                   dir-valid-number=""
+                                   data-ng-model="SearchModel.MileRadius" />
+                        </div>
+                    </div>
+                    <div class="HeaderShorting form-group col-lg-2 open">
+                        <label>@Resource.Sort</label>
+                        <a class="btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                            @Resource.Sort&nbsp;<i class="fa fa-angle-down"></i>
+                        </a>
+                        <ul class="multiSort dropdown-menu hold-on-click pull-right">
+
+                            <li>
+                                <a class="anchor_color " href="javascript:void(0);" data-ng-init="SkillsCount=0"
+                                   data-ng-click="SkillsCount=SkillsCount+1;SkillsVal=SkillsCount%2==0?'Skills ASC':'Skills DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(SkillsVal,false,true);">
+                                    <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(SkillsVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(SkillsVal)}} </span>&nbsp; @Resource.Skills
+                                    <span class="sortorder" data-ng-show="SkillsCount>0" data-ng-class="{reverse: SkillsCount%2==0?false:true}"></span>
+                                </a>
+                                <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(SkillsVal,true,true);SkillsCount=0;"><i class="fa fa-remove"></i></a>
+                            </li>
+
+
+                            <li>
+                                <a class="anchor_color " href="javascript:void(0);" data-ng-init="PreferencesCount=0"
+                                   data-ng-click="PreferencesCount=PreferencesCount+1;PreferencesVal=PreferencesCount%2==0?'Preferences ASC':'Preferences DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(PreferencesVal,false,true);">
+                                    <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(PreferencesVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(PreferencesVal)}} </span>&nbsp; @Resource.Preferences
+                                    <span class="sortorder" data-ng-show="PreferencesCount>0" data-ng-class="{reverse: PreferencesCount%2==0?false:true}"></span>
+                                </a>
+                                <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(PreferencesVal,true,true);PreferencesCount=0;"><i class="fa fa-remove"></i></a>
+                            </li>
+
+
+                            <li>
+                                <a class="anchor_color " href="javascript:void(0);" data-ng-init="MilesCount=0"
+                                   data-ng-click="MilesCount=MilesCount+1;MilesVal=MilesCount%2==0?'Miles ASC':'Miles DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(MilesVal,false,true);">
+                                    <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(MilesVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(MilesVal)}} </span>&nbsp; @Resource.Miles
+                                    <span class="sortorder" data-ng-show="MilesCount>0" data-ng-class="{reverse: MilesCount%2==0?false:true}"></span>
+                                </a>
+                                <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(MilesVal,true,true);MilesCount=0;"><i class="fa fa-remove"></i></a>
+                            </li>
+
+                            <li>
+                                <a class="anchor_color " href="javascript:void(0);" data-ng-init="ConflictsCount=0"
+                                   data-ng-click="ConflictsCount=ConflictsCount+1;ConflictsVal=ConflictsCount%2==0?'Conflicts ASC':'Conflicts DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(ConflictsVal,false,true);">
+                                    <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(ConflictsVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(ConflictsVal)}} </span>&nbsp; @Resource.Conflicts
+                                    <span class="sortorder" data-ng-show="ConflictsCount>0" data-ng-class="{reverse: ConflictsCount%2==0?false:true}"></span>
+                                </a>
+                                <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(ConflictsVal,true,true);ConflictsCount=0;"><i class="fa fa-remove"></i></a>
+                            </li>
+
+
+
+                        </ul>
+
+                    </div>
+
+
+
+
+
+                    <div class="col-lg-2 col-md-3 col-sm-12 col-xs-5">
+                        <label></label>
+                        <div>
+                            <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Search" data-ng-click="SearchEmpRefSchOptions()" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="dataTables_wrapper compact ng-scope">
+            <table class="table table-advance table-bordered table-condensed tbl_reflog  table-striped">
+                <thead>
+                    <tr>
+                        <th>
+
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeTSListPager.sortColumn('Employee',true)"><strong>@Resource.Employee</strong></a>
+                            <span class="sortorder" data-ng-show="EmployeeTSListPager.sortIndex === 'Employee'" data-ng-class="{reverse:EmployeeTSListPager.reverse}"></span>
+
+                        </th>
+                        <th style="max-width: 173px; word-break: break-all;display:none">
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeTSListPager.sortColumn('Frequency',true)"><strong>@Resource.Frequency</strong></a>
+                            <span class="sortorder" data-ng-show="EmployeeTSListPager.sortIndex === 'Frequency'" data-ng-class="{reverse:EmployeeTSListPager.reverse}"></span>
+                        </th>
+                        <th style="display:none"><strong>@Resource.Range</strong></th>
+                        <th style="display:none">
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeTSListPager.sortColumn('StartTime',true)"><strong>@Resource.StartTime</strong></a>
+                            <span class="sortorder" data-ng-show="EmployeeTSListPager.sortIndex === 'StartTime'" data-ng-class="{reverse:EmployeeTSListPager.reverse}"></span>
+                        </th>
+                        <th style="display:none">
+                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeTSListPager.sortColumn('EndTime',true)"><strong>@Resource.EndTime</strong></a>
+                            <span class="sortorder" data-ng-show="EmployeeTSListPager.sortIndex === 'EndTime'" data-ng-class="{reverse:EmployeeTSListPager.reverse}"></span>
+                        </th>
+                        <th class="width-226px">
+                            <div class="pull-left" data-ng-show="EmpRefSchAjaxStart">
+                                @*@Resource.Loading*@
+                                <img src="~/Assets/images/lazyload.gif" />
+                            </div>
+
+                            <div class="pull-right btn-group">
+                                <a class="btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                    <strong>@Resource.Sort&nbsp;<i class="fa fa-angle-down"></i></strong>
+                                </a>
+                                <ul class="multiSort dropdown-menu hold-on-click pull-right">
+
+                                    <li>
+                                        <a class="anchor_color " href="javascript:void(0);" data-ng-init="SkillsCount=0"
+                                           data-ng-click="SkillsCount=SkillsCount+1;SkillsVal=SkillsCount%2==0?'Skills ASC':'Skills DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(SkillsVal,false,true);">
+                                            <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(SkillsVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(SkillsVal)}} </span>&nbsp; @Resource.Skills
+                                            <span class="sortorder" data-ng-show="SkillsCount>0" data-ng-class="{reverse: SkillsCount%2==0?false:true}"></span>
+                                        </a>
+                                        <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(SkillsVal,true,true);SkillsCount=0;"><i class="fa fa-remove"></i></a>
+                                    </li>
+
+
+                                    <li>
+                                        <a class="anchor_color " href="javascript:void(0);" data-ng-init="PreferencesCount=0"
+                                           data-ng-click="PreferencesCount=PreferencesCount+1;PreferencesVal=PreferencesCount%2==0?'Preferences ASC':'Preferences DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(PreferencesVal,false,true);">
+                                            <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(PreferencesVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(PreferencesVal)}} </span>&nbsp; @Resource.Preferences
+                                            <span class="sortorder" data-ng-show="PreferencesCount>0" data-ng-class="{reverse: PreferencesCount%2==0?false:true}"></span>
+                                        </a>
+                                        <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(PreferencesVal,true,true);PreferencesCount=0;"><i class="fa fa-remove"></i></a>
+                                    </li>
+
+
+                                    <li>
+                                        <a class="anchor_color " href="javascript:void(0);" data-ng-init="MilesCount=0"
+                                           data-ng-click="MilesCount=MilesCount+1;MilesVal=MilesCount%2==0?'Miles ASC':'Miles DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(MilesVal,false,true);">
+                                            <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(MilesVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(MilesVal)}} </span>&nbsp; @Resource.Miles
+                                            <span class="sortorder" data-ng-show="MilesCount>0" data-ng-class="{reverse: MilesCount%2==0?false:true}"></span>
+                                        </a>
+                                        <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(MilesVal,true,true);MilesCount=0;"><i class="fa fa-remove"></i></a>
+                                    </li>
+
+                                    <li>
+                                        <a class="anchor_color " href="javascript:void(0);" data-ng-init="ConflictsCount=0"
+                                           data-ng-click="ConflictsCount=ConflictsCount+1;ConflictsVal=ConflictsCount%2==0?'Conflicts ASC':'Conflicts DESC';
+                                                                EmployeeTSListPager.sortMultiColumn(ConflictsVal,false,true);">
+                                            <span data-ng-show="EmployeeTSListPager.sortIndexArray.indexOf(ConflictsVal)!=-1">{{EmployeeTSListPager.sortIndexArray.indexOf(ConflictsVal)}} </span>&nbsp; @Resource.Conflicts
+                                            <span class="sortorder" data-ng-show="ConflictsCount>0" data-ng-class="{reverse: ConflictsCount%2==0?false:true}"></span>
+                                        </a>
+                                        <a class="pull-right" data-ng-click="EmployeeTSListPager.sortMultiColumn(ConflictsVal,true,true);ConflictsCount=0;"><i class="fa fa-remove"></i></a>
+                                    </li>
+
+
+
+                                </ul>
+
+                            </div>
+                        </th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr dir-paginate="item in EmployeeTSList | itemsPerPage: EmployeeTSListPager.pageSize" total-items="EmployeeTSListPager.totalRecords" current-page="EmployeeTSListPager.currentPage" pagination-id="EmployeeTSListPager_ID">
+                        @*<td>{{item.EmployeeName}}</td>*@
+                        <td data-ng-class="{'bg-red':item.NewRemainingHrs==0}" data-ng-mouseover="SearchSchEmployeeModel.EmployeeID =item.EmployeeID">
+                            <a data-ng-class="{' font-white':item.NewRemainingHrs==0}" class="text-decoration-none font-size-14 webpop" item-detail-popup
+                               data-ng-url="SchEmployeeDetailUrl" data-ng-search-model="SearchSchEmployeeModel" data-ng-callback="SearchPatient"
+                               data-ng-template-selector="#schemployeedetail-popover" data-popover-cloasble="true" data-ng-header="@Resource.ClientDetail">{{item.EmployeeName}}</a>
+
+                        </td>
+                        @*<td>{{item.Frequency}}</td>
+        <td>{{item.ETMStartDate | orgdate}} - {{item.ETMEndDate? (item.ETMEndDate | orgdate):'@Resource.NA'}}</td>
+        <td>{{item.StartTime | time12hrFormat}}</td>
+        <td>{{item.EndTime | time12hrFormat}}</td>*@
+                        <td class="text-align-center" style="min-width: 240px;" data-ng-mouseover="SearchEmpRefMatchModel.EmployeeID =item.EmployeeID; SearchEmpRefMatchModel.ReferralID =SearchModel.ReferralID">
+                            <div>
+                                <span class="badge badge-warning badge-roundless margin-top-0 margin-bottom-0 width-52px curser-pointer"
+                                      style="background-color: darkslateblue"
+                                      data-ng-mouseover="SearchEmpRefMatchModel.MatchType ='@Preference.PreferenceKeyType.Skill.ToString()'"
+                                      title="@Resource.Skills"
+                                      item-detail-popup data-ng-url="SchEmpRefSkillsUrl" data-ng-search-model="SearchEmpRefMatchModel" data-ng-width="200"
+                                      data-ng-template-selector="#schemprefskill-popover" data-popover-cloasble="true">
+                                    <i class="fa fa-wrench"></i>{{item.SkillsMatchPercent}}%
+                                </span>
+
+                                <span class="badge badge-warning badge-roundless margin-top-0 margin-bottom-0 width-52px curser-pointer" style="background-color: red"
+                                      title="@Resource.PatientPreferences"
+                                      data-ng-mouseover="SearchEmpRefMatchModel.MatchType ='@Preference.PreferenceKeyType.Preference.ToString()'"
+                                      item-detail-popup data-ng-url="SchEmpRefSkillsUrl" data-ng-search-model="SearchEmpRefMatchModel" data-ng-width="200"
+                                      data-ng-template-selector="#schemprefskill-popover" data-popover-cloasble="true">
+                                    <i class="fa fa-clock-o"></i>{{item.PreferencesMatchPercent}}%
+                                </span>
+                                <span class="badge badge-warning badge-roundless margin-top-0 margin-bottom-0 width-56px" style="background-color: green" title="@Resource.Miles"><i class="fa fa-car"></i>{{item.StrDistance}}</span>
+                                <span class="badge badge-warning badge-roundless margin-top-0 margin-bottom-0 width-45px" data-ng-class="{'NoConflicts':item.Conflicts==0 , 'Conflicts':item.Conflicts>0}" title="@Resource.Conflicts"><i class="fa fa-bolt"></i>{{item.Conflicts}}</span>
+                            </div>
+                        </td>
+                        <td style="text-align: center; vertical-align: top;">
+                            <a href="#" class="btn btn-xs btn-default" data-ng-click="CreateBulkSchedule(item)" title="@Resource.Schedule">+ @Resource.Schedule</a>
+                            <a href="#" class="btn btn-xs btn-default yellow-stripe margin-left-05" data-ng-click="CreateBulkSchedule(item,true)" title="@Resource.Reschedule">+ @Resource.Reschedule</a>
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>
+        </div>
+
+
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="EmployeeTSList.length > 0">
+                <div class="col-sm-4 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(EmployeeTSListPager.pageSize * EmployeeTSListPager.currentPage) - EmployeeTSListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(EmployeeTSListPager.pageSize == EmployeeTSListPager.currentPageSize) ? (EmployeeTSListPager.pageSize * EmployeeTSListPager.currentPage) :(EmployeeTSListPager.pageSize * EmployeeTSListPager.currentPage) - EmployeeTSListPager.pageSize  + EmployeeTSListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeTSListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="EmployeeTSListPager.maxSize" on-page-change="EmployeeTSListPager.pageChanged(newPageNumber)" pagination-id="EmployeeTSListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+        <div data-ng-if="EmployeeTSList.length == 0">
+            <div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger padding-5">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="emprefpopup_right col-sm-3 no-right-padding">
+        <div style="background: aliceblue; border: 1px solid darkgray;" ng-if="PrioAuthorizationList.ReferralBillingAuthorizationID !=null && PrioAuthorizationList.ReferralBillingAuthorizationID!=0">
+            <div class="row">
+                @*<span style="font-size:11px">*@
+                <div class="col-sm-6" style="font-size:11px">
+                    <b style="color: #c41212;">AuthCode:</b>{{PrioAuthorizationList.ReferralBillingAuthorizationName}}
+                </div>
+                <div class="col-sm-6" style="font-size:11px">
+                    <b style="color: #c41212;">ServiceCode:</b>{{PrioAuthorizationList.ServiceCode}}
+                </div>
+
+
+                @*<span class="ng-binding"><b style="color: #c41212;">AuthCode:</b>{{PrioAuthorizationList.ReferralBillingAuthorizationName}}<br /> &nbsp;<b style="color: #c41212;">CareType:</b>{{PrioAuthorizationList.CareType}}</span>&nbsp;<br /><span class="ng-binding"><b style="color: #c41212;">ServiceCode:</b>{{PrioAuthorizationList.ServiceCode}}</span><br>
+                        <span class="ng-binding"><b style="color: #c41212;">Allocated:</b>{{PrioAuthorizationList.Allocated}} &nbsp;<b style="color: #c41212;">Unallocated:</b>{{PrioAuthorizationList.Unallocated}} &nbsp;<b style="color: #c41212;">Available:</b>{{PrioAuthorizationList.Available}}</span>&nbsp;<span class="ng-binding"><b style="color: #c41212;">Remaining:</b>{{PrioAuthorizationList.Remaining}}</span><br>
+                        <span class="ng-binding"><b style="color: #c41212;">StartDate:</b>{{PrioAuthorizationList.StartDates}}&nbsp;<b style="color: #c41212;">EndDate:</b>{{PrioAuthorizationList.EndDates}}</span>
+                    </span>*@
+            </div>
+            <div class="row">
+                <div class="col-sm-12" style="font-size:11px">
+
+                    <b style="color: #c41212;">CareType:</b>{{PrioAuthorizationList.CareType}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6" style="font-size:11px">
+                    <b style="color: #c41212;">Allocated:</b>{{PrioAuthorizationList.Allocated}}
+                </div>
+                <div class="col-sm-6" style="font-size:11px">
+                    <b style="color: #c41212;">Unallocated:</b>{{PrioAuthorizationList.Unallocated}}
+                </div>
+
+
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6" style="font-size:11px">
+                    <b style="color: #c41212;">Available:</b>{{PrioAuthorizationList.Available}}
+                </div>
+                <div class="col-sm-6" style="font-size:11px">
+                    <b style="color: #c41212;">Remaining:</b>{{PrioAuthorizationList.Remaining}}
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6" style="font-size:11px">
+                    <b style="color: #c41212;">StartDate:</b>{{PrioAuthorizationList.StartDates}}
+                </div>
+                <div class="col-sm-6" style="font-size:11px">
+                    <b style="color: #c41212;">EndDate:</b>{{PrioAuthorizationList.EndDates}}
+                </div>
+            </div>
+        </div>
+        <div class="emprefsch_constraints">
+            <h5 class="badge badge-warning badge-roundless margin-top-0 margin-bottom-10 font-black font-size-13 font-weight-500">
+                Patient's Visit Frequency
+                <span data-ng-if="!!SearchModel.ReferralTimeSlotMasterID" common-detail-popover data-content="{{SearchModel.ReferralTimeSlotMasterID}}" popover-closeable="false" popover-width="auto">
+                    <i class="fa fa-info-circle"></i>
+                </span>
+            </h5>
+            <div class="row no-left-margin no-right-margin">
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 no-left-padding">
+                    <label>@Resource.PatientPayor</label>
+                    <div>
+                        <div>
+                            <select id="patientPayor" class="form-control input-sm" data-ng-model="SearchModel.PayorID"
+                                    data-val="true" data-val-required="@Resource.PayorRequired" data-original-title="@Resource.PayorRequired"
+                                    data-ng-options="item.PayorID as item.PayorName for item in PatientPayorList" data-ng-change="GetCareTypeOptions()">
+                                <option value="">@Resource.SelectPayor</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 no-padding">
+                    <label class="control-label required">@Resource.CareType</label>
+                    <div>
+                        <div>
+
+                            <select id="patientCareType" class="form-control input-sm" data-ng-model="SearchModel.CareTypeID"
+                                    data-ng-change="GetAutherizationOptions()"
+                                    data-ng-options="item.DDMasterID as item.Title for item in CareTypeList" required>
+                                <option value="">@Resource.SelectCareType</option>
+                            </select>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 no-left-padding">
+                    <label class="control-label">@Resource.AuthorizationCode</label>
+                    <div>
+                        <div>
+                            <select id="patientAutherizationCode" class="form-control input-sm" data-ng-model="SearchModel.ReferralBillingAuthorizationID"
+                                    data-val="true" data-original-title="@Resource.AuthorizationCodeRequired"
+                                    data-ng-options="item.ReferralBillingAuthorizationID as item.ReferralBillingAuthorizationName for item in ReferralAuthorizationServiceCodeList">
+                                <option value="">@Resource.Select</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                @if (Common.HasPermission(Constants.HC_Permission_Schedule_VirtualVisits))
+                {
+                    <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 no-padding">
+                        <label class="control-label"></label>
+                        <div class="padding-top-10">
+                            <input id="chkIsVirtualVisit" class="unicheckbox text-align-center" type="checkbox"
+                                   data-uniform-value="SearchModel.IsVirtualVisit"
+                                   data-ng-model="SearchModel.IsVirtualVisit"
+                                   val="SearchModel.IsVirtualVisit" />
+                            <label for="isVirtualVisit">@Resource.IsVirtualVisit</label><span beta-tag></span>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="row no-left-margin no-right-margin">
+
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 no-left-padding">
+                    @*{{SearchModel.StartDate}}*@
+                    <label>@Resource.StartDate</label>
+                    <div data-ng-if="SearchModel.TimePickerRequire">
+                        <div class="input-group date date-picker pull-right"
+                             datetimepicker="SearchModel.StartDate" ng-dateval="SearchModel.StartDate" data-val="true">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" />
+
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+
+                    <div data-ng-if="!SearchModel.TimePickerRequire">
+                        <div class="input-group date date-picker pull-right"
+                             datepicker="SearchModel.StartDate" ng-dateval="SearchModel.StartDate" data-val="true">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" />
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 no-padding">
+                    <label>@Resource.EndDate</label>
+                    <div data-ng-if="SearchModel.TimePickerRequire">
+                        <div class="input-group date date-picker pull-right"
+                             datetimepicker="SearchModel.EndDate" ng-dateval="SearchModel.EndDate" data-val="true">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" />
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+
+                    <div data-ng-if="!SearchModel.TimePickerRequire">
+                        <div class="input-group date date-picker pull-right"
+                             datepicker="SearchModel.EndDate" ng-dateval="SearchModel.EndDate" data-val="true">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" />
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+            <div class="pull-left clearfix" data-ng-show="PatientRefSchAjaxStart">
+                <img src="~/Assets/images/lazyload.gif" />
+            </div>
+
+
+            <div data-ng-show="RTSMaster.StartDate" class="clearfix">
+                @*<div class="font-size-12">@Resource.From {{RTSMaster.StartDate | orgdate}} @Resource.To {{ RTSMaster.EndDate ? (RTSMaster.EndDate | orgdate): '@Resource.NA'}}</div>*@
+
+                @*<ul class="client_time">
+            <li data-ng-repeat="item in DetailModel.ListETSDetail"><b>{{item.StrDayName}}</b> {{item.StrStartTime}} - {{item.StrEndTime}}</li>
+        </ul>*@
+                <div class="compact" style="max-height: 340px; overflow: auto;">
+                    <table class="table table-bordered table-striped table-condensed flip-content">
+                        <thead class="flip-content">
+                            <tr>
+                                <th>
+                                    <input type="checkbox" id="chkAllFrequency" name="group1"
+                                           class="margin-left-right-3 uniformControls input-xs"
+                                           data-uniform-value="IsCheckedFrequencyAll"
+                                           data-ng-model="IsCheckedFrequencyAll"
+                                           data-ng-change="OnPatientDaySelectionAll(ListRTSDetail)" title="Select all" />
+                                </th>
+                                <th>@Resource.Day</th>
+                                <th>@Resource.StartTime</th>
+                                <th>@Resource.EndTime</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in ListRTSDetail | orderBy: 'Day'" data-ng-class="{'bg-green':item.RemainingSlotCount==0}" class="text-decoration-none">
+                                <td>
+                                    <input type="checkbox" id="{{'#FrequencyRadio-'+item.EmployeeID }}" name="group1"
+                                           class="margin-left-right-3 uniformControls input-xs"
+                                           data-uniform-value="item.IsChecked"
+                                           data-ng-model="item.IsChecked"
+                                           data-ng-change="OnPatientDaySelection(item)" />
+                                    <span common-detail-popover data-content="{{item.ReferralTimeSlotMasterID}}" popover-closeable="false" popover-width="auto">
+                                        <i class="fa fa-info-circle"></i>
+                                    </span>
+                                </td>
+                                <td title="@Resource.ViewAssignedEmployees"
+                                    data-ng-mouseover="SetReferralTimeSlotModel(item)"
+                                    item-detail-popup data-ng-url="GetAssignedEmployeesURL"
+                                    data-ng-search-model="ReferralTimeSlotModel" data-ng-width="400"
+                                    data-ng-template-selector="#popover-assigned-employee" data-popover-cloasble="true">
+                                    {{item.StrDayName}}
+                                </td>
+                                <td title="@Resource.ViewAssignedEmployees"
+                                    data-ng-mouseover="SetReferralTimeSlotModel(item)"
+                                    item-detail-popup data-ng-url="GetAssignedEmployeesURL"
+                                    data-ng-search-model="ReferralTimeSlotModel" data-ng-width="400"
+                                    data-ng-template-selector="#popover-assigned-employee" data-popover-cloasble="true">
+                                    {{item.StrStartTime}}
+                                </td>
+                                <td title="@Resource.ViewAssignedEmployees"
+                                    data-ng-mouseover="SetReferralTimeSlotModel(item)"
+                                    item-detail-popup data-ng-url="GetAssignedEmployeesURL"
+                                    data-ng-search-model="ReferralTimeSlotModel" data-ng-width="400"
+                                    data-ng-template-selector="#popover-assigned-employee" data-popover-cloasble="true">
+                                    {{item.StrEndTime}}
+                                </td>
+                                <td>
+                                    @*<a href="javascript:void(0)">
+                                <i class="fa fa-eye"></i>
+                            </a>*@
+
+                                    <a href="javascript:void(0)" title="@Resource.UnassignSchedule" data-ng-click="DeleteSchedules(item)" class="text-decoration-none">
+                                        <i class="fa fa-trash font-red" style="font-size:15px;"></i>
+                                    </a>
+                                    @*<a href="javascript:void(0)" title="@Resource.PatientDeniedService" class="text-decoration-none" data-ng-if="SearchModel.ScheduleID > 0" data-ng-click="OpenRemoveScheduleModal(item)">
+                                <i class="fa fa-sticky-note"></i>
+                            </a>*@
+
+                                    <a href="javascript:void(0)" title="@Resource.PatientDeniedService" class="text-decoration-none" data-ng-if="ShowPatientDeniedService"
+                                       data-ng-click="OpenRemoveScheduleModal(item)">
+                                        <i class="fa fa-sticky-note"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div data-ng-hide="RTSMaster.StartDate">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger padding-5">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+
+
+
+        <div class="padding-top-10 clearfix">
+            <div class="padding-bottom-30">
+                <h5 class="font-weight-600 text-decoration-underline margin-top-0 margin-bottom-10 font-black font-size-13 font-weight-500 pull-left">@Resource.PatientOnHold</h5>
+                <a href="javascript:void(0)" class="btn btn-xs btn-success pull-right" data-ng-click="OpenPatientHoldModal(true)">+&nbsp;@Resource.PatientHold</a>
+            </div>
+
+            <div class="col-md-12 no-padding">
+                <div>
+
+
+
+                    @*<input type="radio" id="radiocurrent" name="ratecurrent" data-ng-model="PatientOnHold"
+                               ng-value="PatientOnHold" data-ng-click="OnHoldAction(PatientOnHold)"/>
+                        <label for="radiocurrent">@Resource.Hold</label>
+
+
+                        <input type="radio" id="radiocurrentDaily" name="ratecurrent" data-ng-model="PatientOnHold"
+                               ng-value="PatientOnHold" data-ng-click="OnHoldAction(PatientOnHold)"/>
+                        <label for="radiocurrentDaily">@Resource.Unhold</label>
+                        <span class="custom_switchwrapper"></span>*@
+
+                    @*<a data-ng-click="OnHoldUnHoldAction(1)">123123</a>*@
+                    @* <input type="checkbox" id="hldChk"
+                        class="uniformControls input-xs"
+                        data-uniform-value="PatientHoldDetail.PatientOnHold"
+                        data-ng-model="PatientHoldDetail.PatientOnHold"
+                        data-ng-change="OpenPatientHoldModal(false,PatientHoldDetail)" />**@
+
+
+
+                </div>
+            </div>
+
+            <div class="compact" style="max-height: 200px; overflow: auto; clear: both;">
+
+                <div class="pull-left clearfix" data-ng-show="PatientUnHoldActionAjaxStart">
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+
+
+
+                <table class="table table-bordered table-striped table-condensed flip-content clearfix" data-ng-show="PatientHoldDetailList.length>0">
+                    <thead class="flip-content">
+                        <tr>
+                            <th>#</th>
+                            <th>@Resource.StartDate</th>
+                            <th>@Resource.EndDate</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in PatientHoldDetailList" data-ng-class="{'bg-purple-soft':item.CurrentActiveGroup}"
+                            @*data-ng-attr-title="{{item.CurrentActiveGroup?'@Resource.CurrentActivePatientHoldGroup':''}}"*@
+                            data-ng-attr-title="{{'@Resource.HoldReason : '+item.PatientOnHoldReason}}">
+                            <td>
+                                {{$index+1}}
+                            </td>
+                            <td>{{item.StartDate | orgdate}}</td>
+                            <td>{{ item.EndDate ? (item.EndDate | orgdate): '@Resource.NA'}}</td>
+                            <td>
+                                <a href="javascript:void(0)" title="@Resource.PatientUnHold" data-ng-click="OpenPatientHoldModal(false,item)" class="text-decoration-none">
+                                    <i class="fa fa-edit font-black" data-ng-class="{'font-white':item.CurrentActiveGroup,'font-black':!item.CurrentActiveGroup}"></i>
+                                </a>
+                                <a href="javascript:void(0)" title="@Resource.Remove" data-ng-click="OpenPatientHoldModal(false,item,true)" class="text-decoration-none">
+                                    <i class="fa fa-remove font-black" data-ng-class="{'font-white':item.CurrentActiveGroup,'font-black':!item.CurrentActiveGroup}"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script id="schemprefskill-popover" type="text/ng-template">
+
+
+    <div class="col-sm-12 no-padding">
+        <table class="table table-bordered table-striped table-condensed flip-content" data-ng-if="DetailModel.ListEmpRefPreferenceModel.length>0">
+            <tbody>
+                <tr data-ng-repeat="item in DetailModel.ListEmpRefPreferenceModel">
+                    <td>{{item.PreferenceName}}</td>
+                    <td>
+                        <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.IsMatched"></i>
+                        <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.IsMatched"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div data-ng-if="DetailModel.ListEmpRefPreferenceModel.length==0" class="padding-bottom-15px">
+            <span data-ng-if="DetailModel.SearchEmpRefMatchModel.MatchType =='@Preference.PreferenceKeyType.Skill.ToString()'">
+                No patient skills are set. Please set skills from patient menu.
+            </span>
+            <span data-ng-if="DetailModel.SearchEmpRefMatchModel.MatchType =='@Preference.PreferenceKeyType.Preference.ToString()'">
+                No patient preferences are set. Please set preferences from patient menu.
+            </span>
+        </div>
+    </div>
+
+</script>
+
+
+<script id="popover-assigned-employee" type="text/ng-template">
+
+
+
+    <div class="col-sm-12 no-padding assigned-employee">
+
+
+        <div class="pull-left clearfix" data-ng-show="IsLoadingDetails">
+            <img src="/Assets/images/lazyload.gif" />
+        </div>
+
+        <table class="table table-bordered table-striped table-condensed flip-content" data-ng-if="DetailModel.length>0">
+            <tbody>
+            <thead>
+            <th><strong>@Resource.Name</strong></td>
+            <th>
+                <strong>@Resource.MobileNumber</strong></td>
+                </thead>
+            <tr data-ng-repeat="item in DetailModel">
+                <td>
+                    <a href="@Constants.HC_AddEmployee{{item.EncryptedEmployeeID}}" target="_blank">{{item.EmployeeName}}</a>
+                </td>
+                <td>{{item.MobileNumber | phoneformat}}</td>
+
+                @*<td>
+            <a href="javascript:void(0)" target="_blank" data-ng-click="item.ClickCount=item.ClickCount+1">@Resource.ViewDetails</a>
+
+            <div data-ng-repeat="subItem in item.GetAssignedEmployee" data-ng-show="item.ClickCount!=0 && item.ClickCount%2!=0">
+              {{subItem.StartDate | orgdate}}
+            </div>
+
+        </td>*@
+
+            </tr>
+            </tbody>
+        </table>
+
+        <div data-ng-if="DetailModel.length==0" class="padding-bottom-15px">
+            <span>
+                @Resource.NoEmployeesAssigned
+            </span>
+
+        </div>
+
+    </div>
+
+</script>
+
+
+
+
+
+
+<div id="pationOnHoldModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="ClosePatientHoldModal()">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span data-ng-show="PatientHoldDetail.PatientOnHoldAction">@Resource.PatientHold</span>
+                    <span data-ng-show="!PatientHoldDetail.PatientOnHoldAction">@Resource.PatientUnHold</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <span data-ng-show="PatientHoldDetail.PatientOnHoldAction">@Resource.PatientHoldConfirmation</span>
+                <span data-ng-show="!PatientHoldDetail.PatientOnHoldAction">@Resource.PatientUnHoldConfirmation</span>
+                <form id="modalHoldFrom">
+
+                    <div data-ng-if="!PatientHoldDetail.PatientOnHoldAction && !PatientHoldDetail.PatientUnHoldRemoveAction" class="clearfix margin-top-15">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group col-md-6 no-left-padding">
+                                <label class="control-label required">@Resource.UnHoldDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                     datepicker="PatientHoldDetail.UnHoldDate" ng-dateval="PatientHoldDetail.UnHoldDate" data-val="true"
+                                     data-ng-mindate="PatientHoldDetail.StartDate" data-ng-maxdate="PatientHoldDetail.EndDate">
+                                    <input class="form-control input-sm dateInputMask " placeholder='@Resource.UnHoldDate' maxlength="50"
+                                           name="PatientHoldDetail.UnHoldDate" id="PatientHoldDetail_UnHoldDate"
+                                           data-val-required="@Resource.UnHoldDateRequired" data-val="true" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.UnHoldDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div data-ng-show="PatientHoldDetail.PatientOnHoldAction" class="clearfix margin-top-15">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group col-md-6 no-left-padding">
+                                <label class="control-label required">@Resource.StartDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                     datepicker="PatientHoldDetail.StartDate" ng-dateval="PatientHoldDetail.StartDate" data-val="true">
+                                    <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50"
+                                           name="PatientHoldDetail.StartDate" id="PatientHoldDetail_EndDateStartDate"
+                                           data-val-required="@Resource.StartDateRequired" data-val="true" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.StartDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group col-md-6 no-right-padding">
+                                <label class="control-label">@Resource.EndDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                     datepicker="PatientHoldDetail.EndDate" ng-dateval="PatientHoldDetail.EndDate" data-val="true">
+                                    <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50"
+                                           name="PatientHoldDetail.EndDate" id="PatientHoldDetail_EndDate"
+                                           @*data-val-required="@Resource.EndDateRequired"*@ data-val="false" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.EndDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group clearfix">
+                                <label class="control-label required">@Resource.HoldReason</label>
+                                <textarea rows="5" class="form-control input-sm requiredStrip" data-ng-model="PatientHoldDetail.PatientOnHoldReason" maxlength="1000"
+                                          placeholder="@Resource.HoldReason" data-val="true"
+                                          data-val-required="@Resource.HoldReasonRequired"
+                                          name="PatientHoldDetail.PatientOnHoldReason" id="PatientHoldDetail_PatientOnHoldReason"></textarea>
+                                <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.PatientOnHoldReason" data-valmsg-replace="true"></span>
+                            </div>
+
+                            <div class="clearfix">
+                                @Resource.NotifyEmployee <input type="checkbox" id="notifyEmp" class="uniformControls" data-ng-model="PatientHoldDetail.NotifyEmployee" />
+                            </div>
+
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="ClosePatientHoldModal()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="OnHoldUnHoldAction()">
+                        <span data-ng-show="PatientHoldDetail.PatientOnHoldAction">@Resource.Save</span>
+                        <span data-ng-show="!PatientHoldDetail.PatientOnHoldAction">@Resource.Confirm</span>
+                    </button>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+<div id="removeScheduleModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseRemoveScheduleModal()">&times;</button>
+
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span>@Resource.PatientDeniedService</span>
+                </h4>
+
+            </div>
+            <div class="modal-body">
+
+
+                <form id="modalRemoveScheduleForm">
+
+                    <div class="clearfix margin-top-15">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group clearfix">
+                                <label class="control-label required">@Resource.Reason</label>
+                                <textarea rows="5" class="form-control input-sm" data-ng-model="RemoveScheduleDetail.RemoveScheduleReason" maxlength="1000"
+                                          placeholder="@Resource.Note" data-val="true"
+                                          data-val-required="@Resource.ReasonRequired"
+                                          name="RemoveScheduleDetail.Notes" id="RemoveScheduleDetail_Notes"></textarea>
+                                <span class="field-validation-valid" data-valmsg-for="RemoveScheduleDetail_Notes" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseRemoveScheduleModal()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="OnRemoveScheduleAction()">@Resource.Save</button>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+</div>

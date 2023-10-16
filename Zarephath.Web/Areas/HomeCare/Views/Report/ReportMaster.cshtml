@@ -1,0 +1,80 @@
+﻿@{
+    ViewBag.Title = "ReportMaster";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@model ReportInfoModel
+@Html.Hidden("hdn_ReportModel", Common.SerializeObject(Model))
+<h3>
+    @Model.ReportDescription
+</h3>
+
+<div data-ng-controller="ReportMasterController">
+    @*<div class="row" id="report-container">
+            <div class="col-lg-3 col-md-6 col-sm-12" data-ng-repeat="item in ReportMasterList">
+                <div class="mt-element-ribbon bg-grey-steel">
+                    <div class="ribbon  ribbon-color-danger uppercase" style="left:0px !important;top:0px !important" >{{item.ReportName}}</div>
+
+                    <p class="ribbon-content padding-top-45">
+                        <span href="javascript:void(0);" class="display-block pull-left cursor-pointer Text-justify" common-detail-popover="ABC" popover-trigger="click" data-content="{{item.ReportDescription}}"
+                              ng-header="Description">{{item.ReportDescription.length>150 ? item.ReportDescription.substr(0,150)+'......' :  item.ReportDescription}}</span>
+                    </p>
+                    <hr />
+                    <div>
+
+                        <a class="btn btn-sm blue-steel pull-right" data-ng-click="ReportNavigation('@(Model.ReportURL)',item.ReportName)" data-toggle="modal">View Report</a>
+                    </div>
+                    <br />
+                </div>
+            </div>
+        </div>*@
+
+    <form id="empReportsListSearch">
+
+        <div class="row form-group margin-left-5">
+
+            <div class="col-sm-3 padding-right-0">
+                <div class="fields">
+                    <label>@Resource.ReportName</label>
+                    <input type="text" class="form-control input-sm" data-ng-model="ReportName" data-ng-change="SearchReportsList()" placeholder="@Resource.ReportName" />
+                </div>
+            </div>
+
+            <div class="col-sm-3 padding-right-0">
+                <div class="fields">
+                    <label>@Resource.ReportDescription</label>
+                    <input type="text" class="form-control input-sm" data-ng-model="ReportDescription" data-ng-change="SearchReportsList()" placeholder="@Resource.ReportDescription" />
+                </div>
+            </div>
+
+            <div class="col-sm-1 padding-right-0">
+                <div class="clockIn-btn">
+                    <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Search" data-ng-click="SearchReportsList()" />
+                </div>
+            </div>
+            <div class="col-sm-1 padding-right-0">
+                <div class="clockIn-btn">
+                    <input type='button' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Reset" data-ng-click="ResetReportsList()" />
+                </div>
+            </div>
+        </div>
+    </form>
+
+    <div class="col-sm-12">
+        @Html.Partial("Partial/_EmployeeReportList")
+    </div>
+
+    <div class="col-sm-12">
+        @Html.Partial("Partial/_PatientReportList")
+    </div>
+
+    <div class="col-sm-12">
+        @Html.Partial("Partial/_OtherReportList")
+    </div>
+
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/reportmaster.js")
+}

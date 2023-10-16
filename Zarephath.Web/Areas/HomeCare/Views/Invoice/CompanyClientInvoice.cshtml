@@ -1,0 +1,200 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.InvoiceList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //ViewBag.SelectedMenuItem = Resource.SMI_InvoiceList;
+
+}
+
+@model InvoiceViewModel
+@Html.Hidden("hdnSetCompanyInvoiceListPage", Common.SerializeObject(Model))
+
+
+@Html.Partial("_CompnayInvoiceList");
+@*<div data-ng-controller="CompanyInvoiceListController">
+        <div class="page-bar">
+            <h3 class="page-title">
+                @Resource.InvoiceList
+            </h3>
+        </div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                @if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                    {
+                        <div class="btn-group" data-ng-show="PhysicianList.length > 0">
+                            <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                                <input id="SelectAllDxCode" class="unicheckbox text-align-center" data-ng-show="PhysicianList.length > 0" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                <label for="SelectAllDxCode"></label>
+                            </span>
+                        </div>
+                    }
+                <div class="btn-group">
+                    <button id="refreshBtn" class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                    </button>
+                </div>
+                <div class="inline-block pull-right" data-ng-show="InvoiceList.length > 0">
+                    <div class="pull-right margin-left-5">
+                        <dir-pagination-controls boundary-links="true" max-size="InvoiceListPager.maxSize" on-page-change="InvoiceListPager.pageChanged(newPageNumber)" pagination-id="InvoiceListPager_ID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div class="space20"></div>
+        </div>
+        <div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="portlet-body compact" style="display: block;">
+                        <form id="frmDxCodeList ">
+                            <div class="table-responsive tabbable-custom">
+
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+                                            @if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                                {
+                                            <th class="width-20px"></th>
+                                            }
+                                            @if (SessionHelper.RoleID == Constants.SuperAdminRole)
+
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('PatientName')">Invoice Date</a>
+                                                <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                            </th>
+
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceDate')">Due Date@Resource.</a>
+                                                <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceDate'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceAmount')">@Resource.InvoiceAmount</a>
+                                                <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceAmount'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('PaidAmount')">@Resource.PaidAmount</a>
+                                                <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'PaidAmount'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceStatus')">@Resource.InvoiceStatus</a>
+                                                <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceStatus'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-115px">@Resource.Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="compact-search-tr">
+                                            @if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                                {
+                                            <td class="text-align-center">
+                                            </td>
+                                            }
+                                            @if (SessionHelper.RoleID == Constants.SuperAdminRole)
+                                                {
+                                            <td>
+                                                <div class="input-group date date-picker pull-right"
+                                                     datepicker="InvoiceModel.InvoiceDate" ng-dateval="InvoiceModel.InvoiceDate">
+                                                    @Html.TextBoxFor(m => m.InvoiceDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask",
+                                                   maxlength = "50",
+                                                   id = "InvoiceDatePicker",
+                                                   placeholder = Resource.DateFormat
+                                               })
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </td>
+                                            }
+                                            <td>
+                                                <div class="input-group date date-picker pull-right"
+                                                     datepicker="InvoiceModel.DueDate" ng-dateval="InvoiceModel.DueDate">
+                                                    @Html.TextBoxFor(m => m.DueDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask",
+                                                   maxlength = "50",
+                                                   id = "InvoiceDatePicker",
+                                                   placeholder = Resource.DateFormat
+                                               })
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.InvoiceAmount, new { data_ng_model = "InvoiceModel.InvoiceAmount", @class = "form-control input-sm", placeholder = Resource.InvoiceAmount, maxlength = 20 })
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.PaidAmount, new { data_ng_model = "InvoiceModel.PaidAmount", @class = "form-control input-sm", placeholder = Resource.PaidAmount, maxlength = 100 })
+                                            </td>
+                                            <td>
+                                                <select class="form-control input-sm" data-ng-model="InvoiceModel.IsPaid1" id="InvoiceStatusId" name="InvoiceStatus" placeholder="Invoice Status">
+                                                    <option value="" selected>Select</option>
+                                                    <option value="1">Paid</option>
+                                                    <option value="2">Un-Paid</option>
+                                                </select>
+                                            </td>
+                                            <td class="text-align-center">
+                                                <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchInvoice()" />
+                                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                            </td>
+                                        </tr>
+                                        <tr dir-paginate="item in InvoiceList | itemsPerPage: InvoiceListPager.pageSize" total-items="InvoiceListPager.totalRecords" current-page="InvoiceListPager.currentPage" pagination-id="InvoiceListPager_ID">
+                                            @if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                                {
+                                            <td class="text-align-center">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="Invoice.IsChecked" data-ng-change="SelectInvoice(Invoice)" val="Invoice.IsChecked">
+                                            </td>
+                                            }
+                                            @if (SessionHelper.RoleID == Constants.SuperAdminRole)
+                                                {
+                                            <td>{{item.InvoiceDate}}</td>
+                                            }
+                                            <td>{{item.DueDate}}</td>
+                                            <td>{{item.InvoiceAmount ==null|| item.InvoiceAmount =="" ?"0":item.InvoiceAmount}}</td>
+                                            <td>{{item.PaidAmount==null|| item.PaidAmount =="" ?"0":item.PaidAmount}}</td>
+                                            <td>{{item.IsPaid ==false?"Un-Paid":"Paid"}}</td>
+                                            <td class="text-align-center">
+                                                <a href="#" class="btn btn-xs btn-success">@Resource.View</a>
+                                                <a ng-show="!item.IsPaid" data-ng-click="selectedBill(item.EncryptedInvoiceNumber,item.EncryptedAmount,item.EncryptedMonthDate)" class="btn btn-xs btn-success">@Resource.PayNow</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12" data-ng-if="InvoiceList.length > 0">
+                    <div class="col-sm-3 pull-left no-padding">
+                        @Resource.Showing <span data-ng-bind="(InvoiceListPager.pageSize * InvoiceListPager.currentPage) - InvoiceListPager.pageSize  + 1"></span>
+                        &nbsp;@Resource.To <span data-ng-bind="(InvoiceListPager.pageSize == InvoiceListPager.currentPageSize) ? (InvoiceListPager.pageSize * InvoiceListPager.currentPage) :(InvoiceListPager.pageSize * InvoiceListPager.currentPage) - InvoiceListPager.pageSize  + InvoiceListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="InvoiceListPager.totalRecords"></span>&nbsp;@Resource.Records
+                    </div>
+                    <div class="pull-right top pagination-sm">
+                        <dir-pagination-controls boundary-links="true" max-size="InvoiceListPager.maxSize" on-page-change="InvoiceListPager.pageChanged(newPageNumber)" pagination-id="InvoiceListPager_ID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div data-ng-if="InvoiceList.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/areas/homecare/invoice/companyClientInvoiceList")
+
+    <script type="text/javascript">
+        //var DeleteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Invoice)';
+        //var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Invoice)';
+    </script>
+}
+

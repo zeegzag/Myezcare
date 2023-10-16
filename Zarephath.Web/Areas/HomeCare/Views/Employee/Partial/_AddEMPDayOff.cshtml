@@ -1,0 +1,183 @@
+﻿@model SetEmpDayOffListPage
+<div class="modal fade" id="empDayOffModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <form id="frmDayOff">
+        @{ Html.EnableClientValidation(false); }
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1" data-ng-hide="EmployeeDayOff.EmployeeDayOffID>0">@Resource.AddDayOff</h4>
+                    <h4 class="modal-title" id="H1" data-ng-show="EmployeeDayOff.EmployeeDayOffID>0">@Resource.UpdateDayOff</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+
+                            <div class="col-md-12 no-padding">
+
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label class="control-label required">@Resource.Employee</label>
+
+                                    @Html.DropDownListFor(p => p.EmployeeDayOff.EmployeeID, Model.EmployeeList.Where(c => c.IsDeleted == false).ToSelectList(Model.EmployeeDayOff.EmployeeID.ToString() ?? "", "Name", "EmployeeID", Resource.SelectEmployee, ""),
+                                      new
+                                      {
+                                          id = "EmployeeID",
+                                          data_ng_model = "EmployeeDayOff.EmployeeID",
+                                          data_ng_init = "EmployeeDayOff.EmployeeID=EmployeeDayOff.EmployeeID==''?null:EmployeeDayOff.EmployeeID.toString()",
+                                          @class = "form-control input-sm requiredStrip",
+                                          convert_to_number = "",
+                                          data_ng_disabled = "EmployeeDayOffModel.IsPartial",
+                                      })
+                                    @Html.ValidationMessageFor(m => m.EmployeeDayOff.EmployeeID)
+                                </div>
+
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label class="control-label required">@Resource.PTOType</label>
+
+                                    @Html.DropDownListFor(p => p.EmployeeDayOff.DayOffTypeID, Model.DayOffTypes.ToSelectList(Model.EmployeeDayOff.DayOffTypeID.ToString() ?? "", "Name", "Value", Resource.SelectPTOType, ""),
+                                      new
+                                      {
+                                          id = "DayOffTypeID",
+                                          data_ng_model = "EmployeeDayOff.DayOffTypeID",
+                                          data_ng_init = "EmployeeDayOff.DayOffTypeID=EmployeeDayOff.DayOffTypeID==''?null:EmployeeDayOff.DayOffTypeID.toString()",
+                                          @class = "form-control input-sm requiredStrip",
+                                          convert_to_number = "",
+                                          data_ng_disabled = "EmployeeDayOff.IsActionMode",
+                                      })
+                                    @Html.ValidationMessageFor(m => m.EmployeeDayOff.DayOffTypeID)
+                                </div>
+
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label class="control-label required">@Resource.StartTime</label>
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeDayOff.StartTime" ng-dateval="EmployeeDayOff.StartTime" data-ng-maxdate="EmployeeDayOff.EndTime">
+                                        @Html.TextBoxFor(m => m.EmployeeDayOff.StartTime, new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask",
+                                                    placeholder = Resource.DateTimeFormat,
+                                                    data_ng_disabled = "EmployeeDayOff.IsActionMode"
+                                                })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        @Html.ValidationMessageFor(m => m.EmployeeDayOff.StartTime)
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                    <label class="control-label required">@Resource.EndTime</label>
+                                     <div class="input-group date date-picker pull-right"
+                                         datepicker="EmployeeDayOff.EndTime" ng-dateval="EmployeeDayOff.EndTime" data-ng-mindate="EmployeeDayOff.StartTime">
+                                        @Html.TextBoxFor(m => m.EmployeeDayOff.EndTime, new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask",
+                                                    placeholder = Resource.DateTimeFormat,
+                                                    data_ng_disabled = "EmployeeDayOff.IsActionMode"
+                                                })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        @Html.ValidationMessageFor(m => m.EmployeeDayOff.EndTime)
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                    <label class="control-label required">@Resource.CommentReason</label>
+                                    <div class="">
+                                        @Html.TextAreaFor(x => x.EmployeeDayOff.EmployeeComment,
+                                            new
+                                            {
+                                                ng_model = "EmployeeDayOff.EmployeeComment",
+                                                @class = "form-control input-sm",
+                                                placeholder = @Resource.CommentReason,
+                                                data_ng_disabled = "EmployeeDayOff.IsActionMode",
+                                                @rows = "5",
+                                                maxlength = "1000"
+                                            })
+                                        @Html.ValidationMessageFor(m => m.EmployeeDayOff.EmployeeComment)
+                                    </div>
+                                </div>
+
+
+                                <div data-ng-show="EmployeeDayOff.IsActionMode">
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <label class="control-label bold">@Resource.SubmittedBy : &nbsp;</label>
+                                        <span>{{EmployeeDayOff.SubmittedBy}}</span>
+                                    </div>
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <label class="control-label bold">@Resource.SubmittedDate : &nbsp;</label>
+                                        <span>{{EmployeeDayOff.CreatedDate | datetimeformat| orgdatetime}}</span>
+                                    </div>
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <label class="control-label">@Resource.ApproverComment</label>
+                                        <div class="">
+                                            @Html.TextAreaFor(x => x.EmployeeDayOff.ApproverComment,
+                                            new
+                                            {
+                                                ng_model = "EmployeeDayOff.ApproverComment",
+                                                @class = "form-control input-sm",
+                                                placeholder = @Resource.ApproverComment,
+                                                data_ng_disabled = "EmployeeDayOff.ViewOnly",
+                                                @rows = "5",
+                                                maxlength = "1000"
+                                            })
+                                            @Html.ValidationMessageFor(m => m.EmployeeDayOff.ApproverComment)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+
+                    <div data-ng-show="EmployeeDayOff.IsActionMode && !EmployeeDayOff.ViewOnly">
+                        <button type="button" class="btn btn-sm btn-danger red" data-ng-click="DayOffAction('@EmployeeDayOff.EmployeeDayOffStatus.Denied')">@Resource.DenyDayOff</button>
+                        <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="DayOffAction('@EmployeeDayOff.EmployeeDayOffStatus.Approved')">@Resource.ApproveDayOff</button>
+                    </div>
+
+                    <div data-ng-hide="EmployeeDayOff.IsActionMode">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" data-ng-click="OnCloseModel()">@Resource.Cancel</button>
+                        <button type="submit" class="btn btn-sm  green-jungle" data-ng-click="SaveEmployeeDayOff()">@Resource.Save</button>
+                    </div>
+
+
+
+
+                    <div class="compact clearfix margin-top-30" data-ng-if="EmpScheduleList.length>0">
+
+                        <h5 class="text-align-left pull-left font-red font-weight-600">**@Resource.ReschMsg</h5>
+
+
+                        <table class="table table-bordered table-striped table-condensed flip-content text-align-left">
+                            <thead class="flip-content">
+                                <tr>
+                                    @*<th>@Resource.Employee</th>*@
+                                    <th>@Resource.Patient</th>
+                                    <th>@Resource.StartTime</th>
+                                    <th>@Resource.EndTime</th>
+                                    <th>@Resource.Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-repeat="item in EmpScheduleList">
+                                    @*<td>{{item.EmployeeName}}</td>*@
+                                    <td>{{item.ReferralName}}</td>
+                                    <td>{{item.StrStartTime}}</td>
+                                    <td>{{item.StrEndTime}}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-xs red" data-ng-click="RemoveSchedule(item)" title="@Resource.Delete"><i class="glyphicon glyphicon-trash font-size-10"></i></button>
+                                        <button class="btn btn-success btn-xs blue" data-ng-click="OpenEmpRefSchModal(item)" title="@Resource.Reschedule"><i class="glyphicon glyphicon-adjust font-size-10"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+
+
+</div>

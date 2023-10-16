@@ -1,0 +1,160 @@
+﻿@model HC_SearchPayorModel
+<div class="modal fade" id="model__SeachPayor" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                <h4 class="modal-title page-title no-margin">
+                    <b>
+                        <span class="font-size-18">
+                            Search Payor
+                        </span>
+                    </b>
+                </h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            <div class="col-lg-12">
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label">@Resource.PayorId</label>
+                                    @Html.TextBoxFor(q => q.PayorID, new
+                               {
+                                   @class = "form-control input-sm",
+                                   data_ng_model = "SearchPayorModel.PayorID",
+                                   maxlength = 100
+                               })
+                                    @Html.ValidationMessageFor(q => q.PayorID)
+                                </div>
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label">@Resource.PayorName</label>
+                                    @Html.TextBoxFor(q => q.PayorName, new
+                               {
+                                   @class = "form-control input-sm ",
+                                   data_ng_model = "SearchPayorModel.PayorName",
+                                   maxlength = 100
+                               })
+                                    @Html.ValidationMessageFor(q => q.PayorName)
+                                </div>
+
+
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                    <label class="control-label">&nbsp;</label>
+                                    <button type="submit" data-ng-click="SearchPayorClick()" class="btn green-jungle form-control">@Resource.Search</button>
+                                </div>
+
+
+
+
+                            </div>
+
+                            <div class="col-lg-12 clearfix" style="max-height: 400px;overflow: auto;" data-ng-show="PayorList.length > 0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead class="flip-content">
+                                            <tr>
+                                                <th class="width-30px"></th>
+                                                <th class="">
+                                                    <span>@Resource.PayorId</span>
+                                                </th>
+                                                <th class="">
+                                                    <span>@Resource.PayorName</span>
+                                                </th>
+
+                                                <th class="">
+                                                    <span>@Resource.StateCode</span>
+                                                </th>
+                                                <th class="width-90px text-align-center">
+                                                    <span>@Resource.Action</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody data-ng-repeat="item in PayorList">
+                                            <tr id="openTrViewBatch{{$index}}">
+                                                <td>
+                                                    <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle" data-ng-if="item.payer_alt_names.length > 0"
+                                                          @*data-ng-click="GetPayerAltNames(item,'#CNDetails-'+item.payerid)"*@
+                                                          data-ng-attr-id="{{'CNDetails-'+item.payerid }}"
+                                                          data-toggle="collapse"
+                                                          data-ng-attr-data-target="{{'#ChildNoteDetails-'+item.payerid }}">
+                                                    </span>
+                                                </td>
+                                                <td>{{item.payerid}}</td>
+                                                <td>{{item.payer_name}}</td>
+                                                <td>{{item.payer_state}}</td>
+                                                <td class="text-align-center width-160px">
+                                                    <a href="javascript:void(0);" data-ng-click="SelectPayorClick(item)" class="btn btn-xs green float-right">@Resource.Select</a>
+                                                </td>
+                                            </tr>
+                                            <tr data-ng-attr-id="{{'ChildNoteDetails-'+item.payerid }}" class="collapse collapseDestination" data-ng-if="item.payer_alt_names.length > 0">
+
+                                                <td colspan="10" style="background: #efefef !important; ">
+                                                    <div style="float: left; width: 100%; padding: 15px 25px 0 25px;">
+                                                        @*<div class="space5"></div>
+                                                            <div class="col-md-12 no-padding">
+                                                                <strong><u>Payor Alt Names Details</u></strong>
+                                                            </div>*@
+                                                        <div class="space5"></div>
+                                                        <div class="col-md-12 table-responsive tabbable-custom">
+                                                            <table class="table table-bordered">
+                                                                <thead class="flip-content">
+                                                                    <tr>
+                                                                        <th class="width-25px">#</th>
+                                                                        <th class="">Alt Payor Name</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    <tr data-ng-repeat="cnItem in item.payer_alt_names">
+                                                                        @*<td>{{cnItem.alt_payerid}}</td>*@
+                                                                        <td>{{$index + 1}}</td>
+                                                                        <td>{{cnItem.alt_payer_name}}</td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div data-ng-if="PayorList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    @*<div class="form-group col-lg-12 col-md-3 col-sm-3">
+                            <div class="btn-group pull-right">
+                                <button data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Txt',ViewBatchDetailsModel.BatchID,'P')"
+                                        class="btn btn-sm green margin-right-10">@Resource.Generate837P</button>
+                                <button data-ng-click="ValidateAndGenerateEdi837(false,'@Constants.FileExtension_Txt',ViewBatchDetailsModel.BatchID,'I')"
+                                        class="btn btn-sm green">@Resource.Generate837I</button>
+                            </div>
+                        </div>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

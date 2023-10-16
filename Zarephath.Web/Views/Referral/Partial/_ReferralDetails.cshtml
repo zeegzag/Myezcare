@@ -1,0 +1,483 @@
+﻿@model AddReferralModel
+<form id="frmReferral" class="tabclientsMs" method="post">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12"> 
+            <div id="tabs">
+                <div class="tabbable tabbable-custom tabs-left">
+                    <div class="col-lg-12 col-md-12 col-sm-12 no-padding employeeTabsecond">
+                        <ul class="nav nav-tabs tabs-left no-padding">
+                            <li class="active"><a id="addReferralDetails_clientInformation" href="#tab_ClientInformation" data-toggle="tab">@Resource.ClientInformation <span class="badge badge-important" data-ng-hide="ReferralErrorCount.ClientTab.length==0">{{ReferralErrorCount.ClientTab.length }}</span></a></li>
+                            <li class=""><a id="addReferralDetails_contactInformation" href="#tab_ContactInformation" data-toggle="tab">@Resource.ContactInformation<span class="badge badge-important" data-ng-hide="ReferralErrorCount.ContactTab.length==0">{{ReferralErrorCount.ContactTab.length }}</span></a></li>
+                            <li><a id="addReferralDetails_complianceInformation" href="#tab_ComplianceInformation" data-toggle="tab">@Resource.ComplianceInformation<span class="badge badge-important" data-ng-hide="ReferralErrorCount.ComplianceTab.length==0">{{ReferralErrorCount.ComplianceTab.length }}</span></a></li>
+                            <li><a id="addReferralDetails_referralHistory" href="#tab_ReferralHistory" data-toggle="tab">@Resource.ReferralHistory
+                                <br />
+                                <span class="badge badge-important" data-ng-hide="ReferralErrorCount.ReferralHistoryTab.length==0">{{ReferralErrorCount.ReferralHistoryTab.length}}</span></a></li>
+
+                            <li><a id="addreferraldetails_siblings" href="#tab_ReferralSibling" data-toggle="tab">@Resource.Siblings</a></li>
+
+                            @if (Model.Referral.ReferralID > 0)
+                            {
+                                <li class="dropdown">
+                                    <a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false">@Resource.More <i class="fa fa-angle-down"></i></a>
+                                    <ul class="dropdown-menu" role="menu">
+                                        <li><a id="addreferraldetails_auditlogs" href="#tab_ReferralLogs" data-toggle="tab">@Resource.AuditLogs</a></li>
+                                        <li><a id="addreferraldetails_behaviorcontract" href="#tab_ReferralBXCT" data-toggle="tab">@Resource.BehaviorContracts</a></li>
+                                    </ul>
+                                </li>
+                            }
+
+                        </ul>
+                    </div>
+
+                    <div class="tab-content col-lg-12 col-md-12 col-sm-12">
+
+                        <div class="tab-pane active" id="tab_ClientInformation" style="min-height: 350px;"> 
+                            @Html.Partial("Partial/ReferralDetails/_tabClient")
+                        </div>
+
+                        <div class="tab-pane" id="tab_ContactInformation" style="min-height: 350px;">
+                            @Html.Partial("Partial/ReferralDetails/_tabContact")
+                        </div>
+
+                        <div class="tab-pane" id="tab_ComplianceInformation" style="min-height: 350px;">
+                            @Html.Partial("Partial/ReferralDetails/_tabComplianceInformation")
+                        </div>
+
+                        <div class="tab-pane" id="tab_ReferralHistory" style="min-height: 350px;">
+                            @Html.Partial("Partial/ReferralDetails/_tabReferralHistory")
+                        </div>
+
+                        <div class="tab-pane" id="tab_ReferralSibling" style="min-height: 350px;">
+                            @Html.Partial("Partial/ReferralDetails/_ReferralSiblingMapping")
+                        </div>
+
+                        <div class="tab-pane" id="tab_ReferralLogs" style="min-height: 350px;">
+                            @Html.Partial("Partial/ReferralDetails/_tabAuditLog", new RefAuditLogPageModel())
+                        </div>
+
+                        <div class="tab-pane" id="tab_ReferralBXCT" style="min-height: 350px;">
+                            @Html.Partial("Partial/ReferralDetails/_tabBehaviorContract", new RefBXContractPageModel())
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+    {
+        <div class="row-fluid" data-ng-show="ShowSubmitActions">
+            <div class="pull-right">
+                <button class="btn btn-sm red" data-ng-click="Cancel()">
+                    <i class="fa fa-remove">&nbsp;&nbsp;</i>@Resource.Cancel
+                </button>
+
+                @*@if (Model.Referral.IsSaveAsDraft)
+            {
+                *@
+                <button type="button" class="btn btn-sm green-sharp" data-ng-if="ReferralModel.Referral.IsSaveAsDraft==undefined || ReferralModel.Referral.IsSaveAsDraft" data-ng-click="Save(true)">
+                    <i class="fa fa-clipboard ">&nbsp;&nbsp;</i>@Resource.SaveAsDraft
+                </button>
+                @*}*@
+
+
+                <button type="submit" class="btn btn-sm green-jungle" data-ng-click="Save(false)">
+                    <i class="fa fa-save ">&nbsp;&nbsp;</i>@Resource.Save
+                </button>
+                @*<input type="submit" class="btn btn-sm green-jungle" value='@Resource.Save' data-ng-click="Save()"/>*@
+            </div>
+            <div class="space10"></div>
+        </div>
+    }
+
+
+@*</form>*@
+
+</form>
+
+
+<div class="modal fade modal-scroll outComeForm" id="model_AddContact" tabindex="-1" role="dialog" aria-hidden="true">
+    <form id="frmAddContact">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title text-center"><strong>@Resource.AddNewContact</strong></h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div>
+                                <div class="row">
+                                    <div class="form-group col-lg-8 col-md-8 col-sm-8 col-sm-push-2">
+                                        <input type="text"
+                                            token-input
+                                            ng-val="ContactSearchModel.Contacts"
+                                            textfield='FirstName'
+                                            valuefield='ContactID'
+                                            searchurl="{{GetContactListURL}}"
+                                            placeholder="Enter Contact"
+                                            customclass='form-control input-group-sm'
+                                            tokenlimit='1'
+                                            onresultsformatter='ContactResultsFormatter'
+                                            onaddedcallback='ContactAddCallback'
+                                            ondeletecallback='ContactDeleteCallback'
+                                            ontokenformatter="ContactTokenFormatter"
+                                            id="SearchContactToken" />
+                                        @Html.ValidationMessageFor(q => q.ContactSearchModel.SearchText)
+                                    </div>
+
+                                </div>
+                                <hr class="cm-hr" />
+                                <div class="row" data-ng-show="IsContactEditMode">
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <a href="#" class="btn btn-xs green-jungle pull-right" data-ng-click="EditSearchContact()" data-toggle="modal">
+                                            <i class="fa fa-pencil">&nbsp;&nbsp;</i>@Resource.EditContact
+                                        </a>
+                                    </div>
+
+                                </div>
+                                <div class="row" data-ng-if="!CanAddContact">
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <div class="alert alert-danger alert-dismissable">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+                                            <strong>@Resource.Hey</strong> @Resource.DuplicateContactTypeMessage
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" id="modal-body1">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.ContactType</label>
+                                        <div class="input-group-sm">
+                                            <select class="form-control"
+                data-ng-init="ReferralModel.AddAndListContactInformation.ContactTypeID=(ReferralModel.AddAndListContactInformation.ContactTypeID==null || ReferralModel.AddAndListContactInformation.ContactTypeID=='')?'':ReferralModel.AddAndListContactInformation.ContactTypeID.toString()"
+                data-ng-model="ReferralModel.AddAndListContactInformation.ContactTypeID"
+                data-val="true" data-val-required="@Resource.SelectContactType"
+                id="AddAndListContactInformation_ContactTypeID"
+                name="AddAndListContactInformation.ContactTypeID"
+                data-ng-setname="ReferralModel.AddAndListContactInformation.ContactTypeName" data-ng-class="{'valid': !(ReferralModel.AddAndListContactInformation.ContactTypeID == null  || ReferralModel.AddAndListContactInformation.ContactTypeID == '' )}"
+                convert-to-number=""
+                data-ng-disabled="DisableContactType">
+                                                <option value="">@Resource.SelectContactType</option>
+                                                @*disabled="disabled" style="cursor: no-drop; background: red;" convert-to-number = ""*@
+                                                <option data-ng-repeat='contact in ReferralModel.ContactTypeList' value="{{contact.ContactTypeID}}">{{contact.ContactTypeName}}</option>
+                                            </select>
+
+
+
+
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.ContactTypeID)
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.ROIType</label>
+                                        <div class="input-group-sm">
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.ROIType, Model.ROITypes.ToSelectList(Model.AddAndListContactInformation.ROIType.ToString() ?? "", "Name", "Value", @Resource.SelectROIType, ""),
+            new
+            {
+                data_ng_model = "ReferralModel.AddAndListContactInformation.ROIType",
+                data_ng_init = "ReferralModel.AddAndListContactInformation.ROIType=(ReferralModel.AddAndListContactInformation.ROIType==null || ReferralModel.AddAndListContactInformation.ROIType=='') ?'':ReferralModel.AddAndListContactInformation.ROIType.toString()",
+                @class = "form-control input-sm",
+                data_ng_setname = "ReferralModel.AddAndListContactInformation.Name",
+                data_val = false,
+                convert_to_number = ""
+            })
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.ROIType)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.ROIExpireDate</label>
+
+                                        <div class="input-group date" datepicker="ReferralModel.AddAndListContactInformation.ROIExpireDate" ng-dateval="ReferralModel.AddAndListContactInformation.ROIExpireDate">
+                                            <input class="form-control input-sm dateInputMask" placeholder="@Resource.ROIExpireDate"
+               id="AddAndListContactInformation_ROIExpireDate" maxlength="10" name="Referral.ROIExpireDate"
+               type="text">
+                                            @Html.ValidationMessageFor(m => m.AddAndListContactInformation.ROIExpireDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+
+                                    </div>
+                                    <div class="clearleft"></div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.FirstName</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.FirstName, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddAndListContactInformation.FirstName", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.FirstName, maxlength = 50 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.FirstName)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.LastName</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.LastName, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddAndListContactInformation.LastName", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.LastName, maxlength = 50 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.LastName)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.Email</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.Email, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddAndListContactInformation.Email", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.Email, Email = 50 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Email)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.Phone1</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.Phone1, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddAndListContactInformation.Phone1", data_ng_disabled = "IsContactEditMode", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Phone1)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.Phone2</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.Phone2, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddAndListContactInformation.Phone2", data_ng_disabled = "IsContactEditMode", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Phone2)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label" data-ng-class="{'required': ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Primary_Placement)' || ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'}">@Resource.Address</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.Address, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddAndListContactInformation.Address", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.Address, maxlength = 100 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Address)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label" data-ng-class="{'required': ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Primary_Placement)' || ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'}">@Resource.City</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.City, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddAndListContactInformation.City", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.City, maxlength = 50 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.City)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label" data-ng-class="{'required': ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Primary_Placement)' || ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'}">@Resource.State</label>
+                                        <select disabled class="form-control input-sm" data-ng-model="ReferralModel.AddAndListContactInformation.State" data-ng-init="ReferralModel.AddAndListContactInformation.State='@Constants.DefaultStateCode'">
+                                            <option value="@Constants.DefaultStateCode">@Constants.DefaultStateName</option>
+                                        </select>
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.State)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label " data-ng-class="{'required': ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Primary_Placement)' || ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'}">@Resource.ZipCode</label>
+                                        <div data-ng-if="ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Primary_Placement)' || ReferralModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'">
+                                            <zipcode type="text" class="" ng-model="ReferralModel.AddAndListContactInformation.ZipCode" required="@Resource.ZipCodeRequired" data-ng-disabled="IsContactEditMode" modelid="ZipCode"/>
+                                        </div>
+                                        <div data-ng-if="ReferralModel.AddAndListContactInformation.ContactTypeID!='@((int)ContactType.ContactTypes.Primary_Placement)' && ReferralModel.AddAndListContactInformation.ContactTypeID!='@((int)ContactType.ContactTypes.Legal_Guardian)'">
+                                            <zipcode type="text" class="" ng-model="ReferralModel.AddAndListContactInformation.ZipCode" data-ng-disabled="IsContactEditMode" modelid="ZipCode" />
+                                        </div>
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.ZipCode)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.LanguagePreference</label>
+                                        <div class="validate-group input-group-sm">
+
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.LanguageID, Model.LanguageList.ToSelectList(Model.AddAndListContactInformation.LanguageID.ToString() ?? "", "Name", "LanguageID", @Resource.Select, ""),
+            new
+            {
+                data_ng_model = "ReferralModel.AddAndListContactInformation.LanguageID",
+                data_ng_init = "ReferralModel.AddAndListContactInformation.LanguageID=(ReferralModel.AddAndListContactInformation.LanguageID==null || ReferralModel.AddAndListContactInformation.LanguageID == '')?'':ReferralModel.AddAndListContactInformation.LanguageID.toString()",
+                @class = "form-control input-sm",
+                data_ng_setname = "ReferralModel.AddAndListContactInformation.Name",
+                //data_ng_class = "{'valid': !(ReferralModel.AddAndListContactInformation.LanguageID == null  || ReferralModel.AddAndListContactInformation.LanguageID == '' )}",
+                data_ng_disabled = "IsContactEditMode",
+                convert_to_number = ""
+            })
+
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.LanguageID)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ReferralModel.AddAndListContactInformation.ContactTypeID != '@((int)ContactType.ContactTypes.Primary_Placement)' && ReferralModel.AddAndListContactInformation.ContactTypeID != '@((int)ContactType.ContactTypes.Legal_Guardian)'">
+                                        <label class="control-label">@Resource.IsEmergencyContact?</label>
+                                        <div class="input-group-sm">
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.IsEmergencyContact, Model.EmergencyContactList.ToSelectList(Model.AddAndListContactInformation.IsEmergencyContact.ToString() ?? "", "Name", "Value", "", ""),
+            new
+            {
+                data_ng_model = "ReferralModel.AddAndListContactInformation.IsEmergencyContact",
+                data_ng_init = "ReferralModel.AddAndListContactInformation.IsEmergencyContact=(ReferralModel.AddAndListContactInformation.IsEmergencyContact==null || ReferralModel.AddAndListContactInformation.IsEmergencyContact=='')?'':ReferralModel.AddAndListContactInformation.IsEmergencyContact.toString()",
+                @class = "form-control input-sm",
+                data_ng_setname = "ReferralModel.AddAndListContactInformation.Name",
+                //data_val = false
+            })
+
+
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.IsEmergencyContact)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ReferralModel.AddAndListContactInformation.ContactTypeID == '@((int)ContactType.ContactTypes.Primary_Placement)'">
+                                        <label class="control-label">@Resource.IsPrimaryContactLegalGuardian?
+        <i class="fa fa-question-circle" data-ng-tooltip="@Resource.PrimaryLegalGuardianMessage" data-ng-custom-class="tooltip-extra-z-index"></i>
+
+                                        </label>
+                                        <div class="input-group-sm">
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.IsPrimaryPlacementLegalGuardian, Model.PrimaryContactGuardianList.ToSelectList(Model.AddAndListContactInformation.IsPrimaryPlacementLegalGuardian.ToString() ?? "", "Name", "Value", "", ""),
+            new
+            {
+                data_ng_model = "ReferralModel.AddAndListContactInformation.IsPrimaryPlacementLegalGuardian",
+                data_ng_init = "ReferralModel.AddAndListContactInformation.IsPrimaryPlacementLegalGuardian=(ReferralModel.AddAndListContactInformation.IsPrimaryPlacementLegalGuardian==null?'':ReferralModel.AddAndListContactInformation.IsPrimaryPlacementLegalGuardian.toString())",
+                @class = "form-control input-sm",
+                data_ng_setname = "ReferralModel.AddAndListContactInformation.Name",
+                //data_val = false
+            })
+
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.IsPrimaryPlacementLegalGuardian)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ReferralModel.AddAndListContactInformation.ContactTypeID == '@((int)ContactType.ContactTypes.Legal_Guardian)'">
+                                        <label class="control-label">@Resource.IsDCSLegalGuardian?
+        <i class="fa fa-question-circle" data-ng-tooltip="@Resource.DCSLegalGuardianMessage" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="input-group-sm">
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.IsDCSLegalGuardian, Model.DCSGuardianList.ToSelectList(Model.AddAndListContactInformation.IsDCSLegalGuardian.ToString() ?? "", "Name", "Value", "", ""),
+            new
+            {
+                data_ng_model = "ReferralModel.AddAndListContactInformation.IsDCSLegalGuardian",
+                data_ng_init = "ReferralModel.AddAndListContactInformation.IsDCSLegalGuardian=ReferralModel.AddAndListContactInformation.IsDCSLegalGuardian==null?'':ReferralModel.AddAndListContactInformation.IsPrimaryPlacementLegalGuardian.toString()",
+                @class = "form-control input-sm",
+                data_ng_setname = "ReferralModel.AddAndListContactInformation.Name",
+                //data_val = false
+            })
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.IsDCSLegalGuardian)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ReferralModel.AddAndListContactInformation.ContactTypeID == '@((int)ContactType.ContactTypes.Legal_Guardian)' && ReferralModel.AddAndListContactInformation.IsDCSLegalGuardian=='true'">
+                                        <label class="control-label">@Resource.IsNoticeProviderOnFile?</label>
+                                        <div class="input-group-sm">
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.IsNoticeProviderOnFile, Model.NoticeProviderOnFileList.ToSelectList(Model.AddAndListContactInformation.IsNoticeProviderOnFile.ToString() ?? "", "Name", "Value", "", ""),
+            new
+            {
+                data_ng_model = "ReferralModel.AddAndListContactInformation.IsNoticeProviderOnFile",
+                data_ng_init = "ReferralModel.AddAndListContactInformation.IsNoticeProviderOnFile=ReferralModel.AddAndListContactInformation.IsNoticeProviderOnFile==null?'':ReferralModel.AddAndListContactInformation.IsNoticeProviderOnFile.toString()",
+                @class = "form-control input-sm",
+                data_ng_setname = "ReferralModel.AddAndListContactInformation.Name",
+                //data_val = false
+
+            })
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.IsNoticeProviderOnFile)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ReferralModel.AddAndListContactInformation.ContactTypeID == '@((int)ContactType.ContactTypes.Relative)' || ReferralModel.AddAndListContactInformation.ContactTypeID == '@((int)ContactType.ContactTypes.Relative2)'">
+                                        <label class="control-label">@Resource.RelationWithClient</label>
+                                        <div>
+                                            @Html.TextBoxFor(q => q.AddAndListContactInformation.Relation, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddAndListContactInformation.Relation", maxlength = 50, placeholder = @Resource.RelationWithClient })
+                                        </div>
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Relation)
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+
+                    <div class="col-lg-6 col-md-6 margin-bottom-5">
+                        <div class="pull-left">
+                            <input type="checkbox" id="ismarkoffline" data-ng-model="ReferralModel.AddAndListContactInformation.AddNewContactDetails" class="unicheckbox" val="ReferralModel.AddAndListContactInformation.AddNewContactDetails">
+                            <label for="ismarAddNewContactDetails">
+                                <span class="markcomplete">@Resource.DoYouWantToAddAsNew</span>
+                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.DoYouWantToAddAsNewDesc" data-ng-custom-class="tooltip-extra-z-index"></i>
+                            </label>
+                        </div>
+                        @*<div class="no-left-padding">
+                            <label for="ismarkoffline"><strong class="markcomplete">@Resource.MarkAsOffline</strong></label>
+                        </div>*@
+                    </div>
+                    @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                    {
+                        <button class="btn btn-sm red" data-dismiss="modal">@Resource.Cancel </button>
+                        <input type="submit" data-ng-click="SaveContact()" class="btn btn-sm green-jungle" value="@Resource.AddContact"/>
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+ @Html.Partial("Partial/ReferralDetails/_ReferralPayorMappingEditModal")
+
+@*<div class="modal fade modal-scroll updateReferralPayorInfo" id="model_updateReferralPayorInfo" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-md">
+        <form id="frmUpdateReferralPayorInfo">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title text-center"><strong>@Resource.UpdateReferralPayorDetails</strong></h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-sm-12">
+
+                            <div class="col-md-12 no-padding">
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.Payor</label>
+
+                                    @Html.DropDownListFor(p => p.UpdateReferralPayorMapping.PayorID, Model.PayorList.ToSelectList(Model.UpdateReferralPayorMapping.PayorID.ToString() ?? "", "PayorName", "PayorID", @Resource.SelectPayor, ""),
+                                              new
+                                              {
+                                                  convert_to_number = "",
+                                                  data_ng_model = "ReferralModel.UpdateReferralPayorMapping.PayorID",
+                                                  data_ng_init = "ReferralModel.UpdateReferralPayorMapping.PayorID=(ReferralModel.UpdateReferralPayorMapping.PayorID==null || ReferralModel.UpdateReferralPayorMapping.PayorID==0)?'':ReferralModel.UpdateReferralPayorMapping.PayorID",
+                                                  @class = "form-control input-sm",
+                                                  @disabled = "disabled"
+                                              })
+                                    @Html.ValidationMessageFor(q => q.UpdateReferralPayorMapping.PayorID)
+                                </div>
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.EffectiveStartDate</label>
+                                    <div class="input-group date" datepicker="ReferralModel.UpdateReferralPayorMapping.PayorEffectiveDate" ng-dateval="ReferralModel.UpdateReferralPayorMapping.PayorEffectiveDate">
+                                        <input 
+                                                class="form-control input-sm dateInputMask" placeholder="@Resource.EffectiveDate"
+                                                data-val="true"
+                                                data-val-required="@Resource.EffectiveDateRequired" id="UpdateReferralPayorMapping_PayorEffectiveDate" maxlength="50" name="UpdateReferralPayorMapping.PayorEffectiveDate"
+                                                type="text" />
+
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+
+                                    </div>
+                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.PayorEffectiveDate)
+                                </div>
+
+
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label">@Resource.EffectiveEndDate</label>
+                                    <div class="input-group date" datepicker="ReferralModel.UpdateReferralPayorMapping.PayorEffectiveEndDate" ng-dateval="ReferralModel.UpdateReferralPayorMapping.PayorEffectiveEndDate">
+                                        <input
+                                                    class="form-control input-sm dateInputMask" placeholder="@Resource.EffectiveEndDate"
+                                                    id="UpdateReferralPayorMapping_PayorEffectiveEndDate" maxlength="50" name="UpdateReferralPayorMapping.PayorEffectiveEndDate"
+                                                    type="text"/>
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button class="btn btn-sm red" data-dismiss="modal">@Resource.Cancel</button>
+                    <button class="btn btn-sm green-jungle" data-ng-click="UpdateReferralPayorInformation()">@Resource.Save</button>
+
+                </div>
+            </div>
+        </form>
+    </div>
+
+</div>*@

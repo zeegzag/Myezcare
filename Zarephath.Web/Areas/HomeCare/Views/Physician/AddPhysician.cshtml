@@ -1,0 +1,274 @@
+﻿@{
+    bool isEditMode = Model != null && Model.Physician.PhysicianID > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (isEditMode ? Resource.EditPhysician : @Resource.AddPhysician));
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_PhysicianAdd;
+}
+
+
+
+
+@model PhysicianModel
+
+@Html.Hidden("hdnPhysicianModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="AddPhysicianController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditPhysician : @Resource.AddPhysician)
+            <small>@Resource.EnterPhysicianInformation</small>
+            @*<input type="submit" data-ng-click="SavePhysician()" class="btn btn-sm green-jungle pull-right" value="@(isEditMode ? Resource.Update : Resource.Save)" />
+                <a href="@Constants.HC_PhysicianListURL">*@
+
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form class="form-horizontal" id="frmAddPhysician">
+
+                <div class="form-group row">
+                    <div class="col-sm-12">
+
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.PhysicianInformation
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group search">
+                                        <label class="col-md-5 control-label">
+                                            @Resource.Search
+                                            <i class="fa fa-question-circle" data-ng-tooltip="@Resource.SearchText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="col-md-7">
+                                            <div class="">
+                                                <input class="form-control input-sm valid" id="display" type="text" ng-model="Search" />
+                                                <span>
+                                                    <a href="#model_SearchSpecialist" ng-click="SearchSpecialist(Search)" class="btnsearchSpecialist" data-toggle="modal">
+                                                        <i class="fa fa-search"></i>
+                                                    </a>
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.FirstName</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.FirstName, new { @class = "form-control input-sm", data_ng_model = "PhysicianModel.Physician.FirstName", placeholder = @Resource.FirstName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Physician.FirstName)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.MiddleName</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.MiddleName, new { @class = "form-control input-sm", data_ng_model = "PhysicianModel.Physician.MiddleName", placeholder = @Resource.MiddleName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Physician.MiddleName)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.LastName</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.LastName, new { @class = "form-control input-sm", data_ng_model = "PhysicianModel.Physician.LastName", placeholder = @Resource.LastName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Physician.LastName)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Address</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.Address,
+                                                        new
+                                                        {
+                                                            @class = "form-control input-sm",
+                                                            data_ng_model = "PhysicianModel.Physician.Address",
+                                                            placeholder = @Resource.Address,
+                                                            maxlength = 100,
+                                                        })
+                                            @Html.ValidationMessageFor(q => q.Physician.Address)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.City</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.City,
+                                                        new
+                                                        {
+                                                            @class = "form-control input-sm",
+                                                            data_ng_model = "PhysicianModel.Physician.City",
+                                                            placeholder = @Resource.City,
+                                                            maxlength = 50,
+                                                        })
+                                            @Html.ValidationMessageFor(q => q.Physician.City)
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.State</label>
+                                        <div class="col-md-7">
+                                            @Html.DropDownListFor(p => p.Physician.StateCode, Model.StateList.ToSelectList(Model.Physician.StateCode ?? "", "StateName", "StateCode", @Resource.Select, ""),
+                                                        new
+                                                        {
+                                                            data_ng_model = "PhysicianModel.Physician.StateCode",
+                                                            data_ng_init = "PhysicianModel.Physician.StateCode=PhysicianModel.Physician.StateCode==''?null:PhysicianModel.Physician.StateCode",
+                                                            @class = "form-control input-sm requiredStrip",
+
+                                                        })
+                                            @Html.ValidationMessageFor(q => q.Physician.StateCode)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.ZipCode</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.ZipCode, new
+                                       {
+                                           @class = "form-control input-sm",
+                                           data_ng_model = "PhysicianModel.Physician.ZipCode",
+                                           maxlength = Resource.ZipCodemaxlength,
+                                           placeholder = Resource.ZipCodePlaceholder,
+
+                                           dir_valid_number = ""
+                                       })
+                                            @Html.ValidationMessageFor(q => q.Physician.ZipCode)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.Email</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.Email, new { @class = "form-control input-sm", data_ng_model = "PhysicianModel.Physician.Email", placeholder = @Resource.Email, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Physician.Email)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.Phone</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.Phone, new { @class = "form-control input-sm", data_ng_model = "PhysicianModel.Physician.Phone", placeholder = @Resource.Phone, maxlength = 10 })
+                                            @Html.ValidationMessageFor(q => q.Physician.Phone)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.MobileNumber</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.Mobile, new { @class = "form-control input-sm", data_ng_model = "PhysicianModel.Physician.Mobile", placeholder = @Resource.MobileNumber, maxlength = 10 })
+                                            @Html.ValidationMessageFor(q => q.Physician.Mobile)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">
+                                            @Resource.NPINumber
+                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.NPINumberHelptext"
+                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Physician.NPINumber, new {
+                                           id = "NPI",
+                                           @class = "form-control input-sm", data_ng_model = "PhysicianModel.Physician.NPINumber",
+                                           dir_valid_number = "",placeholder = "XXXXXXXXXX",maxlength = 10})
+                                            @Html.ValidationMessageFor(q => q.Physician.NPINumber)
+                                        </div>
+
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Specialist</label>
+                                        <div class="col-md-7">
+                                            <div class="">
+                                                <ul class="token-input-list dx-code-list">
+                                                    <li style="width: 100%;">
+                                                        <input class="form-control input-sm valid" id="display" type="text" ng-model="PhysicianModel.Physician.PhysicianTypeName" ng-change="SearchSpecialistForText(PhysicianModel.Physician.PhysicianTypeName)" />
+                                                        <span ng-if="PhysicianModel.Physician.PhysicianTypeName"
+                                                              ng-click="clearText()"
+                                                              class="glyphicon form-control-feedback"
+                                                              style="cursor: pointer; pointer-events: all; width: 40%;line-height: 64px;"
+                                                              uib-tooltip="clear"
+                                                              id="glyphicon-remove">
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="DxList" ng-if="Search1">
+                                                <div ng-repeat="item in GetSpecialistForText" ng-click="SelectSpecialistForText(item)">
+                                                    @*<b>Name:</b>&nbsp;&nbsp;{{item.Name}}&nbsp;({{item.NPI}})<br />*@
+                                                    <span style="color: #c41212;"><b>Specialist:</b></span>&nbsp;{{item.Type}}<br />
+
+
+                                                </div>
+                                            </div>
+                                            @*@Html.DropDownListFor(p => p.Physician.PhysicianTypeID, Model.PhysicianTypeList.ToSelectList(Model.Physician.PhysicianTypeID ?? "", "PhysicianTypeName", "PhysicianTypeID", @Resource.Select, ""),
+                                                            new
+                                                            {
+                                                                data_ng_model = "PhysicianModel.Physician.PhysicianTypeID",
+                                                                data_ng_init = "PhysicianModel.Physician.PhysicianTypeID=PhysicianModel.Physician.PhysicianTypeID==''?null:PhysicianModel.Physician.PhysicianTypeID",
+                                                                @class = "form-control input-sm required1",
+
+                                                            })
+                                                @Html.ValidationMessageFor(q => q.Physician.PhysicianTypeID)*@
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="col-md-12 form-group text-center">
+
+                    <input type="submit" data-ng-click="SavePhysician()" class="btn btn-sm green-jungle" value="@(Model != null && Model.Physician.PhysicianID > 0 ? Resource.Update : Resource.Save)" />
+
+                    <a>
+                        <input type="button" class="btn btn-sm red-mint" data-ng-click="Cancel()" value="@Resource.Cancel" />
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+    <!--Open Search Model for Specialist--->
+    <div class="modal fade modal-scroll outComeForm" id="model_SearchSpecialist" tabindex="-1" role="dialog" aria-hidden="true">
+        <form id="frmSearchSpecialist">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <a class="close" data-dismiss="modal">&times;</a>
+                        <h4 class="modal-title text-center"><strong>Search List</strong></h4>
+                    </div>
+                    <hr />
+                    <div class="modal-body">
+                        <div class="medication-popup">
+                            <div class="row" data-ng-repeat="item in GetSpecialist">
+                                <div class="form-group col-lg-9 col-md-9 col-sm-12">
+                                    <div class="medicationName"><label><strong>NPI:</strong></label>{{item.NPI}}</div>
+                                    <div class="medication-list2">
+                                        <div class="dosageForm"><label><strong>Name:</strong></label> {{item.Name}}</div>
+                                        <div class="brandName"><label><strong>Specialist:</strong></label>{{item.Type}}</div>
+                                        <div class="route"><label><strong>PracticeAddress:</strong></label> {{item.PracticeAddress}}</div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-3 col-md-3 col-sm-12 text-right">
+                                    <button class="btn btn-default blue btn-sm" data-dismiss="modal" ng-click="SelectSpecialist(item)">Select</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/physician/addphysician")
+}

@@ -1,0 +1,250 @@
+﻿@{
+    ViewBag.Title = "FormLoad";
+    Layout = "~/Views/Shared/_EmptyLayout.cshtml";
+}
+
+@model SaveNewEBFormModel
+@Html.Hidden("hdn_Model", Common.SerializeObject(Model))
+<div data-ng-controller="FormController">
+
+
+    <table >
+        <tr  >
+            <td  >
+                <iframe id="myIFrame1" style="position: absolute;  top: 0px; left: 0px; bottom:50px; right: 0px; width: 100%; height: 90%; border: none; margin: 0; padding: 0; overflow: hidden; z-index: 999999;"></iframe>
+            </td>
+
+        <tr>
+            <td >
+                @if (Model.IsEditMode)
+                {
+                    <button class="btn btn-lg btn-success" data-ng-click="SubmitFormClick()" style="position: relative; position: absolute;
+        bottom: 10px;
+        width: 20%;
+        margin-left:35%;
+        border: 3px solid #ffffff;z-index: 99999999;">@Resource.SubmitForm</button>}
+            </td>
+        </tr>
+        
+
+
+    </table>
+  </div>
+
+        @*<iframe id="myIFrame1"
+                  style="position: absolute; top: 0px; left: 0px; bottom: 0px; right: 0px; width: 100%; height: 100%; border: none; margin: 0; padding: 0; overflow: hidden; z-index: 999999;"></iframe>
+
+          @if (Model.IsEditMode)
+          {
+              <div class="SaveForm col-lg-12 text-align-center clearfix padding-top-30" style="position: relative; position: absolute;
+        bottom: 10px;
+        width: 100%;
+        border: 3px solid #ffffff;z-index: 99999999;">
+                  <button class="btn btn-lg btn-success" data-ng-click="SubmitFormClick()">@Resource.SubmitForm</button>
+              </div>
+          }
+</div>*@
+
+
+
+@section Scripts{
+    <script type="text/javascript">
+
+        var VMM;
+        controllers.FormController = function ($scope, $http, $window) {
+            VMM = $scope;
+
+            $scope.HtmlData = $.parseJSON($("#hdn_Model").val());
+
+            //#region Validation Scrap Code
+//            $scope.ValidateInput = function (ele, value) {
+               
+//                var id = $(ele).attr("id");
+//                var newID = id + '_error';
+//                var isRequired = $(ele).attr("requiredVal") == 'true';
+
+//                if (isRequired == true && ValideElement(value) == false) {
+
+//                    var message = $(ele).attr("requiredMessage");
+//                    var errHTML = "<span id=" + newID + ">" + message + "</span>";
+//                    $(ele).after(errHTML);
+             
+//                }
+//                else {
+
+////$("#newID").remove(errHTML);
+//                    $("span").remove();
+
+//                  //  $("myIFrame1").submit(function () {
+//                    //    alert("Submitted");
+//                    //  });
+//                 //   debugger
+//                   // $("#myIFrame1").submit();
+
+//                                  //    $("#newID").find("span").remove();
+//                    // $("#newID").remove(errHTML);
+//                     //$(ele).remove(errHTML);
+//                  //  $('span[id^="junk"]').remove();
+//                   // removeAttr("requiredMessage");
+
+                
+//                }
+
+//            }
+//#endregion Validation Scrap Code
+
+            $scope.getQueryString = function (field, url) {
+                var href = url ? url : window.location.href;
+                var reg = new RegExp('[?&]' + field + '=([^&#]*)', 'i');
+                var string = reg.exec(href);
+                return string ? string[1] : null;
+            };
+
+            $scope.SubmitFormClick = function () {
+                
+                var iFrame1 = document.getElementById('myIFrame1');
+             
+
+                $.each($(iFrame1).contents().find('input'), function (index, data) {
+
+                    var inputType = $(data).attr('type');
+
+                    if (inputType === "text" || inputType === "email") {
+
+                        //$scope.ValidateInput($(data), $(data).val());
+
+                        var a = $(data).val();
+                        $(data).attr("value", a);
+
+
+                        
+                    }
+                    else if (inputType === "checkbox" || inputType === "radio") {
+                        var value = $(data).prop("checked");
+                        if (value)
+                            $(data).attr("checked", "checked");
+                    }
+                    else if (inputType === "date") {
+                        var a = $(data).val();
+                        $(data).attr("value", a);
+                    }
+
+
+                  
+                   
+
+                });
+                
+                $.each($(iFrame1).contents().find('select'), function (index, element) {
+                    var selectedOption = $(element).find(":selected");
+                    $(element).children("option").removeAttr("selected");
+                    $(selectedOption).attr("selected", "selected");
+                });
+
+              
+
+                $.each($(iFrame1).contents().find('textarea'), function (index, element) {
+                    var textVal = $(element).val();
+                    $(element).html(textVal);
+                });
+                
+
+                var doc1 = iFrame1.contentDocument ? iFrame1.contentDocument : iFrame1.contentWindow.document;
+                var stringHTML = doc1.children[0].outerHTML;
+                
+                //var objValue = { "Value": stringHTML };
+                //var jsonData = angular.toJson({ obj: objValue });
+                var jsonData = angular.toJson({
+                    "HTMLFormContent": stringHTML,
+                    "EBriggsFormID": $scope.HtmlData.EBriggsFormID,
+                    "OriginalEBFormID": $scope.HtmlData.OriginalEBFormID,
+                    "FormId": $scope.HtmlData.FormId,
+                    "EmployeeID": $scope.HtmlData.EmployeeID,
+                    "ReferralID": $scope.HtmlData.ReferralID,
+                    "EbriggsFormMppingID": $scope.HtmlData.EbriggsFormMppingID,
+                    "SubSectionID": $scope.getQueryString('SubSectionID',CurrentURL)
+                });
+                $scope.SaveForm(jsonData);
+            }
+
+            $scope.SaveForm = function (jsonData) {
+                AngularAjaxCall($http, HomeCareSiteUrl.SaveNewEBFormURL, jsonData, "post", "json", "application/json", true).success(function (response, status, headers, config) {
+                    if (response.IsSuccess) {
+
+                        var resData = {
+                            "OrgPageID": getParam("OrgPageID"),
+                            "PrimaryID": response.Data
+                        };
+                        resData = JSON.stringify(resData);
+                        if (window.opener) {
+                            window.opener.postMessage(resData, "*");
+                        }
+                        else if (parent) {
+                            parent.postMessage(resData, "*");
+                            if (getParam("OrgPageID") == "Mobile") {
+                                window.webkit.messageHandlers.userLogin.postMessage(resData);
+                                myOwnJSHandler.receiveMessageFromJS(data);
+                            }
+                            //window.webkit.messageHandlers.userLogin.postMessage(resData);
+                            //myOwnJSHandler.receiveMessageFromJS(data);
+                        }
+
+
+                    }
+                });
+            }
+
+
+
+        };
+        controllers.FormController.$inject = ['$scope', '$http', '$window'];
+
+        $(document).ready(function () {
+            
+            //var HtmlData = $.parseJSON($("#hdn_Model").val());
+
+            var doc = document.getElementById('myIFrame1').contentWindow.document;
+            doc.open();
+            doc.write(VMM.HtmlData.HTMLFormContent);
+            doc.close();
+
+
+            //$(".SaveForm").click(function () {
+
+            //    var iFrame1 = document.getElementById('myIFrame1');
+            //    $.each($(iFrame1).contents().find('input'), function (index, data) {
+
+            //        var inputType = $(data).attr('type');
+            //        if (inputType === "text") {
+            //            var a = $(data).val();
+            //            $(data).attr("value", a);
+            //        }
+            //        else if (inputType === "checkbox" || inputType === "radio") {
+            //            var value = $(data).prop("checked");
+            //            if (value)
+            //                $(data).attr("checked", "checked");
+            //        }
+
+            //    });
+
+            //    var doc1 = iFrame1.contentDocument ? iFrame1.contentDocument : iFrame1.contentWindow.document;
+            //    var stringHTML = doc1.children[0].outerHTML;
+            //    //var objValue = { "Value": stringHTML };
+            //    //var jsonData = angular.toJson({ obj: objValue });
+            //    var jsonData = angular.toJson({
+            //        "HTMLFormContent": stringHTML,
+            //        "EBriggsFormID": HtmlData.EBriggsFormID,
+            //        "OriginalEBFormID": HtmlData.OriginalEBFormID,
+            //        "FormId": HtmlData.FormId,
+            //        "EmployeeID": HtmlData.EmployeeID,
+            //        "ReferralID": HtmlData.ReferralID
+            //    });
+
+            //    VMM.SaveForm(jsonData);
+            //});
+
+            
+        });
+    </script>
+    }
+   

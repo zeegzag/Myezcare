@@ -1,0 +1,741 @@
+﻿@{
+    ViewBag.Title = "Group Timesheet";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_GroupTimesheetReports;
+}
+
+@model SetGroupTimesheetPage
+@Html.Hidden("hdnSetGroupTimesheetListPage", Common.SerializeObject(Model))
+
+<style>
+    .form-group .fields label {
+        margin-left: 2px;
+    }
+
+    .btn-default:hover, .btn-default:focus, .btn-default.focus {
+        background-color: white;
+    }
+
+    .btn-default:active, .btn-default.active, .open > .btn-default.dropdown-toggle {
+        background-color: white;
+    }
+
+        .btn-default:active:hover, .btn-default:active:focus, .btn-default:active.focus, .btn-default.active:hover, .btn-default.active:focus, .btn-default.active.focus, .open > .btn-default.dropdown-toggle:hover, .open > .btn-default.dropdown-toggle:focus, .open > .btn-default.dropdown-toggle.focus {
+            background-color: white;
+        }
+
+    .bootstrap-select .dropdown-toggle:focus {
+        outline: none !important;
+    }
+</style>
+
+<div data-ng-controller="GroupTimesheetListController">
+
+    <div class="page-bar">
+        <h3 class="page-title">
+            Group Timesheet
+        </h3>
+    </div>
+
+    <div>
+        <steps>
+            <step class="step1" name="first">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Step 1: Select the patient schedule(s)</h3>
+                    </div>
+                    <div class="panel-body">
+
+                        <form id="frmFilters">
+
+                            <div class="row form-group">
+                                @if (SessionHelper.IsHomeCare || SessionHelper.IsCaseManagement)
+                                {
+                                    <div class="col-sm-2 small-select padding-right-0">
+                                        <div class="fields">
+                                            <label>@Resource.Employee</label>
+                                            <select class="form-control input-sm" title="@Resource.SelectEmployee"
+                                                    data-val="true" actions-box="true" multiple="multiple"
+                                                    selectpicker="SearchGroupTimesheetListPage.EmployeeIDs" name="SearchGroupTimesheetListPage.EmployeeIDs">
+                                                <option data-ng-repeat="option in GroupTimesheetModel.EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+
+                                @if (SessionHelper.IsDayCare)
+                                {
+                                    <div class="col-sm-2 small-select padding-right-0">
+                                        <div class="fields">
+                                            <label>@Resource.Facility</label>
+                                            <select class="form-control input-sm" title="@Resource.SelectFacility"
+                                                    data-val="true" actions-box="true" multiple="multiple"
+                                                    selectpicker="SearchGroupTimesheetListPage.FacilityIDs" name="SearchGroupTimesheetListPage.FacilityIDs">
+                                                <option data-ng-repeat="option in GroupTimesheetModel.FacilityList" value="{{option.FacilityID}}">{{option.FacilityName}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                }
+
+
+                                <div class="col-sm-2 small-select padding-right-0">
+                                    <div class="fields">
+                                        <label>@Resource.Patient</label>
+                                        <select class="form-control input-sm" title="@Resource.SelectPatient"
+                                                data-val="true" actions-box="true" multiple="multiple"
+                                                selectpicker="SearchGroupTimesheetListPage.ReferralIDs" name="SearchGroupTimesheetListPage.ReferralIDs">
+                                            <option data-ng-repeat="option in GroupTimesheetModel.ReferralList" value="{{option.ReferralID}}">{{option.ReferralName}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2 small-select padding-right-0">
+                                    <div class="fields">
+                                        <label>@Resource.CareType</label>
+                                        @Html.TextBoxFor(p => p.SearchGroupTimesheetListPage.CareTypeIDs,
+                                        new
+                                        {
+                                            data_ng_model = "SearchGroupTimesheetListPage.CareTypeIDs",
+                                            @class = "form-control hideErrorContent replaceErrorSource",
+                                            id = "CareTypeIDs"
+                                        })
+                                        <div class="replaceErrorDest requiredStrip">
+                                            <select class="form-control input-sm" title="@Resource.SelectCareType"
+                                                    data-val="true" actions-box="true"
+                                                    selectpicker="SearchGroupTimesheetListPage.CareTypeIDs" id="SearchGroupTimesheetListPage.CareTypeIDs"
+                                                    name="SearchGroupTimesheetListPage.CareTypeIDs" required data-val-required="Service is required">
+                                                <option data-ng-repeat="option in GroupTimesheetModel.CareTypeList" value="{{option.CareTypeID}}">{{option.CareType}}</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-2 small-select padding-right-0">
+                                    <div class="fields">
+                                        <label>@Resource.TypesOfTimeSheet</label>
+                                        <div class="replaceErrorDest requiredStrip">
+                                            <select class="form-control input-sm" title="@Resource.SelectTypesOfTimeSheet"
+                                                    data-val="true" actions-box="true"
+                                                    data_ng_model="SearchGroupTimesheetListPage.TypesOfTimeSheet" ,
+                                                    id="SearchGroupTimesheetListPage.TimeSheetIDs"
+                                                    name="SearchGroupTimesheetListPage.TimeSheetIDs" required data-val-required="Type is required">
+                                                <option value="missing">@Resource.MissingTimeSheet</option>
+                                                <option value="incomplete" selected>@Resource.IncompleteTimeSheet</option>
+                                                @*<option value="new">@Resource.NewTimeSheet</option>*@
+                                            </select>
+                                        </div>
+
+                                        @*<input type="text" name="TimeSheetType"/>*@
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2 small-select padding-right-0">
+                                    <div class="fields">
+                                        <label>From Date</label>
+                                        <div class="input-group date date-picker pull-right"
+                                             datepicker="SearchGroupTimesheetListPage.StartDate" ng-dateval="SearchGroupTimesheetListPage.StartDate" data-ng-maxdate="SearchGroupTimesheetListPage.EndDate">
+                                            @Html.TextBoxFor(m => m.SearchGroupTimesheetListPage.StartDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask requiredStrip",
+                                                   maxlength = "50",
+                                                   placeholder = Resource.DateFormat,
+                                                   @required = "true",
+                                                   autocomplete = "off"
+                                               })
+                                            @Html.ValidationMessageFor(m => m.SearchGroupTimesheetListPage.StartDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-2 small-select padding-right-0">
+                                    <div class="fields">
+                                        <label>To Date</label>
+                                        <div class="input-group date date-picker pull-right"
+                                             datepicker="SearchGroupTimesheetListPage.EndDate" ng-dateval="SearchGroupTimesheetListPage.EndDate" data-ng-mindate="SearchGroupTimesheetListPage.StartDate">
+                                            @Html.TextBoxFor(m => m.SearchGroupTimesheetListPage.EndDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask requiredStrip",
+                                                   maxlength = "50",
+                                                   placeholder = Resource.DateFormat,
+                                                   @required = "true",
+                                                   autocomplete = "off"
+                                               })
+                                            @Html.ValidationMessageFor(m => m.SearchGroupTimesheetListPage.EndDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-sm-1 padding-right-0">
+                                    <div class="clockIn-btn">
+                                        <input type="button" class="btn btn-sm btn-primary" value="@Resource.Search" data-ng-click="SearchGroupTimesheet()">
+                                    </div>
+                                </div>
+                                <div class="col-sm-1 padding-right-0">
+                                    <div class="clockIn-btn">
+                                        <input type="button" class="btn btn-sm btn-default" value="@Resource.Reset" data-ng-click="ResetSearchFilter()">
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="filter-cols">
+                            <div class="col-md-12 col-sm-12 col-xs-12">
+                                <div class="inline-block pull-left" data-ng-show="SelectedItemCount > 0">
+                                    <span><span style="font-weight:600">Selected : </span>{{SelectedItemCount}}</span>
+                                </div>
+                                <div class="inline-block pull-right" data-ng-show="GroupTimesheetList.length > 0">
+                                    <span><span style="font-weight:600">Total Record: </span>{{TotalRecord}}</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="emp-visit-table">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact " style="display: block;">
+                                        <form id="frmGroupTimesheetList">
+                                            <div class="table-responsive employeetable ">
+                                                <table class="table table-bordered table-condensed flip-content empvisitlist_tbl employeetable">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th class="width-20px text-align-center">
+                                                                <div class="btn-group" data-ng-show="GroupTimesheetList.length > 0">
+                                                                    <input id="chkSelectAll" class="unicheckbox" type="checkbox" data-ng-checked="SelectAllCheckbox" data-ng-click="SelectAll()" val="SelectAllCheckbox">
+                                                                </div>
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                @if (SessionHelper.IsHomeCare)
+                                                                {
+                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="GroupTimesheetListPager.sortColumn('Name')">@Resource.EmployeeName</a>
+                                                                }
+                                                                @if (SessionHelper.IsDayCare)
+                                                                {
+                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="GroupTimesheetListPager.sortColumn('Name')">@Resource.FacilityName</a>
+                                                                }
+                                                                <span class="sortorder" data-ng-show="GroupTimesheetListPager.sortIndex === 'Name'" data-ng-class="{reverse:GroupTimesheetListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="GroupTimesheetListPager.sortColumn('PatientName')">@Resource.PatientName</a>
+                                                                <span class="sortorder" data-ng-show="GroupTimesheetListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:GroupTimesheetListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="width-110px">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="GroupTimesheetListPager.sortColumn('PayorName')"> @Resource.Payor</a>
+                                                                <span class="sortorder" data-ng-show="GroupTimesheetListPager.sortIndex === 'PayorName'" data-ng-class="{reverse:GroupTimesheetListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="width-110px">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="GroupTimesheetListPager.sortColumn('CareType')">@Resource.CareType</a>
+                                                                <span class="sortorder" data-ng-show="GroupTimesheetListPager.sortIndex === 'CareType'" data-ng-class="{reverse:GroupTimesheetListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="width-110px">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="GroupTimesheetListPager.sortColumn('CareType')">@Resource.AuthorizationCode</a>
+                                                                <span class="sortorder" data-ng-show="GroupTimesheetListPager.sortIndex === 'AuthorizationCode'" data-ng-class="{reverse:GroupTimesheetListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="GroupTimesheetListPager.sortColumn('StartDate')">@Resource.ScheduleStartDate</a>
+                                                                <span class="sortorder" data-ng-show="GroupTimesheetListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:GroupTimesheetListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="GroupTimesheetListPager.sortColumn('EndDate')">@Resource.ScheduleEndDate</a>
+                                                                <span class="sortorder" data-ng-show="GroupTimesheetListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:GroupTimesheetListPager.reverse}"></span>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr data-ng-repeat="GroupTimesheet in GroupTimesheetList ">
+
+                                                            <td class="text-align-center">
+                                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="GroupTimesheet.IsChecked" data-ng-change="SelectGroupTimesheet(GroupTimesheet)" val="GroupTimesheet.IsChecked">
+                                                            </td>
+                                                            <td data-ng-class="GroupTimesheet.RowMarkerClass">
+                                                                <div class="alert-mark">
+                                                                    <span data-ng-if="GroupTimesheet.AnyActionMissing==0">
+                                                                        <a class="text-decoration-none font-size-14 webpop" style="color: red !important;" item-detail-popup-new
+                                                                           data-ng-model="GroupTimesheet" data-ng-template-selector="#GroupTimesheet-popover" data-popover-cloasble="true">
+                                                                            <i class="fa  fa-exclamation-circle"></i>
+                                                                        </a>
+                                                                    </span>
+                                                                    <span data-ng-if="GroupTimesheet.AnyActionMissing==1">
+                                                                        <a class="text-decoration-none font-size-14 webpop" style="color: green !important;" item-detail-popup-new
+                                                                           data-ng-model="GroupTimesheet" data-ng-template-selector="#GroupTimesheet-popover" data-popover-cloasble="true">
+                                                                            <i class="fa fa-info-circle"></i>
+                                                                        </a>
+                                                                    </span>
+                                                                    @if (!SessionHelper.IsDayCare)
+                                                                    {
+                                                                        <span>
+                                                                            {{GroupTimesheet.EmployeeName}}
+                                                                        </span>
+                                                                    }
+                                                                    @if (SessionHelper.IsDayCare)
+                                                                    {
+                                                                        <span>
+                                                                            {{GroupTimesheet.FacilityName}}
+                                                                        </span>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <span>
+                                                                    {{GroupTimesheet.PatientName}}
+                                                                </span>
+                                                            </td>
+                                                            <td>{{GroupTimesheet.PayorName }}</td>
+                                                            <td>{{GroupTimesheet.CareType}}</td>
+                                                            <td>{{GroupTimesheet.AuthorizationCode}}</td>
+                                                            <td>{{GroupTimesheet.StartDate | orgdate' }}</td>
+                                                            <td>{{GroupTimesheet.EndDate | orgdate }}</td>
+                                                        </tr>
+                                                        <tr data-ng-if="GroupTimesheetList.length == 0">
+                                                            <td class="p-0" colspan="8">
+                                                                <div class="alert alert-danger margin-bottom-0">
+                                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="row">
+                                    <div class="col-sm-12" data-ng-if="GroupTimesheetList.length > 0">
+                                        <div class="col-sm-3 pull-left no-padding">
+                                            @Resource.Showing <span data-ng-bind="(GroupTimesheetListPager.pageSize * GroupTimesheetListPager.currentPage) - GroupTimesheetListPager.pageSize  + 1"></span>
+                                            &nbsp;@Resource.To <span data-ng-bind="(GroupTimesheetListPager.pageSize == GroupTimesheetListPager.currentPageSize) ? (GroupTimesheetListPager.pageSize * GroupTimesheetListPager.currentPage) :(GroupTimesheetListPager.pageSize * GroupTimesheetListPager.currentPage) - GroupTimesheetListPager.pageSize  + GroupTimesheetListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="GroupTimesheetListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                        </div>
+                                        <div class="pull-right top pagination-sm">
+                                            <dir-pagination-controls boundary-links="true" max-size="GroupTimesheetListPager.maxSize" on-page-change="GroupTimesheetListPager.pageChanged(newPageNumber)" pagination-id="GroupTimesheetListPager_ID"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>*@
+                        </div>
+                    </div>
+                    <div class="clearfix panel-footer">
+                        <button class="btn btn-success pull-right" data-ng-disabled="SelectedScheduleIds.length === 0" ng-click="stepNext();">Next <i class="glyphicon glyphicon-chevron-right"></i></button>
+                    </div>
+                </div>
+            </step>
+            <step class="step2" name="second">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Step 2: Confirm clock-in and clock-out time</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="emp-visit-table">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact " style="display: block;">
+                                        <form id="frmGroupTimesheetListEditable">
+                                            <div class="employeetable">
+                                                <table class="table table-bordered table-condensed flip-content empvisitlist_tbl employeetable">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th class="width-150px">
+                                                                @Resource.EmployeeName
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                @Resource.PatientName
+                                                            </th>
+                                                            <th class="width-110px">
+                                                                @Resource.Payor
+                                                            </th>
+                                                            <th class="width-110px">
+                                                                @Resource.CareType
+                                                            </th>
+                                                            <th class="width-110px">
+                                                                @Resource.AuthorizationCode
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                @Resource.ScheduleStartDate
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                @Resource.ScheduleEndDate
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                @Resource.ClockInTime
+                                                                <input type="text" ng-model="ClockInTimeOverrideValue"
+                                                                       class="form-control input-sm time"
+                                                                       style="margin-bottom: 0.5rem"
+                                                                       placeholder=@Resource.ClockInTime
+                                                                       time_input_mask=""
+                                                                       id="ClockInTimeOverrideValue"
+                                                                       name="ClockInTimeOverrideValue" />
+
+                                                                <button class="btn btn-danger btn-sm" style="margin-left:3.5rem;position: inherit !important; font-size: 8px"
+                                                                        ng-click="OverrideClockInValues(true)">
+                                                                    Reset
+                                                                </button>
+                                                                <button class="btn btn-info btn-sm pull-right" style="position: inherit !important; font-size: 8px"
+                                                                        ng-click="OverrideClockInValues(false, ClockInTimeOverrideValue)">
+                                                                    Apply All
+                                                                </button>
+                                                            </th>
+                                                            <th class="width-150px">
+                                                                @Resource.ClockOutTime
+                                                                <input type="text" ng-model="ClockOutTimeOverrideValue"
+                                                                       class="form-control input-sm time"
+                                                                       style="margin-bottom: 0.5rem"
+                                                                       placeholder=@Resource.ClockOutTime
+                                                                       time_input_mask=""
+                                                                       id="ClockOutTimeOverrideValue"
+                                                                       name="ClockOutTimeOverrideValue" />
+
+                                                                <button class="btn btn-danger btn-sm " style="margin-left: 3.5rem; position: inherit !important; font-size: 8px"
+                                                                        ng-click="OverrideClockOutValues(true)">
+                                                                    Reset
+                                                                </button>
+                                                                <button class="btn btn-info btn-sm pull-right" style="position: inherit !important; font-size: 8px"
+                                                                        ng-click="OverrideClockOutValues(false, ClockOutTimeOverrideValue)">
+                                                                    Apply All
+                                                                </button>
+                                                            </th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr data-ng-repeat="GroupTimesheet in SelectedGroupTimesheetList()">
+                                                            <td data-ng-class="GroupTimesheet.RowMarkerClass">
+                                                                <div class="alert-mark">
+                                                                    <span data-ng-if="GroupTimesheet.AnyActionMissing==0">
+                                                                        <a class="text-decoration-none font-size-14 webpop" style="color: red !important;" item-detail-popup-new
+                                                                           data-ng-model="GroupTimesheet" data-ng-template-selector="#GroupTimesheet-popover" data-popover-cloasble="true">
+                                                                            <i class="fa  fa-exclamation-circle"></i>
+                                                                        </a>
+                                                                    </span>
+                                                                    <span data-ng-if="GroupTimesheet.AnyActionMissing==1">
+                                                                        <a class="text-decoration-none font-size-14 webpop" style="color: green !important;" item-detail-popup-new
+                                                                           data-ng-model="GroupTimesheet" data-ng-template-selector="#GroupTimesheet-popover" data-popover-cloasble="true">
+                                                                            <i class="fa fa-info-circle"></i>
+                                                                        </a>
+                                                                    </span>
+                                                                    @if (!SessionHelper.IsDayCare)
+                                                                    {
+                                                                        <a class="" data-ng-href="@Constants.HC_AddEmployee{{GroupTimesheet.EncryptedEmployeeID}}" target="_new">
+                                                                            {{GroupTimesheet.EmployeeName}}
+                                                                        </a>
+                                                                    }
+                                                                    @if (SessionHelper.IsDayCare)
+                                                                    {
+                                                                        <a class="" data-ng-href="#" target="_new">
+                                                                            {{GroupTimesheet.FacilityName}}
+                                                                        </a>
+                                                                    }
+                                                                </div>
+                                                            </td>
+                                                            <td>
+                                                                <a class="" data-ng-href="@Constants.HC_AddReferral{{GroupTimesheet.EncryptedReferralID}}" target="_new">
+                                                                    {{GroupTimesheet.PatientName}}
+                                                                </a>
+                                                            </td>
+                                                            <td>{{GroupTimesheet.PayorName }}</td>
+                                                            <td>{{GroupTimesheet.CareType}}</td>
+                                                            <td>{{GroupTimesheet.AuthorizationCode}}</td>
+                                                            <td>{{GroupTimesheet.StartDate | orgdate }}</td>
+                                                            <td>{{GroupTimesheet.EndDate | orgdate }}</td>
+                                                            <td>
+                                                                <input type="text" ng_model="GroupTimesheet.StrStartTimeEdit"
+                                                                       class="form-control input-sm time"
+                                                                       placeholder=@Resource.StartTime
+                                                                       time_input_mask=""
+                                                                       id="StrStartTimeEdit{{$index}}"
+                                                                       name="StrStartTimeEdit{{$index}}"
+                                                                       required />
+                                                            </td>
+
+                                                            <td>
+                                                                <input type="text" ng_model="GroupTimesheet.StrEndTimeEdit"
+                                                                       class="form-control input-sm time"
+                                                                       placeholder=@Resource.EndTime
+                                                                       time_input_mask=""
+                                                                       id="StrEndTimeEdit{{$index}}"
+                                                                       name="StrEndTimeEdit{{$index}}"
+                                                                       required />
+                                                            </td>
+                                                        </tr>
+                                                        <tr data-ng-if="GroupTimesheetList.length == 0">
+                                                            <td class="p-0" colspan="8">
+                                                                <div class="alert alert-danger margin-bottom-0">
+                                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix panel-footer">
+                        <button class="btn btn-danger pull-left" ng-click="HideErrorsGroupTimesheetList();"><i class="glyphicon glyphicon-chevron-left"></i> Prev</button>
+                        <button class="btn btn-success pull-right" ng-click="ValidateGroupTimesheetList();">Next <i class="glyphicon glyphicon-chevron-right"></i></button>
+                    </div>
+                </div>
+            </step>
+            <step class="step3" name="third">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Step 3: Select the visit tasks</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="emp-visit-table">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact " style="display: block;">
+                                        <form id="frmTaskListEditable">
+                                            <div class="table-responsive employeetable ">
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="width-20px text-align-center">
+                                                                <div class="btn-group" data-ng-show="MappedTaskList.length > 0">
+                                                                    <input id="chkSelectAllTasks" name="chkSelectAllTasks" class="unicheckbox" type="checkbox" ng-checked="SelectAllTasksCheckbox" data-ng-click="SelectAllTasks()" val="SelectAllTasksCheckbox">
+                                                                </div>
+                                                            </th>
+                                                            <th>Visit Task Detail</th>
+                                                            <th></th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr ng-repeat="item in MappedTaskList">
+                                                            <td>
+                                                                <div class="checker">
+                                                                    <span>
+                                                                        <input type="checkbox" class="unicheckbox text-align-center ng-pristine ng-untouched ng-valid ng-isolate-scope"
+                                                                               data-ng-model="item.IsChecked"
+                                                                               data-ng-change="SelectVisitTask(item)"
+                                                                               val="item.IsChecked">
+                                                                    </span>
+                                                                </div>
+                                                            </td>
+                                                            <td>{{item.VisitTaskDetail}}</td>
+                                                            <td>
+                                                                <div class="display-flex align-items-center" ng-show="item.IsChecked">
+                                                                    <input type="radio" class="radio radio-inline timeslot-radio" data-ng-model="item.IsDetail" data-ng-value="false" /><span>Simple</span>
+                                                                    <input type="radio" class="radio radio-inline timeslot-radio margin-left-05" data-ng-model="item.IsDetail" data-ng-value="true" /><span class="margin-right-15">Detail</span>
+                                                                    <div class="display-flex align-items-center margin-right-15" ng-if="item.IsDetail">
+                                                                        <select class="form-control input-sm" data-ng-model="item.Hours" data-ng-options="v.Value as v.Name for v in HourList"
+                                                                                data-val="true" data-val-required="@Resource.HoursRequired" id="VisitNote_Hours{{$index}}" name="VisitNote.Hours{{$index}}">
+                                                                            <option value="">@Resource.Hours</option>
+                                                                        </select>
+                                                                        <span class="field-validation-error" data-valmsg-for="item.Hours" data-valmsg-replace="true"></span>
+                                                                    </div>
+                                                                    <div class="display-flex align-items-center margin-right-15" ng-if="item.IsDetail">
+                                                                        <select class="form-control input-sm" data-ng-model="item.Minutes" data-ng-options="v.Value as v.Name for v in MinuteList"
+                                                                                data-val="true" data-val-required="@Resource.MinutesRequired" id="VisitNote_Minutes{{$index}}" name="VisitMinutes.Minutes{{$index}}">
+                                                                            <option value="">@Resource.Minutes</option>
+                                                                        </select>
+                                                                        <span class="field-validation-error" data-valmsg-for="item.Minutes" data-valmsg-replace="true"></span>
+                                                                    </div>
+                                                                    <div class="display-flex align-items-center margin-right-15" ng-if="item.IsDetail">
+                                                                        <input type="text" ng-model="item.Remarks"
+                                                                               class="form-control input-sm"
+                                                                               placeholder="Remarks"
+                                                                               id="Remarks{{$index}}"
+                                                                               name="Remarks{{$index}}"
+                                                                               required />
+                                                                    </div>
+                                                                    <div class="display-flex align-items-center margin-right-15">
+                                                                        <select class="form-control input-sm" data-ng-model="item.TaskOption" data-ng-options="v.TaskOption as v.TaskOption for v in GroupVisitTaskOptionList | filter:item.VisitTaskID"
+                                                                                id="TaskOption{{$index}}" name="TaskOption{{$index}}">
+                                                                            @*data-val="true" data-val-required="TaskOption" id="TaskOption{{$index}}" name="TaskOption{{$index}}">*@
+                                                                            <option value="">Task Option</option>
+                                                                        </select>
+                                                                        <span class="field-validation-error" data-valmsg-for="item.TaskOptionID" data-valmsg-replace="true"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                        <tr data-ng-if="MappedTaskList.length == 0">
+                                                            <td class="p-0" colspan="8">
+                                                                <div class="alert alert-danger margin-bottom-0">
+                                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                                </div>
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+
+                                                </table>
+
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix panel-footer">
+                        <button class="btn btn-danger pull-left" ng-click="stepPrevious();"><i class="glyphicon glyphicon-chevron-left"></i> Prev</button>
+                        <button class="btn btn-success pull-right" data-ng-disabled="(!MappedTaskList) || (MappedTaskList.length === 0) || (!IsAnyTaskSelected())" ng-click="ValidateTaskList();">Next <i class="glyphicon glyphicon-chevron-right"></i></button>
+                    </div>
+                </div>
+            </step>
+            <step class="step4" name="fourth">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Step 4: Review and add Remark</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div class="emp-visit-table">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="portlet-body compact " style="display: block;">
+
+                                        <div class="table-responsive employeetable ">
+                                            <table class="table table-bordered table-condensed flip-content empvisitlist_tbl employeetable">
+                                                <thead class="flip-content">
+                                                    <tr>
+                                                        <th class="width-150px">
+                                                            @Resource.EmployeeName
+                                                        </th>
+                                                        <th class="width-150px">
+                                                            @Resource.PatientName
+                                                        </th>
+                                                        <th class="width-110px">
+                                                            @Resource.Payor
+                                                        </th>
+                                                        <th class="width-110px">
+                                                            @Resource.CareType
+                                                        </th>
+                                                        <th class="width-110px">
+                                                            @Resource.AuthorizationCode
+                                                        </th>
+                                                        <th class="width-150px">
+                                                            @Resource.ScheduleStartDate
+                                                        </th>
+                                                        <th class="width-150px">
+                                                            @Resource.ScheduleEndDate
+                                                        </th>
+                                                        <th class="width-150px">
+                                                            @Resource.ClockIn
+                                                        </th>
+                                                        <th class="width-150px">
+                                                            @Resource.ClockInTime
+                                                        </th>
+                                                        <th class="width-150px">
+                                                            @Resource.ClockOut
+                                                        </th>
+                                                        <th class="width-150px">
+                                                            @Resource.ClockOutTime
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr data-ng-repeat="GroupTimesheet in SelectedGroupTimesheetList()">
+                                                        <td data-ng-class="GroupTimesheet.RowMarkerClass">
+                                                            <div class="alert-mark">
+                                                                <span data-ng-if="GroupTimesheet.AnyActionMissing==0">
+                                                                    <a class="text-decoration-none font-size-14 webpop" style="color: red !important;" item-detail-popup-new
+                                                                       data-ng-model="GroupTimesheet" data-ng-template-selector="#GroupTimesheet-popover" data-popover-cloasble="true">
+                                                                        <i class="fa  fa-exclamation-circle"></i>
+                                                                    </a>
+                                                                </span>
+                                                                <span data-ng-if="GroupTimesheet.AnyActionMissing==1">
+                                                                    <a class="text-decoration-none font-size-14 webpop" style="color: green !important;" item-detail-popup-new
+                                                                       data-ng-model="GroupTimesheet" data-ng-template-selector="#GroupTimesheet-popover" data-popover-cloasble="true">
+                                                                        <i class="fa fa-info-circle"></i>
+                                                                    </a>
+                                                                </span>
+                                                                @if (!SessionHelper.IsDayCare)
+                                                                {
+                                                                    <a class="" data-ng-href="@Constants.HC_AddEmployee{{GroupTimesheet.EncryptedEmployeeID}}" target="_new">
+                                                                        {{GroupTimesheet.EmployeeName}}
+                                                                    </a>
+                                                                }
+                                                                @if (SessionHelper.IsDayCare)
+                                                                {
+                                                                    <a class="" data-ng-href="#" target="_new">
+                                                                        {{GroupTimesheet.FacilityName}}
+                                                                    </a>
+                                                                }
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <a class="" data-ng-href="@Constants.HC_AddReferral{{GroupTimesheet.EncryptedReferralID}}" target="_new">
+                                                                {{GroupTimesheet.PatientName}}
+                                                            </a>
+                                                        </td>
+                                                        <td>{{GroupTimesheet.PayorName }}</td>
+                                                        <td>{{GroupTimesheet.CareType}}</td>
+                                                        <td>{{GroupTimesheet.AuthorizationCode}}</td>
+                                                        <td>{{GroupTimesheet.StartDate | orgdate }}</td>
+                                                        <td>{{GroupTimesheet.EndDate | orgdate }}</td>
+                                                        <td>{{GroupTimesheet.ClockInDateTime | orgdate }}</td>
+                                                        <td>{{GroupTimesheet.ClockInDateTime | orgtime }}</td>
+                                                        <td>{{GroupTimesheet.ClockOutDateTime | orgdate }}</td>
+                                                        <td>{{GroupTimesheet.ClockOutDateTime | orgtime }}</td>
+                                                    </tr>
+                                                    <tr data-ng-if="SelectedGroupTimesheetList().length == 0">
+                                                        <td class="p-0" colspan="8">
+                                                            <div class="alert alert-danger margin-bottom-0">
+                                                                @Html.Raw(Resource.NoRecordsFound)
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+
+                                            <div class="space20"></div>
+
+                                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Visit Task Detail</th>
+                                                        <th>Type</th>
+                                                        <th>Service Time (in Minutes)</th>
+                                                        <th>Remarks</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr ng-repeat="item in SelectedTaskList()">
+                                                        <td>{{item.VisitTaskDetail}}</td>
+                                                        <td>{{item.IsDetail ? "Detail" : "Simple"}}</td>
+                                                        <td>{{item.ServiceTime}}</td>
+                                                        <td>{{item.Remarks}}</td>
+                                                    </tr>
+                                                    <tr data-ng-if="SelectedTaskList().length == 0">
+                                                        <td class="p-0" colspan="8">
+                                                            <div class="alert alert-danger margin-bottom-0">
+                                                                @Html.Raw(Resource.NoRecordsFound)
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+
+                                            </table>
+
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Remarks</label>
+                            <textarea rows="2" class="form-control input-sm" data-ng-model="stepData.Remarks" maxlength="500" placeholder="Remarks" data-val="true" style="width: 100%; height: 98px;"></textarea>
+                        </div>
+                    </div>
+                    <div class="clearfix panel-footer">
+                        <button class="btn btn-danger pull-left" ng-click="stepPrevious();"><i class="glyphicon glyphicon-chevron-left"></i> Prev</button>
+                        <button class="btn btn-success pull-right" ng-click="submitFinal();">Complete <i class="glyphicon glyphicon-chevron-right"></i></button>
+                    </div>
+                </div>
+            </step>
+        </steps>
+    </div>
+
+
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/grouptimesheet.js")
+
+}

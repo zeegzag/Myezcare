@@ -1,0 +1,700 @@
+﻿@model HC_AddReferralModel
+@Html.Hidden("hdnSetBillingSettingModel", Common.SerializeObject(Model))
+@{
+
+    var formAuthID = String.Format("FormAuth{0}", Model.ReferralBillingAuthorization.TempType);
+}
+
+@if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_Details_Add))
+{
+    <form id="@formAuthID">
+        <div class="prior-auth-sec p-lr-15">
+            <div class="row">
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.Payor</label>
+
+                    <select class="form-control input-sm requiredStrip"
+                            data-ng-init="ReferralModel.ReferralBillingAuthorization.PayorID=ReferralModel.ReferralBillingAuthorization.PayorID==''?null:ReferralModel.ReferralBillingAuthorization.PayorID.toString()"
+                            data-ng-model="ReferralModel.ReferralBillingAuthorization.PayorID"
+                            data-val="true"
+                            data-val-required="@Resource.PayorRequired"
+                            id="PayorID-@Model.ReferralBillingAuthorization.TempType"
+                            convert-to-number=""
+                            data-ng-change="AutoPopulateServiceCode()"
+                            data-ng-required="true">
+                        <option value="">@Resource.Select</option>
+                        <option data-ng-repeat="option in PatientPayorList" value="{{option.Value}}">{{option.Name}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.CareType</label>
+                    @Html.DropDownListFor(p => p.ReferralBillingAuthorization.CareType, Model.CareTypeList.ToSelectList("", "Name", "Value", @Resource.Select, ""),
+                        new
+                        {
+                            data_ng_model = "ReferralModel.ReferralBillingAuthorization.CareType",
+                            data_ng_init = "ReferralModel.ReferralBillingAuthorization.CareType=ReferralModel.ReferralBillingAuthorization.CareType==''?null:ReferralModel.ReferralBillingAuthorization.CareType.toString()",
+                            @class = "form-control input-sm requiredStrip",
+                            convert_to_number = "",
+                            //data_ng_change = "AutoPopulateServiceCode()",
+                            data_ng_required = "true"
+                        })
+                    @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.CareType)
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.ServiceCode</label>
+                    @Html.DropDownListFor(q => q.ReferralBillingAuthorization.ServiceCodeID, Model.ServiceCodeList.ToSelectList(Model.ReferralBillingAuthorization.ServiceCodeID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                    new
+                                    {
+                                        convert_to_number = "",
+                                        data_ng_model = "ReferralModel.ReferralBillingAuthorization.ServiceCodeID",
+                                        data_ng_init = "ReferralModel.ReferralBillingAuthorization.ServiceCodeID=(ReferralModel.ReferralBillingAuthorization.ServiceCodeID==0 || ReferralModel.ReferralBillingAuthorization.ServiceCodeID==0)?'':ReferralModel.ReferralBillingAuthorization.ServiceCodeID",
+                                        @class = "form-control input-sm validateElement requiredStrip",
+                                        //data_ng_setname = "ReferralModel.Referral.Name"
+                                        data_ng_change = "OnServiceCodeChange()",
+                                        data_ng_required = "true"
+                                    })
+
+                    @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.ServiceCodeID)
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">@Resource.Taxonomy</label>
+                    <select id="referralBillingTaxonomyCode" class="form-control input-sm"
+                            data-ng-init="ReferralModel.ReferralBillingAuthorization.TaxonomyID=ReferralModel.ReferralBillingAuthorization.TaxonomyID==''?null:ReferralModel.ReferralBillingAuthorization.TaxonomyID"
+                            data-ng-model="ReferralModel.ReferralBillingAuthorization.TaxonomyID"
+                            data-val="true"
+                            data-ng-options="item.Value as item.Name for item in ReferralModel.TaxonomyCodes">
+                        <option value="">@Resource.Select</option>
+                        @*<option data-ng-repeat="option in ReferralModel.TaxonomyCodes" value="{{option.Value}}">{{option.Name}}</option>*@
+                    </select>
+                    @*@Html.DropDownListFor(q => q.ReferralBillingAuthorization.TaxonomyID, Model.TaxonomyCodes.ToSelectList(Model.ReferralBillingAuthorization.TaxonomyID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+            new
+            {
+                data_ng_model = "ReferralModel.ReferralBillingAuthorization.TaxonomyID",
+                data_ng_init = "ReferralModel.ReferralBillingAuthorization.TaxonomyID=(ReferralModel.ReferralBillingAuthorization.TaxonomyID==null || ReferralModel.ReferralBillingAuthorization.TaxonomyID==0)?'':ReferralModel.ReferralBillingAuthorization.TaxonomyID",
+                @class = "form-control input-sm"
+            })*@
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">@Resource.Modifier</label>
+                    <select id="referralCareTypeModifier" class="form-control input-sm"
+                            data-ng-model="ReferralModel.ReferralBillingAuthorization.ModifierID"
+                            data-val="true"
+                            data-ng-options="item.ModifierID as item.ModifierCode for item in ModifierListForDropDown">
+                        <option value="">@Resource.Select</option>
+                        @*<option data-ng-repeat="option in ModifierListForDropDown" value="{{option.ModifierID}}">{{option.ModifierCode}} - {{option.ModifierName}}</option>*@
+                    </select>
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.AuthrizationCode</label>
+                    @Html.TextBoxFor(q => q.ReferralBillingAuthorization.AuthorizationCode, new
+                    {
+                        @class = "form-control input-sm requiredStrip",
+                        data_ng_model = "ReferralModel.ReferralBillingAuthorization.AuthorizationCode",
+                        placeholder = @Resource.AuthrizationCode,
+                        maxlength = 15,
+                        id = String.Format("AuthorizationCode{0}", Model.ReferralBillingAuthorization.TempType),
+                        data_ng_required = "true"
+                    })
+                    @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.AuthorizationCode)
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.UnitType</label>
+                    @Html.DropDownListFor(m => m.ReferralBillingAuthorization.UnitType, Common.SetUnitTypeFilter().ToSelectList(Convert.ToString(1), "Name", "Value", Resource.Select, ""),
+                    new
+                    {
+                        id = "UnitType",
+                        data_ng_model = "ReferralModel.ReferralBillingAuthorization.UnitType",
+                        data_ng_init = "ReferralModel.ReferralBillingAuthorization.UnitType=ReferralBillingAuthorization.UnitType==0?null:ReferralBillingAuthorization.UnitType",
+                        convert_to_number = "",
+                        @class = "form-control input-sm validateElement requiredStrip",
+                        data_ng_change = "OnUnitTypeChange()",
+                        data_ng_required = "true"
+                    })
+                    @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.UnitType)
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.StartDate</label>
+                    <div class="input-group date"
+                         datepicker="ReferralModel.ReferralBillingAuthorization.StartDate"
+                         data-ng-dateval="ReferralModel.ReferralBillingAuthorization.StartDate"
+                         data-ng-maxdate="ReferralModel.ReferralBillingAuthorization.EndDate">
+                        @Html.TextBoxFor(q => q.ReferralBillingAuthorization.StartDate,
+                            new
+                            {
+                                @class = "form-control input-sm requiredStrip dateInputMask",
+                                placeholder = Resource.StartDate,
+                                id = String.Format("StartDate{0}", Model.ReferralBillingAuthorization.TempType),
+                                data_ng_required = "true"
+                            })
+                        @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.StartDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.EndDate</label>
+                    <div class="input-group date"
+                         datepicker="ReferralModel.ReferralBillingAuthorization.EndDate"
+                         data-ng-dateval="ReferralModel.ReferralBillingAuthorization.EndDate"
+                         data-ng-mindate="ReferralModel.ReferralBillingAuthorization.StartDate">
+                        @Html.TextBoxFor(q => q.ReferralBillingAuthorization.EndDate,
+                            new
+                            {
+                                @class = "form-control input-sm requiredStrip dateInputMask",
+                                placeholder = Resource.EndDate,
+                                id = String.Format("EndDate{0}", Model.ReferralBillingAuthorization.TempType),
+                                data_ng_required = "true"
+                            })
+                        @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.EndDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.Rate</label>
+                    @Html.TextBoxFor(q => q.ReferralBillingAuthorization.Rate,
+                   new { @class = "form-control input-sm requiredStrip", data_ng_model = "ReferralModel.ReferralBillingAuthorization.Rate", placeholder = @Resource.Rate, maxlength = 6 })
+                    @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.Rate)
+                </div>
+
+                <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-if="ReferralModel.ReferralBillingAuthorization.UnitType !== @Convert.ToInt16(EnumUnitType.PerDay_FlatRate)">
+                    <label class="control-label">
+                        @Resource.RevenueCode
+                        <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.RevenueCodeDescription"
+                           data-ng-custom-class="tooltip-extra-z-index"></i>
+                    </label>
+                    <a target="_blank" href="@(Constants.HC_GeneralMasterURL+(int)Common.DDType.RevenueCode)" class="padding-left-5">
+                        <i class="fa fa-plus padding-right-5 font-size-15" data-ng-tooltip="@Resource.AddRevenueCode" data-ng-custom-class="tooltip-extra-z-index"></i>
+                    </a>
+                    @Html.DropDownListFor(p => p.ReferralBillingAuthorization.RevenueCode, Model.RevenueCodeList.ToSelectList("", "Name", "Value", @Resource.Select, ""),
+                    new
+                    {
+                    data_ng_model = "ReferralModel.ReferralBillingAuthorization.RevenueCode",
+                    data_ng_init = "ReferralModel.ReferralBillingAuthorization.RevenueCode=ReferralModel.ReferralBillingAuthorization.RevenueCode==''?null:ReferralModel.ReferralBillingAuthorization.RevenueCode.toString()",
+                    @class = "form-control input-sm",
+                    convert_to_number = ""
+                    })
+                    @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.RevenueCode)
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                    <label class="control-label">
+                        DXcode
+                        <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.RevenueCodeDescription"
+                           data-ng-custom-class="tooltip-extra-z-index"></i>
+                    </label>
+                <button class="form-control input-sm" data-ng-model="ReferralModel.ReferralBillingAuthorization.DxCode" data-ng-click="OpenDxCodeModel()"><span class="pull-left">{{ReferralModel.ReferralBillingAuthorization.DxCode}}</span></button>
+                </div>
+                <div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4"
+                         data-ng-if="ReferralModel.ReferralBillingAuthorization.UnitType == @Convert.ToInt16(EnumUnitType.Time)">
+                        <label class="control-label required">
+                            @Resource.PerUnitValue
+                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.PerUnitValueHelpText"
+                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        <div>
+                            @Html.TextBoxFor(q => q.ReferralBillingAuthorization.PerUnitQuantity,
+                            new
+                            {
+                                @class = "form-control input-sm requiredStrip inline-b-imp",
+                                data_ng_model = "ReferralModel.ReferralBillingAuthorization.PerUnitQuantity",
+                                placeholder = @Resource.PerUnitValue,
+                                maxlength = 6,
+                                dir_valid_number = "",
+                                @style = "width: calc(100% - 185px);"
+                            })
+                            @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.PerUnitQuantity)
+                            <input type="text" disabled="disabled" class="form-control input-sm inline-b-imp width-180px-i" data-ng-model="SelectedUnit" />
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4"
+                         data-ng-if="ReferralModel.ReferralBillingAuthorization.UnitType == @Convert.ToInt16(EnumUnitType.Time)">
+                        <label class="control-label required">
+                            @Resource.RoundUpMinutes
+                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.RoundUpValueShouldBeLessThanOrEqualToPerUnitValue"
+                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        <div>
+                            <input type="text" disabled="disabled" class="form-control input-sm inline-b-imp width-180px-i" value="@Constants.DefaultStringForRoundUpMinutes" />
+                            @Html.TextBoxFor(q => q.ReferralBillingAuthorization.RoundUpUnit,
+                                new
+                                {
+                                    id = "RoundUpUnit",
+                                    @class = "form-control input-sm requiredStrip inline-b-imp",
+                                    data_ng_model = "ReferralModel.ReferralBillingAuthorization.RoundUpUnit",
+                                    placeholder = @Resource.RoundUpMinutes,
+                                    maxlength = 6,
+                                    dir_valid_number = "",
+                                    @style = "width: calc(100% - 185px);"
+                                })
+                            @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.RoundUpUnit)
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4"
+                         data-ng-if="ReferralModel.ReferralBillingAuthorization.UnitType == @Convert.ToInt16(EnumUnitType.Time)">
+                        <label class="control-label required">
+                            @Resource.MaxUnitLimit
+                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.MaxUnitHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        @Html.TextBoxFor(q => q.ReferralBillingAuthorization.MaxUnit,
+                            new
+                            {
+                            @class = "form-control input-sm requiredStrip",
+                            data_ng_model = "ReferralModel.ReferralBillingAuthorization.MaxUnit",
+                            placeholder = @Resource.MaxUnit,
+                            maxlength = 6,
+                            dir_valid_number = ""
+                            })
+                        @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.MaxUnit)
+                    </div>
+                    <div class="form-group col-lg-4 col-md-4 col-sm-4"
+                         data-ng-if="ReferralModel.ReferralBillingAuthorization.UnitType == @Convert.ToInt16(EnumUnitType.Time)">
+                        <label class="control-label required">
+                            @Resource.UnitLimit
+                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.DailyUnitHelpText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                        </label>
+                        <div>
+                            @Html.TextBoxFor(q => q.ReferralBillingAuthorization.DailyUnitLimit,
+                                new
+                                {
+                                    @class = "form-control input-sm requiredStrip inline-b-imp",
+                                    data_ng_model = "ReferralModel.ReferralBillingAuthorization.DailyUnitLimit",
+                                    placeholder = @Resource.DailyUnitLimit,
+                                    maxlength = 6,
+                                    dir_valid_number = "",
+                                    @style = "width: calc(100% - 110px);"
+                                })
+                            <span>&nbsp;per&nbsp;</span>
+                            @Html.DropDownListFor(p => p.ReferralBillingAuthorization.UnitLimitFrequency, Common.GetListFromEnum<Common.WorkingHourType>().ToSelectList(Convert.ToString(Model.ReferralBillingAuthorization.UnitLimitFrequency), "Name", "Value"),
+                                    new
+                                    {
+                                        data_ng_model = "ReferralModel.ReferralBillingAuthorization.UnitLimitFrequency",
+                                        data_ng_init = "ReferralModel.ReferralBillingAuthorization.UnitLimitFrequency = (!ReferralModel.ReferralBillingAuthorization.UnitLimitFrequency ? '" + Convert.ToString((int)Common.WorkingHourType.Day) + "' : ReferralModel.ReferralBillingAuthorization.UnitLimitFrequency.toString())",
+                                        @class = "form-control input-sm state-autocomplete inline-block width-auto pull-right"
+                                    })
+                            @Html.ValidationMessageFor(q => q.ReferralBillingAuthorization.DailyUnitLimit)
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                        <label class="control-label display-block">@Resource.Attachment</label>
+                        <div class="fileUpload btn btn-sm blue" data-ng-if="ReferralModel.ReferralBillingAuthorization.ReferralID > 0">
+                            <span>@Resource.UploadFile</span>
+                            <input id="authorizationFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                   fileupload
+                                   file-uploadurl="{{UploadFileURL}}"
+                                   beforesend="BeforeSend"
+                                   aftersend="AfterSend"
+                                   progress="Progress"
+                                   data-primary-id="ReferralModel.ReferralBillingAuthorization.ReferralID"
+                                   data-extra-value="@Constants.PatientAuthorizationsComplianceID"
+                                   filelist="UploadingFileList" />
+                        </div>
+                        <span class="margin-left-10" data-ng-if="ReferralModel.ReferralBillingAuthorization.AttachmentFilePath">
+                            {{ReferralModel.ReferralBillingAuthorization.AttachmentFileName}}
+                            <button class="margin-left-10 btn btn-xs red" data-ng-click="Attachment()">
+                                <i class="fa fa-close"></i>
+                            </button>
+                        </span>
+                    </div>
+                    <div class="space1"></div>
+                    <hr />
+                    <div class="space1"></div>
+                </div>
+                <div class="form-group col-lg-4 col-md-4 col-sm-12 margin-top-17">
+                    <button type="submit" class="btn btn-sm green-jungle" data-ng-tooltip="@Resource.Save" data-ng-click="SaveReferralBillingAuthorization('@formAuthID')">
+                        <i class="fa fa-save ">&nbsp;&nbsp;</i>@Resource.Save
+                    </button>
+                    <a href="javascript:void(0);" data-ng-click="ClearDetails()" data-ng-tooltip="@Resource.Cancel" class="btn btn-sm grey border-grey-cascade"><i class="fa fa-remove">&nbsp;&nbsp;</i>@Resource.Cancel</a>
+                </div>
+                <div class="clearleft"></div>
+            </div>
+        </div>
+        <!--<div class="space10"></div>-->
+        <hr class="padding-bottom-15" />
+    </form>
+}
+
+
+<div @*data-ng-if="ReferralBillingAuthorizationList.length > 0"*@>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+
+            <div class="btn-group">
+
+                @Html.DropDownListFor(m => m.SearchReferralBillingAuthorization.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchReferralBillingAuthorization.IsDeleted), "Name", "Value", "", ""),
+                    new
+                    {
+                        id = "IsDeleted",
+                        data_ng_model = "TempReferralBillingAuthorization.IsDeleted",
+                        data_ng_init = "TempReferralBillingAuthorization.IsDeleted = TempReferralBillingAuthorization.IsDeleted==null?'-1':TempReferralBillingAuthorization.IsDeleted.toString()",
+                        @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                        data_ng_change = "SearchBillingAuthorization()"
+                    })
+
+            </div>
+
+            @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_Details_Delete))
+            {
+                <div class="btn-group" data-ng-if="SelectedReferralBillingAuthorizationIds.length > 0">
+                    <button type="button" data-ng-click="DeleteReferralBillingAuthorization()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{SearchReferralBillingAuthorization.IsDeleted==0?'@Constants.DisableSelected' :(SearchReferralBillingAuthorization.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                    </button>
+                </div>
+            }
+            <div class="inline-block pull-right" data-ng-show="ReferralBillingAuthorizationList.length > 0">
+                <div class="inline-block pull-right" data-ng-show="ReferralBillingAuthorizationList.length > 0">
+                    <div class="pull-right margin-left-5">
+                        <dir-pagination-controls boundary-links="true" max-size="ReferralBillingAuthorizationPager.maxSize" on-page-change="ReferralBillingAuthorizationPager.pageChanged(newPageNumber)" pagination-id="ReferralBillingAuthorizationPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="space20"></div>
+
+        </div>
+    </div>
+
+
+    <div class="row" data-ng-if="ReferralBillingAuthorizationList.length > 0">
+        <div class="col-sm-12">
+            <div class="portlet-body" style="display: block;">
+                <form>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="portlet-body compact">
+                                <div class="dataTables_wrapper">
+                                    <table class="table table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                        <thead class="flip-content">
+                                            <tr>
+                                                @if (Common.HasPermission(Constants.HC_Permission_Patient_AddUpdate))
+                                                {
+                                                    <th class="width-20px"></th>
+                                                }
+
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralBillingAuthorizationPager.sortColumn('PayorName')">@Resource.Payor</a>
+                                                    <span class="sortorder" data-ng-show="ReferralBillingAuthorizationPager.sortIndex === 'PayorName'" data-ng-class="{reverse:ReferralBillingAuthorizationPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralBillingAuthorizationPager.sortColumn('AuthorizationCode')">@Resource.AuthorizationCode</a>
+                                                    <span class="sortorder" data-ng-show="ReferralBillingAuthorizationPager.sortIndex === 'AuthorizationCode'" data-ng-class="{reverse:ReferralBillingAuthorizationPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralBillingAuthorizationPager.sortColumn('CareTypeName')">@Resource.CareType</a>
+                                                    <span class="sortorder" data-ng-show="ReferralBillingAuthorizationPager.sortIndex === 'CareTypeName'" data-ng-class="{reverse:ReferralBillingAuthorizationPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralBillingAuthorizationPager.sortColumn('ServiceCodeName')">@Resource.ServiceCode</a>
+                                                    <span class="sortorder" data-ng-show="ReferralBillingAuthorizationPager.sortIndex === 'ServiceCodeName'" data-ng-class="{reverse:ReferralBillingAuthorizationPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralBillingAuthorizationPager.sortColumn('StarDate')">@Resource.StarDate</a>
+                                                    <span class="sortorder" data-ng-show="ReferralBillingAuthorizationPager.sortIndex === 'StarDate'" data-ng-class="{reverse:ReferralBillingAuthorizationPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralBillingAuthorizationPager.sortColumn('EndDate')">@Resource.EndDate</a>
+                                                    <span class="sortorder" data-ng-show="ReferralBillingAuthorizationPager.sortIndex === 'EndDate'" data-ng-class="{reverse:ReferralBillingAuthorizationPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-100px text-align-center">@Resource.Attachment</th>
+                                                <th class="width-160px text-align-center">@Resource.Action</th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <tr class="compact-search-tr">
+                                                <td class="text-align-center">
+                                                    <div class="btn-group" data-ng-show="ReferralBillingAuthorizationList.length > 0">
+                                                        <input id="@String.Format("SelectReferralBillingAuthorization{0}", Model.ReferralBillingAuthorization.TempType)" class="unicheckbox text-align-center" type="checkbox"
+                                                               data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                        <label for="@String.Format("SelectReferralBillingAuthorization{0}", Model.ReferralBillingAuthorization.TempType)"></label>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control input-sm"
+                                                            data-ng-init="TempReferralBillingAuthorization.PayorID=TempReferralBillingAuthorization.PayorID==''?0:TempReferralBillingAuthorization.PayorID.toString()"
+                                                            data-ng-model="TempReferralBillingAuthorization.PayorID"
+                                                            data-val="true"
+                                                            id="SearchPayorID-@Model.ReferralBillingAuthorization.TempType"
+                                                            convert-to-number="">
+                                                        <option value="">@Resource.Select</option>
+                                                        <option data-ng-repeat="option in PatientPayorList" value="{{option.Value}}">{{option.Name}}</option>
+                                                    </select>
+
+
+                                                </td>
+                                                <td>
+                                                    @Html.TextBoxFor(m => m.SearchReferralBillingAuthorization.AuthorizationCode, new
+                                            {
+                                                data_ng_model = "TempReferralBillingAuthorization.AuthorizationCode",
+                                                @class = "form-control input-sm",
+                                                placeholder = Resource.AuthorizationCode,
+                                                maxlength = 50,
+                                                id = String.Format("SrchAuthrizationCode{0}", Model.ReferralBillingAuthorization.TempType)
+                                            })
+                                                </td>
+                                                <td></td>
+                                                <td></td>
+                                                <td>
+                                                    <div class="input-group date"
+                                                         datepicker="TempReferralBillingAuthorization.StartDate"
+                                                         data-ng-dateval="TempReferralBillingAuthorization.StartDate">
+                                                        @Html.TextBoxFor(q => q.SearchReferralBillingAuthorization.StartDate,
+                                                    new
+                                                    {
+                                                        @class = "form-control input-sm dateInputMask",
+                                                        placeholder = Resource.StartDate,
+                                                        id = String.Format("SrchStartDate{0}", Model.ReferralBillingAuthorization.TempType)
+                                                    })
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+
+                                                </td>
+                                                <td>
+                                                    <div class="input-group date"
+                                                         datepicker="TempReferralBillingAuthorization.EndDate"
+                                                         data-ng-dateval="TempReferralBillingAuthorization.EndDate">
+                                                        @Html.TextBoxFor(q => q.SearchReferralBillingAuthorization.EndDate,
+                                                            new
+                                                            {
+                                                                @class = "form-control input-sm dateInputMask",
+                                                                placeholder = Resource.EndDate,
+                                                                id = String.Format("SrchEndDate{0}", Model.ReferralBillingAuthorization.TempType)
+                                                            })
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+                                                </td>
+                                                <td></td>
+                                                <td class="text-align-center">
+                                                    <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchBillingAuthorization()" />
+                                                    <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter('@formAuthID')">@Resource.Reset</a>
+                                                </td>
+                                            </tr>
+                                            <tr data-ng-class="{'deleted':ReferralBillingAuthorizationList.IsDeleted}" dir-paginate="item in ReferralBillingAuthorizationList | itemsPerPage: ReferralBillingAuthorizationPager.pageSize" total-items="ReferralBillingAuthorizationPager.totalRecords" current-page="ReferralBillingAuthorizationPager.currentPage" pagination-id="ReferralBillingAuthorizationPagerID">
+                                                @if (Common.HasPermission(Constants.HC_Permission_Patient_AddUpdate))
+                                                {
+                                                    <td class="text-align-center">
+                                                        <input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" data-ng-change="SelectedReferralBillingAuthorization(item)" val="item.IsChecked">
+                                                    </td>
+                                                }
+                                                <td>
+                                                    {{item.PayorName  ? item.PayorName:'@Resource.NA'}}
+                                                <td>
+                                                    {{item.AuthorizationCode  ? item.AuthorizationCode:'@Resource.NA'}}
+                                                    <span class="badge badge-warning badge-roundless margin-top-0 margin-bottom-0 curser-pointer pull-right"
+                                                          style="background-color: slategray"
+                                                          data-ng-mouseover="SearchAuthServiceCodesModel.ReferralBillingAuthorizationID = item.ReferralBillingAuthorizationID"
+                                                          title="@Resource.Details"
+                                                          item-detail-popup data-ng-url="GetAuthServiceCodesURL" data-ng-search-model="SearchAuthServiceCodesModel"
+                                                          data-ng-template-selector="#authServiceCode-popover" data-popover-cloasble="true">
+                                                        <i class="fa fa-clock-o">&nbsp;&nbsp;@Resource.ViewMore</i>
+
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    @*<span data-ng-if="item.AllowedTime">{{item.AllowedTime}} {{item.AllowedTimeType == 'Minutes'?'@Resource.MinsLbl':'@Resource.Hours'}} {{item.PriorAuthorizationFrequencyTitle}}</span>*@
+                                                    {{item.CareTypeName  ? item.CareTypeName:'@Resource.NA'}}
+                                                </td>
+                                                <td>
+                                                    {{item.ServiceCodeName  ? item.ServiceCodeName:'@Resource.NA'}}
+                                                </td>
+                                                <td>
+                                                    {{item.StartDate ? (item.StartDate | date:'@Resource._DateFormat') : '@Resource.NA'}}
+                                                </td>
+                                                <td data-ng-class="{'strikeRed':IsEndDateExp(item.EndDate)}">
+                                                    <span>
+                                                        {{item.EndDate ? (item.EndDate | date:'@Resource._DateFormat') : '@Resource.NA' }}
+                                                    </span>
+                                                </td>
+                                                <td class="text-align-center">
+                                                    <div data-ng-if="item.AttachmentFilePath">
+                                                        <a href="{{item.AttachmentFilePath}}" target="_blank" class="btn btn-xs grey" data-ng-tooltip="{{item.AttachmentFileName}}" data-ng-custom-class="tooltip-extra-z-index">
+                                                            <i class="fa fa-eye padding-right-5"></i>@Resource.View
+                                                        </a>
+                                                    </div>
+                                                </td>
+                                                <td class="text-align-center">
+                                                    @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_Details_Add))
+                                                    {
+                                                        <a href="javascript:void(0);" data-ng-click="EditReferralBillingAuthorization(item)" class="btn btn-xs blue">@Resource.Edit </a>
+                                                    }
+                                                    @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_Details_Delete))
+                                                    {
+                                                        <a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteReferralBillingAuthorization(item.ReferralBillingAuthorizationID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                        <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteReferralBillingAuthorization(item.ReferralBillingAuthorizationID,'Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                                    }
+                                                    <a href="javascript:void(0);" data-ng-click="ShowAuthorizationScheduleLinkListModal(item)" class="btn btn-xs green-jungle">@Resource.Link</a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div data-ng-if="ReferralBillingAuthorizationList.length == 0">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger">
+                        @Html.Raw(Resource.NoRecordsFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12" data-ng-if="ReferralBillingAuthorizationList.length > 0">
+        <div class="pull-left col-sm-3 no-padding">
+            @Resource.Showing <span data-ng-bind="(ReferralBillingAuthorizationPager.pageSize * ReferralBillingAuthorizationPager.currentPage) - ReferralBillingAuthorizationPager.pageSize  + 1"></span>
+            &nbsp;@Resource.To <span data-ng-bind="(ReferralBillingAuthorizationPager.pageSize == ReferralBillingAuthorizationPager.currentPageSize) ? (ReferralBillingAuthorizationPager.pageSize * ReferralBillingAuthorizationPager.currentPage) :(ReferralBillingAuthorizationPager.pageSize * ReferralBillingAuthorizationPager.currentPage) - ReferralBillingAuthorizationPager.pageSize  + ReferralBillingAuthorizationPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralBillingAuthorizationPager.totalRecords"></span>&nbsp;@Resource.Records
+        </div>
+        <div class="pull-right top pagination-sm">
+            <dir-pagination-controls boundary-links="true" max-size="ReferralBillingAuthorizationPager.maxSize" on-page-change="ReferralBillingAuthorizationPager.pageChanged(newPageNumber)" pagination-id="ReferralBillingAuthorizationPagerID"></dir-pagination-controls>
+        </div>
+    </div>
+
+</div>
+
+<div class="modal fade" id="ReferralDxCodeModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0%;">
+    <div class="modal-dialog modal-sm" role="document" style="width: 35%">
+        <div class="modal-content">
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>*@
+                <button type="button" class="close" aria-label="Close" data-ng-click="CloseMode()"><span aria-hidden="true">×</span></button>
+                
+            </div>
+            <div class="modal-body">
+                    <form id="ReferralDxCodeModalform">
+                        <table class="table table-bordered table-striped table-condensed flip-content">
+                            <thead class="flip-content">
+                                <tr>
+                                    <th ></th>
+                                    <th ></th>
+                                    <th style="width: 345px">DXCode</th>
+                                    <th>Precedence</th>
+
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                <tr data-ng-repeat="item in DXcodeListDD">
+                                    <td id="sortarrow" class="pushme2" style="width: 40px;  ">
+                                        <a href="#" class="up" ng-show="!$first" ng-click="moveUp($index,item)">
+                                            <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                        </a>
+                                        <a href="#" class="dropdown" ng-show="!$last" ng-click=" moveDown($index,item)">
+                                            <i class="fa fa-arrow-down" aria-hidden="true"></i>
+
+                                        </a>
+
+                                    </td>
+
+                                    <td>
+                                        @*<input type="checkbox" class="unicheckbox" data-ng-model="ReferralModel.ReferralBillingAuthorization.MaxUnit.IsChecked" val="Compliance.IsChecked">*@
+                                        <input type="checkbox" class="unicheckbox text-align-center ng-pristine ng-untouched ng-valid ng-isolate-scope"
+                                               data-ng-model="item.IsChecked"
+                                               data-ng-change="SelectDxCode(item)"
+                                               val="item.IsChecked">
+                                    </td>
+
+                                    @*<td>{{item.DXCodeID}}</td>*@
+                                <td> {{item.DXCodeWithoutDot}} ({{item.Description}})</td>
+                                    <td>{{item.Precedence}}</td>
+
+                                </tr>
+                            </tbody>
+
+                        </table>
+                    </form>
+                    <div class="modal-footer">
+                        <div class="row">
+                            <div class="col-sm-12 text-center">
+                                <button type="submit" data-ng-click="SaveDxCode()" class="btn green-jungle">@Resource.Save</button>
+                                <button type="button" class="btn btn-danger" data-dismiss="modal" data-ng-click="ResetRNote()">@Resource.Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<script id="authServiceCode-popover" type="text/ng-template">
+    <div class="col-sm-12 no-padding">
+        <table class="table table-bordered table-striped table-condensed flip-content" data-ng-if="DetailModel.length>0">
+            <thead>
+                <tr>
+                    <td>@Resource.Modifiers</td>
+                    <td>@Resource.Taxonomy</td>
+                    <td>@Resource.RevenueCode</td>
+                    <td>@Resource.Rate</td>
+                    <td>@Resource.PerUnitValue</td>
+                    <td>@Resource.RoundUpMinutes</td>
+                    <td>@Resource.MaxUnit</td>
+                    <td>@Resource.DailyUnit</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="item in DetailModel">
+                    <td>{{item.Modifiers ? item.Modifiers : '@Resource.NA' }}</td>
+                    <td>{{item.Taxonomy ? item.Taxonomy : '@Resource.NA'}}</td>
+                    <td>{{item.RevenueCode ? item.RevenueCode : '@Resource.NA' }}</td>
+                    <td>{{item.Rate}}</td>
+                    <td>{{item.PerUnitValue}}</td>
+                    <td>{{item.RoundUpMinutes}}</td>
+                    <td>{{item.MaxUnit ? item.MaxUnit : '@Resource.NA' }}</td>
+                    <td>{{item.DailyUnit}}</td>
+
+                </tr>
+            </tbody>
+        </table>
+
+
+
+        <div data-ng-if="DetailModel.length==0" class="padding-bottom-15px">
+            <span>
+                No Service Code found.
+            </span>
+
+        </div>
+    </div>
+
+</script>
+<script type="text/javascript">
+    var MaxUnit = "@Resource.MaxUnit";
+    var DailyUnitLimit = "@Resource.DailyUnitLimit";
+    var Billable = "@Resource.Billable";
+    var GroupOption = "@Resource.GroupOption";
+
+    var UnitTime = "@((int)EnumUnitType.Time)";
+    var UnitTimeValue = "@(Resource.UnitTimeValue)";
+    var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Modifier)';
+    var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.Modifier)';
+
+
+</script>

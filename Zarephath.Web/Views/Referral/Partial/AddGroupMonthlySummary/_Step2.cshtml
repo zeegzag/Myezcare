@@ -1,0 +1,470 @@
+﻿@model GroupMonthlySummaryModel
+<div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 no-padding margin-top-minus-10">
+    <h3 class="inline col-md-6 padding-left-0">@Resource.EnterMonthlySummaryDetail</h3>
+</div>
+<hr class="clearfix" />
+
+<div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 ">
+    <div class="row">
+        <div class="col-sm-12 no-padding">
+            <div class="">
+                <div class="space25"></div>
+                <div class="col-sm-6 no-right-padding">
+                    <strong class="col-sm-3 no-right-padding">@Resource.ServiceDates:</strong>
+                    <div class="col-sm-8 form-group no-left-padding">
+                        <div class="col-sm-5 input-group date  pull-left" datepicker="CommonMonthlySummary.MonthlySummaryStartDate" data-ng-dateval="CommonMonthlySummary.MonthlySummaryStartDate">
+                            @Html.TextBoxFor(q => q.CommonMonthlySummary.MonthlySummaryStartDate,
+                                new
+                                {
+                                    data_val = false,
+                                    @class = "form-control input-sm dateInputMask",
+                                    placeholder = Constants.GlobalDateFormat,
+                                    @maxlength = "10"
+                                })
+                            @Html.ValidationMessageFor(q => q.CommonMonthlySummary.MonthlySummaryStartDate)
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+
+                        <div class="col-sm-push-1 col-sm-5 input-group date   pull-left" datepicker="CommonMonthlySummary.MonthlySummaryEndDate" data-ng-dateval="CommonMonthlySummary.MonthlySummaryEndDate">
+                            @Html.TextBoxFor(q => q.CommonMonthlySummary.MonthlySummaryEndDate,
+                                new
+                                {
+                                    data_val = false,
+                                    @class = "form-control input-sm dateInputMask",
+                                    placeholder = Constants.GlobalDateFormat,
+                                    @maxlength = "10"
+                                })
+                            @Html.ValidationMessageFor(q => q.CommonMonthlySummary.MonthlySummaryEndDate)
+
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-sm-6 ">
+                    <strong class="col-sm-2 no-right-padding">@Resource.Facility:</strong>
+                    <div class="col-sm-4 form-group no-left-padding">
+                        <div class="form-group">
+                            @Html.DropDownListFor(p => p.CommonMonthlySummary.FacilityID, Model.Facilities.ToSelectList(Model.CommonMonthlySummary.FacilityID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                      new
+                                          {
+                                              convert_to_number = "",
+                                              id = "FacilityID",
+                                              data_ng_model = "CommonMonthlySummary.FacilityID",
+                                              data_ng_init = "CommonMonthlySummary.FacilityID=CommonMonthlySummary.FacilityID==''?null:CommonMonthlySummary.FacilityID",
+                                              @class = "form-control input-sm",
+                                              data_val = false
+                                          })
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-sm-12">
+            <div class="">
+                <div class="col-md-6 no-padding">
+                    <strong class="col-md-3 no-right-padding">@Resource.Medication</strong>
+                    <div class="mt-checkbox-inline padding-right-10">
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <input data-ng-model="CommonMonthlySummary.Medication"
+                                class="uniformControls" data-uniform-value="CommonMonthlySummary.Medication"
+                                data-ng-true-value="true" data-ng-false-value="false"
+                                type="checkbox">@Resource.Yes<span></span>
+                        </label>
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <input data-ng-model="CommonMonthlySummary.Medication"
+                                class="uniformControls" data-uniform-value="!CommonMonthlySummary.Medication"
+                                data-ng-true-value="false" data-ng-false-value="true"
+                                type="checkbox">@Resource.No<span></span>
+                        </label>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group col-md-12 col-sm-12 form-md-line-input text-align-center ">
+                <label class="col-md-12 col-sm-12 control-label padding-top-10">@Resource.participateinthenextCFT</label>
+            </div>
+
+            <div class="form-group col-md-12 col-sm-12 form-md-line-input  ">
+                <div class="row">
+                    <label class="col-md-12 col-sm-12 control-label padding-15"><strong>@Resource.MealsandSummaryofFood</strong></label>
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12  text-align-left  margin-bottom-0">
+                        <strong class="inline">@Resource.Breakfast:</strong>
+
+                        <div class="mt-checkbox-inline inline">
+
+                            <div style="display: inline-block;" class="mt-checkbox-inline inline padding-left-16 ">
+                                @foreach (var item5 in Model.SummaryofFood)
+                                {
+                                    <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                        <div class="checker">
+                                            <span class="musthave">
+                                                <input name="attribure" id="@item5.Value" value="@item5.Value" checklist-model="CommonMonthlySummary.BreakfastIds" type="checkbox"/>
+                                            </span>
+                                        </div>
+                                        @item5.Name
+                                    </label>
+                                }
+                            </div>
+                            <label>
+                                @Html.TextBoxFor(q => q.CommonMonthlySummary.BreakfastTxt, new
+                                                {
+                                                    @class = "form-control input-sm width500",
+                                                    data_ng_model = "CommonMonthlySummary.BreakfastTxt",
+                                                })
+                                @Html.ValidationMessageFor(q => q.CommonMonthlySummary.BreakfastTxt)
+                                @*<input type="text" class="form-control input-sm" name="inputBreakfastforhungry" data-ng-value="CommonMonthlySummary.BreakfastTxt">*@
+                            </label>
+                        </div>
+
+
+                    </div>
+                </div>
+
+                <div class="row ">
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12  text-align-left  margin-bottom-0">
+                        <strong class="inline">@Resource.Lunch:</strong>
+
+                        <div class="mt-checkbox-inline inline padding-left-right-23">
+                            <div style="display: inline-block;" class="mt-checkbox-inline inline padding-left-16 ">
+                                @foreach (var item6 in Model.SummaryofFood)
+                                {
+                                    <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                        <div class="checker">
+                                            <span class="musthave">
+                                                <input name="attribure" id="@item6.Value" value="@item6.Value" checklist-model="CommonMonthlySummary.LunchIds" type="checkbox"/>
+                                            </span>
+                                        </div>
+                                        @item6.Name
+                                    </label>
+                                }
+                            </div>
+                            <label>
+                                @Html.TextBoxFor(q => q.CommonMonthlySummary.LunchTxt, new
+                                                 {
+                                                     @class = "form-control input-sm width500",
+                                                     data_ng_model = "CommonMonthlySummary.LunchTxt",
+                                                     //maxlength = 50
+                                                 })
+                                @Html.ValidationMessageFor(q => q.CommonMonthlySummary.LunchTxt)
+                                @*<input type="text" class="form-control input-sm" name="inputLunchforhungry" data-ng-value="CommonMonthlySummary.LunchTxt">*@
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row ">
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12 text-align-left  margin-bottom-0">
+                        <strong class="inline">@Resource.Dinner:</strong>
+                        <div class="mt-checkbox-inline inline padding-left-right-20 ">
+                            <div style="display: inline-block;" class="mt-checkbox-inline inline padding-left-16 ">
+                                @foreach (var item7 in Model.SummaryofFood)
+                                {
+                                    <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                        <div class="checker">
+                                            <span class="musthave">
+                                                <input name="attribure" id="@item7.Value" value="@item7.Value" checklist-model="CommonMonthlySummary.DinnerIds" type="checkbox"/>
+                                            </span>
+                                        </div>
+                                        @item7.Name
+                                    </label>
+                                }
+                            </div>
+                            <label>
+                                @Html.TextBoxFor(q => q.CommonMonthlySummary.DinnerTxt, new
+                                                 {
+                                                     @class = "form-control input-sm width500",
+                                                     data_ng_model = "CommonMonthlySummary.DinnerTxt",
+                                                     //maxlength = 50
+                                                 })
+                                @Html.ValidationMessageFor(q => q.CommonMonthlySummary.DinnerTxt)
+                                @*<input type="text" class="form-control input-sm" name="inputDinnerforhungry" data-ng-value="CommonMonthlySummary.DinnerTxt">*@
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="row">
+                    <strong class="col-sm-8 padding-15">@Resource.MyMoodThroughoutWeekend</strong>
+                    @*<div ng-repeat="item in ReferralModel.BindMealsandSummaryofFood" style="display: inline-block;" class="mt-checkbox-inline inline padding-5">
+                                    <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                        <input name="attribure" id="{{item.Value}}" class="uniformControls" value="{{item.Value}}" checklist-model="CommonMonthlySummary.MoodforThroughoutWeekendIds" type="checkbox" />
+                                        {{item.Value}}  {{item.Name}}</label>
+                                </div>*@
+                    <div style="display: inline-block;" class="mt-checkbox-inline inline padding-left-16 ">
+                        @foreach (var item2 in Model.BindMealsandSummaryofFood)
+                        {
+                            <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                <div class="checker">
+                                    <span class="musthave">
+                                        <input name="attribure" id="@item2.Value" value="@item2.Value" checklist-model="CommonMonthlySummary.MoodforThroughoutWeekendIds" type="checkbox"/>
+                                    </span>
+                                </div>
+                                @item2.Name
+                            </label>
+                        }
+                    </div>
+                    <label class="form-group form-md-line-input col-sm-12 padding-left-16">
+                        @Html.TextBoxFor(q => q.CommonMonthlySummary.MoodforThroughoutWeekendTxt, new
+                                        {
+                                            @class = "form-control input-sm",
+                                            data_ng_model = "CommonMonthlySummary.MoodforThroughoutWeekendTxt",
+                                            //maxlength = 50
+                                        })
+                        @Html.ValidationMessageFor(q => q.CommonMonthlySummary.MoodforThroughoutWeekendTxt)
+                        @*<input type="text" class="form-control input-sm" name="inputMoodforThroughoutWeekendTxt" data-ng-value="CommonMonthlySummary.MoodforThroughoutWeekendTxt">*@
+                    </label>
+                </div>
+
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="row">
+                    <strong class="col-sm-8">@Resource.OutingDetails: </strong>
+                    <label class="form-group form-md-line-input col-sm-12">
+                        @Html.TextAreaFor(q => q.CommonMonthlySummary.OutingDetails, new
+                                                 {
+                                                     data_val = false,
+                                                     @class = "form-control input-sm",
+                                                     data_ng_model = "CommonMonthlySummary.OutingDetails",
+                                                     //maxlength = 50
+                                                 })
+                        @Html.ValidationMessageFor(q => q.CommonMonthlySummary.OutingDetails)
+                        @*<input type="text" class="form-control input-sm" name="inputOutingDetails" data-ng-value="CommonMonthlySummary.OutingDetails">*@
+                    </label>
+                </div>
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="row">
+                    <strong class="col-sm-8">@Resource.promotecommunityintegration</strong>
+                    <label class="form-group form-md-line-input col-sm-12">
+                        @Html.TextAreaFor(q => q.CommonMonthlySummary.PCIInformation, new
+                                                 {
+                                                     data_val = false,
+                                                     @class = "form-control input-sm",
+                                                     data_ng_model = "CommonMonthlySummary.PCIInformation",
+                                                     //maxlength = 50
+                                                 })
+                        @Html.ValidationMessageFor(q => q.CommonMonthlySummary.PCIInformation)
+                        @*<input type="text" class="form-control input-sm" name="inputPCIInformation" data-ng-value="CommonMonthlySummary.PCIInformation">*@
+                    </label>
+                </div>
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="row">
+                    <strong class="col-sm-8">@Resource.treatmentplan:</strong>
+                    <label class="form-group form-md-line-input col-sm-12">
+                        @Html.TextAreaFor(q => q.CommonMonthlySummary.TreatmentPlan, new
+                                                 {
+                                                     data_val = false,
+                                                     @class = "form-control input-sm",
+                                                     data_ng_model = "CommonMonthlySummary.TreatmentPlan",
+                                                     //maxlength = 50
+                                                 })
+                        @Html.ValidationMessageFor(q => q.CommonMonthlySummary.TreatmentPlan)
+                        @*<input type="text" class="form-control input-sm" name="inputTreatmentPlan" data-ng-value="CommonMonthlySummary.TreatmentPlan">*@
+                    </label>
+                </div>
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="row">
+                    <strong class="col-sm-4">@Resource.MedicationsDispensed:   </strong>
+                    <div class="mt-checkbox-inline">
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <input data-ng-model="CommonMonthlySummary.MedicationsDispensed"
+                                class="uniformControls" data-uniform-value="!CommonMonthlySummary.MedicationsDispensed"
+                                data-ng-true-value="false" data-ng-false-value="true"
+                                type="checkbox">@Resource.No<span></span>
+                        </label>
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <input data-ng-model="CommonMonthlySummary.MedicationsDispensed"
+                                class="uniformControls" data-uniform-value="CommonMonthlySummary.MedicationsDispensed"
+                                data-ng-true-value="true" data-ng-false-value="false"
+                                type="checkbox">@Resource.Yes<span></span>
+                        </label>
+                        @Resource.Yesexplain:
+                    </div>
+                    <label class="form-group form-md-line-input col-sm-12">
+                        @Html.TextAreaFor(q => q.CommonMonthlySummary.MedicationsDispensedTxt, new
+                                                 {
+                                                     @class = "form-control input-sm",
+                                                     data_ng_model = "CommonMonthlySummary.MedicationsDispensedTxt",
+
+                                                 })
+                        @Html.ValidationMessageFor(q => q.CommonMonthlySummary.MedicationsDispensedTxt)
+                    </label>
+                </div>
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="row">
+                    <strong class="col-sm-8">@Resource.Nextvisit:</strong>
+                    <label class="form-group form-md-line-input col-sm-12">
+                        @Html.TextAreaFor(q => q.CommonMonthlySummary.Nextvisit, new
+                                                 {
+                                                     @class = "form-control input-sm",
+                                                     data_ng_model = "CommonMonthlySummary.Nextvisit",
+
+                                                 })
+                        @Html.ValidationMessageFor(q => q.CommonMonthlySummary.Nextvisit)
+
+                        @*<input type="text" class="form-control input-sm" name="inputNextvisit" data-ng-value="CommonMonthlySummary.Nextvisit">*@
+                    </label>
+                </div>
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="row">
+                    <strong class="col-sm-5">@Resource.CurrentServicePlan</strong>
+
+                    <div class="mt-checkbox-inline">
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <input data-ng-model="CommonMonthlySummary.CurrentServicePlan"
+                                class="uniformControls" data-uniform-value="CommonMonthlySummary.CurrentServicePlan"
+                                data-ng-true-value="true" data-ng-false-value="false"
+                                type="checkbox">@Resource.Yes<span></span>
+                        </label>
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <input data-ng-model="CommonMonthlySummary.CurrentServicePlan"
+                                class="uniformControls" data-uniform-value="!CommonMonthlySummary.CurrentServicePlan"
+                                data-ng-true-value="false" data-ng-false-value="true"
+                                type="checkbox">@Resource.No<span></span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="row padding-top-10">
+                    <strong class="col-sm-6">@Resource.BelongingsMedicationsReturned </strong>
+                    <div class="mt-checkbox-inline">
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <input data-ng-model="CommonMonthlySummary.BelongingsandMedicationsReturned"
+                                class="uniformControls" data-uniform-value="CommonMonthlySummary.BelongingsandMedicationsReturned"
+                                data-ng-true-value="true" data-ng-false-value="false"
+                                type="checkbox">@Resource.Yes<span></span>
+                        </label>
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <input data-ng-model="CommonMonthlySummary.BelongingsandMedicationsReturned"
+                                class="uniformControls" data-uniform-value="!CommonMonthlySummary.BelongingsandMedicationsReturned"
+                                data-ng-true-value="false" data-ng-false-value="true"
+                                type="checkbox">@Resource.No<span></span>
+                        </label>
+                    </div>
+                    <label class="form-group form-md-line-input col-sm-12">
+                        <small>(@Resource.ZarephathNotManageClientFunds) </small>
+                    </label>
+                </div>
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated padding-top-30">
+                <div class="">
+                    <strong class="col-sm-3 no-padding">@Resource.CoordinationofCareatPickup</strong>
+                    <span class="padding-5" data-ng-repeat="item in Coordinationofcare">
+                        <label class="mt-radio mt-radio-outline">
+                            <input type="radio" name="CoordinationofCareatPickup" id="CoordinationofCareatPickup" data-ng-model="CommonMonthlySummary.CoordinationofCareatPickup" data-ng-value="item.Value">
+                            {{item.Name}}
+                                            <span></span>
+                        </label>
+                    </span>
+                    <br />
+                    <div style="display: inline-block;" class="mt-checkbox-inline inline  padding-left-16">
+                        @foreach (var item3 in Model.EnumCoordinationofCare)
+                        {
+                            <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                <div class="checker">
+                                    <span class="musthave">
+                                        <input name="attribure"
+                                       id="@item3.Value" value="@item3.Value" class="" checklist-model="CommonMonthlySummary.CoordinationofCareatPickupIds" type="checkbox"/>
+                                    </span>
+                                </div>
+                                @item3.Name
+                            </label>
+                        }
+                    </div>
+                    <label class="padding-5 form-group form-md-line-input">
+                        @Html.TextBoxFor(q => q.CommonMonthlySummary.CoordinationofCareatPickupTxt, new
+                                                 {
+                                                     @class = "form-control input-sm  width500",
+                                                     data_ng_model = "CommonMonthlySummary.CoordinationofCareatPickupTxt",
+                                                     //maxlength = 50
+                                                 })
+                        @Html.ValidationMessageFor(q => q.CommonMonthlySummary.CoordinationofCareatPickupTxt)
+                    </label>
+                </div>
+            </div>
+
+            <div class=" col-md-12 col-sm-12 form-md-line-input form-row-seperated">
+                <div class="">
+                    <strong class="col-sm-3 no-padding">@Resource.CoordinationofCareatDropOff</strong>
+                    <span class="padding-5" data-ng-repeat="item in Coordinationofcare">
+                        <label class="mt-radio mt-radio-outline">
+                            <input type="radio" name="CoordinationofCareatDropOff" id="CoordinationofCareatDropOff" data-ng-model="CommonMonthlySummary.CoordinationofCareatDropOff" data-ng-value="item.Value">
+                            {{item.Name}}
+                                            <span></span>
+                        </label>
+                    </span>
+                    <br />
+                    <div style="display: inline-block;" class="mt-checkbox-inline inline padding-left-16">
+                        @foreach (var item4 in Model.EnumCoordinationofCare)
+                        {
+                            <label class="mt-checkbox mt-checkbox-outline padding-3">
+                                <div class="checker">
+                                    <span class="musthave">
+                                        <input name="attribure" id="@item4.Value" value="@item4.Value" class="checker" checklist-model="CommonMonthlySummary.CoordinationofCareatDropOffIds" type="checkbox"/>
+                                    </span>
+                                </div>
+                                @item4.Name
+                            </label>
+                        }
+                    </div>
+                    <label class="padding-5 form-group form-md-line-input">
+                        @Html.TextBoxFor(q => q.CommonMonthlySummary.CoordinationofCareatDropOffTxt, new
+                    {
+                        @class = "form-control input-sm width500",
+                        data_ng_model = "CommonMonthlySummary.CoordinationofCareatDropOffTxt",
+                        //maxlength = 50
+                    })
+                        @Html.ValidationMessageFor(q => q.CommonMonthlySummary.CoordinationofCareatDropOffTxt)
+                        @*<input type="text" class="form-control input-sm" name="inputCoordinationofCareatDropOffTxt" data-ng-value="CommonMonthlySummary.CoordinationofCareatDropOffTxt">*@
+                    </label>
+                </div>
+            </div>
+
+
+
+            <div class="form-group col-md-12 col-sm-12 form-md-line-input ">
+                <div class="row">
+                    <div class="col-sm-12  ">
+                        <div class="col-sm-6 no-right-padding padding-top-65">
+                            <strong class="col-sm-2 no-padding">@Resource.CompletedBy:</strong>
+                            <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                <input type="text" class="form-control input-sm height-19px " id="Text60" name="inputMiddleName" readonly="readonly" data-ng-value="CommonMonthlySummary.CompletedBy">
+                            </div>
+                        </div>
+
+                        <div class="form-group col-lg-6 col-md-6 col-sm-6 pull-left padding-top-15">
+                            <div class="col-md-12">
+                                <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{'@(ConfigSettings.AmazonS3Url + ConfigSettings.ZarephathBucket)/'+ CommonMonthlySummary.Signature}}" />
+                                @*<img class="img-responsive signature-image" id="imgDisplay" src="https://s3.amazonaws.com/zarephath-stage/uploads/EmpSignatures/1/89180000-114517-10102016.png" data-ng-src="https://s3.amazonaws.com/zarephath-stage/uploads/EmpSignatures/1/89180000-114517-10102016.png">*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+            </div>
+        </div>
+    </div>
+</div>

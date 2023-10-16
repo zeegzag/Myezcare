@@ -1,0 +1,201 @@
+﻿@{
+    /**/
+
+    ViewBag.Title = Resource.EmployeeSchedule;
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmployeeTimeSlots;
+}
+@model HC_ETSModel
+
+@Html.Hidden("hdnETSModel", Common.SerializeObject(Model))
+
+<style>
+    /*.bootstrap-select.form-control:not([class*="col-"]) {
+        width: 55% !important;
+    }*/
+</style>
+<div data-ng-controller="AddEmployeeTimeSlotsController">
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+
+
+            <form id="frmAddEmployee01" class="employeescheduleForm">
+
+                <div class="row">
+                    <div class="col-lg-6 col-md-6 col-sm-6 form-inline">
+                        @if (!Model.IsPartial)
+                        {
+                            <button type="button" id="prev" class="btn grey border-grey-cascade btn-sm" title="Previous" data-ng-click="prevOption()">
+                                <i class="fa fa-backward"></i>
+                            </button>
+                        }
+
+                        <select class="form-control input-sm" id="ets_emp" selectpicker
+                                data-ng-init="TempSearchETSMaster.EmployeeID=TempSearchETSMaster.EmployeeID==''?null:TempSearchETSMaster.EmployeeID.toString()"
+                                data-ng-model="TempSearchETSMaster.EmployeeID"
+                                name="ETSModelEmployee"
+                                data-ng-change="SearchETSMasterList()"
+                                disabled="@(Model.IsPartial == true && Model.SearchETSMaster.EmployeeID > 0)">
+                            <option value="">@Resource.SelectEmployee</option>
+                            <option data-ng-repeat="option in ETSModel.EmployeeList" value="{{option.Value}}">{{option.Name}}</option>
+                        </select>
+
+                        @if (!Model.IsPartial)
+                        {
+                            <button type="button" id="next" class="btn grey border-grey-cascade btn-sm" title="Next" data-ng-click="nextOption()">
+                                <i class="fa fa-forward"></i>
+                            </button>
+                        }
+                    </div>
+
+                    <div class="col-lg-6 col-md-6 col-sm-6 form-inline">
+                        <button type="button" class="btn grey border-grey-cascade btn-sm margin-right-05 margin-left-20"
+                                data-ng-click="RefreshETSMaster()" title="@Resource.Refresh">
+                            <i class="fa fa-refresh" aria-hidden="true"></i>
+                        </button>
+
+                        @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeeSchedule_Add)))
+                        {
+                            <button type="button" class="btn btn-sm green-jungle pull-right"
+                                    data-ng-show="TempSearchETSMaster.EmployeeID>0" data-ng-click="OpenEtsMasterModal($event)"
+                                    title="@Resource.AddEmployeeSchedule">
+                                <i class="fa fa-plus" aria-hidden="true">&nbsp;&nbsp;</i>@Resource.AddEmployeeSchedule
+                            </button>
+                        }
+                    </div>
+
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+
+                        <div class="inline-block pull-right" data-ng-show="ETSMasterList.length > 0">
+                            <div class="pull-right margin-left-5">
+                                <dir-pagination-controls boundary-links="true" max-size="ETSMasterListPager.maxSize" on-page-change="ETSMasterListPager.pageChanged(newPageNumber)" pagination-id="ETSMasterListPager"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space20"></div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            <div class="table-responsive">
+
+
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ETSMasterListPager.sortColumn('Name')">@Resource.Name</a>
+                                                <span class="sortorder" data-ng-show="ETSMasterListPager.sortIndex === 'Name'" data-ng-class="{reverse:ETSMasterListPager.reverse}"></span>
+                                            </th>
+
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ETSMasterListPager.sortColumn('StartDate')">@Resource.StartDate</a>
+                                                <span class="sortorder" data-ng-show="ETSMasterListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:ETSMasterListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ETSMasterListPager.sortColumn('EndDate')">@Resource.EndDate</a>
+                                                <span class="sortorder" data-ng-show="ETSMasterListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:ETSMasterListPager.reverse}"></span>
+                                            </th>
+
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ETSMasterListPager.sortColumn('TotalETSDetailCount')">@Resource.SlotsHash</a>
+                                                <span class="sortorder" data-ng-show="ETSMasterListPager.sortIndex === 'TotalETSDetailCount'" data-ng-class="{reverse:ETSMasterListPager.reverse}"></span>
+
+                                            </th>
+                                            <th>Information</th>
+                                            <th class="width-60px col-sm-1">@Resource.Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        @*<tr data-ng-class="{'deleted':item.IsDeleted,'table-row-selected':SearchETSDetail.EmployeeTimeSlotMasterID==item.EmployeeTimeSlotMasterID}"
+                                                dir-paginate="item in ETSMasterList | itemsPerPage: ETSMasterListPager.pageSize" total-items="ETSMasterListPager.totalRecords" current-page="ETSMasterListPager.currentPage" pagination-id="ETSMasterListPager">
+                                                <td>{{item.Name != null ? item.Name : '@Resource.NA'}}</td>
+
+                                                <td>{{item.StartDate | dateformat | orgdate}}</td>
+                                                <td>{{(item.EndDate!=null) ? (item.EndDate| orgdate) : '@Resource.NA'}}</td>
+                                                <td>{{item.TotalETSDetailCount}}</td>
+                                                <td><span class="badge badge-green" ng-if="item.ActiveStat">@Resource.Active</span></td>
+                                                <td>
+                                                    @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeeSchedule_Add)))
+                                                    {
+
+                                                        <a href="javascript:void(0);" class="btn btn-xs blue" data-ng-click="OpenEtsMasterModal($event,item)"><i class="fa fa-edit"></i></a>
+                                                    }
+                                                </td>
+                                            </tr>*@
+
+
+                                        <tr data-ng-class="{'deleted':item.IsDeleted,'table-row-selected':SearchETSDetail.EmployeeTimeSlotMasterID==item.EmployeeTimeSlotMasterID}"
+                                            dir-paginate="item in ETSMasterList | itemsPerPage: ETSMasterListPager.pageSize" total-items="ETSMasterListPager.totalRecords" current-page="ETSMasterListPager.currentPage" pagination-id="ETSMasterListPager">
+                                            <td>{{item.Name}}</td>
+
+                                            <td>{{item.StartDate | dateformat | orgdate }}</td>
+                                            <td>{{(item.EndDate!=null) ? (item.EndDate | dateformat | orgdate) : '@Resource.NA'}}</td>
+                                            <td>{{item.TotalETSDetailCount}}</td>
+                                            <td><span class="badge badge-green" ng-if="item.ActiveStat">@Resource.Active</span></td>
+                                            <td>
+                                                @if (Model.IsPartial == false || (Model.IsPartial && Common.HasPermission(Constants.HC_Permission_Employee_EmployeeSchedule_Add)))
+                                                {
+
+                                                    <a href="javascript:void(0);" class="btn btn-xs blue" data-ng-click="OpenEtsMasterModal($event,item)"><i class="fa fa-edit"></i></a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12" data-ng-if="ETSMasterList.length > 0">
+                        <div class="col-sm-6 pull-left no-padding margin-top-5">
+                            @Resource.Showing <span data-ng-bind="(ETSMasterListPager.pageSize * ETSMasterListPager.currentPage) - ETSMasterListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(ETSMasterListPager.pageSize == ETSMasterListPager.currentPageSize) ? (ETSMasterListPager.pageSize * ETSMasterListPager.currentPage) :(ETSMasterListPager.pageSize * ETSMasterListPager.currentPage) - ETSMasterListPager.pageSize  + ETSMasterListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ETSMasterListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                        </div>
+                        <div class="pull-right top pagination-sm">
+                            <dir-pagination-controls boundary-links="true" max-size="ETSMasterListPager.maxSize" on-page-change="ETSMasterListPager.pageChanged(newPageNumber)" pagination-id="ETSMasterListPager"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="ETSMasterList.length == 0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            @Html.Partial("Partial/_AddETSMaster", Model)
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @if (!Model.IsPartial)
+    {
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/employeetimeslots")
+
+        <script type="text/javascript">
+            var EmpFutureSchDeleteConfirmation = '@Resource.EmpFutureSchDeleteConfirmation';
+            var EmpFutureSchDeleteConfirmationMaster = '@Resource.EmpFutureSchDeleteConfirmationMaster';
+            var TimeSlotForceUpdateConfirmation = '@Resource.EmployeeTimeSlotForceUpdateConfirmation';
+        </script>
+
+    }
+
+}

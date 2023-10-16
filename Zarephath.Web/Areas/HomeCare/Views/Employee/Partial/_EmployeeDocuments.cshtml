@@ -1,0 +1,92 @@
+﻿@model HC_AddEmployeeModel
+<div class="row-fluid">
+    <div class="">
+        <div class="tabbable tabbable-custom tabs-left">
+            <div class="col-md-1 col-sm-2 no-padding">
+                <ul class="nav nav-tabs tabs-left no-padding">
+                    <li class="active">
+                        <a id="EmployeeDocument" href="#tab_Documents" data-toggle="tab">
+                            @Resource.Documents
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div class="tab-content col-md-11 col-sm-10">
+                <div class="tab-pane active" id="tab_Documents" style="min-height: 350px;">
+                    @Html.Partial("Partial/EmployeeDocuments/_Documents", Model)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="EditEmployeeDocument" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-ng-click="CloseEditDocument()"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>@Resource.EditDocument</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmDocumentEdit">
+                        <div class="row">
+                            <div class="form-group col-md-push-1 col-sm-12">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                                    <label class="control-label required">@Resource.FileName</label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(m => m.ReferralDocument.FileName, new { data_ng_model = "DocumentDetail.FileName", @class = "form-control input-sm", maxlength = 100 })
+                                        @Html.ValidationMessageFor(m => m.ReferralDocument.FileName)
+                                    </div>
+                                </div>
+                            </div>
+                            @*<div class="form-group col-md-push-2 col-sm-10">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <label class="control-label required">@Resource.DocumentKind</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(m => m.ReferralDocument.KindOfDocument, Model.DocumentKind.ToSelectList(Model.ReferralDocument.KindOfDocument ?? "", "Name", "Name", "Select", ""),
+                                                    new
+                                                        {
+                                                            data_ng_model = "DocumentDetail.KindOfDocument",
+                                                            data_ng_init = "DocumentDetail.KindOfDocument=(DocumentDetail.KindOfDocument == null || DocumentDetail.KindOfDocument==0)?'':DocumentDetail.KindOfDocument",
+                                                            @class = "form-control input-sm",
+                                                        })
+                                        @Html.ValidationMessageFor(m => m.ReferralDocument.KindOfDocument)
+                                    </div>
+                                </div>
+                            </div>*@
+                            <div class="form-group col-md-push-1 col-sm-12">
+                                <div class="col-lg-3 col-md-3 col-sm-3 col-xs-3">
+                                    <label class="control-label required">@Resource.DocumentType</label>
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="col-md-8">
+                                        <select class="form-control input-sm" data-ng-options="item.DocumentTypeID as item.DocumentTypeName for item in EmployeeModel.DocumentTypeList"
+                                                data-ng-init="DocumentDetail.DocumentTypeID=(DocumentDetail.DocumentTypeID==null || DocumentDetail.DocumentTypeID==0 || DocumentDetail.DocumentTypeID=='') ?'':DocumentDetail.DocumentTypeID"
+                                                data-ng-model="DocumentDetail.DocumentTypeID" data-val="true" data-val-required="@Resource.DocumentTypeRequired"
+                                                id="DocumentTypeID" name="DocumentDetail.DocumentTypeID">
+                                            <option value="">@Resource.Select</option>
+                                        </select>
+                                        @Html.ValidationMessageFor(m => m.ReferralDocument.DocumentTypeID)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal" data-ng-click="CloseEditDocument()">@Resource.Cancel</button>@*data-ng-click="ResetReferralInternamMessage()"*@
+                                <button type="submit" data-ng-click="SaveDocument(DocumentDetail)" class="btn green-jungle">@Resource.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

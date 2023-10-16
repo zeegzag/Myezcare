@@ -1,0 +1,175 @@
+﻿@model ImportDataModel
+@Html.Hidden("hdnImportModel", Common.SerializeObject(Model))
+<div id="uploadmodal" class="modal fade" role="dialog" data-ng-controller="UploadExcelController">
+    <div class="modal-dialog">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5 sbold">@Resource.ImportData</h4>
+            </div>
+            <div class="modal-body">
+                <div class="">
+                    <div class="">
+                        <div class="">
+                            <form id="ImportFrm">
+                                <div class="row">
+                                    <div class="form-group col-lg-9 col-md-9 col-sm-9 col-xs-12">
+                                        <label>@Resource.ImportDataType</label>
+                                        <div>
+                                            @Html.DropDownListFor(m => m.ImportDataTypeModel.ImportDataType, Common.GetImportTypes().ToSelectList(Model.ImportDataTypeModel.ImportDataType, "Name", "Value", Resource.Select, ""), new
+                                       {
+                                           id = "ImportDataType",
+                                           data_ng_model = "ImportDataTypeModel.ImportDataType",
+                                           @class = "form-control input-sm"
+                                       })
+                                            @Html.ValidationMessageFor(q => q.ImportDataTypeModel.ImportDataType)
+                                        </div>
+                                    </div>
+
+                                    <div data-ng-if="ImportDataTypeModel.ImportDataType != '' && ImportDataTypeModel.ImportDataType != undefined">
+                                        <div class="replaceErrorDest form-group col-lg-9 col-md-9 col-sm-9 col-xs-12 fileUpload">
+                                            <div id="excelUpload" class="btn btn-sm btn-default text-align-left" style="width:100%">
+                                                <span><i class="icon-plus"></i>&nbsp; {{SelectFileLabel}}</span>
+                                                <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                       fileupload
+                                                       file-uploadurl="{{UploadFile}}"
+                                                       beforesend="BeforeSend"
+                                                       aftersend="AfterSend"
+                                                       progress="Progress"
+                                                       filelist="UploadingFileList"
+                                                       limitmultifileuploads="1" />
+                                            </div>
+                                            <span data-ng-if="errorMsg" class="color-red">Please select file</span>
+                                        </div>
+
+                                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                            <a href="~/Assets/include/{{ImportDataTypeModel.ImportDataType}}Import.xlsx">@Resource.DownloadSampleExcelFile<i class="padding-left-5 fa fa-download"></i></a>
+                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.UploadExcelHelpText"
+                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </div>
+
+                                        <div class="col-lg-4 col-md-3 col-sm-12 col-xs-5">
+                                            <label></label>
+                                            <div>
+                                                <input type='submit' class="btn btn-sm btn-primary" value="@Resource.UploadFile" data-ng-click="ImportDataInDatabase()" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div data-ng-if="Patients.length>0 || PatientContacts.length>0 || Employees.length>0">
+                    <hr style="display: inline-block; width: 100%;" />
+                    <h4>Error in excel</h4>
+                    <div class="col-sm-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            <div data-ng-show="ImportDataTypeModel.ImportDataType == 'Patient'" data-ng-if="Patients.length>0 || PatientContacts.length>0">
+                                <div class="tabbable tabbable-custom boxless">
+                                    <ul class="nav nav-tabs" id="tabs_patient">
+                                        <li class="active">
+                                            <a id="anc_patients" data-target="#tab_patients" data-toggle="tab">Patients</a>
+                                        </li>
+                                        <li>
+                                            <a id="anc_patientcontacts" data-target="#tab_patientcontacts" data-toggle="tab">Patient Contacts</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="tab_patients">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                                <thead class="flip-content">
+                                                    <tr>
+                                                        <th>PatientId</th>
+                                                        <th>FirstName</th>
+                                                        <th>LastName</th>
+                                                        <th>Gender</th>
+                                                        <th>Account Number</th>
+                                                        <th>Language Preference</th>
+                                                        <th>ErrorMessage</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="flip-content" data-ng-repeat="item in Patients">
+                                                        <td>{{item.PatientID}}</td>
+                                                        <td>{{item.FirstName}}</td>
+                                                        <td>{{item.LastName}}</td>
+                                                        <td>{{item.Gender}}</td>
+                                                        <td>{{item.AccountNumber}}</td>
+                                                        <td>{{item.LanguagePreference}}</td>
+                                                        <td>{{item.ErrorMessage}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                    <div class="tab-pane" id="tab_patientcontacts">
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                                <thead class="flip-content">
+                                                    <tr>
+                                                        <th>PatientId</th>
+                                                        <th>FirstName</th>
+                                                        <th>LastName</th>
+                                                        <th>Email</th>
+                                                        <th>Phone</th>
+                                                        <th>Address</th>
+                                                        <th>ErrorMessage</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr class="flip-content" data-ng-repeat="item in PatientContacts">
+                                                        <td>{{item.PatientID}}</td>
+                                                        <td>{{item.FirstName}}</td>
+                                                        <td>{{item.LastName}}</td>
+                                                        <td>{{item.Email}}</td>
+                                                        <td>{{item.Phone}}</td>
+                                                        <td>{{item.Address}}</td>
+                                                        <td>{{item.ErrorMessage}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-ng-show="ImportDataTypeModel.ImportDataType == 'Employee'" data-ng-if="Employees.length>0">
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead class="flip-content">
+                                            <tr>
+                                                <th>EmployeeID</th>
+                                                <th>Username</th>
+                                                <th>FirstName</th>
+                                                <th>LastName</th>
+                                                <th>Role</th>
+                                                <th>Email</th>
+                                                <th>Address</th>
+                                                <th>ErrorMessage</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="flip-content" data-ng-repeat="item in Employees">
+                                                <td>{{item.EmployeeID}}</td>
+                                                <td>{{item.Username}}</td>
+                                                <td>{{item.FirstName}}</td>
+                                                <td>{{item.LastName}}</td>
+                                                <td>{{item.Role}}</td>
+                                                <td>{{item.Email}}</td>
+                                                <td>{{item.Address}}</td>
+                                                <td>{{item.ErrorMessage}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>                
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

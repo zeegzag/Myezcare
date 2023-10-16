@@ -1,0 +1,342 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.InvoiceList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_InvoiceList;
+}
+
+@model SetInvoiceListPage
+@Html.Hidden("hdnSetInvoiceListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="InvoiceListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.InvoiceList
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @*@if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                {
+                    <div class="btn-group" data-ng-show="PhysicianList.length > 0">
+                        <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                            <input id="SelectAllDxCode" class="unicheckbox text-align-center" data-ng-show="PhysicianList.length > 0" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                            <label for="SelectAllDxCode"></label>
+                        </span>
+                    </div>
+                }*@
+            <div class="btn-group mr-5">
+                <button id="refreshBtn" class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group mr-5" data-ng-if="SelectedInvoices()">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="DeleteInvoices(SelectedInvoices())">
+                    <i class="fa fa-trash"></i>&nbsp;&nbsp;@Resource.DeleteSelected
+                </button>
+            </div>
+            <div class="btn-group max-width-321">
+                <select class="form-control input-sm" multiple title="@Resource.SelectPatient" id="InvoicesCriteria_ReferralIDs"
+                        data-val="true" selectpicker="InvoicesCriteria.ReferralIDs">
+                    <option data-ng-repeat="option in InvoiceModel.ReferralList" value="{{option.ReferralID}}">{{option.ReferralName}}</option>
+                </select>
+            </div>
+            <div class="btn-group max-width-321">
+                <select class="form-control input-sm" multiple title="@Resource.SelectCareType" id="InvoicesCriteria_CareTypeIDs"
+                        data-val="true" selectpicker="InvoicesCriteria.CareTypeIDs">
+                    <option data-ng-repeat="option in InvoiceModel.CareTypeList" value="{{option.CareTypeID}}">{{option.CareType}}</option>
+                </select>
+            </div>
+            <div class="btn-group">
+                <div class="input-group date date-picker pull-right width-150px"
+                     datepicker="InvoicesCriteria.StartDate" ng-dateval="InvoicesCriteria.StartDate">
+                    @Html.TextBoxFor(m => m.InvoicesCriteria.StartDate, new
+                    {
+                        @class = "form-control input-sm dateInputMask",
+                        maxlength = "50",
+                        id = "StartDatePicker",
+                        placeholder = Resource.StartDate
+                    })
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+            <div class="btn-group">
+                <div class="input-group date date-picker pull-right width-150px"
+                     datepicker="InvoicesCriteria.EndDate" ng-dateval="InvoicesCriteria.EndDate">
+                    @Html.TextBoxFor(m => m.InvoicesCriteria.EndDate, new
+                    {
+                        @class = "form-control input-sm dateInputMask",
+                        maxlength = "50",
+                        id = "EndDatePicker",
+                        placeholder = Resource.EndDate
+                    })
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.InvoicesCriteria.InvoiceGenerationFrequency, Common.SetInvoiceGenerationFrequencyList().ToSelectList(Convert.ToString(Model.InvoicesCriteria.InvoiceGenerationFrequency), "Name", "Value"),
+                 new
+                 {
+                     data_ng_model = "InvoicesCriteria.InvoiceGenerationFrequency",
+                     data_ng_init = "InvoicesCriteria.InvoiceGenerationFrequency = !InvoicesCriteria.InvoiceGenerationFrequency ? '1' : InvoicesCriteria.InvoiceGenerationFrequency",
+                     @class = "form-control input-sm",
+                 })
+            </div>
+            <div class="btn-group mr-5">
+                <button id="refreshBtn" class="btn blue btn-sm grey border-grey-cascade" data-ng-click="GenerateInvoices()">
+                    <i class="fa fa-file-text"></i>&nbsp;&nbsp;@Resource.GenerateInvoices
+                </button>
+            </div>
+            <div class="inline-block pull-right" data-ng-show="InvoiceList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="InvoiceListPager.maxSize" on-page-change="InvoiceListPager.pageChanged(newPageNumber)" pagination-id="InvoiceListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                            {*@
+                                        <th class="width-20px"></th>
+                                        @*}*@
+                                        <td>@Resource.InvoiceNumber</td>
+                                        @if (SessionHelper.RoleID == Constants.SuperAdminRole)
+                                        {
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('PatientName')">@Resource.Patient</a>
+                                                <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                            </th>
+                                        }
+                                        <th>
+                                            @Resource.CareType
+                                        </th>
+                                        <th>
+                                            @Resource.ServiceDate
+                                        </th>
+                                        <th>
+                                            @Resource.ServiceTime
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceDate')">@Resource.InvoiceDate</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceDate'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceAmount')">@Resource.InvoiceAmount</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceAmount'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('PaidAmount')">@Resource.PaidAmount</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'PaidAmount'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="InvoiceListPager.sortColumn('InvoiceStatus')">@Resource.InvoiceStatus</a>
+                                            <span class="sortorder" data-ng-show="InvoiceListPager.sortIndex === 'InvoiceStatus'" data-ng-class="{reverse:InvoiceListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-120px text-align-center">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                            {*@
+                                        <td class="text-align-center">
+                                            <input id="SelectAllDxCode" class="unicheckbox text-align-center" data-ng-show="InvoiceList.length > 0" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                        </td>
+                                        @*}*@
+                                        <td></td>
+                                        @if (SessionHelper.RoleID == Constants.SuperAdminRole)
+                                        {
+                                            <td>
+                                                @Html.TextBoxFor(m => m.SearchInvoiceListPage.PatientName, new { data_ng_model = "TempSearchInvoiceListPage.PatientName", @class = "form-control input-sm", placeholder = Resource.PatientName, maxlength = 20 })
+                                            </td>
+                                        }
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td>
+                                            <div class="input-group date date-picker pull-right"
+                                                 datepicker="TempSearchInvoiceListPage.InvoiceDate" ng-dateval="TempSearchInvoiceListPage.InvoiceDate" >
+                                                @Html.TextBoxFor(m => m.SearchInvoiceListPage.InvoiceDate, new
+                                           {
+                                               @class = "form-control input-sm dateInputMask",
+                                               maxlength = "50",
+                                               id = "InvoiceDatePicker",
+                                               placeholder = Resource.InvoiceDate
+                                           })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchInvoiceListPage.InvoiceAmount, new { data_ng_model = "TempSearchInvoiceListPage.InvoiceAmount", @class = "form-control input-sm", placeholder = Resource.InvoiceAmount, maxlength = 20 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchInvoiceListPage.PaidAmount, new { data_ng_model = "TempSearchInvoiceListPage.PaidAmount", @class = "form-control input-sm", placeholder = Resource.PaidAmount, maxlength = 100 })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(m => m.SearchInvoiceListPage.InvoiceStatus, Common.SetInvoiceStatusList().ToSelectList(Convert.ToString(Model.SearchInvoiceListPage.InvoiceStatus), "Name", "Value", Resource.Select, ""),
+                                                                           new
+                                                                           {
+                                                                               id = "InvoiceStatus",
+                                                                               data_ng_model = "TempSearchInvoiceListPage.InvoiceStatus",
+                                                                               data_ng_init = "TempSearchInvoiceListPage.InvoiceStatus = TempSearchInvoiceListPage.InvoiceStatus==null?'':TempSearchInvoiceListPage.InvoiceStatus.toString()",
+                                                                               @class = "form-control input-sm"
+                                                                           })
+                                        </td>
+                                        <td class="text-align-center">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchInvoice()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':Invoice.IsDeleted}" dir-paginate="Invoice in InvoiceList | itemsPerPage: InvoiceListPager.pageSize" total-items="InvoiceListPager.totalRecords" current-page="InvoiceListPager.currentPage" pagination-id="InvoiceListPager_ID">
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                            {*@
+                                        <td class="text-align-center">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="Invoice.IsChecked" data-ng-change="SelectInvoice(Invoice)" val="Invoice.IsChecked">
+                                        </td>
+                                        <td class="text-align-right">
+                                            <a href="{{AddInvoiceDetailURL + Invoice.EncryptedReferralInvoiceID}}"> {{Invoice.ReferralInvoiceID}}</a>
+                                        </td>
+                                        @*}*@
+                                        @if (SessionHelper.RoleID == Constants.SuperAdminRole)
+                                        {
+                                            <td>{{Invoice.PatientName}}</td>
+                                        }
+                                        <td>{{Invoice.CareTypeName}}</td>
+                                        <td>{{Invoice.ServiceStartDate | orgdate}}{{(Invoice.ServiceStartDate !== Invoice.ServiceEndDate ? ' - ' + (Invoice.ServiceEndDate | orgdate) : '')}}</td>
+                                        <td>{{(parseInt(Invoice.ServiceTime / 60) > 0 ? parseInt(Invoice.ServiceTime / 60) + ' @Resource.hrs ' : '') + (Invoice.ServiceTime % 60 > 0 ? Invoice.ServiceTime % 60 + ' @Resource.Mins' : '')}}</td>
+                                        <td class="width-150px">{{Invoice.InvoiceDate | orgdate}}</td>
+                                        <td class="width-120px">{{Invoice.InvoiceAmount|orgcurrency}}</td>
+                                        <td class="width-120px">{{Invoice.PaidAmount |orgcurrency}}</td>
+                                        <td class="width-120px">{{Invoice.StrInvoiceStatus}}</td>
+                                        <td class="text-align-center">
+                                            @*
+                                                @if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                                {*@
+                                            <div class="btn-group">
+                                                <button class="btn btn-default btn-xs dropdown-toggle green-haze-stripe" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                    <b>@Resource.Action</b>
+                                                    <i class="fa fa-angle-down"></i>
+                                                </button>
+                                                <ul class="dropdown-menu pull-right">
+                                                    <li>
+                                                        <a href="{{AddInvoiceDetailURL + Invoice.EncryptedReferralInvoiceID}}"><i class="fa fa-newspaper-o"></i> @Resource.View</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;" data-ng-if="Invoice.InvoiceStatus == @((int)Common.InvoiceStatus.Unpaid)" data-ng-click="UpdatePaymentDetail(@((int)Common.InvoiceStatus.Paid), Invoice)"><i class="fa fa-money"></i> @Resource.MarkAsPaid</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;" data-ng-click="DeleteInvoices(Invoice.ReferralInvoiceID)"><i class="fa fa-trash-o"></i> @Resource.Delete</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:;" data-ng-click="EditInvoiceDueDate(Invoice.ReferralInvoiceID, Invoice)"><i class="fa fa-edit"></i> @Resource.ModifyDueDate</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            @*}*@
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="InvoiceList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(InvoiceListPager.pageSize * InvoiceListPager.currentPage) - InvoiceListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(InvoiceListPager.pageSize == InvoiceListPager.currentPageSize) ? (InvoiceListPager.pageSize * InvoiceListPager.currentPage) :(InvoiceListPager.pageSize * InvoiceListPager.currentPage) - InvoiceListPager.pageSize  + InvoiceListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="InvoiceListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="InvoiceListPager.maxSize" on-page-change="InvoiceListPager.pageChanged(newPageNumber)" pagination-id="InvoiceListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="InvoiceList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="EditInvoiceDueDateModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-ng-click="CloseEditInvoiceDueDateModal()">&times;</button>
+
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <span>@Resource.ModifyDueDate</span>
+                    </h4>
+
+                </div>
+                <div class="modal-body">
+
+
+                    <form id="modalEditInvoiceDueDateForm">
+
+                        <div class="clearfix margin-top-15">
+                            <div class="col-md-12 no-padding">
+                                <div class="form-group clearfix">
+                                    <label>@Resource.InvoiceDueDays</label>
+                                    <div id="start-date" class="input-group date date-picker ng-isolate-scope"
+                                         datepicker="EditInvoice.InvoiceDueDate"
+                                         ng-dateval="EditInvoice.InvoiceDueDate"
+                                         style="max-width: 130px;"
+                                         data-ng-mindate="EditInvoice.InvoiceDate">
+                                        <input class="form-control input-sm dateInputMask" data-val="true" 
+                                               id="EditInvoice_InvoiceDueDate" maxlength="50" name="EditInvoice.InvoiceDueDate" placeholder="mm/dd/yyyy" type="text" value="">
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+
+
+                <div class="modal-footer">
+                    <div>
+                        <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseEditInvoiceDueDateModal()">@Resource.Cancel</button>
+                        <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="SaveEditInvoiceDueDate()">@Resource.Save</button>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/areas/homecare/invoice/invoicelist")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Invoice)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Invoice)';
+    </script>
+}

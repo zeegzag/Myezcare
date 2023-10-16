@@ -1,0 +1,76 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.BillingSummary);
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+@model SearchBillingSummaryReport
+@Html.Hidden("hdnSearchBillingSummaryReport", Common.SerializeObject(Model))
+<div data-ng-controller="BillingSummaryController" style="height: 400px;">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.BillingSummary
+        </h3>
+    </div>
+
+    <div>
+        <div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <form id="frmSearchRptClientStatus">
+                        <div class="col-md-12 no-padding">
+
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                <label class="control-label ">@Resource.StartDate</label>
+                                <div datepicker="SearchReportModel.StartDate" ng-dateval="SearchReportModel.StartDate" class="input-group date">
+                                    @Html.TextBoxFor(m => m.StartDate,
+                                                             new
+                                                                 {
+                                                                     //data_ng_model = "SearchReportModel.StartDate",
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.StartDate,
+                                                                     data_val = false
+                                                                 })
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                <label class="control-label ">@Resource.EndDate</label>
+                                <div datepicker="SearchReportModel.EndDate" ng-dateval="SearchReportModel.EndDate" class="input-group date">
+                                    @Html.TextBoxFor(m => m.EndDate,
+                                        new
+                                        {
+                                            //data_ng_model = "SearchReportModel.EndDate",
+                                            @class = "no-focus form-control input-sm dateInputMask",
+                                            placeholder = Resource.EndDate,
+                                            data_val = false
+                                        })
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="font-white badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="ClientInformationAjaxCall">
+                                <div>
+                                    @Resource.DownloadingInProgress
+                                    <span class="padding-left-5">
+                                        <img src="~/Assets/images/lazyload.gif" /></span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-sm blue" id="btnClientInformationDownload" data-loading-text="@Resource.DownloadingInProgress"  data-ng-click="DownloadClientInformationReport('#btnClientInformationDownload')">@Resource.Download</button>
+        </div>
+    </div>
+
+
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/report/billingsummary")
+}

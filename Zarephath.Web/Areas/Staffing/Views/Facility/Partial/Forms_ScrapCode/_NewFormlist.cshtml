@@ -1,0 +1,224 @@
+﻿@model HC_EBFormModel
+<div>
+
+    <div class="col-lg-12 col-md-12 col-sm-12 no-padding clearfix">
+        <form>
+
+            @if (Model.ForPatient && Model.IsPartial == false)
+            {
+                <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                    <label class="control-label">@Resource.Patient</label>
+
+                    @Html.DropDownListFor(p => p.SearchEbForm.ReferralID, Model.ReferralList.ToSelectList(Model.SearchEbForm.ReferralID.ToString() ?? "", "Name", "Value", Resource.Select, ""),
+                        new
+                        {
+                            id = "ReferralID",
+                            convert_to_number = "",
+                            data_ng_model = "TempSearchEbForm.ReferralID",
+                            data_ng_init = "TempSearchEbForm.ReferralID=TempSearchEbForm.ReferralID==''?null:TempSearchEbForm.ReferralID",
+                            @class = "form-control input-sm",
+                            data_val = "false"
+
+                        })
+
+                </div>
+            }
+
+            @if (Model.ForEmployee && Model.IsPartial == false)
+            {
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                    <label class="control-label">@Resource.Employee</label>
+
+                    @Html.DropDownListFor(p => p.SearchEbForm.EmployeeID, Model.EmployeeList.ToSelectList(Model.SearchEbForm.EmployeeID.ToString() ?? "", "Name", "Value", Resource.Select, ""),
+                        new
+                        {
+                            id = "EmployeeID",
+                            convert_to_number = "",
+                            data_ng_model = "TempSearchEbForm.EmployeeID",
+                            data_ng_init = "TempSearchEbForm.EmployeeID=TempSearchEbForm.EmployeeID==''?null:TempSearchEbForm.EmployeeID",
+                            @class = "form-control input-sm",
+                            data_val = "false"
+
+                        })
+
+                </div>
+
+            }
+
+
+            <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                <label class="control-label">@Resource.Markets</label>
+
+                @Html.DropDownListFor(p => p.SearchEbForm.MarketID, Model.MarketList.ToSelectList(Model.SearchEbForm.MarketID.ToString() ?? "", "Name", "Id", Resource.Select, ""),
+                                new
+                                {
+                                    id = "MarketID",
+                                    convert_to_number = "",
+                                    data_ng_model = "TempSearchEbForm.MarketID",
+                                    data_ng_init = "TempSearchEbForm.MarketID=TempSearchEbForm.MarketID==''?null:TempSearchEbForm.MarketID",
+                                    @class = "form-control input-sm",
+                                    data_val = "false"
+                                })
+
+                 
+
+            </div>
+
+
+
+
+            <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                <label class="control-label">@Resource.FormNumber</label>
+                @Html.TextBoxFor(m => m.SearchEbForm.FormNumber,
+                    new { data_ng_model = "TempSearchEbForm.FormNumber",delete_if_empty="", @class = "form-control input-sm", placeholder = Resource.FormNumber, maxlength = 20 })
+            </div>
+
+
+            <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                <label class="control-label">@Resource.FormName</label>
+                @Html.TextBoxFor(m => m.SearchEbForm.FormName,
+                  new { data_ng_model = "TempSearchEbForm.FormName",delete_if_empty="", @class = "form-control input-sm", placeholder = Resource.FormName, maxlength = 20 })
+            </div>
+
+
+            <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12">
+                <label class="control-label">@Resource.FormCategory</label>
+
+                @Html.DropDownListFor(p => p.SearchEbForm.FormCategoryID, Model.FormCategoryList.ToSelectList(Model.SearchEbForm.FormCategoryID.ToString() ?? "", "Name", "Id", Resource.Select, ""),
+                                new
+                                {
+                                    id = "FormCategoryID",
+                                    convert_to_number = "",
+                                    data_ng_model = "TempSearchEbForm.FormCategoryID",
+                                    data_ng_init = "TempSearchEbForm.FormCategoryID=TempSearchEbForm.FormCategoryID==''?null:TempSearchEbForm.FormCategoryID",
+                                    @class = "form-control input-sm",
+                                    data_val = "false"
+                                })
+
+                 
+
+            </div>
+
+
+            <div class="form-group col-lg-2 col-md-2 col-sm-12 col-xs-12 pull-right margin-top-17 no-right-padding">
+                @*<label class="control-label"></label>*@
+                <div class="">
+                    @* <div class="col-md-6 no-right-padding">
+                        <button type="submit" class="btn btn-sm btn-primary form-control" data-ng-click="SearchReferral()">
+                            @Resource.Search
+                        </button>
+                    </div>*@
+                    <div class="col-md-10 no-right-padding pull-right">
+                        <button class="btn btn-sm grey border-grey-cascade form-control" data-ng-click="ResetSearchFilter()">
+                            @Resource.Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+
+
+
+
+
+        </form>
+    </div>
+
+
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12  margin-top-10 margin-bottom-20" data-ng-if="FormList.length > 0">
+                <dir-pagination-controls boundary-links="true" pagination-id="formPagination" on-page-change="FormListPager.change()"></dir-pagination-controls>
+            </div>
+            <br />
+            <br />
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.SortClm('Name')">@Resource.FormNumber</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'Name'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.SortClm('FormLongName')">@Resource.FormName</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormLongName'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.SortClm('Version')">@Resource.Version</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'Version'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            @*<strong>@Resource.Category</strong>*@
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.SortClm('FormCategory.Name')">@Resource.Category</a>
+                                            <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormCategory.Name'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-140px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                @*|filter: { Name: TempSearchEbForm.FormNumber} 
+                                    |filter: { FormLongName: TempSearchEbForm.FormName} *@
+                                @*<tr dir-paginate="form in FormList | orderBy: ['Name','Version'] | filterForms:formFilter | itemsPerPage:10" pagination-id="formPagination" current-page="FormListPager.formCurrentPage">*@
+                                <tr dir-paginate="form in FormList | orderBy: FormListPager.sortIndex: FormListPager.reverse 
+                                    
+                                    
+                                    | filterForms: TempSearchEbForm 
+                                    
+                                    | itemsPerPage: FormListPager.pageSize"
+                                    pagination-id="formPagination" current-page="FormListPager.currentPage">
+                                    <td>{{ form.Name }}</td>
+                                    <td>{{ form.FormLongName }}</td>
+                                    <td>{{ form.Version }}</td>
+                                    <td>{{ form.FormCategory.Name }}</td>
+                                    <td>
+
+                                        <a class="btn btn-xs btn-primary" target="_blank" ng-hide="!form.HasHtml"  data-ng-click="OpenNewHtmlForm(form)" >New</a>
+
+                                        @*<a class="btn btn-xs btn-primary" target="_blank" ng-attr-href="{{ form.NewHtmlURI + '&ShowMainMenu=1' + pfUrl.getRedirectToLogin() }}" ng-hide="!form.HasHtml">New</a>*@
+                                        @*<a class="btn btn-xs yellow-mint" target="_blank" ng-hide="!form.HasPDF" ng-click="pdf.printClick.formListClick(form)">Print PDF</a>*@
+                                        <a class="btn btn-xs yellow-mint" target="_blank" ng-hide="!form.HasPDF" href="{{form.NewPdfURI}}">Print PDF</a>
+
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="FormList.length > 0">
+                <dir-pagination-controls boundary-links="true" pagination-id="formPagination" on-page-change="FormListPager.change()"></dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="FormList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

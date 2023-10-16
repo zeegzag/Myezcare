@@ -1,0 +1,140 @@
+﻿@{
+    var isEdit = Model.Contact != null && Model.Contact.ContactID > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (isEdit ? Resource.EditParent : @Resource.AddParent));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ParentAdd;
+}
+
+@model AddParentModel
+
+@if (Model != null)
+{
+    @Html.Hidden("hdnParentModel", Common.SerializeObject(Model))
+    <div data-ng-controller="AddParentController">
+        <form class="form-horizontal" id="frmParent">
+            <div class="page-bar">
+                <h3 class="page-title">@(isEdit ? Resource.EditParent : @Resource.AddParent)
+                    <small>@Resource.EnterParentInformation</small>
+                    <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(isEdit ? Resource.Update : @Resource.Save)"/>
+                    <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/>
+                </h3>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+
+                            <div class="fscontainer">
+                                <div class="legend">
+                                    @Resource.ParentDetails
+                                </div>
+                                <div class="col-sm-12">
+                                    <div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.FirstName</label>
+                                            <div class="col-md-5">
+                                                @Html.TextBoxFor(q => q.Contact.FirstName, new { @class = "form-control input-sm", data_ng_model = "ParentModel.Contact.FirstName", placeholder = @Resource.FirstName, maxlength = 50 })
+                                                @Html.ValidationMessageFor(q => q.Contact.FirstName)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.LastName</label>
+                                            <div class="col-md-5">
+                                                @Html.TextBoxFor(q => q.Contact.LastName, new { @class = "form-control input-sm", data_ng_model = "ParentModel.Contact.LastName", placeholder = @Resource.LastName, maxlength = 50 })
+                                                @Html.ValidationMessageFor(q => q.Contact.LastName)
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label">@Resource.Email</label>
+                                            <div class="col-md-5">
+                                                @Html.TextBoxFor(q => q.Contact.Email, new { @class = "form-control input-sm", data_ng_model = "ParentModel.Contact.Email", placeholder = @Resource.Email, maxlength = 100 })
+                                                @Html.ValidationMessageFor(q => q.Contact.Email)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.Address</label>
+                                            <div class="col-md-5">
+                                                @Html.TextBoxFor(q => q.Contact.Address, new { @class = "form-control input-sm", data_ng_model = "ParentModel.Contact.Address", placeholder = @Resource.Address, maxlength = 100 })
+                                                @Html.ValidationMessageFor(q => q.Contact.Address)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label">@Resource.City</label>
+                                            <div class="col-md-5">
+                                                @Html.TextBoxFor(q => q.Contact.City, new { @class = "form-control input-sm", data_ng_model = "ParentModel.Contact.City", placeholder = @Resource.City, maxlength = 50 })
+                                                @Html.ValidationMessageFor(q => q.Contact.City)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label">@Resource.ZipCode</label>
+                                            <div class="col-md-5">
+                                                @Html.TextBoxFor(q => q.Contact.ZipCode, new { @class = "form-control input-sm", data_ng_model = "ParentModel.Contact.ZipCode", placeholder = @Resource.ZipCode, maxlength = 15 })
+                                                @Html.ValidationMessageFor(q => q.Contact.ZipCode)
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.Phone1</label>
+                                            <div class="col-md-5">
+                                                @Html.TextBoxFor(q => q.Contact.Phone1, new { @class = "form-control input-sm", data_ng_model = "ParentModel.Contact.Phone1",  maxlength = 50, placeholder = "(XXX) XXX-XXXX", phone_input = "", dir_Valid_Number = "" })
+                                                @Html.ValidationMessageFor(q => q.Contact.Phone1)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label">@Resource.Phone2</label>
+                                            <div class="col-md-5">
+                                                @Html.TextBoxFor(q => q.Contact.Phone2, new { @class = "form-control input-sm", data_ng_model = "ParentModel.Contact.Phone2",  maxlength = 50,placeholder = "(XXX) XXX-XXXX", phone_input = "", dir_Valid_Number = "" })
+                                                @Html.ValidationMessageFor(q => q.Contact.Phone2)
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.Language</label>
+                                            <div class="col-md-5">
+                                                @Html.DropDownListFor(p => p.Contact.LanguageID, Model.Language.ToSelectList(Model.Contact.LanguageID.ToString() ?? "", "Name", "LanguageID", Resource.Select, ""),
+                                                                  new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      data_ng_model = "ParentModel.Contact.LanguageID",
+                                                                      data_ng_init = "ParentModel.Contact.LanguageID=ParentModel.Contact.LanguageID==''?null:ParentModel.Contact.LanguageID",
+                                                                      @class = "form-control  input-sm"
+                                                                  })
+                                                @Html.ValidationMessageFor(q => q.Contact.LanguageID)
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 form-group no-margin no-padding">
+                        <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(isEdit ? Resource.Update : @Resource.Save)"/>
+                        <a href="@Constants.ParentListURL">
+                            <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/></a>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+}
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/parent/addparent")
+}

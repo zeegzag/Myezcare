@@ -1,0 +1,87 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Permission);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.Permission;
+}
+
+@model PermissionsModule
+@Html.Hidden("hdnAddPermissionModel", Common.SerializeObject(Model))
+
+@Html.Hidden("hdnPerList", Common.SerializeObject((object)ViewBag.ParentPermissions.Items))
+<div data-ng-controller="AddPermissionsController">
+
+    <form id="frmSavePermission" action="POST">
+        <div class="page-bar">
+            <h3 class="page-title">
+                @(Model != null && Model != null && Model.PermissionID > 0 ? "Edit Permission" : "Add Permission")
+            </h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="fscontainer">
+                    <div class="legend">
+                        @Resource.ReleaseNoteDetails
+                    </div>
+                    <div class="clearfix">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Permission Name</label>
+                                <input type="text" required class="form-control input-sm" data-ng-model="PermissionModel.PermissionName" name="PermissionName" placeholder="Permission Name" />
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Description</label>
+                                <input type="text" required class="form-control input-sm" data-ng-model="PermissionModel.Description" name="Description" placeholder="Description" />
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">ParentID</label>
+                                {{PermissionModel.ParentID}}
+                                <input type="hidden" id="selectedParentID" value="{{PermissionModel.ParentID}}" />
+                                <select required class="form-control input-sm" data-ng-model="PermissionModel.ParentID" id="ParentID" name="ParentID" placeholder="ParentID">
+                                    <option value="">Select</option>
+                                    <option data-ng-repeat="item in AllPermissions" value="{{item.PermissionID}}">{{item.PermissionName}}</option>
+                                </select>
+                                @*<input type="text" class="form-control input-sm" data-ng-model="PermissionModel.ParentID" name="ParentID" placeholder="ParentID" />*@
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">OrderID</label>
+                                <input type="text" required class="form-control input-sm" data-ng-model="PermissionModel.OrderID" name="OrderID" placeholder="OrderID" />
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Permission Code</label>
+                                <input type="text" required class="form-control input-sm" data-ng-model="PermissionModel.PermissionCode" name="PermissionCode" placeholder="Permission Code" />
+                            </div>
+                            <div class="form-group col-lg-4 col-md-4 col-sm-12">
+                                <label class="control-label required">Permission Platform </label>
+                                @* <input type="text" class="form-control input-sm" data-ng-model="PermissionModel.PermissionPlatform" name="PermissionPlatform" placeholder="Permission Platform" />*@
+                                <select required class="form-control input-sm" data-ng-model="PermissionModel.PermissionPlatform" name="PermissionPlatform" placeholder="Permission Platform">
+                                    <option value="" selected disabled>Select</option>
+                                    <option value="Mobile">Mobile</option>
+                                    <option value="Web">WEB</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div>
+                <a href="@Constants.PermissionsListURL">
+                    <input type="button" class="btn btn-sm red-mint margin-right-10" value="@Resource.Cancel" />
+                </a>
+                <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="SavePermission()" data-ng-if="!PermissionModel">
+                    @Resource.Save
+                </button>
+                <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="SavePermission()" data-ng-if="PermissionModel">
+                    @Resource.Update
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/permissions/addpermission")
+    <script src="~/Assets/js/sitejs/jquery.validate.js"></script>
+    <script src="~/Assets/js/sitejs/jquery-ui.js"></script>
+}

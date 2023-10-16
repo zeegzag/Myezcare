@@ -1,0 +1,141 @@
+﻿@*<style>
+        .form-control:not(.postzipcode), .form-control:not(.bootstrap-select), .token-input-list, .btn-group.bootstrap-select button {
+            border: 1px solid #ffffff;
+        }
+    </style>*@
+<div class="modal-header">
+    
+        <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+        <div class="col-sm-12">
+            <h4 class="modal-title">
+                Billing Notes
+            </h4>
+        </div>
+</div>
+
+<div class="modal-body">
+    <div class="form-group row" style="margin:0;">
+        
+            <div class="" style="margin-bottom:0;">
+                <div class="billingNotes">
+                    <div class="col-md-12">
+                        <div class="row">
+
+                            <div class="col-md-12 col-sm-12">
+                                <div style="background-color: #97989924; ">
+                                    <div class="row">
+                                        <div class="col-md-12 col-sm-12">
+                                            <div class="field" style="padding-left: 2%; padding-right: 2%; padding-top: 2%; ">
+                                                <div class="field-box">
+                                                    <textarea class="form-control input-sm "
+                                                              data-ng-model="BillingNoteModel.BillingNote"
+                                                              style="font-size:1.4rem !important;"
+                                                              placeholder="Writer Note Here"
+                                                              type="text"
+                                                              name="BillingNotes"
+                                                              value=""
+                                                              rows="5"
+                                                              autocomplete="autocomplete_off_hack_xfr4!k"></textarea>
+                                                    <div class="text-align-center">
+                                                        <button type="submit" data-ng-click="SaveBillingNote()" class="btn margin-15px   green-jungle">Add New Note</button>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        @*<div class="clearfix visible-sm">
+                                            </div>*@
+
+                                    </div>
+
+                                    @*<div class="row">
+                                            <div class="col-lg-12">
+
+                                            </div>
+
+                                        </div>*@
+                                </div>
+                                <div class="scroll" style="max-height: 400px;  overflow-x: hidden; overflow-y: auto; padding: 2% 0%;">
+
+
+                                    <div class="field" data-ng-repeat="GetBillingData in GetBillingNoteList" ng-mouseover="hoverIn(GetBillingData.BillingNoteID)" ng-mouseleave="hoverOut(GetBillingData.BillingNoteID)">
+                                        <div style="background-color: #e3e6e838">
+                                            <div class="row">
+                                                <div class="col-lg-6">
+                                                    <label class="control-label ">{{GetBillingData.LastName }} {{GetBillingData.FirstName }}  &nbsp;  &nbsp; {{GetBillingData.UpdatedDate | orgdatetime }}</label>
+                                                </div>
+                                                <div class="col-lg-2">  </div>
+                                                <div class="col-lg-4" data-ng-if=" GetBillingData.BillingNoteID == BtNoteID">
+
+                                                    <div class="text-align-right" id="Actionbtn">
+                                                        <a href="" class="btn btn-xs green-jungle margin-right-05" data-ng-click="UpdateBillingNote(GetBillingData)" data-ng-if=" GetBillingData.BillingNoteID == BNoteID"><i class="fa fa-save"></i> </a>
+                                                        <a href="" class="btn btn-xs red-mint margin-right-05" data-ng-click="HideAllBillingNoteModal(GetBillingData)" data-ng-if=" GetBillingData.BillingNoteID == BNoteID"><i class="fa fa-close"></i> </a>
+
+                                                        <a href="" class="btn btn-xs blue margin-right-05" data-ng-if=" GetBillingData.BillingNoteID != BNoteID" data-ng-click="UpdateBillinNoteButton(GetBillingData)"><i class="fa fa-edit"></i> </a>
+                                                        <a href="javascript:void(0);" class="btn btn-xs red " data-ng-if=" GetBillingData.BillingNoteID != BNoteID" data-ng-click="DeleteBillingNote(GetBillingData)"><i class="fa fa-trash"></i></a>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    <div class="field-box" data-ng-if=" GetBillingData.BillingNoteID == BNoteID ">
+                                                        <textarea class="form-control"
+                                                                  rows="8" cols="40"
+                                                                  type="text"
+                                                                  style="resize: none; font-size: 1.4rem !important; color: black; box-shadow: 0px 0px 2px 0px #888888; border: solid 1px lightgray;"
+                                                                  data-ng-model="GetBillingData.BillingNote">
+                                                               {{GetBillingData.BillingNote}}
+                                                              >
+                                                 </textarea>
+                                                    </div>
+                                                    <div class="field-box" data-ng-if=" GetBillingData.BillingNoteID != BNoteID" style=" padding: 1%; text-align:justify">
+                                                        @*box-shadow: 0px 0px 2px 0px #888888; border: solid 1px lightgray;*@
+                                                        @*<span>
+                                                                {{GetBillingData.BillingNote}}
+
+                                                                {{GetBillingData.BillingNote.length>50 ? GetBillingData.BillingNote.substr(0,50)+'...' :  GetBillingData.BillingNote}}
+
+
+                                                            </span>*@
+                                                        <span ng-if=" GetBillingData.BillingNote.length != strLimit">
+                                                            {{GetBillingData.BillingNote.length>250 ? GetBillingData.BillingNote.substr(0,250)+'...' :  GetBillingData.BillingNote}}
+                                                            &nbsp;&nbsp;<a ng-if=" GetBillingData.BillingNote.length>250" ng-click="showMore(GetBillingData.BillingNote)">Show more</a>
+                                                        </span>
+                                                        <span ng-if="GetBillingData.BillingNote.length == strLimit">
+                                                            {{GetBillingData.BillingNote}}
+                                                            &nbsp;&nbsp;
+                                                            <a ng-click="showLess()">Show less</a>
+                                                        </span>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+
+
+
+
+                                        </div>
+                                        <br />
+
+
+                                    </div>
+
+                                </div>
+
+
+
+                            </div>
+                            <div class="clearfix visible-sm">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        
+
+    </div>
+
+</div>

@@ -1,0 +1,290 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.AttendanceMaster);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_AttendanceMaster;
+}
+@section Styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/attendancemaster/attendancemaster")
+}
+@model AttendanceMasterPageModel
+
+@Html.Hidden("hdnAttendanceMaster", Common.SerializeObject(Model))
+
+<div data-ng-controller="AttendanceMasterController">
+
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.AttendanceMaster
+            <small>@Resource.ClientAttendanceSheet</small>
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div class="row">
+                <form>
+
+                    <div class="form-group col-lg-2 col-md-2 col-sm-12">
+                        <label class="control-label">@Resource.ClientN</label>
+                        @Html.TextBoxFor(q => q.AttendanceMasterSearchModel.ClientName, new
+                            {
+                                @class = "form-control input-sm",
+                                data_ng_model = "TempSearchAttendanceModel.ClientName",
+                                placeholder = @Resource.ClientN,
+                                maxlength = 50
+                            })
+                    </div>
+
+                    <div class="form-group col-lg-7 col-md-7 col-sm-12">
+
+                        <label class="control-label">
+                            <div class="btn-group vertical-align-baseline">
+                                <a class="text-decoration-none dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@Resource.Facility
+                                    <i class="fa fa-angle-down padding-right-5"></i></a>
+                                <ul class="dropdown-menu min-width-30px" role="menu">
+                                    <li data-ng-repeat="region in AttendanceModel.RegionList">
+                                        <a href="#" ng-click="LoadAllFacility(region.RegionID)">{{region.RegionName}}</a>
+                                    </li>
+
+                                </ul>
+                            </div>
+                        </label>
+
+                        <div class="" id="facilityAuotComplete">
+                            <input token-input type='text'
+                                   ng-val='SelectedFacilityIDs'
+                                   onresultsformatter='OnResultsFormatter'
+                                   tokeninputobj='TokenInputObj'
+                                   textfield='FacilityName'
+                                   valuefield='FacilityID'
+                                   onaddedcallback="OnFacilityAdd"
+                                   ondeletecallback="OnFacilityRemove"
+                                   autoSelectFirstResult="false"
+                                   additional-filter-value="TempSearchReferralModel.RegioinID"
+                                   additional-filter-text="searchParam"
+                                   minChars="1"
+                                   searchurl='{{GetFacilutyListForAutoCompleteURL}}'
+                                   placeholder='@Resource.Facilities' minChars="0"
+                                   customclass="form-control input-sm" />
+                        </div>
+
+
+
+
+                        @*<label class="control-label">@Resource.Facility</label>*@
+                        @*@Html.DropDownListFor(p => p.AttendanceMasterSearchModel.FacilityID, Model.Facilities.ToSelectList(Model.AttendanceMasterSearchModel.FacilityID.ToString() ?? "", "FacilityName", "FacilityID", "", ""),
+                                              new
+                                                  {
+                                                      convert_to_number = "",
+                                                      id = "FacilityID",
+                                                      data_ng_model = "TempSearchAttendanceModel.FacilityID",
+                                                      data_ng_init = "TempSearchAttendanceModel.FacilityID=TempSearchAttendanceModel.FacilityID==''?null:TempSearchAttendanceModel.FacilityID",
+                                                      @class = "form-control input-sm",
+                                                      data_val = false
+                                                  })*@
+                    </div>
+
+
+                    @*<div class="form-group col-lg-2 col-md-2 col-sm-2">
+                        <label class="control-label"></label>
+                        <div class="">
+                            <button type="submit" class="btn  btn-sm blue" data-ng-click="OnFacilitySelect()">@Resource.Search</button>
+                        </div>
+                    </div>*@
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12">
+                        <label class="control-label"></label>
+                        <div>
+
+
+
+                            <div class="btn-group btn-group-xs btn-group-solid pull-right calendar-action">
+                                @*<a data-ng-click="PrintDiv('print-content-assignment')" type="button" class="btn default border-grey-cascade" title="Print">@Resource.Print</a>
+                                <button data-ng-click="ViewReferralList()" type="button" class="btn default border-grey-cascade" data-ng-class="{'purple':ShowReferralList}">@Resource.ReferralList</button>*@
+                                <button data-ng-click="ViewCalenders()" type="button" class="btn default border-grey-cascade " data-ng-class="{'purple':ShowCalenders}"><i class="fa fa-calendar"></i></button>
+                                <button data-ng-click="CalenderPrev()" type="button" class="btn default border-grey-cascade"><i class="fa fa-angle-double-left"></i></button>
+                                <button data-ng-click="CalenderRefresh()" type="button" class="btn default border-grey-cascade"><i class="fa fa-refresh"></i></button>
+                                <button data-ng-click="CalenderNext()" type="button" class="btn default border-grey-cascade"><i class="fa fa-angle-double-right"></i></button>
+                                <!-- <button data-viewname="today" type="button" class="btn red border-grey-cascade">Today</button> -->
+                                <button data-ng-click="CalenderChangeView('month')" type="button" class="btn green border-grey-cascade">@Resource.Month</button>
+                                <button data-ng-click="CalenderChangeView('basicWeek')" type="button" class="btn blue border-grey-cascade">@Resource.Week</button>
+                                <button data-ng-click="CalenderChangeView('basicDay')" type="button" class="btn yellow border-grey-cascade">@Resource.Day</button>
+
+                            </div>
+
+
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <hr />
+            <div class="row margin-bottom-15">
+                <div class="col-lg-6 padding-bottom-10" data-ng-class="{'clear-right':$index % 2 !=0,'clear-left':$index % 2 ==0}" data-ng-repeat="calenderItem in CalendarList">
+                    <div>
+                        <h4 class="pull-left"
+                            common-detail-popover="calenderItem.Facility" popover-width="400" popover-trigger="click"
+                            ng-template-selector="#facilitydetailpopover"><b>{{calenderItem.Facility.FacilityName}}</b>
+                            <small>(<span>@Resource.Capacity : </span>{{calenderItem.Facility.BadCapacity}} | <span>@Resource.PrivateRoom : </span>{{calenderItem.Facility.PrivateRoomCount}}
+                            @*| <span>@Resource.ClientLabel </span>{{calenderItem.AttendanceList.length}}*@)
+                            </small>
+                        </h4>
+                        <div ng-attendance-calender="calenderItem" class="has-toolbar calendarLT" data-ng-show="ShowCalenders"
+                            data-ng-get-event-list="GetAttendanceList"
+                            data-ng-on-event-render="EventRender"
+                            data-ng-on-click="ClickEvent" ng-height="350" ng-editable="false" ng-dragscroll="false" ng-droppable="false" ng-defaultview="basicWeek" ng-disabledragging="true">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+@*START: CLIENT ABSENT REASON CODE*@
+<div class="modal fade" id="EditSchedule" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="EditSchdule"><span>@Resource.AbsentReason</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmScheduleEdit">
+                        <div class="row">
+                            <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                <label class="control-label required">@Resource.Status</label>
+                                @Html.DropDownListFor(m => m.ScheduleMaster.ScheduleStatusID, Model.ScheduleStatuses.ToSelectList(Model.ScheduleMaster.ScheduleStatusID.ToString() ?? "", "ScheduleStatusName", "ScheduleStatusID", "Select", ""),
+                                                      new
+                                                      {
+                                                          convert_to_number = "",
+                                                          data_ng_model = "ScheduleDetail.ScheduleStatusID",
+                                                          data_ng_init = "ScheduleDetail.ScheduleStatusID=(ScheduleDetail.ScheduleStatusID == null || ScheduleDetail.ScheduleStatusID==0)?'':ScheduleDetail.ScheduleStatusID",
+                                                          @class = "form-control input-sm",
+                                                      })
+                                @Html.ValidationMessageFor(m => m.ScheduleMaster.ScheduleStatusID)
+                            </div>
+                            <div data-ng-show="ScheduleDetail.ScheduleStatusID.toString() != CancelStatus">
+                                @*<div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.PickUp</label>
+                                    <select class="form-control input-sm"
+                                                data-ng-init="ScheduleDetail.PickUpLocation=(ScheduleDetail.PickUpLocation == null || ScheduleDetail.PickUpLocation==0)?'':ScheduleDetail.PickUpLocation"
+                                                data-ng-model="ScheduleDetail.PickUpLocation"
+                                                data-val="true" data-val-required="@Resource.PickUpLocationRequired"
+                                                id="PickUpLocation"
+                                                name="ScheduleDetail.PickUpLocation"
+                                                convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in ScheduleMasterModel.TransportLocation | filter:PickUpLocationFilter(ScheduleDetail.PickUpLocation)" value="{{option.TransportLocationID}}">{{option.Location}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.PickUpLocation)
+                                </div>
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ScheduleDetail.ScheduleStatusID.toString() != CnclStatus">
+                                    <label class="control-label required">@Resource.DropOff</label>
+                                    <select class="form-control input-sm"
+                                            data-ng-init="ScheduleDetail.DropOffLocation=(ScheduleDetail.DropOffLocation == null || ScheduleDetail.DropOffLocation==0)?'':ScheduleDetail.DropOffLocation"
+                                            data-ng-model="ScheduleDetail.DropOffLocation"
+                                            data-val="true" data-val-required="@Resource.DropOffLocationRequired"
+                                            id="DropOffLocation"
+                                            name="ScheduleDetail.DropOffLocation"
+                                            convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in ScheduleMasterModel.TransportLocation | filter:PickUpLocationFilter(ScheduleDetail.DropOffLocation)" value="{{option.TransportLocationID}}">{{option.Location}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.DropOffLocation)
+                                </div>
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="ScheduleDetail.ScheduleStatusID.toString() != CnclStatus">
+                                    <label class="control-label required">@Resource.Facility</label>
+                                    <select class="form-control input-sm"
+                                                data-ng-init="ScheduleDetail.FacilityID=(ScheduleDetail.FacilityID == null || ScheduleDetail.FacilityID==0)?'':ScheduleDetail.FacilityID"
+                                                data-ng-model="ScheduleDetail.FacilityID"
+                                                data-val="true" data-val-required="@Resource.FacilityRequired"
+                                                id="EditFacilityID"
+                                                name="ScheduleDetail.FacilityID"
+                                                convert-to-number="">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in ScheduleMasterModel.Facilities | filter:FacilityFilter(ScheduleDetail.FacilityID)" value="{{option.FacilityID}}">{{option.FacilityName}}</option>
+                                    </select>
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.DropOffLocation)
+                                </div>*@
+                                <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                                    <label class="control-label">@Resource.Comment</label>
+                                    @Html.TextAreaFor(m => m.ScheduleMaster.Comments, new { data_ng_model = "ScheduleDetail.Comments", @class = "form-control input-sm", maxlength = 500 })
+                                </div>
+                            </div>
+                            <div data-ng-if="ScheduleDetail.ScheduleStatusID.toString() == CancelStatus">
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.WhoCancel</label>
+                                    @Html.DropDownListFor(m => m.ScheduleMaster.WhoCancelled, Model.CancellationReasons.ToSelectList(Model.ScheduleMaster.WhoCancelled ?? "", "Name", "Value", "Select", ""),
+                                                          new
+                                                          {
+                                                              data_ng_model = "ScheduleDetail.WhoCancelled",
+                                                              data_ng_init = "ScheduleDetail.WhoCancelled=(ScheduleDetail.WhoCancelled == null || ScheduleDetail.WhoCancelled==0)?'':ScheduleDetail.WhoCancelled",
+                                                              @class = "form-control input-sm",
+                                                          })
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.WhoCancelled)
+                                </div>
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.WhenCancel</label>
+                                    <div datepicker="ScheduleDetail.WhenCancelled" ng-dateval="ScheduleDetail.WhenCancelled" class="input-group date">
+                                        @Html.TextBoxFor(m => m.ScheduleMaster.WhenCancelled,
+                                                         new
+                                                         {
+                                                             @class = "form-control input-sm",
+                                                             placeholder = Resource.WhenCancel,
+                                                             date_input_mask = ""
+                                                         })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        @Html.ValidationMessageFor(m => m.ScheduleMaster.WhenCancelled)
+
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-8 col-md-8 col-sm-8">
+                                    <label class="control-label required">@Resource.CancellationReason</label>
+                                    @Html.TextAreaFor(m => m.ScheduleMaster.CancelReason, new { data_ng_model = "ScheduleDetail.CancelReason", @class = "form-control input-sm", maxlength = 500 })
+                                    @Html.ValidationMessageFor(m => m.ScheduleMaster.CancelReason)
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Cancel</button>@*data-ng-click="ResetReferralInternamMessage()"*@
+                                <button type="submit" data-ng-click="SaveAbsentRecordFoClient(ScheduleDetail)" class="btn green-jungle">@Resource.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+@*END: CLIENT ABSENT REASON CODE*@
+
+</div>
+
+
+
+
+<script id="calendereventmarker" type="text/ng-template">
+    @Html.Partial("Partial/_CalenderEventMarker")
+</script>
+<script id="calenderattendanceedit" type="text/ng-template">
+    @Html.Partial("Partial/_CalenderAttendanceEdit")
+</script>
+<script id="facilitydetailpopover" type="text/ng-template">
+    @Html.Partial("Partial/_FacilityDetailPopover")
+</script>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/attendancemaster/attendancemaster")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessageForSchedule = '@string.Format(@Resource.DeleteConfirmationMessage, "Attendance Master")';
+        var CancelStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Cancelled)';
+    </script>
+}

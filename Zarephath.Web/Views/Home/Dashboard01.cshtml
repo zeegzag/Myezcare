@@ -1,0 +1,237 @@
+﻿@model DashboardModel
+@Html.Hidden("hdnSetDashboardListPage", Common.SerializeObject(Model))
+
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Dashboard);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_Dashboard;
+}
+
+
+@Html.Hidden("hdnP_AssignedIMNotifications", Common.SerializeObject(Common.HasPermission(Constants.Permission_Dashboard_AssignedIMNotifications)))
+@Html.Hidden("hdnP_ResolvedIMNotifications", Common.SerializeObject(Common.HasPermission(Constants.Permission_Dashboard_ResolvedIMNotifications)))
+@Html.Hidden("hdnP_MissingIncompleteCheckListSPAR", Common.SerializeObject(Common.HasPermission(Constants.Permission_Dashboard_MissingIncompleteCheckListSPAR)))
+@Html.Hidden("hdnP_MissingExpiredDocuments", Common.SerializeObject(Common.HasPermission(Constants.Permission_Dashboard_MissingExpiredDocuments)))
+@Html.Hidden("hdnP_MissingInternalDocument", Common.SerializeObject(Common.HasPermission(Constants.Permission_Dashboard_MissingInternalDocument)))
+@Html.Hidden("hdnP_AnsellCaseyReview", Common.SerializeObject(Common.HasPermission(Constants.Permission_Dashboard_AnsellCaseyReview)))
+@Html.Hidden("hdnP_AssignedNotesReview", Common.SerializeObject(Common.HasPermission(Constants.Permission_Dashboard_AssignedNotesReview)))
+
+
+
+@if (
+
+    (
+    Common.HasPermission(Constants.Permission_Dashboard_AssignedIMNotifications) || Common.HasPermission(Constants.Permission_Dashboard_ResolvedIMNotifications) ||
+    Common.HasPermission(Constants.Permission_Dashboard_MissingIncompleteCheckListSPAR) ||
+    Common.HasPermission(Constants.Permission_Dashboard_MissingExpiredDocuments) || Common.HasPermission(Constants.Permission_Dashboard_MissingInternalDocument) ||
+    Common.HasPermission(Constants.Permission_Dashboard_AnsellCaseyReview) || Common.HasPermission(Constants.Permission_Dashboard_AssignedNotesReview) 
+   )
+    && (Common.HasPermission(Constants.Permission_View_All_Referral) || Common.HasPermission(Constants.Permission_View_Assinged_Referral)))
+{
+    <div data-ng-controller="DashboardController">
+        <div class="row">
+            @if (Common.HasPermission(Constants.Permission_Dashboard_AssignedIMNotifications))
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="dashboard-stat blue">
+                        <div class="visual">
+                            <i class="fa fa-comments"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span data-counter="counterup">{{ReferralInternalMessageListPager.totalRecords}}</span>
+                            </div>
+                            <div class="desc col-sm-12">@Resource.AssigneInternalMessageNotification</div>
+                        </div>
+                        <a class="more" href="javascript:;" data-ng-click="ViewMoreClick('#ReferralInternalMessageList',ReferralInternalMessageListPager.totalRecords)">@Resource.ViewMore
+
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.Permission_Dashboard_ResolvedIMNotifications))
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="dashboard-stat yellow-casablanca">
+                        <div class="visual">
+                            <i class="fa fa-comments"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span data-counter="counterup">{{ReferralResolvedInternalMessageListPager.totalRecords}}</span>
+                            </div>
+                            <div class="desc col-sm-12">@Resource.ResolvedAssignedInternalMessageNotification</div>
+                        </div>
+                        <a class="more" href="javascript:;" data-ng-click="ViewMoreClick('#ReferralResolvedInternalMessageList',ReferralResolvedInternalMessageListPager.totalRecords)">@Resource.ViewMore
+
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.Permission_Dashboard_MissingIncompleteCheckListSPAR))
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="dashboard-stat red">
+                        <div class="visual">
+                            <i class="fa fa-bar-chart-o"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span data-counter="counterup">{{ReferralSparformCheckListPager.totalRecords}}</span>
+                            </div>
+                            <div class="desc col-sm-12 ">@Resource.IncompleteMissingSparformCKList</div>
+                        </div>
+                        <a class="more" href="javascript:;" data-ng-click="ViewMoreClick('#ReferralSparformCheckList',ReferralSparformCheckListPager.totalRecords)">@Resource.ViewMore
+
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.Permission_Dashboard_MissingExpiredDocuments))
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="dashboard-stat green">
+                        <div class="visual">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span data-counter="counterup">{{ReferralMissingandExpireDocumentListPager.totalRecords}}</span>
+                            </div>
+                            <div class="desc">@Resource.MissingandExpierDocumentList</div>
+                        </div>
+                        <a class="more" href="javascript:;" data-ng-click="ViewMoreClick('#ReferralMissingandExpireDocumentList',ReferralMissingandExpireDocumentListPager.totalRecords)">@Resource.ViewMore
+
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.Permission_Dashboard_MissingInternalDocument))
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="dashboard-stat blue-hoki">
+                        <div class="visual">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span data-counter="counterup">{{ReferralInternalMissingandExpireDocumentListPager.totalRecords}}</span>
+                            </div>
+                            <div class="desc ">@Resource.MissingInternalDocumentList</div>
+                        </div>
+                        <a class="more" href="javascript:;" data-ng-click="ViewMoreClick('#ReferralInternalMissingandExpireDocumentList',ReferralInternalMissingandExpireDocumentListPager.totalRecords)">@Resource.ViewMore
+
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.Permission_Dashboard_AnsellCaseyReview))
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="dashboard-stat yellow-lemon">
+                        <div class="visual">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span data-counter="counterup">{{ReferralAnsellCaseyReviewListPager.totalRecords}}</span>
+                            </div>
+                            <div class="desc ">@Resource.AnsellCaseyAssessmentReview</div>
+                        </div>
+                        <a class="more" href="javascript:;" data-ng-click="ViewMoreClick('#ReferralAnsellCaseyReviewList',ReferralAnsellCaseyReviewListPager.totalRecords)">@Resource.ViewMore
+
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+
+            @if (Common.HasPermission(Constants.Permission_Dashboard_AssignedNotesReview))
+            {
+                <div class="col-lg-2 col-md-3 col-sm-4 col-xs-12">
+                    <div class="dashboard-stat grey-mint">
+                        <div class="visual">
+                            <i class="fa fa-shopping-cart"></i>
+                        </div>
+                        <div class="details">
+                            <div class="number">
+                                <span data-counter="counterup">{{ReferralAssignedNotesReviewListPager.totalRecords}}</span>
+                            </div>
+                            <div class="desc ">@Resource.AssignedNotesReview</div>
+                        </div>
+                        <a class="more" href="javascript:;" data-ng-click="ViewMoreClick('#ReferralAssignedNotesReviewList',ReferralAssignedNotesReviewListPager.totalRecords)">@Resource.ViewMore
+
+                            <i class="m-icon-swapright m-icon-white"></i>
+                        </a>
+                    </div>
+                </div>
+            }
+
+        </div>
+        <hr />
+        <div class="clearfix"></div>
+
+        @if (Common.HasPermission(Constants.Permission_Dashboard_AssignedIMNotifications))
+        {
+            @Html.Partial("_Partial/_ReferralInternalMessageList")
+        }
+        @if (Common.HasPermission(Constants.Permission_Dashboard_ResolvedIMNotifications))
+        {
+            @Html.Partial("_Partial/_ResolvedReferralInternalMessageList")
+        }
+        @if (Common.HasPermission(Constants.Permission_Dashboard_MissingIncompleteCheckListSPAR))
+        {
+            @Html.Partial("_Partial/_ReferralSparFormList")
+        }
+        @if (Common.HasPermission(Constants.Permission_Dashboard_MissingExpiredDocuments))
+        {
+            @Html.Partial("_Partial/_ReferralDocumentList")
+        }
+        @if (Common.HasPermission(Constants.Permission_Dashboard_MissingInternalDocument))
+        {
+            @Html.Partial("_Partial/_ReferralInternalDocumentList")
+        }
+
+        @if (Common.HasPermission(Constants.Permission_Dashboard_AnsellCaseyReview))
+        {
+            @Html.Partial("_Partial/_ReferralAnsellCaseyReviewList")
+        }
+
+        @if (Common.HasPermission(Constants.Permission_Dashboard_AssignedNotesReview))
+        {
+            @Html.Partial("_Partial/_ReferralAssignedNotesList")
+        }
+
+    </div>
+    
+    
+    @section Scripts{
+        @Scripts.Render("~/viewjs/siteApp/home/dashboard")
+    }
+}
+else
+{
+    <div class="text-align-center">
+        <h4>
+            @Html.Raw(String.Format(Resource.DashboardWCMsg, SessionHelper.FirstName))
+        </h4>
+    </div>
+}
+
+
+
+@*@section Scripts{
+    @if (Common.HasPermission(Constants.Permission_Dashboard) && (Common.HasPermission(Constants.Permission_View_All_Referral) || Common.HasPermission(Constants.Permission_View_Assinged_Referral)))
+    {
+        @Scripts.Render("~/viewjs/siteApp/home/dashboard")
+    }
+}*@
+
+<script type="text/javascript">
+    var ResolveNoteConfirmMessage = '@Resource.ResolveNoteConfirmMessage'
+</script>

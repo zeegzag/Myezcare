@@ -1,0 +1,221 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.AgencyList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_AgencyList;
+}
+
+@model SetAgencyListPage
+@Html.Hidden("hdnSetAgencyListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="AgencyListController">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.AgencyList &nbsp;<small>@Resource.AgencyInformation</small>
+            <a href="@Constants.AgencyAddPageURL" class="btn btn-sm green-jungle letter-space pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Agency</a>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @*@if (Common.HasPermission(Constants.Permission_Transportation_AddUpdate))
+            {
+                *@<div class="btn-group" data-ng-show="AgencyList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllAgency" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllAgency"></label>
+                    </span>
+                </div>
+            @*}*@
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchAgencyListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchAgencyListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempAgencyListPage.IsDeleted",
+                                                                          data_ng_init = "TempAgencyListPage.IsDeleted = TempAgencyListPage.IsDeleted==null?'-1':TempAgencyListPage.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchAgency()"
+                                                                      })
+            </div>
+            @*@if (Common.HasPermission(Constants.Permission_Transportation_AddUpdate))
+            {
+                *@<div class="btn-group" data-ng-if="SelectedAgencyIds.length > 0">
+                    <button type="button" data-ng-click="DeleteAgencyList()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempAgencyListPage.IsDeleted==0?'@Constants.DisableSelected' :(TempAgencyListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}</button>
+                </div>
+            @*}*@
+            <div class="inline-block pull-right" data-ng-show="AgencyList.length > 0">
+                <div class="inline-block pull-right" data-ng-show="AgencyList.length > 0">
+                    <div class="pull-right margin-left-5">
+                        <dir-pagination-controls boundary-links="true" max-size="AgencyListPager.maxSize" on-page-change="AgencyListPager.pageChanged(newPageNumber)" pagination-id="AgencyListPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+
+            </div>
+            <div class="space20"></div>
+        </div>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive">
+                        <form id="frmAgencyList">
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @*@if (Common.HasPermission(Constants.Permission_Transportation_AddUpdate))
+                                        {
+                                            *@<th class="width-20px"></th>
+                                        @*}*@
+                                        <th  >
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="AgencyListPager.sortColumn('NickName')">@Resource.AgencyName</a>
+                                            <span class="sortorder" data-ng-show="AgencyListPager.sortIndex === 'NickName'" data-ng-class="{reverse:AgencyListPager.reverse}"></span>
+                                        </th>
+                                        <th >
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="AgencyListPager.sortColumn('ShortName')">@Resource.AgencyShortName</a>
+                                            <span class="sortorder" data-ng-show="AgencyListPager.sortIndex === 'ShortName'" data-ng-class="{reverse:AgencyListPager.reverse}"></span>
+                                        </th>
+                                        <th  >
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="AgencyListPager.sortColumn('RegionName')">@Resource.Region</a>
+                                            <span class="sortorder" data-ng-show="AgencyListPager.sortIndex === 'RegionName'" data-ng-class="{reverse:AgencyListPager.reverse}"></span>
+                                        </th>
+                                        <th  style="display: none">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="AgencyListPager.sortColumn('ContactName')">@Resource.ContactName</a>
+                                            <span class="sortorder" data-ng-show="AgencyListPager.sortIndex === 'ContactName'" data-ng-class="{reverse:AgencyListPager.reverse}"></span>
+                                        </th>
+                                        <th  style="display: none">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="AgencyListPager.sortColumn('Email')">@Resource.Email</a>
+                                            <span class="sortorder" data-ng-show="AgencyListPager.sortIndex === 'Email'" data-ng-class="{reverse:AgencyListPager.reverse}"></span>
+                                        </th>
+                                        <th >
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="AgencyListPager.sortColumn('Phone')">@Resource.Phone</a>
+                                            <span class="sortorder" data-ng-show="AgencyListPager.sortIndex === 'Phone'" data-ng-class="{reverse:AgencyListPager.reverse}"></span>
+                                        </th>
+                                        <th >
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="AgencyListPager.sortColumn('Address')">@Resource.Address</a>
+                                            <span class="sortorder" data-ng-show="AgencyListPager.sortIndex === 'Address'" data-ng-class="{reverse:AgencyListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-130px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @*@if (Common.HasPermission(Constants.Permission_Transportation_AddUpdate))
+                                        {
+                                            *@<td></td>
+                                        @*}*@
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchAgencyListPage.NickName, new { data_ng_model = "TempAgencyListPage.NickName", @class = "form-control input-sm", placeholder = Resource.AgencyName, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchAgencyListPage.ShortName, new { data_ng_model = "TempAgencyListPage.ShortName", @class = "form-control input-sm", placeholder = Resource.LocationCode, maxlength = 50 })
+                                        </td>
+                                        <td>
+
+                                            @Html.DropDownListFor(m => m.SearchAgencyListPage.RegionID, Model.RegionListModel.ToSelectList(Convert.ToString(Model.SearchAgencyListPage.RegionID), "RegionName", "RegionID", Resource.SelectRegion, ""), new
+                                                {
+                                                    id = "RegionID",
+                                                    data_ng_model = "TempAgencyListPage.RegionID",
+                                                    data_ng_init = "SearchAgencyListPage.RegionID=SearchAgencyListPage.RegionID==''?null:SearchAgencyListPage.RegionID",
+                                                    @class = "form-control input-sm",
+                                                    convert_to_number = "",
+                                                    data_val = "false"
+                                                })
+
+                                        </td>
+                                        <td style="display: none">
+                                            @Html.TextBoxFor(m => m.SearchAgencyListPage.ContactName, new { data_ng_model = "TempAgencyListPage.ContactName", @class = "form-control input-sm", placeholder = Resource.ContactName, maxlength = 50 })
+                                        </td>
+                                        <td style="display: none">
+                                            @Html.TextBoxFor(m => m.SearchAgencyListPage.Email, new { data_ng_model = "TempAgencyListPage.Email", @class = "form-control input-sm", placeholder = Resource.Email, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchAgencyListPage.Phone,
+                                            new
+                                                {
+                                                    data_ng_model = "TempAgencyListPage.Phone",
+                                                    @class = "form-control input-sm",
+                                                    placeholder = Resource.Phone,
+                                                })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchAgencyListPage.Address, new { data_ng_model = "TempAgencyListPage.Address", @class = "form-control input-sm", placeholder = Resource.Address, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchAgency()"/>
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in AgencyList | itemsPerPage: AgencyListPager.pageSize" total-items="AgencyListPager.totalRecords" current-page="AgencyListPager.currentPage" pagination-id="AgencyListPagerID">
+                                        @* @if (Common.HasPermission(Constants.Permission_Transportation_AddUpdate))
+                                        {
+                                            *@<td>
+                                                <input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" data-ng-change="SelectAgency(item)" val="item.IsChecked"></td>
+                                        @*}*@
+                                        <td data-ng-bind="item.NickName ? item.NickName:'@Resource.NA'"></td>
+                                        <td  data-ng-bind="item.ShortName ? item.ShortName:'@Resource.NA'"></td>
+                                        <td data-ng-bind="item.RegionName? item.RegionName:'@Resource.NA'"></td>
+                                        <td style="display: none" data-ng-bind="item.ContactName ? item.ContactName:'@Resource.NA'" ></td>
+                                        <td style="display: none" data-ng-bind="item.Email ? item.Email:'@Resource.NA'" ></td>
+                                        <td data-ng-bind="item.Phone ? item.Phone:'@Resource.NA'" ></td>
+                                        <td data-ng-bind="item.Address ? item.Address:'@Resource.NA'" ></td>
+
+                                        <td>
+                                            @*@if (Common.HasPermission(Constants.Permission_Transportation_AddUpdate))
+                                            {
+                                                *@
+                                            <a href="{{ AgencyModelListURL + item.EncryptedAgencyID}}" class="btn btn-xs blue">@Resource.Edit</a>
+                                            <a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteAgencyList(item.AgencyID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                            <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteAgencyList(item.AgencyID,'Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                            @*}*@
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="AgencyList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(AgencyListPager.pageSize * AgencyListPager.currentPage) - AgencyListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(AgencyListPager.pageSize == AgencyListPager.currentPageSize) ? (AgencyListPager.pageSize * AgencyListPager.currentPage) :(AgencyListPager.pageSize * AgencyListPager.currentPage) - AgencyListPager.pageSize  + AgencyListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="AgencyListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="AgencyListPager.maxSize" on-page-change="AgencyListPager.pageChanged(newPageNumber)" pagination-id="AgencyListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="AgencyList.length == 0  ">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/agency/agencylist")
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Agency)';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.Agency)';
+    </script>
+}

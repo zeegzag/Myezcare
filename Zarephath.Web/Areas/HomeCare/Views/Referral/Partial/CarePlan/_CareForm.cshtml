@@ -1,0 +1,305 @@
+﻿@{
+    CacheHelper _cacheHelper = new CacheHelper();
+}
+@model HC_AddReferralModel
+@Html.Hidden("hdnSetAddReferralModel", Common.SerializeObject(Model))
+
+<div>
+    <div class="form-group row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            @*<div class="fscontainer groupErrorParent" id="ShowAddedContactList">*@
+            @*<div class="legend">
+                    Service Details
+                </div>*@
+            <h5><strong>Planned Date of Service Initiation</strong></h5><hr />
+            <div class="row">
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <label class="control-label">Start Date</label>
+                    <div class="input-group date"
+                         datepicker="CareForm.PSI_StartDate"
+                         data-ng-dateval="CareForm.PSI_StartDate"
+                         data-ng-maxdate="CareForm.PSI_EndDate">
+                        @Html.TextBoxFor(q => q.CareForm.PSI_StartDate, new { @class = "form-control input-sm dateInputMask", placeholder = Constants.GlobalDateFormat })
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <label class="control-label">End Date</label>
+                    <div class="input-group date"
+                         datepicker="CareForm.PSI_EndDate"
+                         data-ng-dateval="CareForm.PSI_EndDate"
+                          data-ng-mindate="CareForm.PSI_StartDate">
+                        @Html.TextBoxFor(q => q.CareForm.PSI_EndDate, new { @class = "form-control input-sm dateInputMask", placeholder = Constants.GlobalDateFormat })
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <label class="control-label">Service Requested</label>
+                    <select class="form-control input-sm" multiple="multiple" title="@Resource.Select"
+                            data-val="true" selectpicker="SelectedServiceRequeste" name="CareForm.ServiceRequested">
+                        <option data-ng-repeat="item in VisitTypeList" value="{{item.Value}}">{{item.Name}}</option>
+                    </select>
+                </div>
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <label class="control-label">Is the client medically frail</label>
+                    @Html.DropDownListFor(q => q.CareForm.IsMedicallyFrail, Common.SetYesNoListForBoolean().ToSelectList(Convert.ToString(Model.CareForm.IsMedicallyFrail), "Name", "Value"), new
+                    {
+                        id = "IsMedicallyFrail",
+                        data_ng_model = "CareForm.IsMedicallyFrail",
+                        data_ng_init = "CareForm.IsMedicallyFrail=CareForm.IsMedicallyFrail==''?null:CareForm.IsMedicallyFrail",
+                        @class = "form-control input-sm",
+                        convert_to_boolean = ""
+                    })
+                </div>
+            </div>
+
+            <h5><strong>Service Details</strong></h5><hr />
+            <div class="row">
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Specific Functional Limitations of the client</label>
+                    @Html.TextAreaFor(q => q.CareForm.SpecificFunctionalLimitations, new
+                    {
+                        data_ng_model = "CareForm.SpecificFunctionalLimitations",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Charges for Services Rendered</label>
+                    <div class="col-lg-12 no-padding">
+                        <div class="mt-checkbox-inline margin-top-15">
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input id="IsChargesForServicesRendered" class="uniformControls" 
+                                       data-uniform-value="CareForm.IsChargesForServicesRendered"
+                                       data-ng-model="CareForm.IsChargesForServicesRendered" 
+                                       data-ng-true-value="1" type="checkbox" />
+                                By Insurance Company
+                            </label>
+                            &nbsp;&nbsp;&nbsp; <b>OR</b> &nbsp;&nbsp;&nbsp;
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input id="IsChargesForServicesRendered" class="uniformControls" 
+                                       data-uniform-value="CareForm.IsChargesForServicesRendered"
+                                       data-ng-model="CareForm.IsChargesForServicesRendered" 
+                                       data-ng-true-value="2" type="checkbox" />
+                                Paid in Full or in Part by the Client
+                            </label>
+                        </div>
+                    </div>
+                    <div class="col-lg-12 no-padding">
+                        <div class="mt-checkbox-inline margin-top-15">
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input id="IsChargesForServicesRendered" class="uniformControls" 
+                                       data-uniform-value="CareForm.IsChargesForServicesRendered"
+                                       data-ng-model="CareForm.IsChargesForServicesRendered" 
+                                       data-ng-true-value="3" 
+                                       type="checkbox" />
+                                Significant Other(s)
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline" style="margin-left: 30px;"  
+                                   data-ng-if="CareForm.IsChargesForServicesRendered == 3">
+                                <input id="OnRequest" class="uniformControls" data-uniform-value="CareForm.OnRequest"
+                                        data-ng-model="CareForm.OnRequest" type="checkbox" />
+                                On Request
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Plan of Supervision</label>
+                    @Html.TextAreaFor(q => q.CareForm.PlanOfSupervision, new
+                    {
+                        data_ng_model = "CareForm.PlanOfSupervision",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Duration of services</label>
+                    @Html.TextAreaFor(q => q.CareForm.DurationOfServices, new
+                    {
+                        data_ng_model = "CareForm.DurationOfServices",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Statements of Goals</label>
+                    @Html.TextAreaFor(q => q.CareForm.StatementsOfGoals, new
+                    {
+                        data_ng_model = "CareForm.StatementsOfGoals",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Objectives of Services</label>
+                    @Html.TextAreaFor(q => q.CareForm.ObjectivesOfServices, new
+                    {
+                        data_ng_model = "CareForm.ObjectivesOfServices",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Discharge Plans</label>
+                    @Html.TextAreaFor(q => q.CareForm.DischargePlans, new
+                    {
+                        data_ng_model = "CareForm.DischargePlans",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Description of how the specific tasks are to be performed</label>
+                    @Html.TextAreaFor(q => q.CareForm.DescriptionHowTheTasksArePerformed, new
+                    {
+                        data_ng_model = "CareForm.DescriptionHowTheTasksArePerformed",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+            </div>
+
+            <h5><strong>If applicable to the client</strong></h5><hr />
+            <div class="row">
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Pertinent Diagnosis</label>
+                    @Html.TextAreaFor(q => q.CareForm.PertinentDiagnosis, new
+                    {
+                        data_ng_model = "CareForm.PertinentDiagnosis",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Medications</label>
+                    @Html.TextAreaFor(q => q.CareForm.Medications, new
+                    {
+                        data_ng_model = "CareForm.Medications",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Treatments</label>
+                    @Html.TextAreaFor(q => q.CareForm.Treatments, new
+                    {
+                        data_ng_model = "CareForm.Treatments",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Equipment Needs</label>
+                    @Html.TextAreaFor(q => q.CareForm.EquipmentNeeds, new
+                    {
+                        data_ng_model = "CareForm.EquipmentNeeds",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+            </div>
+            <div class="row">
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Diet</label>
+                    @Html.TextAreaFor(q => q.CareForm.Diet, new
+                    {
+                        data_ng_model = "CareForm.Diet",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+                <div class="form-group col-lg-6 col-md-3 col-sm-3">
+                    <label class="control-label">Nutritional Needs</label>
+                    @Html.TextAreaFor(q => q.CareForm.NutritionalNeeds, new
+                    {
+                        data_ng_model = "CareForm.NutritionalNeeds",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+            </div>
+
+            <h5><strong>Physician’s orders</strong></h5><hr />
+            <div class="row">
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <label class="control-label">Physician’s orders needed</label>
+                    @Html.DropDownListFor(q => q.CareForm.IsPhysiciansOrdersNeeded, Common.SetYesNoListForBoolean().ToSelectList(Convert.ToString(Model.CareForm.IsPhysiciansOrdersNeeded), "Name", "Value"), new
+                    {
+                        id = "IsPhysiciansOrdersNeeded",
+                        data_ng_model = "CareForm.IsPhysiciansOrdersNeeded",
+                        data_ng_init = "CareForm.IsPhysiciansOrdersNeeded=CareForm.IsPhysiciansOrdersNeeded==''?null:CareForm.IsPhysiciansOrdersNeeded",
+                        @class = "form-control input-sm",
+                        convert_to_boolean = ""
+                    })
+                </div>
+                <div class="form-group col-lg-9 col-md-3 col-sm-3" data-ng-if="CareForm.IsPhysiciansOrdersNeeded == true">
+                    <label class="control-label">If yes, note how they will be obtained</label>
+                    @Html.TextAreaFor(q => q.CareForm.PhysicianOrdersDescription, new
+                    {
+                        data_ng_model = "CareForm.PhysicianOrdersDescription",
+                        @class = "form-control input-sm",
+                        rows = 4
+                    })
+                </div>
+            </div>
+
+            @*</div>*@
+        </div>
+        <div class="col-md-12">
+            <hr />
+            <div class="">
+                <button class="btn btn-sm primary pull-right margin-right-05" data-ng-click="GenerateForm()">Generate Form</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="space20"></div>
+
+    <div class="modal fade" id="CareFormHtml" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none; margin-top: 0px;"  aria-hidden="true">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="font-size-20">Plan of Care Form</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseCareFormModel()"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    @Html.Partial("Partial/CarePlan/_CareFormHtml", Model)
+                </div>
+                <div class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="ClientSignatureModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" style="display: none; margin-top: 0px;" data-backdrop="static" data-keyboard="false" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span class="font-size-20">Client Signature</span>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="CloseClientSignModel()"><span aria-hidden="true">×</span></button>
+                </div>
+                <div class="modal-body">
+                    <div class="container" style="width:570px;height:210px;" >
+                        <signature-pad accept="accept" clear="clear" style="border:1px solid" height="220" width="568" dataurl="dataurl"></signature-pad>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button id="save-png" data-ng-click="SaveSignatureImage()">Save</button>
+                    <button id="clear" data-ng-click="ClearSignatureImage()">Clear</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

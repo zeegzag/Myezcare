@@ -1,0 +1,338 @@
+﻿@model OrganizationFormPageModel
+@Html.Hidden("hdnOrganizationFormPage", Common.SerializeObject(Model))
+
+
+
+    <div class="row">
+
+
+        <div class="col-lg-12">
+
+            <div class="col-sm-5 form-box-shadow">
+
+                <div class="page-bar" style="margin: -30px 2px 0 0px;">
+                    <span class="page-title text-align-center">
+                        @Resource.AvailableForms
+                        <small data-ng-show="SelectedForms.length>0" style="color: #1472ff;">{{SelectedForms.length}} form(s) selected.</small>
+                    </span>
+                </div>
+
+
+                <div class="row">
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <label class="control-label">@Resource.Markets</label>
+                        @Html.DropDownListFor(p => p.SearchFormModel.MarketID, Model.MarketList.ToSelectList(Model.SearchFormModel.MarketID.ToString() ?? "", "Name", "Id", Resource.Select, ""),
+                    new
+                    {
+                        id = "MarketID",
+                        convert_to_number = "",
+                        data_ng_model = "TempSearchFormModel.MarketID",
+                        data_ng_init = "TempSearchFormModel.MarketID=TempSearchFormModel.MarketID==''?null:TempSearchFormModel.MarketID",
+                        @class = "form-control input-sm",
+                        data_val = "false"
+                    })
+
+
+
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <label class="control-label">@Resource.Category</label>
+
+                        @Html.DropDownListFor(p => p.SearchFormModel.FormCategoryID, Model.FormCategoryList.ToSelectList(Model.SearchFormModel.FormCategoryID.ToString() ?? "", "Name", "Id", Resource.Select, ""),
+                    new
+                    {
+                        id = "FormCategoryID",
+                        convert_to_number = "",
+                        data_ng_model = "TempSearchFormModel.FormCategoryID",
+                        data_ng_init = "TempSearchFormModel.FormCategoryID=TempSearchFormModel.FormCategoryID==''?null:TempSearchFormModel.FormCategoryID",
+                        @class = "form-control input-sm",
+                        data_val = "false"
+                    })
+
+
+
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <label class="control-label">@Resource.FormNumber</label>
+                        @Html.TextBoxFor(m => m.SearchFormModel.FormNumber,
+                    new { data_ng_model = "TempSearchFormModel.FormNumber", delete_if_empty = "", @class = "form-control input-sm", placeholder = Resource.FormNumber, maxlength = 20 })
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <label class="control-label">@Resource.FormName</label>
+                        @Html.TextBoxFor(m => m.SearchFormModel.FormName,
+                    new { data_ng_model = "TempSearchFormModel.FormName", delete_if_empty = "", @class = "form-control input-sm", placeholder = Resource.FormName, maxlength = 20 })
+                    </div>
+
+                </div>
+                <div>
+
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="portlet-body compact" style="display: block;">
+                                <form id="frmList ">
+                                    <div class="table-responsive tabbable-custom form-table-overflow">
+
+                                        <table class="table table-bordered table-striped table-condensed flip-content">
+                                            <thead class="flip-content">
+                                                <tr>
+                                                    <th class="width-20px">
+                                                        @*<input id="SelectAllFormCheckbox" class="unicheckbox" type="checkbox" data-ng-model="SelectAllFormCheckbox" data-ng-change="SelectAllForms()" val="SelectAllFormCheckbox">*@
+                                                    </th>
+
+                                                    <th class="width-min-107px">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.SortClm('Name')">@Resource.FormNumber</a>
+                                                        <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'Name'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                                    </th>
+                                                    <th>
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="FormListPager.SortClm('FormLongName')">@Resource.FormName</a>
+                                                        <span class="sortorder" data-ng-show="FormListPager.sortIndex === 'FormLongName'" data-ng-class="{reverse:FormListPager.reverse}"></span>
+                                                    </th>
+                                                    <th class=""></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td colspan="4">
+                                                        <a class="badge badge-success" data-ng-click="SelectAllForms(true)">@Resource.SelectAll</a>
+                                                        <a class="badge badge-danger" data-ng-click="SelectAllForms(false)">@Resource.DeselectAll</a>
+                                                    </td>
+                                                </tr>
+                                                <tr dir-paginate="form in FormList | orderBy: FormListPager.sortIndex: FormListPager.reverse 
+                                                    | filterForms: TempSearchFormModel 
+                                                    | itemsPerPage: FormListPager.pageSize"
+                                                    pagination-id="formPagination" current-page="FormListPager.currentPage">
+
+
+                                                    <td>
+                                                        <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="form.IsChecked" data-ng-change="SelectForm(form)" val="form.IsChecked">
+                                                    </td>
+
+                                                    <td>{{ form.Name }}
+                                                        <span data-ng-if="form.IsNewForm" class="newForm" title="@Resource.NewForm"><i class="fa fa-star"></i></span>
+                                                    </td>
+                                                    <td>{{ form.FormLongName }}</td>
+                                                    <td>
+                                                        <a class="btn btn-xs btn-primary" ng-hide="!form.HasPDF" data-ng-click="OpenNewHtmlForm(form)" title="@Resource.FormPreview"><i class="fa fa-eye"></i></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12" data-ng-if="ResultForms.length > 0">
+                            <dir-pagination-controls boundary-links="true" pagination-id="formPagination" on-page-change="FormListPager.change()"></dir-pagination-controls>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div data-ng-if="ResultForms.length == 0">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-danger">
+                                            @Html.Raw(Resource.NoRecordsFound)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+            <div class="col-md-1 text-align-center padding-top-200px">
+                <button class="btn btn-default btn-lg clearfix" data-ng-click="MoveFromEbFormToOrgForm()">
+                    <span class="glyphicon glyphicon-chevron-right"></span>
+                </button>
+                <br />
+                <br />
+                <button class="btn btn-default btn-lg clearfix" data-ng-click="MoveFromOrgFormToEbFrom()">
+                    <span class="glyphicon glyphicon-chevron-left"></span>
+                </button>
+            </div>
+
+
+
+            <div class="col-sm-5 form-box-shadow">
+
+                <div class="page-bar" style="margin: -30px 2px 0 0px;">
+                    <span class="page-title text-align-center">
+                        @Resource.SelectedForms
+                        <small data-ng-show="SelectedOrgForms.length>0" style="color: #1472ff;">{{SelectedOrgForms.length}} form(s) selected.</small>
+                    </span>
+                </div>
+
+
+                <div class="row">
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <label class="control-label">@Resource.Markets</label>
+
+                        @Html.DropDownListFor(p => p.SearchFormModel.MarketID, Model.MarketList.ToSelectList(Model.SearchFormModel.MarketID.ToString() ?? "", "Name", "Id", Resource.Select, ""),
+                    new
+                    {
+                        id = "OrgMarketID",
+                        convert_to_number = "",
+                        data_ng_model = "TempSearchOrgFormModel.MarketID",
+                        data_ng_init = "TempSearchOrgFormModel.MarketID=TempSearchOrgFormModel.MarketID==''?null:TempSearchOrgFormModel.MarketID",
+                        @class = "form-control input-sm",
+                        data_val = "false"
+                    })
+
+
+
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <label class="control-label">@Resource.Category</label>
+
+                        @Html.DropDownListFor(p => p.SearchFormModel.FormCategoryID, Model.FormCategoryList.ToSelectList(Model.SearchFormModel.FormCategoryID.ToString() ?? "", "Name", "Id", Resource.Select, ""),
+                    new
+                    {
+                        id = "OrgFormCategoryID",
+                        convert_to_number = "",
+                        data_ng_model = "TempSearchOrgFormModel.FormCategoryID",
+                        data_ng_init = "TempSearchOrgFormModel.FormCategoryID=TempSearchOrgFormModel.FormCategoryID==''?null:TempSearchOrgFormModel.FormCategoryID",
+                        @class = "form-control input-sm",
+                        data_val = "false"
+                    })
+
+
+
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <label class="control-label">@Resource.FormNumber</label>
+                        @Html.TextBoxFor(m => m.SearchFormModel.FormNumber,
+                    new { id = "OrgFormNumber", data_ng_model = "TempSearchOrgFormModel.FormNumber", delete_if_empty = "", @class = "form-control input-sm", placeholder = Resource.FormNumber, maxlength = 20 })
+                    </div>
+
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 col-xs-12">
+                        <label class="control-label">@Resource.FormName</label>
+                        @Html.TextBoxFor(m => m.SearchFormModel.FormName,
+                    new { id = "OrFormName", data_ng_model = "TempSearchOrgFormModel.FormName", delete_if_empty = "", @class = "form-control input-sm", placeholder = Resource.FormName, maxlength = 20 })
+                    </div>
+
+                </div>
+                <div>
+                    @*<div class="row">
+                        <div class="col-sm-12  margin-top-10 margin-bottom-20" data-ng-if="OrgFormList.length > 0">
+                            <dir-pagination-controls boundary-links="true" pagination-id="formOrgPagination" on-page-change="OrgFormListPager.change()"></dir-pagination-controls>
+                        </div>
+                        <br />
+                        <br />
+                    </div>*@
+
+                    <div class="row" >
+                        <div class="col-sm-12">
+                            <div class="portlet-body compact" style="display: block;">
+                                <form id="frmOrgList ">
+                                    <div class="table-responsive tabbable-custom form-table-overflow">
+
+                                        <table class="table table-bordered table-striped table-condensed flip-content">
+                                            <thead class="flip-content">
+                                                <tr>
+
+                                                    <th class="width-20px">
+                                                        @*<input id="SelectAllOrgFormCheckbox" class="unicheckbox" type="checkbox" data-ng-model="SelectAllOrgFormCheckbox" data-ng-change="SelectAllOrgForms()" val="SelectAllOrgFormCheckbox">*@
+                                                    </th>
+
+                                                    <th class="width-min-107px">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="OrgFormListPager.SortClm('Name')">@Resource.FormNumber</a>
+                                                        <span class="sortorder" data-ng-show="OrgFormListPager.sortIndex === 'Name'" data-ng-class="{reverse:OrgFormListPager.reverse}"></span>
+                                                    </th>
+                                                    <th>
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="OrgFormListPager.SortClm('FormLongName')">@Resource.FormName</a>
+                                                        <span class="sortorder" data-ng-show="OrgFormListPager.sortIndex === 'FormLongName'" data-ng-class="{reverse:OrgFormListPager.reverse}"></span>
+                                                    </th>
+                                                    @* <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="OrgFormListPager.SortClm('Version')">@Resource.Version</a>
+                                            <span class="sortorder" data-ng-show="OrgFormListPager.sortIndex === 'Version'" data-ng-class="{reverse:OrgFormListPager.reverse}"></span>
+                                        </th>*@
+                                                    @*<th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="OrgFormListPager.SortClm('FormCategory.Name')">@Resource.Category</a>
+                                            <span class="sortorder" data-ng-show="OrgFormListPager.sortIndex === 'FormCategory.Name'" data-ng-class="{reverse:OrgFormListPager.reverse}"></span>
+                                        </th>*@
+                                                    <th class="">@Resource.Action</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+
+                                                <tr>
+                                                    <td colspan="4">
+                                                        <a class="badge badge-success" data-ng-click="SelectAllOrgForms(true)">@Resource.SelectAll</a>
+                                                        <a class="badge badge-danger" data-ng-click="SelectAllOrgForms(false)">@Resource.DeselectAll</a>
+                                                    </td>
+                                                </tr>
+
+                                                <tr dir-paginate="form in OrgFormList | orderBy: OrgFormListPager.sortIndex: OrgFormListPager.reverse 
+                                                | filterForms: TempSearchOrgFormModel:'orgforms' 
+                                                | itemsPerPage: OrgFormListPager.pageSize"
+                                                    pagination-id="formOrgPagination" current-page="OrgFormListPager.currentPage">
+
+                                                    <td>
+                                                        <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="form.IsChecked" data-ng-change="SelectOrgForm(form)" val="form.IsChecked">
+                                                    </td>
+                                                    <td>{{ form.Name }}</td>
+                                                    <td>{{ form.FormLongName }}</td>
+                                                    @*<td>{{ form.Version }}</td>*@
+                                                    @*<td>{{ form.FormCategory}}</td>*@
+                                                    <td>
+                                                        <a class="btn btn-xs btn-primary" ng-hide="!form.HasPDF" data-ng-click="OpenNewHtmlForm(form)" title="@Resource.FormPreview"><i class="fa fa-eye"></i></a>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12" data-ng-if="ResultOrgForms.length > 0">
+                            <dir-pagination-controls boundary-links="true" pagination-id="formOrgPagination" on-page-change="OrgFormListPager.change()"></dir-pagination-controls>
+                        </div>
+                    </div>
+                    
+                    
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div data-ng-if="ResultOrgForms.length == 0">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-danger">
+                                            @Html.Raw(Resource.NoRecordsFound)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                
+            </div>
+
+        </div>
+
+
+
+        <div class="clearfix col-lg-11">
+            <hr />
+            <button class="btn btn-success btn-lg  pull-right" data-ng-click="SaveOrganizationFormDetails()">@Resource.Save</button>
+        </div>
+    </div>

@@ -1,0 +1,640 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.TransportationGroupList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ScheduleTransportation;
+}
+
+@model TransportationAssignmentModel
+@Html.Hidden("hdnTransportationAssignmentModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="TransportationAssignmentController">
+    <form id="frmStartDAte">
+        <div class="page-bar">
+            <h3 class="page-title">@Resource.TransportationGroups
+                <small>@Resource.AssignTransportationGroups</small>
+                <a data-ng-if="IsPastDateSelected()" href="#confirmModal" data-toggle="modal" class="btn  btn-sm green-jungle-stripe btn-default pull-right letter-space" data-ng-click="AddTransportationGroup()">@Resource.CreateTrips</a>
+
+
+                <span style="width: 140px; margin-right: 20px;" class="input-group date date-picker pull-right" datepicker="TempSearchRefrralForTransportatiAssignment.StartDate" ng-dateval="TempSearchRefrralForTransportatiAssignment.StartDate">
+                    @Html.TextBoxFor(m => m.SearchRefrralForTransportatiAssignment.StartDate, new
+                        {
+                            @class = "form-control input-sm no-focus dateInputMask",
+                            maxlength = "50"
+                        })
+                    @Html.ValidationMessageFor(m => m.SearchRefrralForTransportatiAssignment.StartDate)
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </span>
+
+            </h3>
+        </div>
+    </form>
+    <div class="row">
+        <div class="col-lg-5 col-md-5 col-sm-12 position-fixed">
+            <div class="row">
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <div class="input-group input-group-sm">
+                        @Html.DropDownListFor(p => p.SearchRefrralForTransportatiAssignment.FacilityID, Model.FacilityList.ToSelectList(Model.SearchRefrralForTransportatiAssignment.FacilityID.ToString() ?? "", "Name", "Value", Resource.SelectFacility, ""),
+                                              new
+                                                  {
+                                                      data_ng_model = "TempSearchRefrralForTransportatiAssignment.FacilityID",
+                                                      data_ng_init = "TempSearchRefrralForTransportatiAssignment.FacilityID=TempSearchRefrralForTransportatiAssignment.FacilityID==''?null:TempSearchRefrralForTransportatiAssignment.FacilityID",
+                                                      @class = "form-control select2",
+                                                      data_val = false
+                                                  })
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <div class="input-group input-group-sm">
+                        @Html.DropDownListFor(p => p.SearchRefrralForTransportatiAssignment.TransportLocationID, Model.SetTransportLocationDropDown.ToSelectList(Model.SearchRefrralForTransportatiAssignment.TransportLocationID.ToString() ?? "", "Name", "Value", Resource.SelectLocation, ""),
+                                              new
+                                                  {
+                                                      data_ng_model = "TempSearchRefrralForTransportatiAssignment.TransportLocationID",
+                                                      data_ng_init = "TempSearchRefrralForTransportatiAssignment.TransportLocationID=TempSearchRefrralForTransportatiAssignment.TransportLocationID==''?null:TempSearchRefrralForTransportatiAssignment.TransportLocationID",
+                                                      @class = "form-control select2",
+                                                      data_val = false
+                                                  })
+                    </div>
+                </div>
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <div class="input-group input-group-sm">
+                        @Html.DropDownListFor(p => p.SearchRefrralForTransportatiAssignment.TripDirection, Model.TransportationDirectionList.ToSelectList(Model.SearchRefrralForTransportatiAssignment.TripDirection, "Name", "Name"),
+                                              new
+                                                  {
+                                                      data_ng_model = "TempSearchRefrralForTransportatiAssignment.TripDirection",
+                                                      @class = "form-control select2",
+                                                      data_val = false
+                                                  })
+                    </div>
+                </div>
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <div class="">
+                        <input type="submit" value="Search Clients" class="btn btn-sm blue " data-ng-click="SearchTransportationGroup()" />
+                    </div>
+                </div>
+            </div>
+            <hr />
+            <div class="row">
+                <div class="row padding-left-right-10">
+                    <div class="col-md-12 text-center">
+                        <div class="top pagination-sm ng-hide" data-ng-show="IsClientLoading">
+                            Loading, Please wait...
+                    <img src="/Assets/images/lazyload.gif">
+                        </div>
+                    </div>
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div class="portlet-body compact">
+                            <div class="dataTables_wrapper external-events-group schedule-assignment-list" data-ng-nicescroll data-ng-if="ReferralList.length > 0">
+                                <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                    <thead>
+                                        <tr>
+                                            <th></th>
+                                            <th>
+                                                <strong>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Name')">@Resource.Client</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Name'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                </strong>
+                                            </th>
+                                            @*<th>
+                                                <strong>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Gender')">@Resource.Sex</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Gender'" data-ng-class="{reverse:ReferralListPager.Gender}"></span></strong></th>*@
+
+                                            <th class="width-40px">
+                                                <div class="btn-group dropdown">
+                                                    <a class="btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                        <strong>@Resource.Sort <i class="fa fa-angle-down"></i></strong>
+                                                    </a>
+                                                    <ul class="dropdown-menu dropdown-menu-right">
+                                                        <li>
+
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Age')">@Resource.Age
+                                                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Age'" data-ng-class="{reverse:ReferralListPager.reverse}"></span></a>
+                                                        </li>
+                                                        <li>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ParentName')">@Resource.Parent
+                                                                <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ParentName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span></a>
+                                                        </li>
+                                                    </ul>
+
+                                                </div>
+                                            </th>
+                                            @*<th>
+                                                <strong>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Age')">@Resource.Age</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Age'" data-ng-class="{reverse:ReferralListPager.reverse}"></span></strong></th>*@
+                                            <th>
+                                                <strong>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('ParentName')">@Resource.Parent</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'ParentName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                </strong>
+                                            </th>
+                                            <th class="width-50px">
+                                                <strong>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Location')">@Resource.Loc</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Location'" data-ng-class="{reverse:ReferralListPager.reverse}"></span></strong></th>
+
+
+                                            <th class="width-100px">
+                                                <strong>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('Phone')">@Resource.Phone</a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'Phone'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                </strong>
+                                            </th>
+                                            <th>
+                                                <strong>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralListPager.sortColumn('FacilityName')">@Resource.Facility
+                                                    </a>
+                                                    <span class="sortorder" data-ng-show="ReferralListPager.sortIndex === 'FacilityName'" data-ng-class="{reverse:ReferralListPager.reverse}"></span>
+                                                </strong>
+                                            </th>
+                                            <th data-ng-if="IsPastDateSelected()">
+                                                <strong></strong>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr dir-paginate="Referral in ReferralList | itemsPerPage: ReferralListPager.pageSize" total-items="ReferralListPager.totalRecords" current-page="ReferralListPager.currentPage" pagination-id="ReferralListPagerID">
+                                            <td>
+                                                <label data-ng-if="(SearchRefrralForTransportatiAssignment.TripDirection=='@TransportationGroup.TripDirectionUp' && !Referral.IsAssignedToTransportationGroupUp)||
+                                                                    SearchRefrralForTransportatiAssignment.TripDirection=='@TransportationGroup.TripDirectionDown' && !Referral.IsAssignedToTransportationGroupDown">
+                                                    <input type="checkbox" class="unicheckbox"
+                                                        data-ng-model="Referral.IsChecked" data-ng-change="SelectReferral(Referral)" val="Referral.IsChecked"></label>
+                                            </td>
+                                            <td data-ng-class="{'red-border':Referral.NeedPrivateRoom}">
+                                                <a class="text-decoration-none" data-ng-bind="Referral.Name ? Referral.Name:'@Resource.NA'" common-detail-popover="Referral" data-ng-template-selector="#transportation-detail" popover-cloasble="true" data-popover-trigger="click"></a>
+                                            </td>
+                                            <td>{{Referral.Gender ? Referral.Gender:'@Resource.NA'}}|{{Referral.Age}}</td>
+                                            <td data-ng-bind="Referral.ParentName ? Referral.ParentName:'@Resource.NA'" ></td>
+                                            <td data-ng-bind="Referral.Location == 'NULL' ? '@Resource.NA':Referral.Location"  ></td>
+                                            <td data-ng-bind="Referral.Phone | phoneformat"></td>
+                                            <td data-ng-bind="Referral.FacilityName == 'NULL' ? '@Resource.NA':Referral.FacilityName" ></td>
+                                            <td data-ng-if="IsPastDateSelected()">
+                                                <div data-ng-if="SearchRefrralForTransportatiAssignment.TripDirection=='@TransportationGroup.TripDirectionUp' && !Referral.IsAssignedToTransportationGroupUp" 
+                                                     class="external-event up" calender-dropper="Referral" ng-class="{'selected':Referral.IsChecked}" >
+                                                    <a href="javascript:void(0);" class=""><i class="glyphicon glyphicon-move"></i></a>
+                                                </div>
+                                                <div data-ng-if="SearchRefrralForTransportatiAssignment.TripDirection=='@TransportationGroup.TripDirectionDown' && !Referral.IsAssignedToTransportationGroupDown" 
+                                                     class="external-event down" calender-dropper="Referral" data-ng-class="{selected:Referral.IsChecked}">
+                                                    <a href="javascript:void(0);" class=""><i class="glyphicon glyphicon-move"></i></a>
+                                                </div>
+
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row">
+                                    <div class="col-sm-12" data-ng-if="ReferralList.length > 0">
+                                        <div class="pull-left col-md-6 no-padding">
+                                            @Resource.Showing <span data-ng-bind="(ReferralListPager.pageSize * ReferralListPager.currentPage) - ReferralListPager.pageSize  + 1"></span>
+                                            &nbsp;@Resource.To <span data-ng-bind="(ReferralListPager.pageSize == ReferralListPager.currentPageSize) ? (ReferralListPager.pageSize * ReferralListPager.currentPage) :(ReferralListPager.pageSize * ReferralListPager.currentPage) - ReferralListPager.pageSize  + ReferralListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                        </div>
+                                        <div class="pull-right top pagination-sm">
+                                            <dir-pagination-controls boundary-links="true" max-size="ReferralListPager.maxSize" on-page-change="ReferralListPager.pageChanged(newPageNumber)" pagination-id="ReferralListPagerID"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div data-ng-if="ReferralList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-push-5  col-lg-7 col-md-7 col-sm-12">
+            <div>
+                <div class="row">
+                    <div class="col-lg-push-1 col-lg-11 padding-bottom-10px">
+                        <div class="row">
+                            <form>
+                                <!-- <div class="col-lg-5 col-md-5 col-sm-5" id="nestable_list_menu">
+                                         <button type="button" class="btn btn-sm green btn-outline sbold uppercase" data-action="expand-all">Expand All</button>
+                                         <button type="button" class="btn btn-sm red btn-outline sbold uppercase" data-action="collapse-all">Collapse All</button>
+                                     </div>-->
+                                <div class="col-lg-2 col-md-2 col-sm-2 no-right-padding">
+                                    <button id="expandall" type="button" class="btn btn-sm green btn-outline sbold uppercase" data-ng-click="ExpandAllDiv()" data-action="expand-all">@Resource.ExpandAll</button>
+                                </div>
+
+                                <div class="col-lg-2 col-md-2 col-sm-2 no-left-padding">
+                                    <button type="button" class="btn btn-sm red btn-outline sbold uppercase" data-action="collapse-all" data-ng-click="CollapseAllDiv()">@Resource.CollapseAll</button>
+                                </div>
+
+                                <div class="col-lg-2 col-md-2 col-sm-2 pull-right">
+                                    <button class="btn btn-sm btn-default  uppercase" data-ng-click="PrintDiv('transactionGroupContainer')">@Resource.PrintAll</button>
+                                </div>
+                            </form>
+                        </div>
+                        <hr />
+                    </div>
+
+                    <div class="col-lg-push-1 col-lg-11 transactionGroupContainer" id="transactionGroupContainer">
+                        <div class="col-md-12 text-center">
+                            <div class="top pagination-sm ng-hide" data-ng-show="IsTransportationAssignmentLoading">
+                                @Resource.Loading
+                    <img src="/Assets/images/lazyload.gif">
+                            </div>
+                        </div>
+                        <div class="portlet light bordered">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <i class="fa fa-long-arrow-up font-red red"></i><i class="fa fa-bus font-red red"></i>
+                                    <span class="caption-subject font-red sbold uppercase red">@Resource.TripDirectionUP</span>
+                                </div>
+                                <div class="tools no-print">
+                                    <a href="" class="collapse"></a>
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div ng-repeat="transportationGroup in TransportationGroupUpList" class="portlet box blue-soft page-break" data-ng-style="{'background-color':transportationGroup.TransportationGroup.FacilityColorScheme+' !important','border':'1px solid '+transportationGroup.TransportationGroup.FacilityColorScheme}"
+                                    data-droppable="transportationGroup" data-on-drop="OnClienrDropperDrop" data-ng-accept=".up" id="{{'tgr'+transportationGroup.TransportationGroup.TransportationGroupID}}">
+
+                                    <div class="portlet-title" data-ng-attr-style="{{ 'background-color:'+ transportationGroup.TransportationGroup.FacilityColorScheme +'!important' }}">@*data-ng-style="{'background-color':transportationGroup.TransportationGroup.FacilityColorScheme + ' !important'}"*@
+                                        <div class="caption">
+                                            <i class="fa fa-gift"></i>{{transportationGroup.TransportationGroup.StaffNames}}
+                                                <small class="bold">({{transportationGroup.TransportationGroup.GroupFacilityName}}| 
+                                                {{transportationGroup.TransportationGroup.GroupLocation}} | {{transportationGroup.ClientList.length}})</small>
+                                            <!--<i class="fa fa-gift"></i>PHARY / CALLIE<small>House: <b>Apache</b>, Drop Off: <b>Encanto</b>, Trip:  <b>Up</b>, Count: <b>10 </b></small>-->
+                                        </div>
+                                        <div class="actions no-print">
+                                            <div class="btn-group">
+                                                <span class="btn-sm trans-group-setting cursor-pointer" href="javascript:;" data-toggle="dropdown"><i class="fa fa-cog font-size-15"></i></span>
+                                                <ul class="dropdown-menu pull-right">
+                                                    <li>
+                                                        <a href="javascript:;" data-ng-click="AssignClient(transportationGroup)"><i class="fa fa-check-square-o padding-right-20px"></i>@Resource.AssignClient</a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li>
+                                                        <a href="javascript:;" data-ng-click="PrintDiv('tgr'+transportationGroup.TransportationGroup.TransportationGroupID)"><i class="fa fa-print padding-right-20px"></i>@Resource.Print </a>
+                                                    </li>
+                                                    <li data-ng-if="IsPastDateSelected()">
+                                                        <a href="javascript:;" data-ng-click="EditTransportationGroup(transportationGroup.TransportationGroup,transportationGroup.ClientList.length)"><i class="fa fa-edit padding-right-20px"></i>@Resource.Edit </a>
+
+                                                    </li>
+                                                    <li data-ng-if="IsPastDateSelected()">
+                                                        <a href="javascript:;" data-ng-click="RemoveTransportationGroup(transportationGroup.TransportationGroup.TransportationGroupID)">
+                                                            <i class="fa fa-remove padding-right-20px"></i>@Resource.Delete </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="tools no-print">
+                                            <a href="javascript:;" class="collapse"></a>
+                                            <a href="" class="fullscreen"></a>
+
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="scroller1" data-rail-visible="1" data-rail-color="yellow" data-handle-color="#a1b2bd">
+                                            <span><strong>House: </strong><span>{{transportationGroup.TransportationGroup.GroupFacilityName}}</span></span>,
+                                            <span><strong>Location: </strong><span>{{transportationGroup.TransportationGroup.GroupLocation}}</span></span>,
+                                            <span><strong>Trip: </strong><span>{{transportationGroup.TransportationGroup.TripDirection}}</span></span>
+                                            <br />
+                                            <div class="portlet-body compact">
+                                                <div class="dataTables_wrapper external-events-group " data-ng-if="transportationGroup.ClientList.length > 0">
+                                                    <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                        <thead>
+                                                            <tr>
+                                                                <th><strong>#</strong></th>
+                                                                <th><strong>@Resource.Client</strong></th>
+                                                                <th><strong>@Resource.Sex</strong></th>
+                                                                <th><strong>@Resource.Age</strong></th>
+                                                                <th><strong>@Resource.Parent</strong></th>
+                                                                <th><strong>@Resource.Location</strong></th>
+                                                                <th><strong>@Resource.Phone</strong></th>
+                                                                <th><strong>@Resource.Facility</strong></th>
+                                                                <th class="no-print" data-ng-if="IsPastDateSelected()"><strong></strong></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody data-ng-repeat="referral in transportationGroup.ClientList">
+                                                            <tr>
+                                                                <td class="v-align-center" rowspan="2" data-ng-bind="$index+1"></td>
+                                                                <td data-ng-class="{'strike font-red':referral.IsReferralDeleted}" data-ng-bind="referral.Name ? referral.Name:'@Resource.NA'"></td>
+                                                                <td data-ng-bind="referral.Gender ? referral.Gender:'@Resource.NA'"></td>
+                                                                <td data-ng-bind="referral.Age"></td>
+                                                                <td data-ng-bind="referral.ParentName ? referral.ParentName:'@Resource.NA'" ></td>
+                                                                <td data-ng-bind="referral.Location == 'NULL' ? '@Resource.NA':referral.Location"  ></td>
+                                                                <td data-ng-bind="referral.Phone|phoneformat"></td>
+                                                                <td data-ng-bind="referral.FacilityName == 'NULL' ? '@Resource.NA':referral.FacilityName" ></td>
+                                                                <td class="no-print" data-ng-if="IsPastDateSelected()">
+                                                                    <div class="external-event">
+                                                                        <a href="#" class="" data-ng-click="RemoveTransportationGroupClient(referral,transportationGroup)"><i class="glyphicon glyphicon-remove"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td colspan="8">
+                                                                    <b class="badge margin-2" data-ng-repeat="TransportationFilterName in referral.TransportationFilterName" data-ng-class="TransportationFilterName | removeSpaces" data-ng-bind="TransportationFilterName"></b>
+                                                                    <a data-ng-if="IsPastDateSelected()" class="no-print" href="#" data-common-detail-popover="SetPopupModel(referral)" data-ng-template-selector="#transportation-filter" data-popover-trigger="click" popover-width="400" pop-over-functions="referral.popoverhide">EDIT</a>
+                                                                    <a href="javascript:;" title="Edit Schedule" data-toggle="modal" class="pull-right badge bold {{referral.ScheduleStatusName | removeSpaces}}" data-ng-bind="referral.ScheduleStatusName"></a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="">
+                                                    <div data-ng-if="transportationGroup.ClientList.length == 0">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="alert alert-danger">
+                                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="portlet light bordered page-break-always">
+                            <div class="portlet-title">
+                                <div class="caption">
+                                    <i class="fa fa-long-arrow-down font-red red"></i><i class="fa fa-bus font-red red"></i>
+                                    <span class="caption-subject font-red sbold uppercase red">@Resource.TripDirectionDown</span>
+                                </div>
+                                <div class="tools no-print">
+                                    <a href="" class="collapse"></a>
+                                    <!--<a href="" class="remove"></a>-->
+                                </div>
+                            </div>
+                            <div class="portlet-body">
+                                <div data-ng-repeat="transportationGroup in TransportationGroupDownList" class="portlet box blue-soft page-break"
+                                    data-ng-style="{'background-color':transportationGroup.TransportationGroup.FacilityColorScheme+' !important','border':'1px solid '+transportationGroup.TransportationGroup.FacilityColorScheme}"
+                                    data-on-drop="OnClienrDropperDrop" data-droppable="transportationGroup" data-ng-accept=".down" id="{{'tgrdown'+transportationGroup.TransportationGroup.TransportationGroupID}}">
+                                    <div class="portlet-title"
+                                        data-ng-attr-style="{{ 'background-color:'+ transportationGroup.TransportationGroup.FacilityColorScheme +'!important' }}">
+                                        <div class="caption">
+                                            <i class="fa fa-gift"></i>{{transportationGroup.TransportationGroup.StaffNames}}
+                                               <small class="bold">({{transportationGroup.TransportationGroup.GroupFacilityName}} | 
+                                               {{transportationGroup.TransportationGroup.GroupLocation}}| {{transportationGroup.ClientList.length}})</small>
+                                            <!--<i class="fa fa-gift"></i>PHARY / CALLIE<small>House: <b>Apache</b>, Drop Off: <b>Encanto</b>, Trip:  <b>Up</b>, Count: <b>10 </b></small>-->
+                                        </div>
+                                        <div class="actions no-print">
+                                            <div class="btn-group">
+                                                <span class="btn-sm cursor-pointer" href="javascript:;" data-toggle="dropdown">
+                                                    <i class="fa fa-cog font-size-15"></i>
+
+                                                </span>
+                                                <ul class="dropdown-menu pull-right">
+                                                    <li>
+                                                        <a href="javascript:;" data-ng-click="AssignClient(transportationGroup)">
+                                                            <i class="fa fa-check-square-o padding-right-20px"></i>@Resource.AssignClient</a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li>
+                                                        <a href="javascript:;" data-ng-click="PrintDiv('tgrdown'+transportationGroup.TransportationGroup.TransportationGroupID)">
+                                                            <i class="fa fa-print padding-right-20px"></i>@Resource.Print </a>
+                                                    </li>
+                                                    <li data-ng-if="IsPastDateSelected()">
+                                                        <a href="javascript:;" data-ng-click="EditTransportationGroup(transportationGroup.TransportationGroup,transportationGroup.ClientList.length)">
+                                                            <i class="fa fa-edit padding-right-20px"></i>@Resource.Edit </a>
+                                                    </li>
+                                                    <li data-ng-if="IsPastDateSelected()">
+                                                        <a href="javascript:;" data-ng-click="RemoveTransportationGroup(transportationGroup.TransportationGroup.TransportationGroupID)">
+                                                            <i class="fa fa-remove padding-right-20px"></i>@Resource.Delete </a>
+                                                    </li>
+
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="tools no-print">
+                                            <a href="javascript:;" class="collapse"></a>
+                                            <a href="" class="fullscreen"></a>
+
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body">
+                                        <div class="scroller1" data-rail-visible="1" data-rail-color="yellow" data-handle-color="#a1b2bd">
+                                            <span><strong>House: </strong><span>{{transportationGroup.TransportationGroup.GroupFacilityName}}</span></span>,
+                                            <span><strong>Location: </strong><span>{{transportationGroup.TransportationGroup.GroupLocation}}</span></span>,
+                                            <span><strong>Trip: </strong><span>{{transportationGroup.TransportationGroup.TripDirection}}</span></span>
+                                            <br />
+                                            <div class="portlet-body compact">
+                                                <div class="dataTables_wrapper external-events-group " data-ng-if="transportationGroup.ClientList.length >0">
+                                                    <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                        <thead>
+                                                            <tr>
+                                                                <th><strong>#</strong></th>
+                                                                <th><strong>@Resource.Client</strong></th>
+                                                                <th><strong>@Resource.Sex</strong></th>
+                                                                <th><strong>@Resource.Age</strong></th>
+                                                                <th><strong>@Resource.Parent</strong></th>
+                                                                <th><strong>@Resource.Location</strong></th>
+                                                                <th><strong>@Resource.Phone</strong></th>
+                                                                <th><strong>@Resource.Facility</strong></th>
+                                                                <th class="no-print" data-ng-if="IsPastDateSelected()"><strong></strong></th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody ng-repeat="referral in transportationGroup.ClientList">
+                                                            <tr>
+                                                                <td class="v-align-center" rowspan="2" data-ng-bind="$index+1"></td>
+                                                                <td data-ng-class="{'strike font-red':referral.IsReferralDeleted}" data-ng-bind="referral.Name ? referral.Name:'@Resource.NA'"></td>
+                                                                <td data-ng-bind="referral.Gender ? referral.Gender:'@Resource.NA'"></td>
+                                                                <td data-ng-bind="referral.Age"></td>
+                                                                <td data-ng-bind="referral.ParentName ? referral.ParentName:'@Resource.NA'" ></td>
+                                                                <td data-ng-bind="referral.Location == 'NULL' ? '@Resource.NA':referral.Location"  ></td>
+                                                                <td data-ng-bind="referral.Phone|phoneformat"></td>
+                                                                <td data-ng-bind="referral.FacilityName == 'NULL' ? '@Resource.NA':referral.FacilityName" ></td>
+                                                                <td class="no-print" data-ng-if="IsPastDateSelected()">
+                                                                    <div class="" data-ng-repeat="TransportationFilterName in referral.TransportationFilterName">
+                                                                        <a class="badge badge" data-ng-class="TransportationFilterName" href="#"></a>
+                                                                    </div>
+                                                                    <div class="external-event">
+                                                                        <a data-ng-if="IsPastDateSelected()" href="#" data-ng-click="RemoveTransportationGroupClient(referral,transportationGroup)"><i class="glyphicon glyphicon-remove"></i></a>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+
+                                                            <tr>
+                                                                <td colspan="8" class="Transportationfilters">
+                                                                    <b class="badge margin-2" data-ng-repeat="TransportationFilterName in referral.TransportationFilterName" data-ng-class="TransportationFilterName | removeSpaces">{{TransportationFilterName}}</b>
+                                                                    <a class="no-print" href="#" data-common-detail-popover="SetPopupModel(referral)" data-ng-template-selector="#transportation-filter" data-popover-trigger="click" popover-width="300" pop-over-functions="referral.popoverhide">EDIT</a>
+                                                                    <a href="javascript:;" title="Edit Schedule" data-toggle="modal" class="pull-right badge bold {{referral.ScheduleStatusName | removeSpaces}}" data-ng-bind="referral.ScheduleStatusName"></a>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                                <div class="">
+                                                    <div data-ng-if="transportationGroup.ClientList.length == 0">
+                                                        <div class="row">
+                                                            <div class="col-lg-12">
+                                                                <div class="alert alert-danger">
+                                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@Resource.AddNewGroup</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmAddTranspotationGroup">
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.Date</label>
+                                        @*<div class="input-group date date-picker" data-date-format="mm/dd/yyyy">
+                                            <input type="text" class="form-control input-sm" value="06/22/2016" disabled="disabled">
+                                            <span class="input-group-btn">
+                                                <button class="btn default" type="button">
+                                                    <i class="fa fa-calendar"></i>
+                                                </button>
+                                            </span>
+                                        </div>*@
+                                        <div class="input-group date date-picker pull-right"
+                                            datepicker="TempSearchRefrralForTransportatiAssignment.StartDate"
+                                            ng-dateval="AddTransportationGroupModel.TransportationGroup.TransportationDate"
+                                            ng-mindate="SetDatePickerDate(AddTransportationGroupModel.TransportationGroup.TransportationDate,Today)">
+                                            @Html.TextBoxFor(m => m.AddTransportationGroupModel.TransportationGroup.TransportationDate, new
+                                                {
+                                                    @class = "form-control input-sm no-focus",
+                                                    maxlength = "50",
+                                                    disabled = ""
+                                                })
+                                            @Html.ValidationMessageFor(m => m.AddTransportationGroupModel.TransportationGroup.TransportationDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.GroupName</label>
+                                        @Html.TextBoxFor(m => m.AddTransportationGroupModel.TransportationGroup.GroupName,
+                                                         new
+                                                             {
+                                                                 data_ng_model = "AddTransportationGroupModel.TransportationGroup.GroupName",
+                                                                 @class = "form-control input-sm",
+                                                                 placeholder = Resource.GroupName,
+                                                                 maxlength = 100
+                                                             })
+                                        @Html.ValidationMessageFor(m => m.AddTransportationGroupModel.TransportationGroup.GroupName)
+                                        @*<input type="text" class="form-control input-sm" placeholder="Group Name">*@
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.Staff</label>
+                                        <div class="col-sm-12 no-padding groupErrorParent">
+                                            <select class="selectpicker groupError  input-sm  form-control"
+                                                    id="SelectedStaffs"  data-buttonStyle="btn-sm btn-default"
+                                                    selectpicker = "AddTransportationGroupModel.SelectedStaffs"
+                                                    multiple="multiple"
+                                                    name="AddTransportationGroupModel.SelectedStaffs"
+                                                    max-selection = @ConfigSettings.MaxStaff>
+                                                <option data-ng-repeat="option in TransportaionAssignmentModel.EmployeeList | filter:FilterStaffDropdown(AddTransportationGroupModel.SelectedStaffs)" value="{{option.Value}}">{{option.Name}}</option>
+                                            </select>
+                                            @Html.ValidationMessageFor(m => m.AddTransportationGroupModel.TransportationGroup.TransportationDate)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.Facility</label>
+                                        <select class="form-control input-sm"
+                                                data-ng-init="AddTransportationGroupModel.TransportationGroup.FacilityID=AddTransportationGroupModel.TransportationGroup.FacilityID?AddTransportationGroupModel.TransportationGroup.FacilityID.toString():''"
+                                                data-ng-model="AddTransportationGroupModel.TransportationGroup.FacilityID"                                                
+                                                id="FacilityID" data-val="true" data-val-required="@Resource.SelectFacility"
+                                                name="AddTransportationGroupModel.TransportationGroup.FacilityID">
+                                            <option value="">@Resource.Select</option>
+                                            <option data-ng-repeat="option in TransportaionAssignmentModel.FacilityList | filter:FilterDropdown(AddTransportationGroupModel.TransportationGroup.FacilityID)" value="{{option.Value}}">{{option.Name}}</option>
+                                        </select>
+                                        @Html.ValidationMessageFor(m => m.AddTransportationGroupModel.TransportationGroup.FacilityID)
+
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.DropOffLocation</label>
+                                        <select class="form-control input-sm"
+                                                data-ng-init="AddTransportationGroupModel.TransportationGroup.LocationID=AddTransportationGroupModel.TransportationGroup.LocationID?AddTransportationGroupModel.TransportationGroup.LocationID.toString():''"
+                                                data-ng-model="AddTransportationGroupModel.TransportationGroup.LocationID"                                                
+                                                id="LocationID" data-val="true" data-val-required="@Resource.SelectLocation"
+                                                name="AddTransportationGroupModel.TransportationGroup.LocationID">
+                                            <option value="">@Resource.Select</option>
+                                            <option data-ng-repeat="option in TransportaionAssignmentModel.SetTransportLocationDropDown | filter:FilterDropdown(AddTransportationGroupModel.TransportationGroup.LocationID)" value="{{option.Value}}">{{option.Name}}</option>
+                                        </select>
+                                        @Html.ValidationMessageFor(m => m.AddTransportationGroupModel.TransportationGroup.LocationID)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.TripDirection</label>
+                                        @Html.DropDownListFor(p => p.AddTransportationGroupModel.TransportationGroup.TripDirection,
+                                                              Model.TransportationDirectionList.ToSelectList("", "Name", "Name", Resource.Select, ""),
+                                                              new
+                                                                  {
+                                                                      data_ng_model = "AddTransportationGroupModel.TransportationGroup.TripDirection",
+                                                                      @class = "form-control input-sm ",
+                                                                      data_ng_disabled = "DisableTripDropdown"
+                                                                  })
+                                        @Html.ValidationMessageFor(m => m.AddTransportationGroupModel.TransportationGroup.TripDirection)
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-ng-click="OnCloseModel()">@Resource.Cancel</button>
+                    <button type="button" class="btn green-jungle" data-ng-click="SaveTransportationGroup()">@Resource.Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script id="transportation-filter" type="text/ng-template">
+    @Html.Partial("Partial/_TransportationGroupFilter")
+</script>
+<script id="transportation-detail" type="text/ng-template">
+    @Html.Partial("Partial/_TransportationDetailPopover")
+</script>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/transportationgroup/transportationassignment")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessageForTransportationGroup = '@string.Format(@Resource.DeleteConfirmationMessage, "Transportation Group")';
+        var DeleteConfirmationMessageForTransportationGroupClient = '@string.Format(@Resource.DeleteConfirmationMessage, "Transportation Group Client")';
+
+        window.TripDirectionUp = '@TransportationGroup.TripDirectionUp';
+        window.TripDirectionDown = '@TransportationGroup.TripDirectionDown';
+        var PageSize = 40;
+    </script>
+}

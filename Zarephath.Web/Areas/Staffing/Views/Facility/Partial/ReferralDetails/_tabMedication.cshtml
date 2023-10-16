@@ -1,0 +1,394 @@
+﻿@model ReferralMedication
+
+<div class="tab-pane fade in active">
+    <form class="form-horizontal" id="frmReferralMedication">
+        @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Medication_AddUpdate))
+        {
+            <div class="form-group row">
+                <div class="col-sm-12">
+                    <div class="fscontainer">
+                        <div class="legend">
+                            @Resource.MedicationLable
+                            <div style="position: absolute;right: 13px;top: 6px;">
+                                <button class="btn btn-default btn-xs dropdown-toggle green-haze-stripe" type="button" data-toggle="dropdown" aria-expanded="false">
+                                    <b>Print</b>
+                                    <i class="fa fa-angle-down"></i>
+                                </button>
+                                <ul class="dropdown-menu pos-itm">
+                                    <li>
+                                        <a href="javascript:;" data-ng-click="MedicationReport('MD Order Report')" title="MD Order Report"><i class="fa fa-print"></i> MD Order Report</a>
+                                    </li>
+                                    <li>
+                                        <a href="javascript:;" data-ng-click="MedicationLogReport('Medication Log Report')" title="Medication Log Report"><i class="fa fa-print"></i> Medication Log Report</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="medicineform">
+                            <div class="form-box">
+                                <div class="fields-col">
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="row" id="divMedicationCard" ng-if="ShowMedicationList">
+                                                <div class="col-md-12 sol-sm-12">
+                                                    <div class="medicare-search-card">
+                                                        <div class="medicare-left-col">
+                                                            <div class="medicationName"><label><strong>Medication Name:</strong></label><span id="cardMedicationName"></span></div>
+                                                            <div class="medication-list2">
+                                                                <div class="dosageForm"><label><strong>Dosage Form:</strong></label><span id="cardDosageForm"></span> </div>
+                                                                <div class="brandName"><label><strong>Brand Name:</strong></label><span id="cardBrandName"></span></div>
+                                                                <div class="route"><label><strong>Route:</strong></label> <span id="cardRoute"></span></div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 form-col search">
+                                            <label class="control-label required">@Resource.ReferralMedicationSearch </label>
+                                            <div class="search-col">
+                                                <input class="form-control input-sm requiredStrip required validateElement" id="txtSearchMedication" pattern="[a-zA-Z]+" ng-pattern-restrict  autocomplete="off"  type="text" ng-model="ReferralMedication.SearchMedicationResult" />
+                                                <a href="#model_AddMedication" data-ng-click="OpenAddMedicationModal()" class="btnsearch" data-toggle="modal" >
+                                                    <i class="fa fa-search"></i>
+                                                </a>
+                                                <input type="hidden" id="hdnMedicationId" value="" />
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 form-col dose">
+                                            <label class="control-label required">@Resource.ReferralMedicationDose</label>
+                                            @Html.TextBoxFor(q => q.Dose,
+                                                                 new
+                                                                 {
+                                                                     data_ng_model = "ReferralMedication.Dose",
+                                                                     @class = "form-control input-sm requiredStrip required validateElement",
+                                                                     maxlength = 100
+                                                                 })
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 form-col units">
+                                            <label class="control-label">@Resource.ReferralMedicationUnits</label>
+                                            @Html.TextBoxFor(q => q.Unit,
+                                                                 new
+                                                                 {
+                                                                     data_ng_model = "ReferralMedication.Unit",
+                                                                     @class = "form-control input-sm validateElement",
+                                                                     maxlength = 100
+                                                                 })
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 form-col frequency">
+                                            <label class="control-label required">@Resource.ReferralMedicationFrequency</label>
+                                            @Html.TextBoxFor(q => q.Frequency,
+                                                                 new
+                                                                 {
+                                                                     data_ng_model = "ReferralMedication.Frequency",
+                                                                     @class = "form-control input-sm requiredStrip required validateElement",
+                                                                     maxlength=100
+                                                                 })
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-3 col-sm-6 form-col route">
+                                            <label class="control-label required">@Resource.ReferralMedicationRoute</label>
+                                            @Html.TextBoxFor(q => q.Route,
+                                                                 new
+                                                                 {
+                                                                     data_ng_model = "ReferralMedication.Route",
+                                                                     @class = "form-control input-sm requiredStrip required validateElement",
+                                                                     maxlength= 100
+                                                                 })
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 form-col dose">
+                                            <label class="control-label">@Resource.ReferralMedicationQuantity</label>
+                                            @Html.TextBoxFor(q => q.Quantity,
+                                                                 new
+                                                                 {
+                                                                     data_ng_model = "ReferralMedication.Quantity",
+                                                                     @class = "form-control input-sm validateElement",
+                                                                     maxlength = 3,
+                                                                     key_press_validation = "Digit"
+                                                                 })
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 form-col">
+                                            <label class="control-label">@Resource.ReferralMedicationStartDate</label>
+                                            <div id="dateStartDate" class="input-group date" datepicker="ReferralMedication.StartDate" data-ng-dateval="ReferralMedication.StartDate">
+                                                <input class="form-control input-sm  dateInputMask" data-val="true"
+                                                       placeholder="@Resource.ReferralMedicationStartDate" id="referralStartDate" maxlength="10" name="ReferralMedication.StartDate"
+                                                       type="text">
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-3 col-sm-6 form-col">
+                                            <label class="control-label">@Resource.ReferralMedicationEndDate</label>
+                                            <div id="dateEndDate" class="input-group date" datepicker="ReferralMedication.EndDate" data-ng-dateval="ReferralMedication.EndDate">
+                                                <input class="form-control input-sm  dateInputMask" data-val="true"
+                                                       placeholder="@Resource.ReferralMedicationEndDate" id="referralEndDate" maxlength="10" name="ReferralMedication.EndDate"
+                                                       type="text">
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6 form-col list-col">
+                                            <label class="control-label required">@Resource.Physician</label>
+                                            <select class="form-control input-sm requiredStrip" title="@Resource.Physician"
+                                                    data-ng-model="ReferralMedication.PhysicianID" name="SearchEmpCalender.EmployeeID" required data-original-title="This field is required.">
+                                                <option value="">@Resource.Physician</option>
+                                                <option data-ng-repeat="option in ReferralModel.ReferralPhysicians  " value="{{option.PhysicianID}}">{{option.PhysicianName}}</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 form-col list-col">
+                                            <label class="control-label">@Resource.ReferralMedicationHealthDiagnostics</label>
+                                            <select class="form-control input-sm" title="@Resource.ReferralMedicationHealthDiagnostics"
+                                                    data-ng-model="ReferralMedication.HealthDiagnostics" name="SearchEmpCalender.EmployeeID">
+                                                <option value="">@Resource.ReferralMedicationHealthDiagnostics</option>
+                                                <option data-ng-repeat="option in DxCodeMappingList" value="{{option.DXCodeID}}">{{option.DXCodeName}}</option>
+                                            </select>
+
+                                            @*@Html.TextAreaFor(q => q.HealthDiagnostics,
+                                            new
+                                            {
+                                                data_ng_model = "ReferralMedication.HealthDiagnostics",
+                                                @class = "form-control input-sm",
+                                                maxlength=2000
+                                            })*@
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6 col-sm-6 form-col list-col">
+                                            <label class="control-label">@Resource.ReferralMedicationPatientInstructions</label>
+                                            @Html.TextAreaFor(q => q.PatientInstructions,
+                                            new
+                                            {
+                                                data_ng_model = "ReferralMedication.PatientInstructions",
+                                                @class = "form-control input-sm height-80",
+                                                maxlength = 2000,
+                                                @row="5"
+                                            })
+                                        </div>
+                                        <div class="col-md-6 col-sm-6 form-col list-col">
+                                            <label class="control-label">@Resource.ReferralMedicationPharmacistInstructions</label>
+                                            @Html.TextAreaFor(q => q.PharmacistInstructions,
+                                            new
+                                            {
+                                                data_ng_model = "ReferralMedication.PharmacistInstructions",
+                                                @class = "form-control input-sm height-80",
+                                                maxlength = 2000,
+                                                @row=5
+                                            })
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="field">
+                                            <div class="field-box">
+                                                <div class="custom_switch">
+                                                    <input type="radio" id="radiocurrent" selected name="ratecurrent" data-ng-model="ReferralMedication.IsActive"
+                                                           ng-value="true" />
+                                                    <label class="padding-top-5" for="radiocurrent">@Resource.Active</label>
+                                                    <input type="radio" id="radiocurrentDaily" name="ratecurrent" data-ng-model="ReferralMedication.IsActive"
+                                                           ng-value="false" />
+                                                    <label class="padding-top-5" for="radiocurrentDaily">InActive</label>
+                                                    <span class="custom_switchwrapper"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!--Medicineform-->
+            </div>
+            <div class="btn-group btn-group-lg btn-group-multiple text-center text-center" role="group" aria-label="...">
+                <label id="back-step" class="back">
+                    <div class="btn btn-sm green-jungle" data-ng-if="ReferralMedication.MedicationId==null" data-ng-click="SaveReferralMedication(item)">@Resource.ReferralMedicationSaveMedication</div>
+                    <div class="btn btn-sm green-jungle" data-ng-if="ReferralMedication.MedicationId!=null" data-ng-click="SaveReferralMedication1(item)">@Resource.ReferralMedicationSaveMedication</div>
+                </label>
+                <label id="continue-step" class="continue">
+                    <div class="btn btn-default red btn-sm" data-ng-click="CancelReferralMedication()" role="button">@Resource.ReferralMedicationCancelMedication</div>
+                </label>
+            </div>
+        }
+        <div class="medicinetable-box">
+            <h2>@Resource.ReferralMedicationActiveDrugLabel</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th width="310">@Resource.ReferralMedicationDrugName</th>
+                        <th>@Resource.ReferralMedicationPhysician</th>
+                        <th>@Resource.ReferralMedicationDose</th>
+                        <th>@Resource.ReferralMedicationUnits</th>
+                        <th>@Resource.ReferralMedicationFrequency</th>
+                        <th>@Resource.ReferralMedicationRoute</th>
+                        <th>@Resource.ReferralMedicationQuantity</th>
+                        <th>@Resource.Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in ActiveReferralMedications">
+                        @*<td width="310">{{item.MedicationName}}</td>*@
+                        <td width="310" title="Click on Notes">
+                            <span href="javascript:void(0);" class="display-block pull-left cursor-pointer" common-detail-popover="ABC" popover-trigger="click" data-content="{{item.MedicationName}}"
+                                  ng-header="Medication Name">{{item.MedicationName.length>35 ? item.MedicationName.substr(0,35)+'...' :  item.MedicationName}}</span>
+                        </td>
+                        <td>{{item.PhysicianName}}</td>
+                        <td>{{item.Dose}}</td>
+                        <td>{{item.Unit}}</td>
+                        <td>{{item.Frequency}}</td>
+                        <td>{{item.Route}}</td>
+                        <td>{{item.Quantity}}</td>
+                        <td>
+                            @*<i id="pops{{item.ReferralMedicationID}}" data-ng-mouseover="OpenReferralMedicationDetails($event, item, 'true')" class="fa fa-exclamation-triangle glyphicon-info-sign"></i>*@
+                            @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Medication_AddUpdate))
+                            {
+                                <a href="javascript:void(0);" ng-click="EditReferralMedication(item)" class="btn btn-xs blue margin-right-05"> <i class="fa fa-edit"></i></a>
+                            }
+                            @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Medication_Delete))
+                            {
+                                <a href="javascript:void(0);" data-ng-click="DeleteReferralMedication(item)" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="medicinetable-box">
+            <h2>@Resource.ReferralMedicationInActiveDrugLabel</h2>
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th width="310">@Resource.ReferralMedicationDrugName</th>
+                        <th>@Resource.ReferralMedicationPhysician</th>
+                        <th>@Resource.ReferralMedicationDose</th>
+                        <th>@Resource.ReferralMedicationUnits</th>
+                        <th>@Resource.ReferralMedicationFrequency</th>
+                        <th>@Resource.ReferralMedicationRoute</th>
+                        <th>@Resource.ReferralMedicationQuantity</th>
+                        <th>@Resource.Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr data-ng-repeat="item in InActiveReferralMedications">
+                        <td width="310" title="Click on Notes">
+                            <span href="javascript:void(0);" class="display-block pull-left cursor-pointer" common-detail-popover="ABC" popover-trigger="click" data-content="{{item.MedicationName}}"
+                                  ng-header="Medication Name">{{item.MedicationName.length>35 ? item.MedicationName.substr(0,35)+'...' :  item.MedicationName}}</span>
+                        </td>
+                        <td>{{item.PhysicianName}}</td>
+                        <td>{{item.Dose}}</td>
+                        <td>{{item.Unit}}</td>
+                        <td>{{item.Frequency}}</td>
+                        <td>{{item.Route}}</td>
+                        <td>{{item.Quantity}}</td>
+                        <td>
+                            @* <i id="pops{{item.ReferralMedicationID}}" data-ng-mouseover="OpenReferralMedicationDetails($event)" class="fa fa-exclamation-triangle glyphicon-info-sign"></i>*@
+                            @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Medication_AddUpdate))
+                            {
+                                <a href="javascript:void(0);" ng-click="EditReferralMedication(item)" class="btn btn-xs blue margin-right-05"> <i class="fa fa-edit"></i></a>
+                            }
+                            @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Medication_Delete))
+                            {
+                                <a href="javascript:void(0);" data-ng-click="DeleteReferralMedication(item)" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                            }
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade modal-scroll outComeForm" id="model_AddMedication" tabindex="-1" role="dialog" aria-hidden="true">
+    <form id="frmAddMedication">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a class="close" data-dismiss="modal">&times;</a>
+                    <h4 class="modal-title text-center"><strong>Add Medication</strong></h4>
+                    <span class="pull-right btn btn-xs blue" data-ng-click="OpenAddNewMedication()">Add New Medication</span>
+                </div>
+                <div class="modal-body">
+                    <div class="medication-popup">
+                        <div class="row" data-ng-repeat="item in GetMedicationsList">
+                            <div class="form-group col-lg-9 col-md-9 col-sm-12">
+                                <div class="medicationName"><label><strong>Medication Name:</strong></label>{{item.generic_name}}</div>
+                                <div class="medication-list2">
+                                    <div class="dosageForm"><label><strong>Dosage Form:</strong></label> {{item.dosage_form}}</div>
+                                    <div class="brandName"><label><strong>Brand Name:</strong></label>{{item.labeler_name}}</div>
+                                    <div class="route"><label><strong>Route:</strong></label> {{item.route}}</div>
+                                    <div data-ng-repeat="st in item.active_ingredients">
+                                        <div class="route">&nbsp;<label><strong>Strength:</strong></label> {{st.strength}}</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-12 text-right">
+                                <button class="btn btn-default blue btn-sm" data-dismiss="modal" ng-click="SelectMedication(item)">Select</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="modal fade modal-scroll outComeForm" id="AddNewMedication" tabindex="-1" role="dialog" aria-hidden="true">
+    <form id="frmAddNewMedication">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a class="close" data-dismiss="modal">&times;</a>
+                    <h4 class="modal-title text-center"><strong>Add Medication</strong></h4>
+                </div>
+
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div>
+                                <div class="row" id="modal-body1">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">Medication Name</label>
+                                        @Html.TextBoxFor(q => q.AddMedicationModel.MedicationName, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddMedicationModel.MedicationName", data_ng_disabled = "IsMedicationDisabled", placeholder = "Medication Name", maxlength = 1000 })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">Generic Name</label>
+                                        @Html.TextBoxFor(q => q.AddMedicationModel.Generic_Name, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddMedicationModel.Generic_Name", data_ng_disabled = "IsMedicationDisabled", placeholder = "Generic Name", maxlength = 1000 })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">Brand Name</label>
+                                        @Html.TextBoxFor(q => q.AddMedicationModel.Brand_Name, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddMedicationModel.Brand_Name", data_ng_disabled = "IsMedicationDisabled", placeholder = "Brand Name", maxlength = 1000 })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">Product Type</label>
+                                        @Html.TextBoxFor(q => q.AddMedicationModel.Product_Type, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddMedicationModel.Product_Type", data_ng_disabled = "IsMedicationDisabled", placeholder = "Product Type", maxlength = 1000 })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">Route</label>
+                                        @Html.TextBoxFor(q => q.AddMedicationModel.Route, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddMedicationModel.Route", data_ng_disabled = "IsMedicationDisabled", placeholder = "Route", maxlength = 1000 })
+                                    </div>
+                                     <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">Strength</label>
+                                        @Html.TextBoxFor(q => q.AddMedicationModel.Dose, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddMedicationModel.Strength", data_ng_disabled = "IsMedicationDisabled", placeholder = "Strength", maxlength = 1000 })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">Dosage Form</label>
+                                        @Html.TextBoxFor(q => q.AddMedicationModel.Dosage_Form, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.AddMedicationModel.Dosage_Form", data_ng_disabled = "IsMedicationDisabled", placeholder = "Dosage Form", maxlength = 200 })
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-lg-6 col-md-6 margin-bottom-5">
+                    </div>
+                    <button class="btn btn-sm red" data-ng-click="CancelNewMedication()">@Resource.Cancel </button>
+                    <input type="submit" data-ng-click="SaveMedication(item)" class="btn btn-sm green-jungle" value="@Resource.Save"  />
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script>
+    function dosomething() {
+        alert("hi");
+    }
+</script>

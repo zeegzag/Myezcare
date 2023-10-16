@@ -1,0 +1,66 @@
+﻿@{
+    bool isEditMode = Model != null && Model.Agency != null && Model.Agency.AgencyID > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.Agency != null && Model.Agency.AgencyID > 0 ? Resource.EditAgency : @Resource.AddAgency));
+    // Layout = "~/Views/Shared/_Layout.cshtml";
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_AgencyAdd;
+    HC_SetFacilityHouseListModel model = ViewBag.HC_SetFacilityHouseListModel != null ? (HC_SetFacilityHouseListModel)ViewBag.HC_SetFacilityHouseListModel : new HC_SetFacilityHouseListModel();
+    model.IsPartial = true;
+    string agencyId = Model != null && Model.Agency != null && Model.Agency.AgencyID > 0 ? Model.Agency.AgencyID.ToString() : "";
+}
+
+@model AddAgencyModel
+@if (Model != null)
+{
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditAgency : @Resource.AddAgency)
+            @*<small>@Resource.EnterAgencyInformation</small>*@
+            @if (isEditMode)
+            {
+                @Html.Raw(string.Format(" - <span class='font-size-18 font-weight-400 font-style-oblique'>{0}</span>", Model.Agency.NickName))
+            }
+        </h3>
+    </div>
+
+   
+
+    <div class="row">
+        @Html.Hidden("AgencyID", agencyId)
+        <div class="col-md-12">
+            <div class="tabbable tabbable-custom boxless">
+                <ul class="nav nav-tabs" id="loanDetailTopTabs">
+                    <li class="active">
+                        <a id="addAgencyDetail" data-target="#tab_AgencyDetail" data-toggle="tab">@Resource.Agency</a>
+                    </li>
+                    @if (Model != null && Model.Agency != null && SessionHelper.IsCaseManagement)
+                    {
+                        <li class="@(isEditMode ? "" : "disabled")">
+                            <a id="facilities" data-target="#tab_Facilities" data-toggle="@(isEditMode ? "tab" : "")">@Resource.AgencyFacility</a>
+                        </li>
+                    }
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_AgencyDetail" data-ng-controller="AddAgencyController">
+                        @Html.Partial("Partial/_AgencyDetail")
+                    </div>
+                    @if (Model != null && Model.Agency != null && SessionHelper.IsCaseManagement)
+                    {
+                        <div class="tab-pane" id="tab_Facilities">
+                            @Html.Partial("~/Areas/HomeCare/Views/FacilityHouse/FacilityHouseList.cshtml", model)
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+}
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/homecare/agency/addagency")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/facilityhouse/facilityhouselist")
+    <script>
+        var NPIInvalid = '@Resource.NPIInvalid';
+    </script>
+}

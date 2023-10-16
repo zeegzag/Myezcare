@@ -1,0 +1,134 @@
+﻿@model SetRolePermissionModel
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.RolePermission);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_RoleAndPermission;
+}
+@Html.Hidden("hdnRolePermissionModel", Common.SerializeObject(Model))
+<div data-ng-controller="RolePermissionController">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.RolePermission<small>&nbsp;&nbsp;@Resource.SearchAndSetRolePermissionDetails</small>
+            <span class="role-heading-right"><a href="javascript:void(0);" data-ng-click="OpenAddRolePopUp()" class="btn btn-sm green-jungle pull-right letter-space"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddRole</a></span>
+        </h3>
+    </div>
+    <div class="row">
+        <form id="frmrolepermission">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div class="col-lg-6 col-md-6 col-sm-6">
+
+                    <div class="permissionList">
+                        <div class="row-fluid">
+                            <div class="caption">
+                                <i class=" icon-layers font-green"></i>
+                                <span class="caption-subject font-green bold uppercase font-size-17">System - Permissions</span>
+                                <div class="caption-desc font-grey-cascade">
+                                    Default system permission list. You can
+                                    @*<pre class="mt-code">*@<b>check & assign permissions</b>@*</pre>*@
+                                    to selected roles.
+                                </div>
+                                <div class="space10"></div>
+                                <div class="col-sm-8 no-padding">
+                                    <label class="control-label">@Resource.RoleName</label>
+                                    <div class="form-group">
+                                        <select name="mySelect" id="mySelect" class="form-control"
+                                            data-ng-options="obj.RoleID as obj.RoleName for obj in RoleList"
+                                            data-ng-model="SearchRolePermission.RoleID"
+                                            data-ng-init="SearchRolePermission.RoleID = SearchRolePermission.RoleID==''? null: SearchRolePermission.RoleID"
+                                            data-ng-change="GetRolePermission(SearchRolePermission)"
+                                            data-ng-setname="SearchRolePermission.RoleName">
+                                            <option value="">@Resource.SelectRole</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="font-sm col-md-12 no-padding"><b class="font-red-thunderbird">@Resource.NoteLabel</b><i> @Html.Raw(Resource.RolePermissionNote)</i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6">
+                    <div class=" col-lg-12 col-md-12 col-sm-12 no-padding margin-top-5">
+                        <div class="col-md-3">
+                            <label class="control-label"><strong>@Resource.SelectedRole</strong></label>
+                        </div>
+                        <div class="col-md-6">
+                            <span data-ng-show="!IsEditRoleName" data-ng-bind="SearchRolePermission.RoleName"></span>
+                            @Html.TextBoxFor(m => m.SearchRolePermissionModel.RoleName, new { @class = "input-sm", data_ng_model = "SearchRolePermission.RoleName", data_ng_show = "IsEditRoleName", maxlength = "50", placeholder = Resource.RoleName })
+                            @Html.ValidationMessageFor(m => m.SearchRolePermissionModel.RoleName)
+                            <button id="btnEditRole" data-ng-click="IsEditRoleName?UpdateRoleName():EditRoleName()"><span class="{{IsEditRoleName?'glyphicon glyphicon-floppy-disk color-blue':'glyphicon glyphicon-pencil color-blue'}}"></span></button>
+                        </div>
+                    </div>
+                    <div class="">
+                        <div>
+                            <div class="space20"></div>
+                            <div class="portlet-body compact">
+                                <div class="dataTables_wrapper external-events-group table-responsive">
+                                </div>
+                            </div>
+                            <div class="">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div>
+                                            <i class="glyphicon glyphicon-tree-conifer"></i>@Resource.Permissions
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div id="jstreeid" data-ng-click="SetPermission()" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="PermissionList" tree="treeInstance" tree-events="ready:ExpandTreeView;changed:SaveRoleWisePermission;hover_node:ShowDescription;"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="modal fade" id="AddNewRoleModal" tabindex="-1" role="dialog" aria-labelledby="AddNewRoleLabel">
+            <div class="modal-dialog" role="document">
+                <form id="frmnewrole">
+                    <div class="modal-content ">
+                        <div class="modal-header caption-desc ">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title" id="H1">@Resource.AddNewRole</h4>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="form-group col-sm-12">
+                                            @*<div class="col-sm-3">
+                                                <label class="control-label">@Resource.RoleName</label>
+                                            </div>*@
+                                            <div class="col-sm-12" id="roles">
+                                                @Html.TextBoxFor(m => m.SearchRolePermissionModel.AddNewRoleName, new { @class = "form-control", data_ng_model = "RoleModel.RoleName", maxlength = "50", placeholder = Resource.RoleName })
+                                                @Html.ValidationMessageFor(m => m.SearchRolePermissionModel.AddNewRoleName)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <input type="button" data-ng-click="ResetRoleModel()" class="btn btn-danger" data-dismiss="modal" value="@Resource.Cancel"/>
+                                        <input type="submit" data-ng-click="AddNewRole()" class="btn green-jungle " value="@Resource.Save"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/security/rolepermission")
+}

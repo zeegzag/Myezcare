@@ -1,0 +1,258 @@
+﻿<div class="ah">
+    @{ 
+        string paginationId = new string(Guid.NewGuid().ToString("N").Take(5).ToArray());
+    }
+    @model HC_AddReconcile835Model
+    @*<strong>@Resource.PayorAdjudicationHistory</strong>*@
+    <div class="row" data-ng-if="item.ParentReconcileList.length>0">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="portlet-body compact" style="display: block;">
+                <div class="table-responsive ">
+                    <table class="table table-bordered table-condensed flip-content tblAdjudicationHostory">
+                        @*    <table class="table table-bordered table-striped table-condensed flip-content tblAdjudicationHostory">*@
+                        <thead class="flip-content">
+                            <tr>
+                                <th></th>
+                                <th></th>
+                                <th class="">
+                                    <span class="anchor_color">@Resource.ClaimStatus</span>
+                                </th>
+                                <th class="">
+                                    <span class="anchor_color">@Resource.PayorClaimStatus</span>
+                                </th>
+                                @*<th class="">
+            <span class="anchor_color">@Resource.ClientLabel</span>
+        </th>*@
+                                <th class="">
+                                    <span class="anchor_color">@Resource.Payor</span>
+                                </th>
+                                @*<th class="">
+            <span class="anchor_color" title="@Resource.AHCCCSID">@Resource.AHCCCSNumber</span>
+        </th>*@
+                                @*<th class="">
+            <span class="anchor_color">@Resource.DOBShort</span>
+        </th>*@
+                                @*<th class="">
+            <span class="anchor_color">@Resource.CISLabel</span>
+        </th>*@
+                                <th class="">
+                                    <span class="anchor_color">@Resource.ServiceDate</span>
+                                </th>
+                                <th class="">
+                                    <span class="anchor_color">@Resource.ServiceCode</span>
+                                </th>
+                                <th class="">
+                                    <span class="anchor_color">@Resource.ModifierShort</span>
+                                </th>
+                                @*<th class="">
+            <span class="anchor_color">@Resource.POS</span>
+        </th>*@
+                                <th class="">
+                                    <span class="anchor_color">@Resource.Unit</span>
+                                </th>
+                                <th class="">
+                                    <span class="anchor_color">@Resource.BilledAmount</span>
+                                </th>
+                                <th class="">
+                                    <span class="anchor_color">@Resource.PaidAmount</span>
+                                </th>
+                                <th class="">
+                                    <span class="anchor_color">@Resource.NPI</span>
+                                </th>
+                                <th class="">
+                                    <span class="anchor_color">@Resource.Provider</span>
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody dir-paginate="data in item.ParentReconcileList | itemsPerPage: item.ParentReconcileListPager.pageSize" 
+                               total-items="item.ParentReconcileListPager.totalRecords" current-page="item.ParentReconcileListPager.currentPage" 
+                               pagination-id="item.PagerID">
+                            <tr id="openTrReconcile{{$index}}">
+                                <td class="td-reconcile">
+                                    <input type="checkbox" class="unicheckbox text-align-center margin-top-0" data-ng-model="data.IsChecked" data-ng-change="SelectReconcile(data)" val="data.IsChecked">
+                                </td>
+                                <td data-ng-class="{'badge-danger':data.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement',
+                                                        'badge-warning':data.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Void'  ,
+                                                        'badge-default':data.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff'}"
+                                    data-ng-attr-title="{{data.ClaimAdjustmentTypeID}}">
+                                    <span class="collapseSource1 curser-pointer font-size-18 font-blue fa fa-plus-circle"
+                                          data-ng-click="GetBatchNoteDetails(data,'#openTrReconcile'+$index)"
+                                          data-ng-attr-id="{{'BNDetails-'+data.BatchNoteID }}"
+                                          data-toggle="collapse"
+                                          data-ng-attr-data-target="{{'#BatchNoteDetails-'+data.BatchNoteID }}">
+                                    </span>
+                                </td>
+                                <td>
+                                    <span data-ng-if="data.BatchNoteID !== EditBatchNoteID"> {{data.Status ? data.Status:'@Resource.NA'}} </span>
+                                    <div data-ng-if="data.BatchNoteID === EditBatchNoteID" class="btn-group">
+                                        @Html.DropDownListFor(p => p.ClaimStatus.ClaimStatusID, Model.ClaimStatusList.ToSelectList(Model.ClaimStatus.ClaimStatusID.ToString() ?? "", "StatusName", "ClaimStatusID", @Resource.Select, ""), new
+                                              {
+                                                  convert_to_number = "",
+                                                  data_val = "false",
+                                                  data_ng_model = "TempClaimStatus.ClaimStatusID",
+                                                  data_ng_init = "TempClaimStatus.ClaimStatusID=TempClaimStatus.ClaimStatusID==''?null:TempClaimStatus.ClaimStatusID.toString()",
+                                                  @class = "form-control input-sm select-batch-edit"
+                                              })
+                                        @*<select data-ng-model="StatusId" class="form-control input-sm select-batch-edit">
+                    <option data-ng-repeat="x in Status" value="{{x.id}}">{{x.status}}</option>
+                </select>*@
+                                    </div>
+                                </td>
+
+                                <td>
+                                    <span data-ng-if="data.BatchNoteID !== EditBatchNoteID">{{data.ClaimStatus ? data.ClaimStatus:'@Resource.NA'}} </span>
+                                    <div data-ng-if="data.BatchNoteID === EditBatchNoteID" class="btn-group">
+                                        @Html.DropDownListFor(p => p.ClaimStatusCode.ClaimStatusCodeID, Model.ClaimStatusCodeList.ToSelectList(Model.ClaimStatusCode.ClaimStatusCodeID.ToString() ?? "", "ClaimStatusName", "ClaimStatusCodeID", @Resource.Select, ""), new
+                                               {
+                                                   convert_to_number = "",
+                                                   data_val = "false",
+                                                   data_ng_model = "TempClaimStatusCode.ClaimStatusCodeID",
+                                                   data_ng_init = "TempClaimStatusCode.ClaimStatusCodeID=TempClaimStatusCode.ClaimStatusCodeID==''?null:TempClaimStatusCode.ClaimStatusCodeID.toString()",
+                                                   @class = "form-control input-sm select-batch-edit"
+                                               })
+                                        @*<select data-ng-model="BatchStatusId" class="form-control input-sm select-batch-edit">
+                    <option data-ng-repeat="x in Status" value="{{x.id}}">{{x.status}}</option>
+                </select>*@
+                                    </div>
+                                </td>
+
+                                @*<td>{{data.ClientName ? data.ClientName:'@Resource.NA'}}</td>*@
+                                <td>{{data.Payor ? data.Payor:'@Resource.NA'}}</td>
+
+                                @*<td>{{data.AHCCCSID ? data.AHCCCSID:'@Resource.NA'}}</td>*@
+                                @*<td>{{data.ClientDob |orgdate}}</td>*@
+                                @*<td>{{data.CISNumber ? data.CISNumber:'@Resource.NA'}}</td>*@
+                                <td>{{data.ServiceDate ? (data.ServiceDate|orgdate):'@Resource.NA'}}</td>
+                                <td>{{data.ServiceCode ? data.ServiceCode :'@Resource.NA'}}</td>
+                                <td>{{data.Modifier ? data.Modifier:'@Resource.NA'}}</td>
+                                @*<td>{{data.PosID ? data.PosID:'@Resource.NA'}}</td>*@
+                                <td>{{data.CalculatedUnit ? data.CalculatedUnit:'@Resource.NA'}}</td>
+                                <td>{{data.BilledAmount ? (data.BilledAmount | orgcurrency):'@Resource.NA'}}</td>
+                                <td>
+                                    <span data-ng-if="data.BatchNoteID !== EditBatchNoteID"> {{data.PaidAmount ? (data.PaidAmount | orgcurrency) :'@Resource.NA'}} </span>
+                                    <div data-ng-if="data.BatchNoteID === EditBatchNoteID" class="btn-group">
+                                        <input class="form-control input-sm input-batch-edit dirValidDecimal" type="number" name="PaidAmount" placeholder="Paid amount" data-ng-model="BatchTemp.PaidAmount" />
+                                    </div>
+                                </td>
+                                <td>{{data.BillingProviderNPI ? data.BillingProviderNPI:'@Resource.NA'}}</td>
+                                <td>{{data.BillingProvider ? data.BillingProvider:'@Resource.NA'}}</td>
+
+                                <td>
+                                    <a data-ng-if="data.BatchNoteID !== EditBatchNoteID" data-ng-click="EditParentReconcileList(data)" class="btn-xs no-padding font-size-14" title="Edit">
+                                        <i class="fa fa-pencil"></i>
+                                    </a>
+                                    <a data-ng-if="data.BatchNoteID === EditBatchNoteID" class="btn-xs no-padding font-size-14">
+                                        <i class="fa fa-save" title="Update" data-ng-click="UpdateParentReconcileList(data)"></i>
+                                        <i class="fa fa-times" title="Cancel" data-ng-click="CancelUpdate()"></i>
+                                    </a>
+                                </td>
+                                <td data-ng-class="{'badge-danger':data.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement',
+                                                        'badge-warning':data.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Void' ,
+                                                        'badge-default':data.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff'}" data-ng-attr-title="{{data.ClaimAdjustmentTypeID}}">
+                                    <div class="btn-group">
+                                        <a class="btn-xs dropdown-toggle no-padding font-size-14" type="button" data-toggle="dropdown" aria-expanded="false">
+                                            <i class="fa fa-adjust"></i>
+                                        </a>
+                                        <ul class="dropdown-menu pull-right">
+
+                                            <li data-ng-if="data.PayorClaimNumber">
+                                                <a data-ng-click="SetClaimAdjustmentFlag(data,'@ClaimAdjustmentType.ClaimAdjustmentType_Void')"><i class="fa fa-eraser"></i>@Resource.Void</a>
+                                            </li>
+                                            <li data-ng-if="data.PayorClaimNumber">
+                                                <a data-ng-click="SetClaimAdjustmentFlag(data,'@ClaimAdjustmentType.ClaimAdjustmentType_Replacement')"><i class="fa fa-exchange"></i>@Resource.Replacement</a>
+                                            </li>
+                                            <li>
+                                                <a data-ng-click="SetClaimAdjustmentFlag(data,'@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff')"><i class="fa fa-file-text-o"></i>@Resource.WriteOff</a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr data-ng-attr-id="{{'BatchNoteDetails-'+data.BatchNoteID }}" class="collapse collapseDestination1">
+                                <td colspan="23">
+                                    <div class="space20"></div>
+                                    <div class="col-md-12">
+
+                                        <div class="tabbable tabbable-custom">
+                                            <ul class="nav nav-tabs" id="adjudicationRelatedTabs">
+                                                <li class="active">
+                                                    <a data-ng-attr-id="adjudicationDetails{{data.BatchNoteID}}" data-ng-attr-data-target="#tab_Adjudication{{data.BatchNoteID}}" data-toggle="tab">@Resource.AdjudicationHistory</a>
+                                                </li>
+                                                <li class="">
+                                                    <a data-ng-attr-id="batchHistory{{data.BatchNoteID}}" data-ng-attr-data-target="#tab_BatchHistory{{data.BatchNoteID}}" data-toggle="tab">@Resource.BatchHistory</a>
+                                                </li>
+                                                <li class="">
+                                                    <a data-ng-attr-id="noteHistory{{data.BatchNoteID}}" data-ng-attr-data-target="#tab_NoteHistory{{data.BatchNoteID}}" data-toggle="tab">@Resource.NoteHistory</a>
+                                                </li>
+                                                <li class="pull-right" data-ng-if="data.ClaimAdjustmentTypeID">
+                                                    <span class="label" data-ng-class="{'label-danger':data.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement',
+                                                                                            'label-warning':data.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Void' ,
+                                                                                            'label-default':data.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff'}">
+                                                        {{data.ClaimAdjustmentTypeID}}
+
+
+                                                        <a data-ng-click="SetClaimAdjustmentFlag(item,'@ClaimAdjustmentType.ClaimAdjustmentType_Remove')"><i class="fa fa-remove"></i></a>
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                            <div class="tab-content">
+                                                <div class="tab-pane active" data-ng-attr-id="tab_Adjudication{{data.BatchNoteID}}">
+                                                    @Html.Partial("Partial/_AdjudicationHostory")
+                                                </div>
+                                                <div class="tab-pane" data-ng-attr-id="tab_BatchHistory{{data.BatchNoteID}}">
+                                                    @Html.Partial("Partial/_BatchHistory")
+                                                </div>
+                                                <div class="tab-pane" data-ng-attr-id="tab_NoteHistory{{data.BatchNoteID}}">
+                                                    @Html.Partial("Partial/_NoteHistory")
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="clearfix"></div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12" data-ng-if="item.ParentReconcileList.length > 0">
+            <div class="col-sm-3 pull-left no-padding">
+                @Resource.Showing <span data-ng-bind="(item.ParentReconcileListPager.pageSize * item.ParentReconcileListPager.currentPage) - item.ParentReconcileListPager.pageSize  + 1"></span>
+                &nbsp;@Resource.To <span data-ng-bind="(item.ParentReconcileListPager.pageSize == item.ParentReconcileListPager.currentPageSize) ? (item.ParentReconcileListPager.pageSize * item.ParentReconcileListPager.currentPage) :(item.ParentReconcileListPager.pageSize * item.ParentReconcileListPager.currentPage) - item.ParentReconcileListPager.pageSize  + item.ParentReconcileListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="item.ParentReconcileListPager.totalRecords"></span>&nbsp;@Resource.Records
+            </div>
+
+
+            <div class="btn-group margin-left-20PR">
+                <div class="top pagination-sm" data-ng-show="AjaxStart">
+                    <b>@Resource.Loading</b>
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+            </div>
+
+
+            <div class="pull-right top pagination-sm">
+                <dir-pagination-controls boundary-links="true" max-size="item.ParentReconcileListPager.maxSize" 
+                                         on-page-change="item.ParentReconcileListPager.pageChanged(newPageNumber,item)" 
+                                         pagination-id="item.PagerID"></dir-pagination-controls>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div data-ng-if="item.ParentReconcileList.length == 0  ">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

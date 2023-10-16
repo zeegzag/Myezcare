@@ -1,0 +1,200 @@
+﻿@model SetEmployeeVisitListPage
+
+<style>
+    #tblMissingTimeSheet {
+            max-height: 60vh;
+            overflow: auto;
+            display: block;
+            margin-top:5px;
+    }
+        #tblMissingTimeSheet thead tr th {
+            font-weight:bold;
+        }
+</style>
+
+@Html.Hidden("hdnSetMissingTSListPage", Common.SerializeObject(Model))
+<div class="modal fade" id="MissingTimeSheetModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseMissingTimeSheetModal()"><span aria-hidden="true">×</span></button>
+                <h4>Missing TimeSheet</h4>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="control-label">@Resource.EmployeeList</label>
+                            <select class="form-control input-sm" title="@Resource.SelectEmployee"
+                                    data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.EmployeeID != null)"
+                                    selectpicker="TempSearchMissingTsListPage.EmployeeID" name="SearchEmpCalender.EmployeeID">
+                                <option data-ng-repeat="option in EmployeeVisitModel.EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="control-label">@Resource.PatientList</label>
+                            <select class="form-control input-sm" title="@Resource.SelectPatient"
+                                    data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.ReferralID != null)"
+                                    selectpicker="TempSearchMissingTsListPage.ReferralID" name="SearchEmpCalender.ReferralID">
+                                <option data-ng-repeat="option in EmployeeVisitModel.ReferralList" value="{{option.ReferralID}}">{{option.ReferralName}}</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="control-label">@Resource.StartDate</label>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="TempSearchMissingTsListPage.StartDate" ng-dateval="TempSearchMissingTsListPage.StartDate" data-ng-maxdate="TempSearchMissingTsListPage.EndDate">
+                                @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StartDate, new
+                           {
+                               @class = "form-control input-sm dateInputMask",
+                               maxlength = "50",
+                               placeholder = Resource.DateFormat
+                           })
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="control-label">@Resource.EndDate</label>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="TempSearchMissingTsListPage.EndDate" ng-dateval="TempSearchMissingTsListPage.EndDate" data-ng-maxdate="Today">
+                                @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.EndDate, new
+                           {
+                               @class = "form-control input-sm dateInputMask",
+                               maxlength = "50",
+                               placeholder = Resource.DateFormat
+                           })
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="btn-group">
+                    <a class="letter-space btn btn-sm green-jungle" data-ng-click="ResetTS_PostData()">@Resource.Reset</a>
+                </div>
+                <div class="btn-group">
+                    <a class="letter-space btn btn-sm green-jungle" data-ng-click="GetMissingTimeSheet()">@Resource.Search</a>
+                </div>
+                <div class="btn-group">
+                    <a class="letter-space btn btn-sm green-jungle" data-ng-if="SelectedMissingTs.length>0" data-ng-click="AddMissingTimeASheet()">Add missing Timesheet</a>
+             
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            <form id="frmMissingTimeSheet">
+                                <div id="tblMissingTimeSheet" class="table-responsive tabbable-custom">
+                                    <table id="tblMissingTimeSheet" class="table table-bordered table-condensed flip-content missingTS_tbl">
+                                        <thead class="flip-content">
+                                            <tr>
+                                                <th>
+                                                </th>
+                                                <th class="width-150px">
+                                                    <a class="anchor_color" href="javascript:void(0);">@Resource.Employee</a>
+                                                </th>
+                                                <th class="width-150px">
+                                                    <a class="anchor_color" href="javascript:void(0);">@Resource.Patient</a>
+                                                </th>
+                                                <th class="width-150px">
+                                                    <a class="anchor_color" href="javascript:void(0);">@Resource.StartDate</a>
+                                                </th>
+                                                <th class="width-150px">
+                                                    <a class="anchor_color" href="javascript:void(0);">@Resource.EndDate</a>
+                                                </th>
+                                                <th class="width-150px">
+                                                    <a class="anchor_color" href="javascript:void(0);">@Resource.CareType</a>
+                                                </th>
+                                                <th class="width-50px">
+                                                    <a class="anchor_color" href="javascript:void(0);">@Resource.ClockInTime</a>
+                                                </th>
+                                                <th class="width-50px">
+                                                    <a class="anchor_color" href="javascript:void(0);">@Resource.ClockOutTime</a>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="MissingTimeSheet in MissingTimeSheetList | itemsPerPage: EmployeeVisitListPager.pageSize"
+                                                total-items="MissingTimeSheetList.totalRecords"
+                                                current-page="MissingTimeSheetList.currentPage">
+                                                <td class="text-align-center">
+                                                    <input type="checkbox" class="unicheckbox text-align-center"
+                                                           data-ng-model="MissingTimeSheet.IsChecked"
+                                                           data-ng-change="SelectMissingTS(MissingTimeSheet)"
+                                                           val="MissingTimeSheet.IsChecked">
+                                                </td>
+                                                <td>{{MissingTimeSheet.EmployeeName }}</td>
+                                                <td>{{MissingTimeSheet.PatientName }}</td>
+                                                <td>{{MissingTimeSheet.StartDate | datetimeformat }}</td>
+                                                <td>{{MissingTimeSheet.EndDate | datetimeformat }}</td>
+                                                <td>{{MissingTimeSheet.CareType }}</td>
+                                                <td>{{MissingTimeSheet.ClockInTime }}</td>
+                                                <td>{{MissingTimeSheet.ClockOutTime }}</td>
+
+                                                @*<td>
+                                            @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StrStartTimeEdit,
+                                            new
+                                            {
+                                                ng_model = "MissingTimeSheet.StartTime",
+                                                @class = "form-control input-xs time",
+                                                placeholder = @Resource.StartTime,
+                                                time_input_mask = "",
+                                                id = "StrMisStartTimeEdit{{$index}}",
+                                            })
+                                            @Html.ValidationMessageFor(m => m.SearchEmployeeVisitListPage.StrStartTimeEdit)
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StrEndTimeEdit,
+                                                new
+                                                {
+                                                    ng_model = "MissingTimeSheet.StrEndTimeEdit",
+                                                    @class = "form-control input-xs time",
+                                                    placeholder = @Resource.EndTime,
+                                                    time_input_mask = "",
+                                                    id = "StrMisEndTimeEdit{{$index}}",
+                                                    compare_with = "#StrMisStartTimeEdit{{$index}}",
+                                                    validation_timecompare = ""
+                                                })
+                                            @Html.ValidationMessageFor(m => m.SearchEmployeeVisitListPage.StrEndTimeEdit)
+                                        </td>*@
+                                            </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12" data-ng-if="TempSearchMissingTsListPage.length > 0">
+                        <div class="col-sm-3 pull-left no-padding">
+                            @Resource.Showing <span data-ng-bind="(missingTimesheetsPager.pageSize * missingTimesheetsPager.currentPage) - missingTimesheetsPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(missingTimesheetsPager.pageSize == missingTimesheetsPager.currentPageSize) ? (missingTimesheetsPager.pageSize * missingTimesheetsPager.currentPage) :(missingTimesheetsPager.pageSize * missingTimesheetsPager.currentPage) - missingTimesheetsPager.pageSize  + missingTimesheetsPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="missingTimesheetsPager.totalRecords"></span>&nbsp;@Resource.Records
+                        </div>
+                        <div class="pull-right top pagination-sm">
+                            <dir-pagination-controls boundary-links="true" max-size="EmployeeVisitListPager.maxSize" on-page-change="missingTimesheetsPager.pageChanged(newPageNumber)" pagination-id="EmployeeVisitListPager_ID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @*@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/missingTimesheet")*@
+
+    <script type="text/javascript">
+        @*var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.EmployeeVisit)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.EmployeeVisit)';
+        var StrtEndTimeRequired = '@Resource.StrtEndTimeRequired';
+        var GenerateBillingNote = '@Resource.GenerateBillingNotes';
+        var ConfirmationForBillingNote = '@Resource.ConfirmationForBillingNote';*@
+    </script>
+}

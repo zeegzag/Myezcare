@@ -1,0 +1,109 @@
+﻿@model ReportModel
+
+@Html.Hidden("hdnSetRequestClientListModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptRequestClientListController">
+
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon ribbon-color-warning uppercase">@Resource.RequestClientListReport</div>
+        <p class="ribbon-content">
+            @Resource.RequestClientListDetail
+        </p>
+        <hr />
+        <div>
+            <a class="btn btn-sm blue-madison pull-right" href="#model__SearchRptRequestClientList" data-toggle="modal">@Resource.GenerateReport</a>
+        </div>
+        <br />
+    </div>
+
+    <div class="modal fade" id="model__SearchRptRequestClientList" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.ClientStatusReport, Resource.SearchParameter)</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmSearchRptClientStatus">
+                                <div class="col-md-12 no-padding">
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Name</label>
+                                        @Html.TextBoxFor(m => m.SearchRequestClientListModel.ClientName, new { data_ng_model = "SearchRequestClientListModel.ClientName", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Status</label>
+                                        
+                                        @Html.DropDownListFor(p => p.SearchRequestClientListModel.ReferralStatusID, Model.ReferralStatuses.ToSelectList(Model.SearchRequestClientListModel.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", Resource.SelectStatus, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "ReferralStatusID",
+                                                                      data_ng_model = "SearchRequestClientListModel.ReferralStatusID",
+                                                                      data_ng_init = "SearchRequestClientListModel.ReferralStatusID=SearchRequestClientListModel.ReferralStatusID==''?null:SearchRequestClientListModel.ReferralStatusID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                   
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Region</label>
+                                        @Html.DropDownListFor(m => m.SearchRequestClientListModel.RegionID, Model.Region.ToSelectList(Convert.ToString(Model.SearchRequestClientListModel.RegionID), "RegionName", "RegionID", Resource.SelectRegion, ""), new
+                                            {
+                                                id = "RegionID",
+                                                data_ng_model = "SearchRequestClientListModel.RegionID",
+                                                data_ng_init = "SearchRequestClientListModel.RegionID=SearchRequestClientListModel.RegionID==''?null:SearchRequestClientListModel.RegionID",
+                                                @class = "form-control input-sm",
+                                                convert_to_number = ""
+
+                                            })
+                                    </div>
+
+                                    
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.EnableDisableClient</label>
+                                        @Html.DropDownListFor(m => m.SearchRequestClientListModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchRequestClientListModel.IsDeleted), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      id = "IsDeleted",
+                                                                      data_ng_model = "SearchRequestClientListModel.IsDeleted",
+                                                                      data_ng_init = "SearchRequestClientListModel.IsDeleted = SearchRequestClientListModel.IsDeleted==null?'-1':SearchRequestClientListModel.IsDeleted.toString()",
+                                                                      @class = "form-control input-sm"
+
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="ClientStatusAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                            <span class="padding-left-5"><img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetSearchFilter()" data-dismiss="modal">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm blue" id="btnClientStatusDownload" data-loading-text="@Resource.DownloadingInProgress" data-ng-click="DownloadClientStatusReport('#btnClientStatusDownload')">@Resource.Download</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</div>

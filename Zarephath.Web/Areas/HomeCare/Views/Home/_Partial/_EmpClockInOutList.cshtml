@@ -1,0 +1,311 @@
+﻿
+<div id="EmpClockInOutList" class="row">
+    <div class="col-md-12">
+        <div class="portlet box">
+            <div class="portlet-title">
+                <div class="caption header-font-size-14 uppercase">
+                    <div class="pull-left">@Resource.EmployeeDidNotClkInClkout</div>
+                    <div class="pull-left padding-left-25 font-style-italic">Total Schedule - {{TotalSchedule}}</div>
+                    <div class="pull-left padding-left-25 font-style-italic">Inprogress - {{Inprogress}}</div>
+                    <div class="pull-left padding-left-25 font-style-italic">Missed - {{MissedSchedule}}</div>
+                    <div class="pull-left padding-left-25 font-style-italic">Complete - {{TotalComplete}}</div>
+                    <div class="pull-right padding-left-25" data-ng-show="EmpClockInOutListAjaxStart">
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+                <div class="tools">
+                    <a href="javascript:;" class="collapse"></a>
+                    <a href="javascript:;" class="fullscreen"></a>
+                </div>
+            </div>
+
+            <div class="portlet-body table_font-size-12" style="height:auto !important; min-height:0">
+
+
+                <form id="empClckInClckOut">
+
+                    <div class="row form-group">
+
+                        <div class="col-sm-1 small-select padding-right-0">
+                            <div class="fields">
+                                <label>@Resource.Employee</label>
+                                <input type="text" class="form-control input-sm" data-ng-model-options='{ debounce: 1000 }' data-ng-model="EmpClockInOutListSearchModel.EmployeeName" data-ng-change="SearchEmpClockInOutList()" placeholder="@Resource.Employee" />
+                            </div>
+                        </div>
+
+                        <div class="col-sm-1 small-select padding-right-0">
+                            <div class="fields">
+                                <label>@Resource.CareType</label>
+                                <select class="form-control input-sm" data-ng-model="EmpClockInOutListSearchModel.DDMasterID" data-ng-change="SearchEmpClockInOutList()">
+                                    <option value="" data-ng-selected="selected">@Resource.CareType</option>
+                                    <option data-ng-repeat="item in GetCareTypes" value="{{item.DDMasterID}}">{{item.Title}}</option>
+                                </select>
+                            </div>
+                        </div>
+
+
+                        <div class="col-sm-1 small-select padding-right-0">
+                            <div class="fields">
+                                <label>@Resource.Location</label>
+                                <select class="form-control input-sm" multiple title="@Resource.Location" id="multipleLocationSelect"
+                                        data-val="true" data-ng-model="EmpClockInOutListSearchModel.RegionID" data-ng-change="SearchEmpClockInOutList()"
+                                        selectpicker="SelectedGroups">
+                                    <option data-ng-repeat="item in GetRegionList" value="{{item.RegionID}}">{{item.RegionName}}</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-1 small-select padding-right-0">
+                            <div class="fields">
+                                <label>@Resource.TimeSlots</label>
+
+                                <select class="form-control input-sm" multiple title="@Resource.TimeSlots" id="multipleTimeSlotSelect"
+                                        data-val="true" data-ng-model="EmpClockInOutListSearchModel.TimeSlots" data-ng-change="SearchEmpClockInOutList()"
+                                        selectpicker="SelectedGroups">
+                                    @*<option value="Day">24 Hrs.</option>*@
+                                    <option value="Morning">Morning</option>
+                                    <option value="Afternoon">Afternoon</option>
+                                    <option value="Evening">Evening</option>
+                                    <option value="Night">Night</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-sm-1 small-select padding-right-0">
+                            <div class="fields">
+                                <label>@Resource.Status</label>
+                                <select class="form-control input-sm" data-ng-model="EmpClockInOutListSearchModel.Status" data-ng-change="SearchEmpClockInOutList()">
+                                    <option value="" data-ng-selected="selected">@Resource.Status</option>
+                                    <option value="Complete">Complete</option>
+                                    <option value="Missed">Missed</option>
+                                    <option value="Inprogress">Inprogress</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-1 small-select padding-right-0">
+                            <div class="fields">
+                                <label>@Resource.StarDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                     datepicker="EmpClockInOutListSearchModel.StartDate" ng-dateval="EmpClockInOutListSearchModel.StartDate" data-val="true">
+                                    <input class="form-control input-sm dateInputMask clockInOutDateFilterWidth" placeholder='@Resource.StarDate' 
+                                           maxlength="50" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-1 small-select padding-right-0">
+                            <div class="fields">
+                                <label>@Resource.EndDate</label>
+                                <div class="input-group date date-picker pull-right" data-ng-maxdate="EmpClockInOutListEndDate"
+                                     datepicker="EmpClockInOutListSearchModel.EndDate" ng-dateval="EmpClockInOutListSearchModel.EndDate" data-val="true">
+                                    <input class="form-control input-sm dateInputMask clockInOutDateFilterWidth" placeholder='@Resource.EndDate' maxlength="50" />
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                    <div class="row form-group" style="padding-left: 60%;">
+                        <div class="col-sm-2 padding-right-0">
+                            <div class="clockIn-btn">
+                                <input type='submit' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Search" data-ng-click="SearchEmpClockInOutList()" />
+                            </div>
+                        </div>
+                        <div class="col-sm-2 padding-right-0">
+                            <div class="clockIn-btn">
+                                <input type='button' class="btn btn-sm btn-default bg-gray-color" value="@Resource.Reset" data-ng-click="ResetEmpClockInOutList()" />
+                            </div>
+                        </div>
+                        @if (Common.HasPermission(Constants.HC_Permission_Dashboard_ViewMap))
+                        {
+                            <div class="col-sm-3 padding-right-0">
+                                <div class="clockIn-btn">
+                                    <input type="button" class="btn btn-sm btn-default view-map-bg" value="View Map" data-ng-click="OpenClockInClockOutMapModal($event,EmpClockInOutList)" autocomplete="autocomplete_off_hack_xfr4!k">
+                                </div>
+                            </div>
+                        }
+                        @if (Common.HasPermission(Constants.HC_Permission_Dashboard_BroadcastNotifications))
+                        {
+                            <div class="col-sm-3 padding-right-0">
+                                <div class="clockIn-btn">
+                                    <input type="button" class="btn btn-sm btn-default view-map-bg" value="Broadcast" data-ng-click="BroadcastNotificationModal()" autocomplete="autocomplete_off_hack_xfr4!k">
+                                </div>
+                            </div>
+                        }
+                        <div class="col-sm-1 padding-right-0">
+                            <div class="clockIn-img">
+                                <a href="javascript:;" data-ng-click="EmpClockInOuReport('Employee ClockIn and ClockOut Report')" title="Print"><img src="~/Assets/images/printer.ico" class="print-img" /></a>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+
+                @*<div class="table-responsive">*@
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="portlet-body" style="display: block;">
+                            <div class="table-responsive">
+                                <form id="frmReferralinterMessageList">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead>
+                                            <tr>
+                                                <th class="width-45px">
+                                                    <div class="btn-group" data-ng-show="EmpClockInOutList.length > 0">
+                                                        <input id="SelectAllSchedule" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll(SelectAllCheckbox)" val="SelectAllCheckbox">
+                                                        <label for="SelectAllEmployee"></label>
+                                                    </div>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpClockInOutListPager.sortColumn('Employee')">@Resource.Employee</a>
+                                                    <span class="sortorder" data-ng-show="EmpClockInOutListPager.sortIndex === 'Employee'" data-ng-class="{reverse:EmpClockInOutListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpClockInOutListPager.sortColumn('Patient')">@Resource.Patient</a>
+                                                    <span class="sortorder" data-ng-show="EmpClockInOutListPager.sortIndex === 'Patient'" data-ng-class="{reverse:EmpClockInOutListPager.reverse}"></span>
+                                                </th>
+                                                <th>
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpClockInOutListPager.sortColumn('CareType')">@Resource.CareType</a>
+                                                    <span class="sortorder" data-ng-show="EmpClockInOutListPager.sortIndex === 'CareType'" data-ng-class="{reverse:EmpClockInOutListPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-125px">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpClockInOutListPager.sortColumn('Phone')">Employee Phone</a>
+                                                    <span class="sortorder" data-ng-show="EmpClockInOutListPager.sortIndex === 'Phone'" data-ng-class="{reverse:EmpClockInOutListPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-150px">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpClockInOutListPager.sortColumn('ScheduleStartTime')">@Resource.ScheduleStartTime</a>
+                                                    <span class="sortorder" data-ng-show="EmpClockInOutListPager.sortIndex === 'ScheduleStartTime'" data-ng-class="{reverse:EmpClockInOutListPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-150px">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpClockInOutListPager.sortColumn('ScheduleEndTime')">@Resource.ScheduleEndTime</a>
+                                                    <span class="sortorder" data-ng-show="EmpClockInOutListPager.sortIndex === 'ScheduleEndTime'" data-ng-class="{reverse:EmpClockInOutListPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-75px">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpClockInOutListPager.sortColumn('ClockIn')">@Resource.ClockIn</a>
+                                                    <span class="sortorder" data-ng-show="EmpClockInOutListPager.sortIndex === 'ClockIn'" data-ng-class="{reverse:EmpClockInOutListPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-85px">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmpClockInOutListPager.sortColumn('ClockOut')">@Resource.ClockOut</a>
+                                                    <span class="sortorder" data-ng-show="EmpClockInOutListPager.sortIndex === 'ClockOut'" data-ng-class="{reverse:EmpClockInOutListPager.reverse}"></span>
+                                                </th>
+                                                <th class="width-85px">
+                                                    @Resource.Action
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr dir-paginate="item in EmpClockInOutList | itemsPerPage: EmpClockInOutListPager.pageSize" total-items="EmpClockInOutListPager.totalRecords" current-page="EmpClockInOutListPager.currentPage" pagination-id="EmpClockInOutListPagerID">
+                                                <td>
+                                                    <span class="pull-left">
+                                                        <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectSchedule(item)" val="item.IsChecked">
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.Employee"></span>
+                                                </td>
+                                                <td>
+                                                    <span>{{item.Patient}}</span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.CareType"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.MobileNumber"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.ScheduleStartTime | orgdatetime"></span>
+                                                </td>
+                                                <td>
+                                                    <span data-ng-bind="item.ScheduleEndTime | orgdatetime"></span>
+                                                </td>
+                                                <td class="width-10px">
+                                                    <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.ClockIn"></i>
+                                                    <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.ClockIn"></i>
+                                                </td>
+                                                <td class="width-10px">
+                                                    <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.ClockOut"></i>
+                                                    <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.ClockOut"></i>
+                                                   
+                                                </td>
+                                                <td class="width-120px" > 
+                                                    <a href="javascript:void(0);" data-ng-click="ChangeSchedulePopup(item,item)" title="Change Schedule">&nbsp;Change Schedule 
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*</div>*@
+                <div class="row">
+                    <div class="col-sm-12" data-ng-if="EmpClockInOutList.length > 0">
+                        <div class="col-sm-6 pull-left no-left-padding"
+                             data-ng-hide="EmpClockInOutListPager.currentPage==1 && (EmpClockInOutListPager.currentPageSize < EmpClockInOutListPager.pageSize)">
+                            @Resource.Showing <span data-ng-bind="(EmpClockInOutListPager.pageSize * EmpClockInOutListPager.currentPage) -EmpClockInOutListPager.pageSize  + 1"></span>
+                            &nbsp;@Resource.To <span data-ng-bind="(EmpClockInOutListPager.pageSize == EmpClockInOutListPager.currentPageSize) ? (EmpClockInOutListPager.pageSize * EmpClockInOutListPager.currentPage) :(EmpClockInOutListPager.pageSize * EmpClockInOutListPager.currentPage) - EmpClockInOutListPager.pageSize  + EmpClockInOutListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmpClockInOutListPager.totalRecords"></span>&nbsp;@Resource.Records
+                        </div>
+                        <div class="pull-right">
+                            <dir-pagination-controls boundary-links="true" on-page-change="EmpClockInOutListPager.pageChanged(newPageNumber)" pagination-id="EmpClockInOutListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="EmpClockInOutList.length == 0">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <br class="clearfix" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ClockInClockOutAdressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; width:151%; margin-left:-23%">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="ClockInClockOutAdressModelClosed()" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5"></h4>
+            </div>
+            <div class="modal-body">
+
+                <div id="dvMap" style="width: 100%; height: 500px">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="BroadcastNotificationModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; width:110%; margin-left:7%">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="BroadcastNotificationModalClosed()" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5"></h4>
+            </div>
+            <div class="modal-body">
+                @Html.Partial("_Partial/_BroadcastNotifications")
+                @*<div id="dvMap" style="width: 100%; height: 400px">*@
+
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+
+

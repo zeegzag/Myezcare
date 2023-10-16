@@ -1,0 +1,77 @@
+﻿@model HC_AddPayorModel
+@{
+    bool isEditMode = Model.Payor.PayorID > 0;
+}
+@Html.Hidden("hdnAddPayorModel", Common.SerializeObject(Model))
+<div id="addpayordetailmodel" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseAddPayorModal()">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span>@Resource.PayorDetails</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+                @*<form class="form-horizontal" id="frmPayor">*@
+                <div class="col-lg-12 col-md-12 col-sm-12 no-padding">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="form-group row">
+                                <div class="col-sm-12">
+                                    <div class="tabbable tabbable-custom boxless">
+                                        <ul class="nav nav-tabs" id="loanDetailTopTabs">
+                                            <li class="active">
+                                                <a id="addPayorDetail" data-target="#tab_PayorDetail" data-toggle="tab">@Resource.Payor</a>
+                                            </li>
+                                            <li data-ng-show="Edit === false" class="disabled" wzd-cancel">
+                                                <a id="ServiceCode" data-target="#tab_ServiceCode" data-toggle="">@Resource.ServiceCodeMapping</a>
+                                            </li>
+                                            <li data-ng-show="Edit === true" class="@(Common.HasPermission(Constants.HC_Permission_Payor_ServiceCode_Mapping) ? "" : "disabled") wzd-cancel">
+                                                <a id="ServiceCode" data-target="#tab_ServiceCode" data-toggle="tab">@Resource.ServiceCodeMapping</a>
+                                            </li>
+                                        </ul>
+                                        <div class="tab-content">
+                                            <div class="tab-pane active" id="tab_PayorDetail" data-ng-controller="AddParyorDetailController">
+                                                @Html.Partial("Partial/Payor/Partial/_PayorDetail")
+                                            </div>
+                                            @*<form id="FrmServiceCode"></form>*@
+                                            <div class="tab-pane" id="tab_ServiceCode" data-ng-controller="AddServiceCodeController">
+                                                @Html.Partial("Partial/Payor/Partial/_ServiceCode")
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*</form>*@
+            </div>
+
+
+            <div class="modal-footer">
+                <div class="col-md-12">
+                    @*<button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseAddPayorModal()">@Resource.Cancel</button>
+                        <button type="button" class="btn btn-sm  btn-primary blue" data-ng-show="Edit === false" data-ng-click="SavePayorDetails()">@Resource.Save</button>
+                        <button type="button" class="btn btn-sm  btn-primary blue" data-ng-show="Edit === true" data-ng-click="SavePayorDetails()">@Resource.Update</button>*@
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/payor/addpayor")
+
+<script type="text/javascript">
+    var EncryptedPayorID = "@Model.Payor.EncryptedPayorID";
+    var MaxUnit = "@Resource.MaxUnit";
+    var DailyUnitLimit = "@Resource.DailyUnitLimit";
+    var Billable = "@Resource.Billable";
+    var GroupOption = "@Resource.GroupOption";
+    var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.PayorServiceCodeMappingDetail)';
+    var UnitTime = "@((int)EnumUnitType.Time)";
+    var UnitTimeValue = "@(Resource.UnitTimeValue)";
+</script>

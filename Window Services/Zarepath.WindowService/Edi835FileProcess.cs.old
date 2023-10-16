@@ -1,0 +1,55 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Configuration;
+using System.Configuration.Install;
+using System.Linq;
+using System.ServiceProcess;
+using System.Threading.Tasks;
+using System.Timers;
+using Zarephath.Core.Infrastructure;
+using Zarephath.Core.Infrastructure.DataProvider;
+using Zarephath.Core.Models;
+
+namespace Zarepath.EmailService
+{
+    public partial class Edi835FileProcess : ServiceBase
+    {
+        public Edi835FileProcess()
+        {
+            InitializeComponent();
+        }
+
+        protected override void OnStart(string[] args)
+        {
+            var timerFirst = new Timer();
+            long serviceExecuteInterval = Convert.ToInt64(ConfigurationManager.AppSettings["EmailServiceInterval"]) * 1000;
+            timerFirst.Interval = serviceExecuteInterval;
+            timerFirst.Elapsed += new ElapsedEventHandler(DoRespiteHourReset);
+            timerFirst.Enabled = true;
+        }
+
+        private void DoRespiteHourReset(object sender, EventArgs e)
+        {
+            string logpath = AppDomain.CurrentDomain.BaseDirectory + ConfigSettings.LogPath + ConfigSettings.EmailLog;
+            try
+            {
+                ICronJobDataProvider cronJobDataProvider = new CronJobDataProvider();
+                ServiceResponse response = cronJobDataProvider.ProcessEdi835Files();
+                Common.CreateLogFile(Convert.ToString(response.Data), ConfigSettings.EmailFileName, logpath);
+            }
+            catch (Exception ex)
+            {
+                Common.CreateLogFile(ex.ToString(), ConfigSettings.EmailFileName, logpath);
+            }
+
+        }
+
+        protected override void OnStop()
+        {
+            // TODO: Add code here to perform any tear-down necessary to stop your service.
+        }
+
+    }
+}

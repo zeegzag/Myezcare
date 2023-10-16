@@ -1,0 +1,180 @@
+﻿@*@model Zarephath.Core.Models.ViewModel.SetEBCategoryListPage*@
+
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.CategoryList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_CategoryList;
+}
+
+@model SetEBCategoryListPage
+@Html.Hidden("hdnSetCategoryListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="CategoryListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.CategoryList &nbsp; 
+
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+          
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchEBCategoryListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchEBCategoryListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                           new
+                                                                           {
+                                                                               id = "IsDeleted",
+                                                                               data_ng_model = "TempSearchCategoryListPage.IsDeleted",
+                                                                               data_ng_init = "TempSearchCategoryListPage.IsDeleted = TempSearchCategoryListPage.IsDeleted==null?'-1':TempSearchCategoryListPage.IsDeleted.toString()",
+                                                                               @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                               data_ng_change = "SearchCategory()"
+                                                                           })
+            </div>
+            @*@if (Common.HasPermission(Constants.HC_Permission_EBCategory_Delete))
+            {*@
+                <div class="btn-group" data-ng-if="SelectedCategoryIds.length > 0">
+                    <button type="button" data-ng-click="DeleteCategory()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchCategoryListPage.IsDeleted==0 ?'@Resource.DisableSelected' :(TempSearchCategoryListPage.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                    </button>
+                </div>
+            @*}*@
+            @*@if (Common.HasPermission(Constants.HC_Permission_EBCategory_AddUpdate))
+            {*@
+                <div class="btn-group padding-left-15">
+                    <a href="@Constants.HC_AddCategoryURL" class="btn btn-sm letter-space green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Category</a>
+                </div>
+            @*}*@
+            <div class="inline-block pull-right" data-ng-show="CategoryList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="CategoryListPager.maxSize" on-page-change="CategoryListPager.pageChanged(newPageNumber)" pagination-id="CategoryListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_EBCategory_Delete))
+                                        {*@
+                                            <th class="width-20px"></th>
+                                        @*}*@
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="CategoryListPager.sortColumn('Name')">@Resource.Category</a>
+                                            <span class="sortorder" data-ng-show="CategoryListPager.sortIndex === 'Name'" data-ng-class="{reverse:CategoryListPager.reverse}"></span>
+                                        </th>
+                                        <th style="display:none">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="CategoryListPager.sortColumn('ID')">ID</a>
+                                            <span class="sortorder" data-ng-show="CategoryListPager.sortIndex === 'ID'" data-ng-class="{reverse:CategoryListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="CategoryListPager.sortColumn('EBCategoryID')">EBCategoryID</a>
+                                            <span class="sortorder" data-ng-show="CategoryListPager.sortIndex === 'EBCategoryID'" data-ng-class="{reverse:CategoryListPager.reverse}"></span>
+                                        </th>
+                                       
+                                        <th class="width-115px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_EBCategory_Delete))
+                                        {*@
+                                            <td class="text-align-center">
+                                                <input id="SelectAllDxCode" class="unicheckbox text-align-center" data-ng-show="CategoryList.length > 0" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                            </td>
+                                        @*}*@
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchEBCategoryListPage.Name , new { data_ng_model = "TempSearchCategoryListPage.Name", @class = "form-control input-sm", placeholder = Resource.Category, maxlength = 100 })
+                                        </td>
+                                        <td style="display:none">
+                                            @Html.TextBoxFor(m => m.SearchEBCategoryListPage.ID, new { data_ng_model = "TempSearchCategoryListPage.ID", @class = "form-control input-sm", placeholder = "Id", maxlength = 20 })
+                                        </td>
+                                        <td >
+                                            @Html.TextBoxFor(m => m.SearchEBCategoryListPage.EBCategoryID, new { data_ng_model = "TempSearchCategoryListPage.EBCategoryID", @class = "form-control input-sm", placeholder = "EBCategoryID", maxlength = 100 })
+                                        </td>
+                                       
+                                        <td class="text-align-center">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchCategory()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':Category.IsDeleted}" dir-paginate="Category in CategoryList | itemsPerPage: CategoryListPager.pageSize" total-items="CategoryListPager.totalRecords" current-page="CategoryListPager.currentPage" pagination-id="CategoryListPager_ID">
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_EBCategory_Delete))
+                                        {*@
+                                            <td class="text-align-center">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="Category.IsChecked" data-ng-change="SelectCategory(Category)" val="Category.IsChecked">
+                                            </td>
+                                        @*}*@
+                                        <td>{{Category.Name}}</td>
+                                        <td style="display:none" >{{Category.Id}}</td>
+
+                                        <td>{{Category.EBCategoryID}} </td>
+                                        
+                                        <td class="text-align-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_EBCategory_AddUpdate))
+                                            {
+                                                <a href="{{ AddCategoryURL + Category.EncryptedEBCategoryID}}"  class="btn btn-xs blue">@Resource.Edit </a>
+                                            }
+                                            @if (Common.HasPermission(Constants.HC_Permission_EBCategory_Delete))
+                                            {
+                                                <a href="javascript:void(0);" data-ng-show="Category.IsDeleted" data-ng-click="DeleteCategory(Category.EBCategoryID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!Category.IsDeleted" data-ng-click="DeleteCategory(Category.EBCategoryID,'@Resource.Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="CategoryList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(CategoryListPager.pageSize * CategoryListPager.currentPage) - CategoryListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(CategoryListPager.pageSize == CategoryListPager.currentPageSize) ? (CategoryListPager.pageSize * CategoryListPager.currentPage) :(CategoryListPager.pageSize * CategoryListPager.currentPage) - CategoryListPager.pageSize  + CategoryListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="CategoryListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="CategoryListPager.maxSize" on-page-change="CategoryListPager.pageChanged(newPageNumber)" pagination-id="CategoryListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="CategoryList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/Category/Categorylist")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Category)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.Category)';
+    </script>
+}

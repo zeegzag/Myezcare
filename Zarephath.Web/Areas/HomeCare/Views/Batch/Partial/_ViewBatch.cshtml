@@ -1,0 +1,170 @@
+﻿@model dynamic
+
+
+<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h4 class="modal-title page-title no-margin">
+        <b>
+            <span>
+                <span class="font-size-18">
+                    @Resource.BatchClaimsDetailsGroupByClients
+                    <span class='badge badge-danger' data-ng-if="ViewBatchDetailsModel.IsBatchSent">Sent</span>
+                </span>
+                <span class="font-size-14">
+                    <span class='font-size-18 font-weight-400 '>
+                        &nbsp;-&nbsp;
+                        <small>
+                            @Resource.Batch: #<b>{{ViewBatchDetailsModel.BatchID}}</b> &nbsp;/&nbsp;
+                            @Resource.Payor: <b>{{ViewBatchDetailsModel.PayorName}}</b>
+                        </small>
+                    </span>
+
+                    @*( <span>@Resource.Batch #{{ViewBatchDetailsModel.BatchID}}</span><span data-ng-if="ViewBatchDetailsModel.IsBatchSent"> -
+                        <span class="badge badge-danger">Sent</span></span> )*@
+                </span>
+            </span>
+        </b>
+       
+        <span class="font-size-14 margin-top-10" data-ng-if="ViewBatchDetailsModel.StartDate">
+            <br />
+            @Resource.ServiceDate:
+            <b>
+                <span class="padding-left-5">{{ViewBatchDetailsModel.StartDate | orgdate}}<span class="padding-left-right-2">-</span>{{ViewBatchDetailsModel.EndDate |dateformat}}</span>
+            </b>
+        </span>
+    </h4>
+</div>
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="portlet-body compact" style="display: block;">
+                <div class="space5"></div>
+                <div class="col-lg-12" style="max-height: 400px;overflow: auto;" data-ng-show="EDI837Model.BillingProviders[0].Subscribers_Updated.length > 0">
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped table-condensed flip-content">
+                            <thead class="flip-content">
+                                <tr>
+                                    <th class="width-30px"></th>
+                                    <th class="">
+                                        <span>@Resource.Patient</span>
+                                    </th>
+                                    <th class="">
+                                        <span>@Resource.Account #</span>
+                                    </th>
+                                    <th class="">
+                                        <span>Claim Trace ID</span>
+                                    </th>
+                                    <th class="">
+                                        @*<span>@Resource.TotalClaims</span>*@
+                                        <span>Total Line Items</span>
+                                    </th>
+                                    <th class="">
+                                        <span>Billed Amt</span>
+                                    </th>
+
+                                    <th class="">
+                                        <span>Total Allowed Amt</span>
+                                    </th>
+
+
+                                    <th class="">
+                                        <span>Total Paid Amt</span>
+                                    </th>
+                                    <th class="width-90px text-align-center">
+                                        <span>@Resource.Action</span>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody data-ng-repeat="item in EDI837Model.BillingProviders[0].Subscribers_Updated">
+                                <tr id="openTrViewBatch{{$index}}">
+                                    <td>
+                                        <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle"
+                                              @*data-ng-click="GetChildNoteDetailsOfClaim(item,'#CNDetails-'+item.ReferralID,PatientClaimsList.Model)"*@
+                                              data-ng-click="GetChildNoteDetailsOfClaim(item,item.Claim, ViewBatchDetailsModel)"
+                                              data-ng-attr-id="{{'CNDetails-'+ item.Claim.BatchID+item.Claim.ClaimUniqueTraceID }}"
+                                              data-toggle="collapse"
+                                              data-ng-attr-data-target="{{'#ChildNoteDetails-'+ item.Claim.BatchID+item.Claim.ClaimUniqueTraceID }}">
+                                        </span>
+                                    </td>
+                                    <td>{{item.LastName +' '+ item.FirstName}}</td>
+                                    <td>{{item.SubscriberID}}</td>
+                                    <td>{{item.Claim.ClaimUniqueTraceID}}</td>
+                                    <td>{{item.Claim.ServiceLines.length}}</td>
+                                    <td>{{item.Claim.TotalAmount | orgcurrency}}</td>
+                                    <td>{{item.Claim.TotalAllowedAmount | orgcurrency}}</td>
+                                    <td data-ng-class="{'bg-success': item.Claim.TotalAmount == item.Claim.TotalPaidAmount && item.Claim.TotalAllowedAmount == item.Claim.TotalPaidAmount ,  'bg-warning': item.Claim.TotalAmount != item.Claim.TotalPaidAmount && item.Claim.TotalPaidAmount > 0 , 'bg-danger': item.Claim.TotalAmount != item.Claim.TotalPaidAmount &&  item.Claim.TotalPaidAmount ==0}">
+                                        {{item.Claim.TotalPaidAmount | orgcurrency}}
+                                    </td>
+
+
+                                    <td class="text-align-center width-160px">
+                                        <a data-ng-if="item.PayorBillingType == '@Common.PayorEDIFileType.Professional.ToString()'" href="javascript:void(0);" data-ng-click="ShowCMS1500File(item)" class="btn btn-xs blue">@Resource.CMS1500</a>
+                                        <a data-ng-if="item.PayorBillingType == '@Common.PayorEDIFileType.Institutional.ToString()'" href="javascript:void(0);" data-ng-click="ShowUB04File(item)" class="btn btn-xs green">@Resource.UB04</a>
+                                        <a href="javascript:void(0);" data-ng-click="ShowEmployeeVisits(item)" class="btn btn-xs green float-right">@Resource.View @Resource.Visit </a>
+                                    </td>
+                                </tr>
+                                <tr data-ng-attr-id="{{'ChildNoteDetails-'+ item.Claim.BatchID+item.Claim.ClaimUniqueTraceID }}" class="collapse collapseDestination">
+                                    
+                                    <td colspan="10" style="background: #efefef !important; ">
+                                        <div style="float: left; width: 100%; padding: 15px 25px 0 25px;">
+                                            <div class="space5"></div>
+                                            <div class="col-md-12 no-padding">
+                                                <strong><u>Child Note Details</u></strong>
+                                            </div>
+                                            <div class="space5"></div>
+                                            <div class="col-md-12 table-responsive tabbable-custom">
+                                                <table class="table table-hover table-bordered table-striped table-condensed table-checkable ">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            @if (SessionHelper.IsDayCare)
+                                                            {
+                                                                <th class="text-align-left">@Resource.Facility</th>
+                                                            }
+                                                            else
+                                                            {
+                                                                <th class="text-align-left">@Resource.Employee</th>
+                                                            }
+                                                            <th class="width-100px">@Resource.ServiceCode</th>
+                                                            <th class="width-120px">@Resource.ServiceTime (Min)</th>
+                                                            <th class="width-100px">@Resource.Rate / @Resource.Unit</th>
+                                                            <th class="width-100px">@Resource.BillingUnit</th>
+                                                            <th class="width-100px">Billed Amt</th>
+                                                            <th class="width-100px">Allowed Amt</th>
+                                                            <th class="width-100px">Paid Amt</th>
+                                                            <th class="width-100px">@Resource.Date</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody data-ng-repeat="cnItem in item.ChildNoteList">
+                                                        <tr>
+                                                            <td class="text-align-left">
+                                                                {{cnItem.EmployeeName  ? cnItem.EmployeeName:'@Resource.NA'}}
+                                                            </td>
+                                                            <td>{{(cnItem.CareType == null)? '' : cnItem.CareType + ' - ' }}{{cnItem.ServiceCode}}</td>
+                                                            <td>{{cnItem.CalculatedServiceTime}}</td>
+                                                            <td>{{cnItem.Rate  | orgcurrency}}</td>
+                                                            <td>{{cnItem.CalculatedUnit}}</td>
+                                                            <td>{{cnItem.CalculatedAmount  | orgcurrency}}</td>
+                                                            <td>{{cnItem.ClaimAllowedAmount | orgcurrency}}</td>
+                                                            <td>{{cnItem.ClaimPaidAmount | orgcurrency}}</td>
+                                                            <td>{{cnItem.strServiceDate}}</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal-footer">
+   
+</div>

@@ -1,0 +1,596 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.CareForm);
+    Layout = "~/Views/Shared/_PrintLayout.cshtml";
+    CacheHelper _cacheHelper = new CacheHelper();
+}
+@model CareForm
+<div class="row">
+    <div class="col-md-12">
+        <div class="row">
+            <div class="col-sm-12 text-align-center" style="padding-bottom:20px !important">
+                <b><u>PLAN OF CARE FORM</u></b>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-5">
+                    <strong class="col-sm-2">@Resource.Client</strong>
+                    <div class="col-sm-10 form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_client" readonly="readonly"
+                               value="@Model.ClientName">
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <strong class="col-sm-6">@Resource.Record #:</strong>
+                    <div class="col-sm-6  form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_recordId" readonly="readonly"
+                               value="@Model.RecordID">
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <strong class="col-sm-8"> <span class="pull-right">@Resource.CareForm Date:</span></strong>
+                    <div class="col-sm-4  form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_careformDate" readonly="readonly"
+                               value="@(Model.CareFormDate == null ? "" : Model.CareFormDate.Value.ToString("MM/dd/yyyy"))">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-12">
+                    <strong class="col-sm-3">Location of Service:</strong>
+                    <div class="col-sm-9 form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_LOS" readonly="readonly"
+                               value="@Model.LocationOfService">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-4">
+                    <strong class="col-sm-4">@Resource.Phone #:</strong>
+                    <div class="col-sm-8 form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_phone" readonly="readonly"
+                               value="@Model.Phone">
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <strong class="col-sm-4">@Resource.Cell:</strong>
+                    <div class="col-sm-8  form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_cell" readonly="readonly"
+                               value="@Model.Cell">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-6">
+                    <strong class="col-sm-2">@Resource.Email:</strong>
+                    <div class="col-sm-10 form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_email" readonly="readonly"
+                               value="@Model.Email">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-4">
+                    <strong class="col-sm-12">Planned Date of Service Initiation:</strong>
+                </div>
+                <div class="col-sm-4">
+                    <strong class="col-sm-4">@Resource.StartDate:</strong>
+                    <div class="col-sm-8  form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_careformDate" readonly="readonly"
+                               value="@( Model.PSI_StartDate == null ? "" : Model.PSI_StartDate.Value.ToString("MM/dd/yyyy"))">
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <strong class="col-sm-4">@Resource.EndDate:</strong>
+                    <div class="col-sm-8  form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_careformDate" readonly="readonly"
+                               value="@( Model.PSI_EndDate == null ? "" : Model.PSI_EndDate.Value.ToString("MM/dd/yyyy"))">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-12">
+                    <strong class="col-sm-2">Service Requested:</strong>
+                    <div class="col-sm-10 form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_ServiceRequested" readonly="readonly"
+                               value="@Model.Str_ServiceRequested">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-15">
+                <div class="col-sm-12">
+                    <div class="col-sm-12 mt-checkbox-inline">
+                        <strong class="">Is the client medically frail:</strong>
+                        &nbsp;&nbsp;&nbsp;
+                        <label class="mt-checkbox mt-checkbox-outline padding-3">
+                            <div class="checker">
+                                @if (Model.IsMedicallyFrail)
+                        {
+                            <span class="musthave checked">
+                                <input name="IsMedicallyFrail" id="IsMedicallyFrail" value="" class="checker" type="checkbox" />
+                            </span>
+                }
+                else
+                {
+                    <span class="musthave ">
+                        <input name="IsMedicallyFrail" id="IsMedicallyFrail" value="" class="checker" type="checkbox" />
+                    </span>
+        }
+                            </div>
+                            @Resource.Yes
+                        </label>
+                        &nbsp;&nbsp;
+                        <label class="mt-checkbox mt-checkbox-outline padding-3">
+                            <div class="checker">
+                                @if (!Model.IsMedicallyFrail)
+                        {
+                            <span class="musthave checked">
+                                <input name="IsMedicallyFrail" id="IsMedicallyFrail" value="" class="checker" type="checkbox" />
+                            </span>
+                }
+                else
+                {
+                    <span class="musthave ">
+                        <input name="IsMedicallyFrail" id="IsMedicallyFrail" value="" class="checker" type="checkbox" />
+                    </span>
+        }
+                            </div>
+                            @Resource.No
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Specific Functional Limitations of the client:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.SpecificFunctionalLimitations</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Charges for Services Rendered:</strong>
+                </div>
+            </div>
+            <div class="col-sm-12 margin-top-10 margin-bottom-10">
+                <div class="col-sm-12">
+                    <div class="col-sm-12 mt-checkbox-inline">
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <div class="checker">
+                                @if(Model.IsChargesForServicesRendered == 1)
+                                {
+                                    <span class="musthave checked">
+                                        <input name="IsChargesForServicesRendered" id="IsChargesForServicesRendered"
+                                           value="" class="checker" disabled="disabled" type="checkbox" />
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="musthave">
+                                        <input name="IsChargesForServicesRendered" id="IsChargesForServicesRendered"
+                                           value="" class="checker" disabled="disabled" type="checkbox" />
+                                    </span>
+                                }
+                            </div>
+                            By Insurance Company
+                        </label>
+                        &nbsp;&nbsp;&nbsp; <b>OR</b> &nbsp;&nbsp;&nbsp;
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <div class="checker">
+                                @if(Model.IsChargesForServicesRendered == 2)
+                                {
+                                    <span class="musthave checked">
+                                        <input name="IsChargesForServicesRendered" id="IsChargesForServicesRendered"
+                                           value="" class="checker" disabled="disabled" type="checkbox" />
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="musthave">
+                                        <input name="IsChargesForServicesRendered" id="IsChargesForServicesRendered"
+                                           value="" class="checker" disabled="disabled" type="checkbox" />
+                                    </span>
+                                }
+                            </div>
+                            Paid in Full or in Part by the Client
+                        </label>
+                        &nbsp;&nbsp;&nbsp; <b>OR</b> &nbsp;&nbsp;&nbsp;
+                        <label class="mt-checkbox mt-checkbox-outline">
+                            <div class="checker">
+                                @if(Model.IsChargesForServicesRendered == 3)
+                                {
+                                    <span class="musthave checked">
+                                        <input name="IsChargesForServicesRendered" id="IsChargesForServicesRendered"
+                                           value="" class="checker" disabled="disabled" type="checkbox" />
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="musthave">
+                                        <input name="IsChargesForServicesRendered" id="IsChargesForServicesRendered"
+                                           value="" class="checker" disabled="disabled" type="checkbox" />
+                                    </span>
+                                }
+                            </div>
+                            Significant Other(s)
+                        </label>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        @if(Model.IsChargesForServicesRendered == 3)
+                        {
+                            <label class="mt-checkbox mt-checkbox-outline">
+                            <div class="checker">
+                                @if(Model.OnRequest == true)
+                                {
+                                    <span class="musthave checked">
+                                        <input name="OnRequest" id="OnRequest"
+                                           value="" class="checker" disabled="disabled" type="checkbox" />
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="musthave">
+                                        <input name="OnRequest" id="OnRequest"
+                                           value="" class="checker" disabled="disabled" type="checkbox" />
+                                    </span>
+                                }
+                            </div>
+                            On Request
+                        </label>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Plan of Supervision:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.PlanOfSupervision</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Duration of services:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.DurationOfServices</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Statements of Goals:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.StatementsOfGoals</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Objectives of Services:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.ObjectivesOfServices</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Discharge Plans:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.DischargePlans</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Description of how the specific tasks are to be performed:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.DescriptionHowTheTasksArePerformed</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-20 margin-top-20">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12 text-align-center"><u>If applicable to the client:</u></strong>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Pertinent Diagnosis:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.PertinentDiagnosis</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-1">Medications:</strong>
+                    @*<div class="col-sm-11 mt-checkbox-inline">
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <strong class="">See Attached Medication Form:</strong>
+                    &nbsp;&nbsp;&nbsp;
+                    <label class="mt-checkbox mt-checkbox-outline padding-3">
+                        <div class="checker">
+                            @if(Model.IsAttachedMedicationForm)
+                            {
+                                <span class="musthave checked">
+                                    <input name="IsAttachedMedicationForm" id="IsAttachedMedicationForm" value="" class="checker" type="checkbox" />
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="musthave ">
+                                    <input name="IsAttachedMedicationForm" id="IsAttachedMedicationForm" value="" class="checker" type="checkbox" />
+                                </span>
+                            }
+                        </div>
+                        @Resource.Yes
+                    </label>
+                    &nbsp;&nbsp;
+                    <label class="mt-checkbox mt-checkbox-outline padding-3">
+                        <div class="checker">
+                            @if(!Model.IsAttachedMedicationForm)
+                            {
+                                <span class="musthave checked">
+                                    <input name="IsAttachedMedicationForm" id="IsAttachedMedicationForm" value="" class="checker" type="checkbox" />
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="musthave ">
+                                    <input name="IsAttachedMedicationForm" id="IsAttachedMedicationForm" value="" class="checker" type="checkbox" />
+                                </span>
+                            }
+                        </div>
+                        @Resource.No
+                    </label>
+                </div>*@
+                </div>
+            </div>
+
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.Medications</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12  margin-top-60">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Treatments:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.Treatments</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Equipment Needs:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.EquipmentNeeds</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Diet:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.Diet</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12">
+                <div class="col-sm-12">
+                    <strong class="col-sm-12">Nutritional Needs:</strong>
+                </div>
+            </div>
+            <div class="col-md-12 margin-bottom-10">
+                <div class="form-group col-md-12 form-md-line-input">
+                    <div class="col-md-12 form-row-seperated">
+                        <div class="txt_box">
+                            <p>@Model.NutritionalNeeds</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-12">
+                    <div class="col-sm-12 mt-checkbox-inline">
+                        <strong class=""><u>Physician’s orders needed:</u></strong>
+                        &nbsp;&nbsp;&nbsp;
+                        <label class="mt-checkbox mt-checkbox-outline padding-3">
+                            <div class="checker">
+                                @if (Model.IsPhysiciansOrdersNeeded)
+                        {
+                            <span class="musthave checked">
+                                <input name="IsPhysiciansOrdersNeeded" id="IsPhysiciansOrdersNeeded" value="" class="checker" type="checkbox" />
+                            </span>
+                }
+                else
+                {
+                    <span class="musthave ">
+                        <input name="IsPhysiciansOrdersNeeded" id="IsPhysiciansOrdersNeeded" value="" class="checker" type="checkbox" />
+                    </span>
+        }
+                            </div>
+                            @Resource.Yes
+                        </label>
+                        &nbsp;&nbsp;
+                        <label class="mt-checkbox mt-checkbox-outline padding-3">
+                            <div class="checker">
+                                @if (!Model.IsPhysiciansOrdersNeeded)
+                        {
+                            <span class="musthave checked">
+                                <input name="IsPhysiciansOrdersNeeded" id="IsPhysiciansOrdersNeeded" value="" class="checker" type="checkbox" />
+                            </span>
+                }
+                else
+                {
+                    <span class="musthave ">
+                        <input name="IsPhysiciansOrdersNeeded" id="IsPhysiciansOrdersNeeded" value="" class="checker" type="checkbox" />
+                    </span>
+        }
+                            </div>
+                            @Resource.No
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            @if (Model.IsPhysiciansOrdersNeeded)
+    {
+        <div class="col-sm-12">
+            <div class="col-sm-12">
+                <span class="col-sm-12">If yes, note how they will be obtained:</span>
+            </div>
+        </div>
+        <div class="col-md-12 margin-bottom-10">
+            <div class="form-group col-md-12 form-md-line-input">
+                <div class="col-md-12 form-row-seperated">
+                    <div class="txt_box">
+                        <p>@Model.PhysicianOrdersDescription</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+}
+
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-8">
+                    <strong class="col-sm-4">Client / Representative Signature</strong>
+                    <div class="col-sm-8 form-group form-md-line-input" style="border:1px solid">
+                        <img class="img-responsive signature-image" id="imgDisplay" src="@Model.ClientSignature" />
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <strong class="col-sm-2">@Resource.Date</strong>
+                    <div class="col-sm-10  form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_ClientSignatureDate" readonly="readonly"
+                               value="@(Model.ClientSignatureDate == null ? "" : Model.ClientSignatureDate.Value.ToString("MM/dd/yyyy"))">
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-12 margin-bottom-10">
+                <div class="col-sm-8">
+                    <strong class="col-sm-4">Registered Nurse Signature</strong>
+                    @if (!string.IsNullOrEmpty(Model.NurseSignature))
+            {
+                <div class="col-sm-8 form-group form-md-line-input" style="border:1px solid">
+                    <img class="img-responsive signature-image" id="imgDisplay" src="@Model.NurseSignature" />
+                </div>
+    }
+    else
+    {
+        <div class="col-sm-8 form-group form-md-line-input">
+            <input type="text" class="form-control input-sm height-19px" id="txt_Nurse_Sign" readonly="readonly">
+        </div>
+        }
+                </div>
+                <div class="col-sm-4 ">
+                    <strong class="col-sm-2">@Resource.Date</strong>
+                    <div class="col-sm-10  form-group form-md-line-input">
+                        <input type="text" class="form-control input-sm height-19px" id="txt_NurseSignatureDate" readonly="readonly"
+                               value="@(Model.NurseSignatureDate == null ? "" : Model.NurseSignatureDate.Value.ToString("MM/dd/yyyy"))">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr />
+    </div>
+    <div class="col-md-12">
+        <div class="col-md-9">
+            <span class="col-md-12"> @_cacheHelper.SiteName </span>
+        </div>
+    </div>
+</div>

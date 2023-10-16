@@ -1,0 +1,438 @@
+﻿@model SetScheduleAggregatorLogsListPage
+@{
+
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.ScheduleAggregatorLogsList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ScheduleAggregatorLogs;
+}
+
+@section Styles{
+    <style>
+        .Pending {
+            background-color: #fff3cd !important;
+        }
+
+        .Failed {
+            background-color: #f8d7da !important;
+        }
+
+        .Success {
+            background-color: #d4edda !important;
+        }
+
+        .Waiting {
+            background-color: #d4f1f4 !important;
+        }
+    </style>
+
+}
+
+@Html.Hidden("hdnSetScheduleAggregatorLogsListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="ScheduleAggregatorLogsListController">
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()" tabindex="1">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+
+            </div>
+            <div class="btn-group" data-ng-if="SelectedScheduleAggregatorLogsIds.length > 0">
+                <button type="button" data-ng-click="ResendData()" class="btn blue btn-sm grey border-grey-cascade">
+                    <i class="fa fa-trash"></i>&nbsp;&nbsp;@Resource.Resend
+                </button>
+            </div>
+            <div class="btn-group margin-left-20PR">
+                <div class="top pagination-sm" data-ng-show="AjaxStart">
+                    @Resource.Loading
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+            </div>
+            <div class="inline-block pull-right">
+
+                <div class="pull-right margin-left-5 width-250px" data-ng-show="ScheduleAggregatorLogsList.length > 0">
+                    @Resource.Showing <span data-ng-bind="ScheduleAggregatorLogsList.length "></span>&nbsp;@Resource.Of
+                    &nbsp;<span data-ng-bind="ScheduleAggregatorLogsListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive tabbable-custom">
+                        @{ Html.EnableClientValidation(false); }
+                        <form id="frmScheduleAggregatorLogsList">
+                            <table class="table table-bordered table-striped table-condensed flip-content table-checkable">
+                                <thead class="flip-content">
+                                    <tr>
+
+                                        <th class="width-10px"></th>
+
+                                        <th></th>
+
+                                        <th class="width-25px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('Name',true)">@Resource.Name</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'Name'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-10px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('Medicaid',true)">@Resource.Medicaid</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'Medicaid'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-80px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('StartDate',true)">@Resource.StartDate</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'StartDate'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="width-80px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('EndDate',true)">@Resource.EndDate</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'EndDate'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="width-150px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('Address',true)">@Resource.Address</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'Address'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="width-20px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('EmployeeName',true)">@Resource.Employee</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'EmployeeName'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="width-80px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('Aggregator',true)">@Resource.ClaimProcessor</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'Aggregator'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-80px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('LastSent',true)">@Resource.LastSentOn</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'LastSent'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-80px">
+                                            <a class="anchor_color" href="javascript:void(0);"
+                                               data-ng-click="ScheduleAggregatorLogsListPager.sortColumn('LastStatus',true)">@Resource.Status</a>
+                                            <span class="sortorder"
+                                                  data-ng-show="ScheduleAggregatorLogsListPager.sortIndex === 'LastStatus'"
+                                                  data-ng-class="{reverse:ScheduleAggregatorLogsListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="width-90px">
+                                            @Resource.Action
+
+                                        </th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+
+                                        <td>
+
+                                            <div class="btn-group" data-ng-show="ScheduleAggregatorLogsList.length > 0">
+                                                <input id="SelectAllCaseManager" class="unicheckbox" type="checkbox"
+                                                       data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()"
+                                                       val="SelectAllCheckbox">
+
+                                            </div>
+
+                                        </td>
+
+                                        <td></td>
+
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchScheduleAggregatorLogsModel.Name, new {
+                                            data_ng_model = "TempSearchScheduleAggregatorLogsListPage.Name", @class =
+                                            "form-control input-sm", placeholder = Resource.Name })
+                                        </td>
+
+                                        <td></td>
+                                        <td>
+                                            <div class="input-group date no-focus"
+                                                 datepicker="TempSearchScheduleAggregatorLogsListPage.StartDate"
+                                                 ng-dateval="TempSearchScheduleAggregatorLogsListPage.StartDate">
+                                                @Html.TextBoxFor(m => m.SearchScheduleAggregatorLogsModel.StartDate,
+                                                new
+                                                {
+                                                @class = "no-focus form-control input-sm dateInputMask",
+                                                placeholder = Resource.StartDate
+                                                })
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div class="input-group date no-focus"
+                                                 datepicker="TempSearchScheduleAggregatorLogsListPage.EndDate"
+                                                 ng-dateval="TempSearchScheduleAggregatorLogsListPage.EndDate">
+                                                @Html.TextBoxFor(m => m.SearchScheduleAggregatorLogsModel.EndDate,
+                                                new
+                                                {
+                                                @class = "no-focus form-control input-sm dateInputMask",
+                                                placeholder = Resource.EndDate
+                                                })
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchScheduleAggregatorLogsModel.Address, new {
+                                            data_ng_model = "TempSearchScheduleAggregatorLogsListPage.Address", @class =
+                                            "form-control input-sm", placeholder = Resource.SearchByAddress })
+                                        </td>
+
+                                        <td>
+                                            <div>
+                                                @Html.DropDownListFor(p =>
+                                                p.SearchScheduleAggregatorLogsModel.EmployeeID,
+                                                Model.EmployeeList.ToSelectList(Model.SearchScheduleAggregatorLogsModel.EmployeeID.ToString()
+                                                ?? "", "EmployeeName", "EmployeeID", Resource.Select, ""),
+                                                new
+                                                {
+                                                id = "EmployeeID",
+                                                data_ng_model = "TempSearchScheduleAggregatorLogsListPage.EmployeeID",
+                                                data_ng_init =
+                                                "TempSearchScheduleAggregatorLogsListPage.EmployeeID=TempSearchScheduleAggregatorLogsListPage.EmployeeID==''?null:TempSearchScheduleAggregatorLogsListPage.EmployeeID",
+                                                @class = "form-control input-sm",
+                                                data_val = "false"
+
+                                                })
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <div>
+                                                @Html.DropDownListFor(p =>
+                                                p.SearchScheduleAggregatorLogsModel.ClaimProcessor,
+                                                Model.ClaimProcessorList.ToSelectList(Model.SearchScheduleAggregatorLogsModel.ClaimProcessor
+                                                ?? "", "Name", "Value", Resource.Select, ""),
+                                                new
+                                                {
+                                                id = "ClaimProcessor",
+                                                data_ng_model = "TempSearchScheduleAggregatorLogsListPage.ClaimProcessor",
+                                                data_ng_init =
+                                                "TempSearchScheduleAggregatorLogsListPage.ClaimProcessor=TempSearchScheduleAggregatorLogsListPage.ClaimProcessor==''?null:TempSearchScheduleAggregatorLogsListPage.ClaimProcessor",
+                                                @class = "form-control input-sm",
+                                                data_val = "false"
+
+                                                })
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group date no-focus"
+                                                 datepicker="TempSearchScheduleAggregatorLogsListPage.LastSent"
+                                                 ng-dateval="TempSearchScheduleAggregatorLogsListPage.LastSent">
+                                                @Html.TextBoxFor(m => m.SearchScheduleAggregatorLogsModel.LastSent,
+                                                new
+                                                {
+                                                    ng_model = "TempSearchScheduleAggregatorLogsListPage.LastSent",
+                                                @class = "no-focus form-control input-sm dateInputMask",
+                                                    placeholder = Resource.Date
+                                                })
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div>
+                                                <select id="MySelect" class="form-control btn-sm width-100px" title="@Resource.Select" ng-model="TempSearchScheduleAggregatorLogsListPage.Status">
+                                                    <option value="">@Resource.Select</option>
+                                                    <option value="-1">@Resource.Pending</option>
+                                                    <option value="0">@Resource.Failed</option>
+                                                    <option value="-2">@Resource.WaitingForResponse</option>
+                                                    <option value="-1,0,-2">@Resource.Pending or @Resource.Failed or @Resource.WaitingForResponse</option>
+                                                    <option value="1">@Resource.Success</option>
+                                                </select>
+                                            </div>
+                                        </td>
+
+                                        <td>
+                                            <input type="submit" value="@Resource.Search"
+                                                   class="btn btn-default grey border-grey-cascade btn-xs"
+                                                   data-ng-click="SearchScheduleAggregatorLogs()" />
+                                            <a href="javascript:void(0);"
+                                               class="btn btn-default grey border-grey-cascade btn-xs"
+                                               data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-ng-repeat-start="log in ScheduleAggregatorLogsList">
+
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox text-align-center"
+                                                   data-ng-model="log.IsChecked"
+                                                   data-ng-change="SelectScheduleAggregatorLogs(log)"
+                                                   val="log.IsChecked">
+                                        </td>
+
+                                        <td width="1px" class="text-align-center">
+                                            <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle" data-ng-click="GetLogDetails(log)"
+                                                  data-toggle="collapse" data-ng-attr-data-target="{{'#LogDetails-'+log.ScheduleID }}" data-ng-hide="!log.LastSent"></span>
+                                            <span class="collapseSource curser-pointer font-size-18 fa fa-plus-circle" style="color: #aaa; cursor: not-allowed;" data-ng-hide="log.LastSent"></span>
+                                        </td>
+
+                                        <td>
+                                            {{log.Name}}
+                                        </td>
+
+                                        <td>
+                                            {{log.Medicaid}}
+                                        </td>
+                                        <td>{{log.StartDate | orgdate}}</td>
+                                        <td>{{log.EndDate | orgdate}}</td>
+
+                                        <td>
+                                            {{log.PatAddress}}
+
+                                        </td>
+
+                                        <td>
+                                            {{log.EmployeeName}}
+
+                                        </td>
+                                        <td>
+                                            {{log.AggregatorText ? log.AggregatorText : '@Resource.NA'}}
+                                        </td>
+                                        <td>
+                                            {{log.LastSent ? (log.LastSent | orgdatetime) : '@Resource.NA'}}
+                                        </td>
+                                        <td class="{{log.LastStatusText}}">
+                                            {{log.LastStatusText != null ? log.LastStatusText : '@Resource.NA'}}
+                                        </td>
+
+                                        <td class="text-align-center">
+
+                                            <a href="javascript:void(0);" class="margin-left-5 btn btn-xs red"
+                                               data-ng-click="ResendData(log)"
+                                               title="Resend Data">@Resource.Resend</a>
+
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-repeat-end data-ng-attr-id="{{'LogDetails-'+log.ScheduleID }}" class="collapse collapseDestination">
+                                        <td colspan="2"></td>
+                                        <td colspan="10">
+                                            <div class="padding-10" data-ng-if="log.IsDetailsCaptured">
+                                                <strong>@Resource.ScheduleAggregatorLogsList</strong>
+                                                <div class="row mt-10">
+                                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="portlet-body compact" style="display: block;">
+                                                            <div class="table-responsive ">
+                                                                <table class="table table-bordered table-striped table-condensed flip-content table-custom-list mb-0">
+                                                                    <thead class="flip-content">
+                                                                        <tr>
+                                                                            <th>@Resource.TransactionID</th>
+                                                                            <th>@Resource.ClaimProcessor</th>
+                                                                            <th>@Resource.CreatedDate</th>
+                                                                            <th>@Resource.UpdatedDate</th>
+                                                                            <th>@Resource.Status</th>
+                                                                            <th>@Resource.FileName</th>
+                                                                            <th>@Resource.Details</th>
+                                                                            <th class="width-90px">
+                                                                                @Resource.Action
+
+                                                                            </th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+                                                                        <tr data-ng-repeat="item in LogDetails[log.ScheduleID]">
+                                                                            <td class="width-255px" data-ng-bind="item.TransactionID"></td>
+                                                                            <td class="width-100px" data-ng-bind="item.AggregatorText"></td>
+                                                                            <td class="width-130px">{{item.CreatedDate ? (item.CreatedDate | orgdatetime) : '@Resource.NA'}}</td>
+                                                                            <td class="width-130px">{{item.UpdatedDate ? (item.UpdatedDate | orgdatetime) : '@Resource.NA'}}</td>
+                                                                            <td class="width-100px {{item.StatusText}}" data-ng-bind="item.StatusText"></td>
+                                                                            <td data-ng-bind="item.FileName"></td>
+                                                                            <td data-ng-bind="item.Messages"></td>
+                                                                            <td class="text-align-center">
+
+                                                                                <a data-ng-if="item.LogFilePath" href="{{item.LogFilePath}}" target="_blank" class="margin-left-5 btn btn-xs blue"
+                                                                                   title="View Log">@Resource.View</a>
+
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="ScheduleAggregatorLogsList.length > 0">
+                <div class="no-padding col-md-4 pull-left">
+                    <span>
+                        @Resource.Showing <span data-ng-bind="ScheduleAggregatorLogsList.length "></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ScheduleAggregatorLogsListPager.totalRecords"></span>&nbsp;@Resource.Records
+                    </span>
+                    <button class="btn btn-xs margin-left-20 yellow-gold-stripe border-default border-grey-gallery"
+                            data-ng-click="LoadMore()" data-ng-show="!AjaxStart">
+                        @Resource.LoadMore
+                    </button>
+
+                </div>
+                <div class="top pagination-sm margin-left-40PR" data-ng-show="AjaxStart">
+                    @Resource.Loading
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ScheduleAggregatorLogsList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger" data-ng-show="!AjaxStart">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                        <div class="top pagination-sm" data-ng-show="AjaxStart">
+                            @Resource.Loading
+                            <img src="~/Assets/images/lazyload.gif" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/scheduleaggregatorlogs.js")
+
+}

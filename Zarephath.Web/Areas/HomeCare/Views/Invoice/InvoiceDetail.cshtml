@@ -1,0 +1,310 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.InvoiceDetail);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_InvoiceList;
+    CacheHelper _cacheHelper = new CacheHelper();
+}
+@model GetInvoiceDetail
+@Html.Hidden("hdInvoiceDetail", Common.SerializeObject(Model))
+@Html.Hidden("hdBillToPayor", _cacheHelper.InvoiceAddressIsBilltoPayor == true ? "2" : "1")
+@Html.Hidden("hdInvoiceAddressIsIncludePatientAddress", _cacheHelper.InvoiceAddressIsIncludePatientAddress == true ? "1" : "")
+@Html.Hidden("hdInvoiceAddressIsIncludePatientAddressLine1", _cacheHelper.InvoiceAddressIsIncludePatientAddressLine1 == true ? "1" : "")
+@Html.Hidden("hdInvoiceAddressIsIncludePatientAddressLine2", _cacheHelper.InvoiceAddressIsIncludePatientAddressLine2 == true ? "1" : "")
+@Html.Hidden("hdInvoiceAddressIsIncludePatientAddressZip", _cacheHelper.InvoiceAddressIsIncludePatientAddressZip == true ? "1" : "")
+@Html.Hidden("hdInvoiceIsIncludePatientDOB", _cacheHelper.InvoiceIsIncludePatientDOB == true ? "1" : "")
+
+<div data-ng-controller="InvoiceDetailController" class="container border">
+    <div class="row margin-top-15 border-bottom">
+        <div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-3 ">
+            <img src="@_cacheHelper.TemplateLogo" width="200" height="40" />
+        </div>
+        <div class="form-group col-lg-6 col-md-6 col-sm-6 col-xs-6 text-align-center">
+            <strong class="font-size-18">@Resource.Invoice</strong>
+        </div>
+        <div class="form-group col-lg-3 col-md-3 col-sm-3 col-xs-3 ">
+            <span class="font-size-14"><strong>@Resource.InvoiceDate</strong>: {{InvoiceDetail.InvoiceDetailModel.StrInvoiceDate |dateformat|orgdate}}</span><br />
+            <span class="font-size-14"><strong>Due @Resource.Date</strong>: {{InvoiceDetail.InvoiceDetailModel.StrInvoiceDueDate|dateformat|orgdate}}</span><br />
+            <span class="font-size-14"><strong>@Resource.InvoiceNumber </strong>: {{InvoiceDetail.InvoiceDetailModel.ReferralInvoiceID}}</span><br />
+        </div>
+    </div>
+    <div class="row margin-top-15 border-bottom">
+        <div class="form-group col-lg-2 col-md-3 col-sm-3">
+            <label class="control-label">@Resource.AccountName</label>
+            <input class="form-control input-xs" disabled="" type="text" data-ng-model="InvoiceDetail.InvoiceDetailModel.ReferralName">
+        </div>
+        <div class="form-group col-lg-2 col-md-3 col-sm-3">
+            <label class="control-label">@Resource.AccountNumber</label>
+            <input class="form-control input-xs" disabled="" type="text" data-ng-model="InvoiceDetail.InvoiceDetailModel.AHCCCSID">
+        </div>
+        <div class="form-group col-lg-2 col-md-2 col-sm-2">
+            <label class="control-label">@Resource.InvoiceStatus</label>
+            <div class="clear-both"></div>
+            <span class="badge badge-danger" data-ng-if="InvoiceDetail.InvoiceDetailModel.InvoiceStatus == @((int)Common.InvoiceStatus.Unpaid)">
+                {{InvoiceDetail.InvoiceDetailModel.StrInvoiceStatus}}
+            </span>
+            <span class="badge badge-green" data-ng-if="InvoiceDetail.InvoiceDetailModel.InvoiceStatus == @((int)Common.InvoiceStatus.Paid)">
+                {{InvoiceDetail.InvoiceDetailModel.StrInvoiceStatus}}
+            </span>
+            <span class="badge badge-warning" data-ng-if="InvoiceDetail.InvoiceDetailModel.InvoiceStatus == @((int)Common.InvoiceStatus.PartialPaid)">
+                {{InvoiceDetail.InvoiceDetailModel.StrInvoiceStatus}}
+            </span>
+            <span class="badge badge-info" data-ng-if="InvoiceDetail.InvoiceDetailModel.InvoiceStatus == @((int)Common.InvoiceStatus.Void)">
+                {{InvoiceDetail.InvoiceDetailModel.StrInvoiceStatus}}
+            </span>
+        </div>
+        <div class="form-group col-lg-2 col-md-2 col-sm-2">
+            <label class="control-label">@Resource.PayableAmount</label>
+            <div class="clear-both"></div>
+            <span class="badge badge-danger">
+                {{InvoiceDetail.InvoiceDetailModel.PayAmount | orgcurrency}}
+            </span>
+        </div>
+        <div class="form-group col-lg-2 col-md-2 col-sm-2">
+            <label class="control-label">@Resource.PaidAmount</label>
+            <div class="clear-both"></div>
+            <span class="badge badge-green" data-ng-if="InvoiceDetail.InvoiceDetailModel.PaidAmount != 0">
+                {{InvoiceDetail.InvoiceDetailModel.PaidAmount | orgcurrency}}
+            </span>
+            <span class="badge badge-danger" data-ng-if="InvoiceDetail.InvoiceDetailModel.PaidAmount == 0">
+                @Resource.NA
+            </span>
+        </div>
+        <div class="form-group col-lg-2 col-md-2 col-sm-2" data-ng-if="InvoiceDetail.InvoiceDetailModel.InvoiceStatus == @((int)Common.InvoiceStatus.PartialPaid)">
+            <label class="control-label">@Resource.RemainingAmount</label>
+            <div class="clear-both"></div>
+            <span class="badge badge-warning">
+                {{(InvoiceDetail.InvoiceDetailModel.PayAmount - InvoiceDetail.InvoiceDetailModel.PaidAmount) | orgcurrency}}
+            </span>
+        </div>
+    </div>
+    <div class="row margin-top-15 border-bottom">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <table class="table table-responsive table-bordered table-condensed flip-content margin-bottom-5">
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="margin-bottom-5"></div>
+                            <table class="table table-responsive table-bordered table-striped table-condensed flip-content margin-bottom-5">
+                                <thead>
+                                    <tr>
+                                        <td class="width-240px"><b>@Resource.ServiceDate</b></td>
+                                        <td><b>@Resource.Description</b></td>
+                                        <td><b>Service By</b></td>
+                                        <td><b>@Resource.ServiceTime</b></td>
+                                        @*<td><b>@Resource.Description</b></td>*@
+                                        <td class="width-120px"><b>@Resource.BasicRate</b></td>
+                                        <td class="width-120px"><b>@Resource.Amount</b></td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="summary in InvoiceDetail.InvoiceTransactionDetailModelList">
+                                        <td>{{summary.ServiceDate | orgdate}} {{summary.StartDate | date:'shortTime'}} to {{summary.EndDate | date:'shortTime'}}</td>
+                                        <td>Charges for the {{summary.CareTypeName}}</td>
+                                        <td>{{summary.EmployeeName}}</td>
+                                        <td>{{(parseInt(summary.ServiceTime / 60) > 0 ? parseInt(summary.ServiceTime / 60) + ' @Resource.hrs ' : '') + (summary.ServiceTime % 60 > 0 ? summary.ServiceTime % 60 + ' @Resource.Mins' : '')}}</td>
+                                        @*<td>Charges for the {{summary.CareTypeName}}</td>*@
+                                        <td> {{summary.Rate | orgcurrency}} / {{(summary.PerUnitQuantity) ? summary.PerUnitQuantity + ' @Resource.Mins' : '@Resource.Visit' }}</td>
+                                        <td> {{summary.Amount | orgcurrency}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <table class="table table-responsive table-bordered table-condensed flip-content margin-bottom-5">
+                                <tbody>
+                                    <tr>
+                                        @*<td rowspan="3" width="800px">
+                                                <h5 class="margin-5"><b>Note:</b></h5>
+                                                <p class="margin-5" style="width:751px">@_cacheHelper.InvoiceNote</p>
+                                            </td>*@
+                                        <td align="right">@Resource.TotalAmount</td>
+                                        <td class="width-120px"> {{InvoiceDetail.InvoiceDetailModel.TotalAmount | orgcurrency}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right">Tax <b>( {{InvoiceDetail.InvoiceDetailModel.InvoiceTaxRate}} %)</b> </td>
+                                        <td>
+
+                                            {{(InvoiceDetail.InvoiceDetailModel.TotalAmount * InvoiceDetail.InvoiceDetailModel.InvoiceTaxRate / 100) |  orgcurrency}}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td align="right"><b>@Resource.PayableAmount</b></td>
+                                        <td>
+
+                                            {{InvoiceDetail.InvoiceDetailModel.PayAmount | orgcurrency}}
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row margin-top-15 border-bottom">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <table class="table table-responsive table-bordered table-condensed flip-content">
+                <thead>
+                    <tr>
+                        <td>
+                            <b>@Resource.PaymentInformation</b>
+                        </td>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="col-lg-12 col-md-12 col-sm-12 margin-top-5 margin-bottom-5"
+                                 data-ng-if="(InvoiceDetail.InvoiceDetailModel.TotalPayableAmount) != 0 && InvoiceDetail.InvoiceDetailModel.InvoiceStatus != @((int)Common.InvoiceStatus.Void)">
+                                <div class="pull-right">
+                                    <button class="btn btn-xs green-jungle letter-space" data-ng-click="UpdatePaymentDetail(@((int)Common.InvoiceStatus.Paid))">
+                                        @Resource.PayNow
+                                    </button>
+                                    <button class="btn btn-xs blue letter-space" data-ng-click="OpenPartialPaymentPopup()">
+                                        @Resource.PartialPayment
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <table class="table table-responsive table-bordered table-condensed flip-content"
+                                       data-ng-class="InvoiceDetail.ReferralPaymentHistoriesDetailList.length != 0 ? 'table-striped' : ''">
+                                    <thead>
+                                        <tr>
+                                            <td><b>@Resource.PaymentDate</b></td>
+                                            <td><b>@Resource.PaidAmount</b></td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="paymenthistory in InvoiceDetail.ReferralPaymentHistoriesDetailList">
+                                            <td><span ng-bind="paymenthistory.StrPaymentDate"></span></td>
+                                            <td> <span> {{paymenthistory.PaidAmount| orgcurrency}}</span></td>
+                                        </tr>
+                                        <tr data-ng-if="InvoiceDetail.ReferralPaymentHistoriesDetailList.length == 0">
+                                            <td colspan="2">
+                                                <div class="alert alert-danger margin-bottom-0">
+                                                    <p class="text-align-center">@Resource.RecordsFound</p>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="row margin-top-15 border-bottom">
+        <div class="col-lg-12 col-md-12 col-sm-12 margin-bottom-15">
+            <table>
+                <tr>
+                    <td style="vertical-align:top;"><label for="rd_billtoclient"><input name="bill" id="rd_billtoclient" ng-model="isPayor" type="radio" ng-value="1" />@Resource.BilltoClient</label></td>
+                    <td>&nbsp;&nbsp;</td>
+                    <td style="vertical-align:top;"><label for="rd_billtopayer"><input name="bill" id="rd_billtopayer" ng-model="isPayor" type="radio" ng-value="2" />@Resource.BilltoPayor</label></td>
+                    <td>&nbsp;&nbsp;</td>
+                    <td style="vertical-align:top;" data-ng-show="''+isPayor == '2' || ''+isPayor == '1'">
+                        <label class="control-label">@Resource.Payor</label>
+
+                        <select class="form-control input-sm" title="@Resource.Select" id="multipleSelect"
+                                data-ng-disabled="{{isPayor =="1" ? "true" : "false"}}"
+                                data-val="true" data-ng-model="payorId" data-ng-change="SearchReferral()" selectpicker="SelectedGroups">
+                            <option data-ng-repeat="option in InvoiceDetail.Payors" value="{{option.EncryptedPayorID}}">{{option.PayorName}}</option>
+                        </select>
+
+
+                    </td>
+                    <td>&nbsp;&nbsp;</td>
+                    <td style="vertical-align:top;" data-ng-show="''+isPayor == '2' || ''+isPayor == '1'">
+                        <input id="InvoiceAddressIsIncludePatientAddress" class="unicheckbox" type="checkbox"
+                               data-ng-checked="InvoiceAddressIsIncludePatientAddress"
+                               data-ng-click="onInvoiceAddressIsIncludePatientAddressChecked('InvoiceAddressIsIncludePatientAddress')"
+                               val="InvoiceAddressIsIncludePatientAddress">
+                        <label for="InvoiceAddressIsIncludePatientAddress" class="control-label">@Resource.IncludePatientAddress</label>
+                        <br />&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input id="InvoiceIsIncludePatientDOB" class="unicheckbox" type="checkbox"
+                               data-ng-checked="InvoiceIsIncludePatientDOB"
+                               data-ng-click="onChecked('InvoiceIsIncludePatientDOB')"
+                               val="InvoiceIsIncludePatientDOB">
+                        <label for="InvoiceIsIncludePatientDOB" class="control-label">@Resource.IncludePatientDOB</label>
+                        <br />&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input id="InvoiceAddressIsIncludePatientAddressLine1" class="unicheckbox" type="checkbox"
+                               data-ng-checked="InvoiceAddressIsIncludePatientAddressLine1"
+                               data-ng-click="onChecked('InvoiceAddressIsIncludePatientAddressLine1')"
+                               val="InvoiceAddressIsIncludePatientAddressLine1">
+                        <label for="InvoiceAddressIsIncludePatientAddressLine1" class="control-label">@Resource.IncludeAddressline 1</label>
+                        <br />&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input id="InvoiceAddressIsIncludePatientAddressLine2" class="unicheckbox" type="checkbox"
+                               data-ng-checked="InvoiceAddressIsIncludePatientAddressLine2"
+                               data-ng-click="onChecked('InvoiceAddressIsIncludePatientAddressLine2')"
+                               val="InvoiceAddressIsIncludePatientAddressLine2">
+                        <label for="InvoiceAddressIsIncludePatientAddressLine2" class="control-label">@Resource.IncludeAddressline 2</label>
+                        <br />&nbsp;&nbsp;&nbsp;&nbsp;
+                        <input id="InvoiceAddressIsIncludePatientAddressZip" class="unicheckbox" type="checkbox"
+                               data-ng-checked="InvoiceAddressIsIncludePatientAddressZip"
+                               data-ng-click="onChecked('InvoiceAddressIsIncludePatientAddressZip')"
+                               val="InvoiceAddressIsIncludePatientAddressZip">
+                        <label for="InvoiceAddressIsIncludePatientAddressZip" class="control-label">@Resource.IncludeAddressZip</label>
+                        <br />&nbsp;&nbsp;&nbsp;&nbsp;
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row margin-top-15 border-bottom">
+        <div class="col-lg-12 col-md-12 col-sm-12 margin-bottom-15">
+            <a href='@Constants.HC_GenerateInvoicePdf@Crypto.Encrypt(Convert.ToString(Model.InvoiceDetailModel.ReferralInvoiceID))?{{isPayor =="1"?"":"&EncryptedPayorID="+payorId}}{{InvoiceAddressIsIncludePatientAddress?"&InvoiceAddressIsIncludePatientAddress=true" :"" }}{{InvoiceIsIncludePatientDOB?"&InvoiceIsIncludePatientDOB=true" :"" }}{{InvoiceAddressIsIncludePatientAddressLine1?"&InvoiceAddressIsIncludePatientAddressLine1=true" :"" }}{{InvoiceAddressIsIncludePatientAddressLine2?"&InvoiceAddressIsIncludePatientAddressLine2=true" :"" }}{{InvoiceAddressIsIncludePatientAddressZip?"&InvoiceAddressIsIncludePatientAddressZip=true" :"" }}' class="btn btn-xs btn-warning" target="_blank">@Resource.Print</a>
+            @if (SessionHelper.IsEmployeeLogin)
+            {
+                <button class="btn btn-xs green-dark" data-ng-click="UpdatePaymentDetail(@((int)Common.InvoiceStatus.Void))"
+                        data-ng-if="InvoiceDetail.InvoiceDetailModel.InvoiceStatus != @((int)Common.InvoiceStatus.Paid) &&
+                            InvoiceDetail.InvoiceDetailModel.InvoiceStatus != @((int)Common.InvoiceStatus.Void)">
+                    @Resource.MarkInvoiceVoid
+                </button>
+            }
+            <a class="btn btn-xs red letter-space" href="@Constants.HC_InvoiceListURL">
+                @Resource.Cancel
+            </a>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="UpdateReferralInvoiceDetailPopup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+         style="display: none; margin-top: 0px;">
+        <div class="modal-dialog modal-sm" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <a class="text-decoration-none sbold uppercase ng-binding">
+                            <span>@Resource.PartialPayment</span>
+                        </a>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="UpdateReferralInvoiceDetailfrm">
+                        <div class="form-group">
+                            <label class="control-label">@Resource.Amount</label>
+                            <input type="text" class="form-control input-sm" data-ng-model="PartialPaymentAmount"
+                                   data-val="true" data-val-required="@Resource.AmountRequired"
+                                   id="Invoice_PartialPaymentAmount" name="Invoice.PartialPaymentAmount" />
+                            <span class="field-validation-error" data-valmsg-for="Invoice.PartialPaymentAmount" data-valmsg-replace="true"></span>
+                        </div>
+                        <a class="letter-space btn btn-sm green-jungle pull-right" data-ng-click="UpdatePartialPaymentDetail(@((int)Common.InvoiceStatus.PartialPaid))">@Resource.Process</a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+    <script>
+        var PartialPaymentLessThanEqualPayableAmount = "@Resource.PartialPaymentLessThanEqualPayableAmount";
+        var EnterAmountGreaterThanZero = "@Resource.EnterAmountGreaterThanZero"
+    </script>
+    @Scripts.Render("~/assets/js/viewjs/siteApp/areas/homecare/invoice/invoicedetail")
+}

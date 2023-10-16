@@ -1,0 +1,345 @@
+﻿@model SetTransportContactModel
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.TransportContactModel.ContactID > 0 ? Resource.EditTransportContact : Resource.AddTransportContact));
+    bool boolIsPartialView = ViewBag.IsPartialView != null;
+    string isPartialView = boolIsPartialView ? "1" : "0";
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_TransportContactAdd;
+    bool isEditMode = Model.TransportContactModel.ContactID > 0;
+
+}
+
+@Html.Hidden("hdnTransportContactModel", Common.SerializeObject(Model))
+@Html.Hidden("IsPartialView", isPartialView)
+<div data-ng-controller="AddTransportContactController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditTransportContact : @Resource.AddTransportContact)
+            <small>@Resource.EnterTransportContactInformation</small>
+            &nbsp;&nbsp;
+            @if (boolIsPartialView)
+            {
+                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+            }
+            else
+            {
+                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+            }
+            <input type="submit" data-ng-click="SaveTransportContactDetails()" class="btn btn-sm green-jungle pull-right margin-right-10" value="@(Model != null && Model.TransportContactModel.ContactID > 0 ? Resource.Update : Resource.Save)" />
+
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <form id="frmaddTransportContact" class="form-horizontal">
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div id="tabs" class="addEmployeeTabs">
+                            <div class="tabbable tabbable-custom tabs-left">
+                                <div class="col-lg-12 col-md-12 col-sm-12 no-padding employeeTabsecond">
+                                    <ul class="nav nav-tabs tabs-left">
+                                        <li id="s1" class="active">
+                                            <a id="addEmployee_Information" href="#tab_EmployeeInformation" data-toggle="tab">
+                                                @Resource.TransportContactDetails
+                                            </a>
+                                        </li>
+                                        <li id="s2" data-ng-show="TransportContactModel.ContactID > 0 && (''+TransportContactModel.ContactType) == '2'" class="tab-pane">
+                                            <a id="addEmployee_Information" href="#tab_vehicalList" data-toggle="tab">
+                                                @Resource.VehicleList
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="tab-content col-lg-12 col-md-12 col-sm-12">
+                                    <div class="tab-pane active" id="tab_EmployeeInformation" style="min-height: 350px;">
+
+                                        <div class="form-group row">
+                                            <div class="col-sm-12">
+                                                <div class="fscontainer">
+                                                    <div class="legend">
+                                                         @Resource.TransportContactDetails
+                                                    </div>
+                                                    <div class="col-sm-12 no-padding">
+                                                        <div class="col-sm-12">
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.ServiceProviderType
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.DropDownListFor(p => p.TransportContactModel.ContactType, Model.TransportContactTypeListModel.ToSelectList("", "ContactTypes", "ContactTypeID", @Resource.Select, ""),
+                                                                    new
+                                                                    {
+                                                                        data_ng_model = "TransportContactModel.ContactType",
+                                                                        data_ng_init = "TransportContactModel.ContactType=TransportContactModel.ContactType==null?'':TransportContactModel.ContactType.toString()",
+                                                                        @class = "form-control input-sm requiredStrip"
+                                                                    })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.ContactType)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.OrganizationName
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    <input type="text"
+                                                                           token-input
+                                                                          
+                                                                           ng-val="TransportContactModel.OrganizationID"
+                                                                           textfield='OrganizationID'
+                                                                           valuefield='OrganizationID'
+                                                                           searchurl="{{SearchOrganizationNameURL}}"
+                                                                           placeholder="@Resource.SearchLocation"
+                                                                           tokenlimit='1'
+                                                                           onresultsformatter='RegionResultsFormatter'
+                                                                           ontokenformatter="RegionTokenFormatter"
+                                                                           ondeletecallback='RemoveRegion'
+                                                                           autoSelectFirstResult="true"
+                                                                           minChars="1"
+                                                                           tokeninputobj="RegionTokenObj"
+                                                                           id="RegionTokenID"
+                                                                           customclass="form-control input-sm" />
+                                                                    @*@Html.DropDownListFor(p => p.TransportContactModel.OrganizationID, Model.OrganizationTypeListModel.ToSelectList("", "OrganizationName", "OrganizationID", @Resource.Select, ""),
+        new
+        {
+            data_ng_model = "TransportContactModel.OrganizationID",
+            data_ng_init = "TransportContactModel.OrganizationID=TransportContactModel.OrganizationID==null?'':TransportContactModel.OrganizationID.toString()",
+            @class = "form-control input-sm requiredStrip"
+        })
+        @Html.ValidationMessageFor(m => m.TransportContactModel.OrganizationID)*@
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.FirstName
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.FirstName, new
+                                                                    {
+                                                                        data_ng_model = "TransportContactModel.FirstName",
+                                                                        @class = "form-control input-sm",
+                                                                        placeholder = Resource.FirstName,
+                                                                        maxlength = 50
+                                                               })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.FirstName)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.LastName
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.LastName, new { data_ng_model = "TransportContactModel.LastName", @class = "form-control input-sm", placeholder = Resource.LastName, maxlength = 50 })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.LastName)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.MobileNumber
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.MobileNumber, new
+                                                                    {
+                                                                        data_ng_model = "TransportContactModel.MobileNumber",
+                                                                        @class = "form-control input-sm",
+                                                                        placeholder = Resource.MobileNumber,
+                                                                        maxlength = 10
+                                                               })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.MobileNumber)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label">
+                                                                    @Resource.Phone
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.Phone, new { data_ng_model = "TransportContactModel.Phone", @class = "form-control input-sm", placeholder = Resource.Phone, maxlength = 10 })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.Phone)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label">
+                                                                    @Resource.Email
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.Email, new
+                                                                    {
+                                                                        data_ng_model = "TransportContactModel.Email",
+                                                                        @class = "form-control input-sm",
+                                                                        placeholder = Resource.Email,
+                                                                        maxlength = 50
+                                                               })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.Email)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label">
+                                                                    @Resource.Fax
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.Fax, new { data_ng_model = "TransportContactModel.Fax", @class = "form-control input-sm", placeholder = Resource.Fax, maxlength = 10 })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.Fax)
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label">
+                                                                    @Resource.ApartmentNo
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.ApartmentNo, new
+                                                                    {
+                                                                        data_ng_model = "TransportContactModel.ApartmentNo",
+                                                                        @class = "form-control input-sm",
+                                                                        placeholder = Resource.ApartmentNo,
+                                                                        maxlength = 10
+                                                               })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.ApartmentNo)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.Address
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.Address, new { data_ng_model = "TransportContactModel.Address", @class = "form-control input-sm", placeholder = Resource.Address, maxlength = 100 })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.Address)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.City
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.City, new { data_ng_model = "TransportContactModel.City", @class = "form-control input-sm", placeholder = Resource.City, maxlength = 25 })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.City)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.State
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.DropDownListFor(p => p.TransportContactModel.State, Model.StateCodeListModel.ToSelectList("", "StateName", "StateCode", @Resource.Select, ""),
+                                                                    new
+                                                                    {
+                                                                        data_ng_model = "TransportContactModel.State",
+                                                                        data_ng_init = "TransportContactModel.State=TransportContactModel.State==null?'':TransportContactModel.State.toString()",
+                                                                        @class = "form-control input-sm requiredStrip"
+                                                                    })
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.State)
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group col-sm-6">
+                                                                <label class="col-md-5 col-sm-5 control-label required">
+                                                                    @Resource.ZipCode
+                                                                </label>
+                                                                <div class="col-md-7 col-sm-7 input-group">
+                                                                    @Html.TextBoxFor(m => m.TransportContactModel.ZipCode, new { data_ng_model = "TransportContactModel.ZipCode", @class = "form-control input-sm", placeholder = Resource.ZipCodePlaceholder, maxlength = Resource.ZipCodemaxlength})
+                                                                    @Html.ValidationMessageFor(m => m.TransportContactModel.ZipCode)
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                    
+                                                </div>
+                                                <div class="space15"></div>
+                                                <div class="col-md-12 form-group text-center">
+                                                    <input type="submit" data-ng-click="SaveTransportContactDetails()" class="btn btn-sm green-jungle" value="@(Model != null && Model.TransportContactModel.ContactID > 0 ? Resource.Update : Resource.Save)" />
+                                                    @if (boolIsPartialView)
+                                                    {
+                                                        <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint" value="@Resource.Cancel" />
+                                                    }
+                                                    else
+                                                    {
+                                                        <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint" value="@Resource.Cancel" />
+                                                    }
+                                                </div>
+                                            </div>
+
+                                        </div>
+            </form>
+                                    </div>
+                                    <div class="tab-pane" id="tab_vehicalList" style="min-height: 350px;">
+                                        <div class="btn-group padding-left-15">
+                                            <a href="" ng-click="VehicleEditModel(0)" class="btn btn-sm green-jungle letter-space pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Vehicle</a>
+                                        </div>
+                                        <div class="form-group row">
+                                            <div class="col-sm-12">
+                                                <div class="table-responsive">
+                                                    <table class="table table-pinned table-bordered table-striped table-condensed">
+                                                        <thead class="flip-content">
+                                                            <tr>
+                                                                <th class="">
+                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VehicleListPager.sortColumn('TransportService')">@Resource.TransportService</a>
+                                                                    <span class="sortorder" data-ng-show="VehicleListPager.sortIndex === 'TransportService'" data-ng-class="{reverse:VehicleListPager.reverse}"></span>
+                                                                </th>
+                                                                <th class="">
+                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VehicleListPager.sortColumn('Attendent')">@Resource.Attendent</a>
+                                                                    <span class="sortorder" data-ng-show="VehicleListPager.sortIndex === 'Attendent'" data-ng-class="{reverse:VehicleListPager.reverse}"></span>
+                                                                </th>
+                                                                <th class="">
+                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VehicleListPager.sortColumn('BrandName')">@Resource.BrandName</a>
+                                                                    <span class="sortorder" data-ng-show="VehicleListPager.sortIndex === 'BrandName'" data-ng-class="{reverse:VehicleListPager.reverse}"></span>
+                                                                </th>
+                                                                <th class="">
+                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VehicleListPager.sortColumn('VIN_Number')">@Resource.VIN_Number</a>
+                                                                    <span class="sortorder" data-ng-show="VehicleListPager.sortIndex === 'VIN_Number'" data-ng-class="{reverse:VehicleListPager.reverse}"></span>
+                                                                </th>
+                                                                <th class="">
+                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VehicleListPager.sortColumn('Model')">@Resource.Model</a>
+                                                                    <span class="sortorder" data-ng-show="VehicleListPager.sortIndex === 'Model'" data-ng-class="{reverse:VehicleListPager.reverse}"></span>
+                                                                </th>
+                                                                <th class="">
+                                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VehicleListPager.sortColumn('Color')">@Resource.Color</a>
+                                                                    <span class="sortorder" data-ng-show="VehicleListPager.sortIndex === 'Color'" data-ng-class="{reverse:VehicleListPager.reverse}"></span>
+                                                                </th>
+                                                                <th class="width-120px" style="text-align:center">@Resource.Action</th>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+
+                                                            <tr data-ng-class="{'deleted':vehicle.IsDeleted}" dir-paginate="vehicle in VehicleList | itemsPerPage: VehicleListPager.pageSize" total-items="VehicleListPager.totalRecords" current-page="VehicleListPager.currentPage" pagination-id="VehicleListPagerID">
+
+                                                                <td data-ng-bind="vehicle.TransportService"></td>
+                                                                <td data-ng-bind="vehicle.Attendent"></td>
+                                                                <td data-ng-bind="vehicle.BrandName"></td>
+                                                                <td data-ng-bind="vehicle.VIN_Number"></td>
+                                                                <td data-ng-bind="vehicle.Model"></td>
+                                                                <td data-ng-bind="vehicle.Color"></td>
+                                                                <td class="text-align-center">
+                                                                    <a href="" ng-click="VehicleEditModel(vehicle.EncryptedVehicleID)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+
+                                                                    <a href="javascript:void(0);" data-ng-show="vehicle.IsDeleted" data-ng-click="DeleteVehicle(vehicle.VehicleID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                    <a href="javascript:void(0);" data-ng-show="!vehicle.IsDeleted" data-ng-click="DeleteVehicle(vehicle.VehicleID,'Disable')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="Vehicle_fixedAside" class="asideBar-right fixed">
+        <div class="listContentinner">
+            <div class="closeasidebar" data-ng-click="VehicleEditModelClosed()"><i class="fa fa-close"></i></div>
+            <iframe id="Vehicle_fixedAsidelDDLBindIFrame" style="position:absolute; top:2%;  bottom:0px; right:0px; width:100%; min-height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/transportservice/addtransportservice")
+}

@@ -1,0 +1,73 @@
+﻿@using Zarephath.Core.Models
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.NotificationConfiguration);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_NotificationConfiguration;
+    var roles = (ViewBag.Roles as List<NameValueData>);
+}
+
+@model NotificationConfigurationModel
+@Html.Hidden("hdnNotificationConfigurationModel", Common.SerializeObject(Model))
+@Html.Hidden("hdnSelectRoleMessage", Resource.SelectAtleastOneRole)
+@Html.Hidden("hdnSelectOrDeselectAll", Resource.SelectOrDeselectAll)
+<div data-ng-controller="NotificationConfigurationController">
+    <form id="frmNotificationConfiguration">
+        <div class="page-bar">
+            <h3 class="page-title" style="display:inline-block;">
+                @Resource.NotificationConfiguration
+            </h3>
+            <button type="submit" class="btn btn-sm blue pull-right letter-space margin-top-10" data-ng-disabled="DetailDisabled" data-ng-click="Save()"><i class="fa fa-copy">&nbsp;&nbsp;</i>@Resource.Save</button>
+        </div>
+        <div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="space10"></div>
+                    <div class="col-lg-offset-4 col-lg-4 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8 no-padding">
+                        <label class="control-label required">@Resource.Role</label>
+                        <div class="form-group">
+                            @Html.DropDownListFor(m => m.RoleID, roles.ToSelectList(Model.RoleID.ToString() ?? "", "Name", "Value", Resource.Select, ""),
+                                                        new
+                                                        {
+                                                            id = "RoleID",
+                                                            convert_to_number = "",
+                                                            data_ng_model = "NotificationConfigurationModel.RoleID",
+                                                            data_ng_init = "NotificationConfigurationModel.RoleID=NotificationConfigurationModel.RoleID==''?null:NotificationConfigurationModel.RoleID",
+                                                            @class = "form-control input-sm",
+                                                            data_val = "false",
+                                                            data_ng_change = "GetRoleMapping()",
+                                                            required = true
+                                                        })
+                        </div>
+                    </div>
+                    <div class="space20"></div>
+                    <div class="col-lg-offset-3 col-lg-6 col-md-offset-2 col-md-8 col-sm-offset-1 col-sm-10 no-padding">
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.NotificationConfigurationDetail
+                            </div>
+                            <div class="space10"></div>
+                            <div class="col-sm-12">
+                                <div class="panel panel-default">
+                                    <div class="panel-heading">
+                                        <div>
+                                            <i class="fa fa-tags"></i>&nbsp;&nbsp;@Resource.NotificationConfigurationList
+                                        </div>
+                                    </div>
+                                    <div class="panel-body">
+                                        <div ng-if="NotificationConfigurationList && NotificationConfigurationList.length > 0">
+                                            <div id="jstreeid" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="NotificationConfigurationList" tree="treeInstance" data-ng-show="NotificationConfigurationList.length > 0"></div>
+                                        </div>
+                                        <div class="text-align-center" data-ng-if="NotificationConfigurationList.length == 0">@Resource.NoRecordFoundMessage</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/notificationconfiguration/index")
+}

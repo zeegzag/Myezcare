@@ -1,0 +1,79 @@
+﻿@model HC_AddPayorModel
+<div class="row">
+    <div class="col-lg-12 no-padding margin-bottom-10">
+        <form>
+            <input class="form-control input-sm input-inline"
+                   data-ng-model="EDI837SettingModel.searchtext"
+                   type="text"
+                   placeholder="@Resource.Search"
+                   value="">
+
+            <button type="submit" class="btn btn-primary btn-sm"
+                    data-ng-click="GetAllEdi837Setting()">
+                @Resource.Search
+            </button>
+            <button type="button" class="btn btn-default grey border-grey-cascade btn-sm"
+                    data-ng-click="ResetSearchFilter()">
+                @Resource.Reset
+            </button>
+        </form>
+    </div>
+    <div class="col-lg-12 no-padding">
+        <div class="portlet-body compact">
+            <div class="col-lg-6 no-padding" ng-repeat="limit in getLimits(AllBiilingSettingList)">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped table-condensed flip-content " style="table-layout: fixed;word-wrap: break-word;">
+                        <thead class="flip-content">
+                            <tr>
+                                <th class="">Key</th>
+                                <th class="width-130px">Value</th>
+                                <th class="width-60px">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in AllBiilingSettingList | limitTo : limit">
+                                <td>{{item.Key}}</td>
+                                <td>
+                                    <span data-ng-if="!item.IsEditable">{{item.Val}}</span>
+                                    <input type="text" data-ng-model="item.Val"
+                                           class="form-control input-xs time"
+                                           id="StrSetting{{$index}}" data-ng-if="item.IsEditable"
+                                           maxlength="{{item.CharLength}}" />
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0);" data-ng-click="EditEdi837Setting(item,'#StrSetting'+$index)"
+                                       class="btn btn-xs btn-primary" data-ng-if="!item.IsEditable" title="@Resource.Edit">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" data-ng-click="SaveEDI837Setting(item,'#StrSetting'+$index)"
+                                       class="btn btn-xs green-jungle" data-ng-if="item.IsEditable" title="@Resource.Save">
+                                        <i class="fa fa-save"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" data-ng-click="CancelEDI837Setting(item)"
+                                       class="btn btn-xs btn-default grey border-grey-cascade" data-ng-if="item.IsEditable" title="@Resource.Cancel">
+                                        <i class="fa fa-close"></i>
+                                    </a>
+                                </td>
+                                @*<a href="javascript:void(0);" data-ng-click="EditEdi837Setting(item)"
+                                        class="btn btn-xs btn-primary ng-scope" title="Edit">
+                                        <i class="fa fa-edit"></i>
+                                    </a>*@
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-12 no-padding">
+        <div data-ng-if="getLimits(AllBiilingSettingList) == 0">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger">
+                        @Html.Raw(Resource.NoRecordsFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

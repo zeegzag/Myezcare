@@ -1,0 +1,161 @@
+﻿@model HC_AddReferralModel
+@{bool isEditMode = Model != null && Model.Referral.ReferralID > 0;}
+
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="fscontainer dxcodeBlock">
+            <div class="legend">
+                @Resource.DxCodeDetails
+                <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.DXCodeHelptext"
+                   data-ng-custom-class="tooltip-extra-z-index"></i>
+            </div>
+            @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_DxCode_AddUpdate))
+            {
+                <div class="row">
+                    @Html.TextBoxFor(q => q.DXCodeCount,
+                              new
+                              {
+                                  data_ng_model = "ReferralModel.DXCodeCount",
+                                  @class = "form-control hideErrorContent replaceErrorSource validateElement",
+                                  data_error_Count = "ReferralErrorCount.ReferralHistoryTab"
+                              })
+
+                    @Html.ValidationMessageFor(m => m.DXCodeCount)
+                    <div class="col-md-12">
+                        <div class="col-md-9 no-padding replaceErrorDest">
+                            @*<div class="form-group col-lg-6 col-md-12 col-sm-12">
+                            <label class="control-label">@Resource.DXCode
+                            </label>
+                            <input type="text"
+                                   token-input
+                                   ng-val="ReferralModel.ReferralDXCodeMapping.DXCodeID"
+                                   textfield='DXCodeName'
+                                   valuefield='DXCodeID'
+                                   searchurl="{{GetDXCodeListForAutoCompleteURL}}"
+                                   placeholder="@Resource.DXCodes"
+                                   tokenlimit='1'
+                                   onresultsformatter='OnDxCodeResultsFormatter'
+                                   onaddedcallback='OnDXCodeAdd'
+                                   autoSelectFirstResult="true"
+                                   minChars="1"
+                                   tokeninputobj="DxCodeTokenInputObj"
+                                   id="ProductDxCodeToken"
+                                   customclass="form-control input-sm" />
+                        </div>*@
+                            <div class="form-group col-lg-6 col-md-5 col-sm-5">
+                                <label class="control-label">
+                                    @Resource.DXCode
+                                    @*<i class="fa fa-question-circle" data-ng-tooltip="@Resource.IsTimeBasedMessage" data-ng-custom-class="tooltip-extra-z-index"></i>*@
+                                </label>
+                                <div class="">
+                                    <ul class="token-input-list dx-code-list">
+                                        <li style="width: 100%;">
+                                            <input class="form-control input-sm valid" id="display" placeholder = @Resource.DXCode type="text" ng-model="Search" ng-change="SearchGetICD10Code(Search)" ng-disabled="isDisabled" />
+                                            <span ng-if="Search"
+                                                  ng-click="clearText()"
+                                                  class="glyphicon form-control-feedback"
+                                                  style="cursor: pointer; pointer-events: all; width: 40%;line-height: 64px;"
+                                                  uib-tooltip="clear"
+                                                  id="glyphicon-remove">
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                @*<div class="has-feedback">
+                                <input class="input-group " type="text"
+                                       placeholder="@Resource.DXCodes"
+                                       style="height:31px;width:100%"
+                                       ng-model="Search"
+                                       ng-change="SearchGetICD10Code(Search)" />
+                                <span ng-if="Search"
+                                      ng-click="clearText()"
+                                      class="glyphicon glyphicon-remove form-control-feedback"
+                                      style="cursor: pointer; pointer-events: all;"
+                                      uib-tooltip="clear">
+                                </span>
+                            </div>*@
+                                <div class="DxList" ng-if="Search1">
+                                    <div class="DXCode div1" ng-repeat="item in GetICD10CodeList" ng-click="Click(item)">
+                                        <b>DX Code:</b>&nbsp;&nbsp;{{item.DXCodeWithoutDot}}&nbsp;({{item.DXCodeName}})<label class="DXCodeType">ICD 10</label><br />
+                                        <span style="color: #c41212;"><b>Description:</b></span>&nbsp;{{item.Description}}<br />
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-6 col-sm-3">
+                                <label class="control-label">
+                                    @Resource.Precedence
+                                    <i class="fa fa-question-circle" data-ng-tooltip="@Resource.PrecedenceValue" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                </label>
+                            <div class="input-group col-md-12">
+                                @Html.TextBoxFor(q => q.ReferralDXCodeMapping.Precedence, new
+                           {
+                               @class = "form-control input-sm",
+                               data_ng_model = "ReferralModel.ReferralDXCodeMapping.Precedence",
+                               data_ng_disabled = "!isDisabled",
+                               placeholder = Resource.Precedence,
+                               maxlength = 3,
+                               key_press_validation = "Digit"
+                           })
+                            </div>
+                        </div>
+                        <div class="form-group col-lg-3 col-md-3 col-sm-3 margin-top-18">
+                            <a class="btn btn-sm btn-info" data-ng-click="SaveReferralDXCodeMapping(item)">
+                                <i class="fa fa-save ">&nbsp;&nbsp;</i>@Resource.Add
+                            </a>
+                            <a class="btn btn-sm border-light bg-gray-color widget-title-color-gray" data-ng-click="CancelDXCodeMapping()">
+                                <i class="fa fa-remove ">&nbsp;&nbsp;</i>@Resource.Cancel
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            }
+            <div class="row">
+                <div class="form-group col-lg-12 col-md-12 col-sm-12 mb-0" data-ng-if="ReferralModel.DxCodeMappingList.length > 0" data-ng-cloak>
+                    <div class="table-responsive">
+                        <table class="table table-advance table-bordered table-striped table-hover table-condensed" style="cursor: move;">
+                            <thead>
+                                <tr>
+                                    <th width="120"><strong>@Resource.Type</strong></th>
+                                    <th><strong>@Resource.DXCode</strong></th>
+                                    <th><strong>@Resource.Description</strong></th>
+                                    <th class="text-align-center"><strong>@Resource.Precedence</strong></th>
+                                    <th class="width-20px"><strong>@Resource.Action</strong></th>
+                                </tr>
+                            </thead>
+                            <tbody dnd-list="DxCodeMappingList">
+                                <tr data-ng-class="{'deleted':dxCode.IsDeleted}" data-ng-repeat="dxCode in ReferralModel.DxCodeMappingList"
+                                    dnd-list-id="{{dxCode.ReferralDXCodeMappingID}}"
+                                    dnd-draggable="dxCode"
+                                    dnd-moved="Sorting($index)"
+                                    dnd-effect-allowed="move"
+                                    dnd-selected="models.selected = dxCode"
+                                    ng-class="{'selected': models.selected === dxCode}">
+                                    <td>{{dxCode.DxCodeShortName }}</td>
+                                    <td>{{(dxCode.DXCodeWithoutDot ? dxCode.DXCodeWithoutDot  :'@Resource.NA') +' (' + dxCode.DXCodeName +')'}}</td>
+                                    <td>{{dxCode.Description}}</td>
+                                    <td class="text-align-center">{{(dxCode.Precedence)? dxCode.Precedence :'@Resource.NA'}}</td>
+                                    <td class="text-center">
+                                        @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_DxCode_AddUpdate))
+                                        {
+                                            <a data-ng-click="EditDxCodeFromMapping(dxCode)"><i class="fa fa-edit curser-pointer"></i></a>
+                                        }
+                                        @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_DxCode_Delete))
+                                        {
+                                            <a data-ng-click="DeleteDxCodeFromMapping(dxCode,'Delete Records')"><i class="fa fa-remove curser-pointer"></i></a>
+                                        }
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

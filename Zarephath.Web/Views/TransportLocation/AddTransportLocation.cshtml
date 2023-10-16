@@ -1,0 +1,257 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.TransportLocation.TransportLocationID > 0 ? Resource.EditTransportationLocation : @Resource.AddTransportationLocation));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_TransportationLocationAdd;
+}
+
+@model AddTransportationLocationModel
+@Html.Hidden("hdnTransPortationModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="AddtransportationLocationController">
+    <form class="form-horizontal" id="frmTransPortationLocation">
+        <div class="page-bar">
+            <h3 class="page-title">@(Model != null && Model.TransportLocation.TransportLocationID > 0 ? Resource.EditTransportationLocation : @Resource.AddTransportationLocation)
+                <small>@Resource.EnterTransportationLocation</small>
+                <input type="submit"  data-ng-disabled="IsFileUploading"  data-ng-click="SaveTransPortationLocationDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model.TransportLocation.TransportLocationID > 0 ? Resource.Update : Resource.Save)"/>
+                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/>
+            </h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.TransportationLocation
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label required">@Resource.Location</label>
+                                        <div class="col-md-9">
+                                            @Html.TextBoxFor(q => q.TransportLocation.Location, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.Location", placeholder = @Resource.Location, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.TransportLocation.Location)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label required">
+                                            @Resource.LocationCode
+                                        </label>
+                                        <div class="col-md-9">
+                                            @Html.TextBoxFor(q => q.TransportLocation.LocationCode, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.LocationCode", placeholder = @Resource.LocationCode, maxlength = 50 })
+                                            @Html.ValidationMessageFor(model => model.TransportLocation.LocationCode)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label required">@Resource.Address</label>
+                                        <div class="col-md-9">
+                                            @Html.TextAreaFor(q => q.TransportLocation.Address, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.Address", placeholder = @Resource.Address, maxlength = 100, rows = "2" })
+                                            @Html.ValidationMessageFor(q => q.TransportLocation.Address)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label required">@Resource.City</label>
+                                        <div class="col-md-9">
+                                            @Html.TextBoxFor(q => q.TransportLocation.City, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.City", placeholder = @Resource.City, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.TransportLocation.City)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label required">@Resource.State</label>
+                                        <div class="col-md-9">
+                                            <select disabled class="form-control input-sm" data-ng-model="TransPortationModel.TransportLocation.State" data-ng-init="TransPortationModel.TransportLocation.State='@Constants.DefaultStateCode'">
+                                                <option value="@Constants.DefaultStateCode">@Constants.DefaultStateName</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-3 control-label required">@Resource.Phone</label>
+                                        <div class="col-md-9">
+                                            @Html.TextBoxFor(q => q.TransportLocation.Phone, new
+                                            {
+                                                @class = "form-control input-sm",
+                                                data_ng_model = "TransPortationModel.TransportLocation.Phone",
+                                                maxlength = 15,
+                                                placeholder = "(XXX) XXX-XXXX",
+                                                phone_input = "",
+                                                key_press_validation = "Digit"
+                                            })
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        @Html.LabelFor(m => m.TransportLocation.Zip, new {@class = "col-md-3 control-label required"})
+                                        <div class="col-md-9">
+                                            <zipcode class="Transport-Location-Zipcode" type="text" ng-model="TransPortationModel.TransportLocation.Zip" required="ZipCode is required" modelid="Zip"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group ">
+                                        @Html.LabelFor(m => m.TransportLocation.RegionID, new { @class = "col-md-3 control-label required" })
+                                        <div class="col-md-9">
+                                            @Html.DropDownListFor(p => p.TransportLocation.RegionID, Model.RegionList.ToSelectList(Model.TransportLocation.RegionID.ToString() ?? "", "RegionName", "RegionID", Resource.SelectRegion, ""),
+                                                      new
+                                                          {
+                                                              convert_to_number = "",
+                                                              data_ng_model = "TransPortationModel.TransportLocation.RegionID",
+                                                              data_ng_init = "TransPortationModel.TransportLocation.RegionID=TransPortationModel.TransportLocation.RegionID==''?null:TransPortationModel.TransportLocation.RegionID.toString()",
+                                                              @class = "form-control input-sm"
+                                                          })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.TransportLocation.RegionID)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <div class="col-sm-6 no-padding">
+                                    <div class="col-sm-3">
+                                        <div class="tab-content col-md-11 col-sm-10">
+                                            <div class="tab-pane active" id="tab_ClientDocuments">
+                                                <div class="btn-group btn-block text-center">
+                                                    <div ng-if="!IsFileUploading" class="fileUpload btn btn-xs btn-primary margin-right-0">
+                                                        <span><i class="icon-plus"></i>&nbsp; @Resource.UploadFile</span>
+                                                        <div>
+                                                            <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                                amazonfileupload
+                                                                file-uploadurl="{{UploadFile}}" beforesend="BeforeSend" aftersend="AfterSend" progress="Progress" filelist="UploadingFileList" onchange="loadFile(event)" data-ng-aws-settings-model="TransPortationModel.AmazonSettingModel" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-sm-6 no-padding">
+                                        <div class="col-sm-6">
+                                            <script>
+                                                var loadFile = function (event) {
+                                                    var output = document.getElementById('img1');
+                                                    output.src = URL.createObjectURL(event.target.files[0]);
+                                                };
+                                            </script>
+                                            <img class="img-responsive" id="imgDisplay" data-ng-if="!IsFileUploading && TransPortationModel.TransportLocation.MapImage" data-ng-src="{{TransPortationModel.AmazonSettingModel.URL+'/'+TransPortationModel.TransportLocation.MapImage}}" width="100%" />
+                                            <img class="img-responsive" id="defaultSignature" src="/Assets/images/no-image-available.jpg" data-ng-if="!IsFileUploading && !TransPortationModel.TransportLocation.MapImage" />
+                                            <img class="img-responsive" id="img1" src="" data-ng-show="IsFileUploading" width="100%" />
+
+
+                                            <div class="col-sm-12 no-padding" data-ng-repeat="filedata in UploadingFileList">
+                                                <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            @* <hr />
+                            <div class="col-md-12 remove-form-horizontal">
+                                <strong>@Resource.PickUpDropOffTimingDetails :</strong>
+                                <div class="row">
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.MondayPickUp</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.MondayPickUp, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.MondayPickUp", placeholder = @Resource.MondayPickUp, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.MondayDropOff</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.MondayDropOff, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.MondayDropOff", placeholder = @Resource.MondayDropOff, maxlength = 30 })
+                                    </div>
+
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.TuesdayPickUp</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.TuesdayPickUp, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.TuesdayPickUp", placeholder = @Resource.TuesdayPickUp, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.TuesdayDropOff</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.TuesdayDropOff, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.TuesdayDropOff", placeholder = @Resource.TuesdayDropOff, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.WednesdayPickUp</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.WednesdayPickUp, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.WednesdayPickUp", placeholder = @Resource.WednesdayPickUp, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3 ">
+                                        <label class="control-label ">@Resource.WednesdayDropOff</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.WednesdayDropOff, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.WednesdayDropOff", placeholder = @Resource.WednesdayDropOff, maxlength = 320 })
+                                    </div>
+
+                                    <div class="clearleft"></div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.ThursdayPickUp</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.ThursdayPickUp, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.ThursdayPickUp", placeholder = @Resource.ThursdayPickUp, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.ThursdayDropOff</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.ThursdayDropOff, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.ThursdayDropOff", placeholder = @Resource.ThursdayDropOff, maxlength = 30 })
+                                    </div>
+
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.FridayPickUp</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.FridayPickUp, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.FridayPickUp", placeholder = @Resource.FridayPickUp, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.FridayDropOff   </label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.FridayDropOff, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.FridayDropOff", placeholder = @Resource.FridayDropOff, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.SaturdayPickUp</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.SaturdayPickUp, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.SaturdayPickUp", placeholder = @Resource.SaturdayPickUp, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.SaturdayDropOff</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.SaturdayDropOff, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.SaturdayDropOff", placeholder = @Resource.SaturdayDropOff, maxlength = 30 })
+                                    </div>
+
+                                    <div class="clearleft"></div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.SundayPickUp</label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.SundayPickUp, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.SundayPickUp", placeholder = @Resource.SundayPickUp, maxlength = 30 })
+                                    </div>
+
+                                    <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                        <label class="control-label ">@Resource.SundayDropOff
+                                        </label>
+                                        @Html.TextBoxFor(q => q.TransportLocation.SundayDropOff, new { @class = "form-control input-sm", data_ng_model = "TransPortationModel.TransportLocation.SundayDropOff", placeholder = @Resource.SundayDropOff, maxlength = 30 })
+                                    </div>
+
+                                </div>
+                            </div>*@
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-12 form-group no-margin no-padding">
+                    <input type="submit" data-ng-click="SaveTransPortationLocationDetails()" data-ng-disabled="IsFileUploading" class="btn btn-sm green-jungle pull-right" value="@(Model.TransportLocation != null && Model.TransportLocation.TransportLocationID > 0 ? Resource.Update : Resource.Save)"/>
+                    <a href="@Constants.TransPortationModelListURL">
+                        <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel"/></a>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/transportlocation/addtransportlocation")
+    <script type="text/javascript">
+        var InvalidImageUploadMessage = '@Resource.InvalidImageUploadMessage';
+    </script>
+}

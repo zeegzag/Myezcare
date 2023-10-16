@@ -1,0 +1,75 @@
+﻿@{
+    ViewBag.Title = "Twilio SubAccount";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+    <div class="page-bar">
+        <h3 class="page-title">
+            Edit Subaccount
+            <a href="~/Twilio/Create" class="btn btn-sm letter-space green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>Add Subaccount</a>
+        </h3>
+    </div>
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 ">
+            <div class="form-group">
+                <div class="form-group">
+                    <input type="text" id="accountName" class="form-control" placeholder="Name of account" />
+                </div>
+                <br />
+                <div class="form-group">
+                    <select id="status" class="form-control">
+                        <option value="active">Active</option>
+                        <option value="suspended">Suspended</option>
+                        <option value="closed">Closed</option>
+                    </select>
+                </div>
+                <br />
+                <div class="form-group">
+                    <input type="submit" class="btn btn-success" value="Save" />
+                    <a href="/Twilio" class="btn btn-warning">Back</a>
+                </div>
+                <br />
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $.ajax({
+                type: 'GET',
+                url: "/api/TwilioAPI/FetchSubAccount?sid=@ViewBag.id",
+                dataType: 'json',
+                success: function (result) {
+                        $("#accountName").val(result.friendly_name)
+                        $("#status").val(result.status)
+                },
+                error: function (ex) {
+                    alert(JSON.parse(ex.responseText).ExceptionMessage);
+                },
+            });
+
+            $(".btn-success").on('click', function () {
+            var queryObj = "?status=" + $("#status").val() + "&name=" + $("#accountName").val() + "&subAccountId=@ViewBag.id";
+
+            $.ajax({
+                type: 'POST',
+                url: "/api/TwilioAPI/UpdateSubAccount" + queryObj,
+                dataType: 'json',
+                success: function (result) {
+                        console.log(result)
+                        window.location.href = "/Twilio";
+                },
+                error: function (ex) {
+                    alert(JSON.parse(ex.responseText).ExceptionMessage);
+                },
+            });
+
+        });
+
+        });
+    </script>
+}

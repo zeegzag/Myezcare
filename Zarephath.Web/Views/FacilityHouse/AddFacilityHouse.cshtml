@@ -1,0 +1,45 @@
+﻿@model SetFacilityHouseModel
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.FacilityHouseModel.FacilityID > 0 ? Resource.EditFacilityHouse : Resource.AddFacilityHouse));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_FacilityHouseAdd;
+    bool isEditMode = Model.FacilityHouseModel.FacilityID > 0;
+}
+
+@Html.Hidden("hdnFacilityHouseModel", Common.SerializeObject(Model))
+<div data-ng-controller="AddFacilityHouseController">
+    <div class="page-bar">
+        <h3 class="page-title">@(isEditMode ? Resource.EditFacilityHouse : @Resource.AddFacilityHouse)
+            <small>@Resource.EnterFacilityDetail</small>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabbable tabbable-custom boxless">
+                <ul class="nav nav-tabs" id="loanDetailTopTabs">
+                    <li class="active">
+                        <a id="addFacilityDetail" data-target="#tab_FacilityHouseDetail" data-toggle="tab">@Resource.FacilityDetails</a>
+                    </li>
+                    <li class="@(isEditMode ? "" : "disabled")">
+                        <a id="FacilityTransportLocationMapping"  data-target="#tab_FacilityTransportLocationMapping" data-toggle="@(isEditMode ? "tab" : "")">@Resource.FacilityTransportLocationMapping</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_FacilityHouseDetail">
+                        @Html.Partial("Partial/_FacilityHouseDetail", Model)
+                    </div>
+                    <div class="tab-pane" id="tab_FacilityTransportLocationMapping">
+                        @Html.Partial("Partial/_FacilityTransportLocationMapping", Model)
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/viewjs/siteApp/facilityhouse/addfacilityhouse")
+}

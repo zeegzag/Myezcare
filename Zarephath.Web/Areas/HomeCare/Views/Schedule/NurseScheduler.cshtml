@@ -1,0 +1,368 @@
+﻿@{
+    ViewBag.Title = "NurseScheduler";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model Zarephath.Core.Models.Scheduler.ScheduleDTO
+<h2>@Resource.NurseScheduler</h2>
+
+@section Styles{
+    @Styles.Render("~/nurseschedule/css")
+}
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="row">
+            <div class="col-sm-3">
+                @Html.DropDownList("ddlCareTypes", new SelectList(@ViewBag.CareTypes, "CareTypeId", "CareType"), new { @class = "ui fluid multiple search normal selection dropdown", @multiple = "" })
+            </div>
+            @if (bool.Parse(ViewData["LimitedAccess"].ToString()) == false)
+            {
+            <div class="col-sm-3">
+                @Html.DropDownList("ddlEmployees", new SelectList(@ViewBag.Employees, "EmployeeID", "Name"), new { @class = "ui fluid multiple search normal selection dropdown", @multiple = "" })
+            </div>
+            }
+            <div class="col-sm-3">
+                @Html.DropDownList("ddlPatients", new SelectList(@ViewBag.Patients, "ReferralID", "Name"), new { @class = "ui fluid multiple search normal selection dropdown", @multiple = "" })
+            </div>
+            <div class="col-sm-3">
+                <button type="button" class="btn btn-sm btn-primary" onclick="SearchFilter();">@Resource.Search</button>
+            </div>
+        </div>
+        <br /><br />
+        <div class="row">
+            <div class="col-sm-5 text-left">
+                <div id="loader" class="top pagination-sm">
+                    @Resource.Loading
+                    <img src="~/Assets/images/lazyload.gif" />
+                    <br /><br />
+                </div>
+            </div>
+            <div class="col-sm-5 text-right">
+                <button id="btnAddSchedule" type="button" class="btn btn-sm btn-primary">@Resource.AddSchedule</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-10">
+                <div id="calendar"></div>
+            </div>
+        </div>
+        <div class="modal fade recurbox" id="event-modal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">@Resource.Appointment</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body appontbox">
+                        <div id="loaderModal" class="top pagination-sm position-fixed top-0 bottom-0 width-100 margin-top-minus-15px margin-left-minus-15px btn-transparent display-flex align-items-center justify-content-center">
+                            <div class="position-relative padding-10px display-flex flex-column btn-white">
+                                <p>@Resource.Loading</p>
+                                <div class="display-flex justify-content-center">
+                                    <img src="~/Assets/images/lazyload.gif" />
+                                </div>
+                            </div>
+                        </div>
+                        <input type="hidden" name="event-index">
+                        <input type="hidden" name="nurseScheduleId">
+                        <form class="form-horizontal">
+                            <div class="filedbox">
+                                <div class="row">
+                                    @if (bool.Parse(ViewData["LimitedAccess"].ToString()) == false)
+                                    {
+                                    <div class="col-sm-6 px-md-5">
+                                        <label class="required form-label">@Resource.Employee:</label><br />
+                                        @Html.DropDownList("ddlPopupEmployee", new SelectList(@ViewBag.Employees, "EmployeeID", "Name"), new { @class = "ui search dropdown form-control" })
+                                    </div>
+                                    <div class="col-sm-6 px-md-5">
+                                        <label class="required form-label">@Resource.Patient:</label><br />
+                                        @Html.DropDownList("ddlPopupPatient", new SelectList(@ViewBag.Patients, "ReferralID", "Name"), new { @class = "ui search dropdown form-control" })
+                                    </div>
+                                    }
+                                    else
+                                    {
+                                    <div class="col-sm-12 px-md-5">
+                                        <label class="required form-label">@Resource.Patient:</label><br />
+                                        @Html.DropDownList("ddlPopupPatient", new SelectList(@ViewBag.Patients, "ReferralID", "Name"), new { @class = "ui search dropdown form-control" })
+                                    </div>
+                                    }
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-6 px-md-5">
+                                        <label class="required form-label">@Resource.CareType:</label>
+                                        @Html.DropDownList("ddlPopupCareType", new SelectList(@ViewBag.CareTypes, "CareTypeId", "CareType"), @Resource.Select, new { @class = "form-control", style = "background-color:white;" })
+                                    </div>
+                                    <div class="col-sm-6 px-md-5">
+                                        <label class="form-label">@Resource.PatientPayor:</label>
+                                        <select id="ddlPatientPayor" class="form-control" style="background-color:white;">
+                                            <option value="" selected="selected">@Resource.Select</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-6 px-md-5">
+                                        <label class="form-label">@Resource.AuthorizationCode:</label>
+                                        <select id="ddlAuthorizationCode" class="form-control" style="background-color:white;">
+                                            <option value="" selected="selected">@Resource.Select</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-6 px-md-5">
+                                        <div class="row" id="authorizationCodeDetails">
+                                            <div class="col-sm-4">
+                                                <label>@Resource.StartDate:</label>
+                                                <span id="authStartDate"></span>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <label>@Resource.EndDate:</label>
+                                                <span id="authEndDate"></span>
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <label>@Resource.ServiceCode:</label>
+                                                <span id="authServiceCode"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <input type="radio" id="rb-one-time-event" name="ScheduleRecurrence" value="OneTime" checked="checked">&nbsp;@Resource.OneTimeSchedule
+                                    <input type="radio" id="rb-recurrence-event" name="ScheduleRecurrence" value="Repeat">&nbsp;@Resource.ReccurrentSchedule <i class="fa fa-question-circle" data-ng-tooltip="@Resource.OneTimeOrReccurrentScheduleInfo"></i>
+                                </div>
+                            </div>
+                            <div class="filedbox" id="schedule-recurrence-choice">
+                                <h2>@Resource.RecurrencePattern</h2>
+                                <div class="row">
+                                    <div class="col-sm-12 px-md-5">
+                                        <div id="schedule-recurrence-selection">
+                                            <div class="row">
+                                                <div class="col-sm-12">
+                                                    <div>
+                                                        <div class="col-sm-3 recuflt">
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="reccurencechoice" id="daily" value="1" checked>&nbsp;@Resource.RecurrenceDaily
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="reccurencechoice" id="weekly" value="2">&nbsp;@Resource.RecurrenceWeekly
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="reccurencechoice" id="monthly" value="4">&nbsp;@Resource.RecurrenceMonthly
+                                                            </div>
+                                                            <div class="form-check">
+                                                                <input class="form-check-input" type="radio" name="reccurencechoice" id="yearly" value="16">&nbsp;@Resource.RecurrenceYearly
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-sm-9">
+                                                            <div class="row">
+                                                                <div class="col-sm-12 px-md-5">
+                                                                    <div id="daily-interval-selection" style="display:none;">
+                                                                        <div class="margin-top-10 margin-bottom-10" style="display: flex; align-items: center;">
+                                                                            <label class="form-label">@Resource.RecurEvery:</label>&nbsp;&nbsp;
+                                                                            <input type="number" id="txtDailyInterval" class="form-control" value="1"
+                                                                                   onKeyPress="if(this.value.length==3) return false;" style="width: 80px;" min="1" max="999" />
+                                                                            &nbsp;&nbsp;<label class="form-label">@Resource.days</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-12 px-md-5">
+                                                                    <div id="weekly-interval-selection" style="display:none;">
+                                                                        <div class="margin-top-10 margin-bottom-10" style="display: flex; align-items: center;">
+                                                                            <label class="form-label">@Resource.RecurEvery:</label>&nbsp;&nbsp;
+                                                                            <input type="number" id="txtWeeklyInterval" class="form-control" value="1"
+                                                                                   onKeyPress="if(this.value.length==2) return false;" style="width: 80px;" min="1" max="99" />
+                                                                            &nbsp;&nbsp;<label class="form-label">@Resource.weeksOn:</label>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-12 px-md-5">
+                                                                    <div id="monthly-interval-selection" style="display:none;">
+                                                                        <div class="margin-top-10 margin-bottom-10" style="display: flex; align-items: center;">
+                                                                            <div class="form-check margin-right-10">
+                                                                                <input class="form-check-input" type="radio" name="monthlychoice" id="monthlyday" value="1" checked>&nbsp;@Resource.Day
+                                                                            </div>
+                                                                            <div class="form-check">
+                                                                                <input class="form-check-input" type="radio" name="monthlychoice" id="monthlyon" value="2">&nbsp;@Resource.On
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="monthlychoice-day" style="display:none;">
+                                                                            <div style="display: flex; align-items: center;">
+                                                                                <input type="number" id="txtDayOfMonth" class="form-control" value="1"
+                                                                                       onKeyPress="if(this.value.length==2) return false;" style="width: 80px;" min="1" max="31" />
+                                                                                &nbsp;&nbsp;<label class="form-label margin-right-10">@Resource.ofEvery</label>&nbsp;&nbsp;
+                                                                                <input type="number" id="txtMonthlyInterval" class="form-control" value="1"
+                                                                                       onKeyPress="if(this.value.length==2) return false;" style="width: 80px;" min="1" max="12" />
+                                                                                &nbsp;&nbsp;<label class="form-label">@Resource.months</label>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div id="monthlychoice-on" style="display:none;">
+                                                                            @Html.CheckBoxFor(model => model.IsFirstWeekOfMonthSelected) @Resource.ScheduleFirstWeekOfMonth
+                                                                            @Html.CheckBoxFor(model => model.IsSecondWeekOfMonthSelected) @Resource.ScheduleSecondWeekOfMonth
+                                                                            @Html.CheckBoxFor(model => model.IsThirdWeekOfMonthSelected) @Resource.ScheduleThirdWeekOfMonth
+                                                                            @Html.CheckBoxFor(model => model.IsFourthWeekOfMonthSelected) @Resource.ScheduleFourthWeekOfMonth
+                                                                            @Html.CheckBoxFor(model => model.IsLastWeekOfMonthSelected) @Resource.ScheduleLastWeekOfMonth
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-12 px-md-5">
+                                                                    <div id="weekday-selection" style="display:none;">
+                                                                        @Html.CheckBoxFor(model => model.IsSundaySelected) @Resource.ScheduleSunday
+                                                                        @Html.CheckBoxFor(model => model.IsMondaySelected) @Resource.ScheduleMonday
+                                                                        @Html.CheckBoxFor(model => model.IsTuesdaySelected) @Resource.ScheduleTuesday
+                                                                        @Html.CheckBoxFor(model => model.IsWednesdaySelected) @Resource.ScheduleWednesday
+                                                                        @Html.CheckBoxFor(model => model.IsThursdaySelected) @Resource.ScheduleThursday
+                                                                        @Html.CheckBoxFor(model => model.IsFridaySelected) @Resource.ScheduleFriday
+                                                                        @Html.CheckBoxFor(model => model.IsSaturdaySelected) @Resource.ScheduleSaturday
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="row">
+                                                                <div class="col-sm-12 px-md-5">
+                                                                    <div id="yearly-interval-selection" style="display:none;">
+                                                                        <br />
+                                                                        <div class="float-left">
+                                                                            <label class="form-label">@Resource.YearlyScheduleOn:</label>&nbsp;&nbsp;
+                                                                            @Html.DropDownList("ddlAnniversaryMonth", (SelectList)ViewBag.Months, null, new { @class = "form-control", style = "width: 100px; background-color:white;" })
+                                                                        </div>
+                                                                        <div class="float-left anniversaryday">
+                                                                            <input type="number" id="txtAnniversaryDay" class="form-control" onKeyPress="if(this.value.length==2) return false;" style="width: 70px;" min="1" max="31" />
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="filedbox" id="schedule-recurrence-choice-dates">
+                                <h2 id="recurrence-heading">@Resource.RangeOfRecurrence</h2>
+                                <div class="row">
+                                    <div class="col-sm-12 px-md-5">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <label class="form-label">@Resource.StarDate:</label>
+                                                <div class="input-group date">
+                                                    <input id="min-date" name="event-start-date" type="text" class="form-control">
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                            <div id="schedule-end-date">
+                                                <div class="col-sm-4">
+                                                    <label class="form-label"> @Resource.EndDate:</label>
+                                                    <div class="input-group date">
+                                                        <input id="event-end-date" name="event-end-date" type="text" class="form-control">
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-4" id="no-end-date">
+                                                <input type="checkbox" id="chkbxNoDate" /> <label class="form-label">@Resource.NoEndDate</label> <i class="fa fa-question-circle" data-ng-tooltip="@Resource.ScheduleNoEndDateInfo"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="filedbox">
+                                <div class="row">
+                                    <div class="col-sm-6 px-md-5">
+                                        <input type="checkbox" id="chkbxIsAnyDay" />
+                                        <label class="form-label">@Resource.IsAnyDay</label> <i class="fa fa-question-circle" data-ng-tooltip="@Resource.IsAnyDay"></i>
+                                    </div>
+                                    <div class="col-sm-6 px-md-5">
+                                        <div class="row">
+                                            <div class="col-sm-4">
+                                                <label class="form-label">@Resource.IsVirtualVisit:</label>
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <div class="float-left">
+                                                    <input type="radio" id="isVirtualVisitNo" name="virtualvisit" checked="checked"> <label class="form-label">No</label>
+                                                </div>
+                                                <div class="float-left">
+                                                    &nbsp;<input type="radio" id="isVirtualVisitYes" name="virtualvisit"> <label class="form-label">Yes</label> <i class="fa fa-question-circle" data-ng-tooltip="@Resource.VirtualVisits"></i>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        @*<input type="checkbox" id="chkbxIsVirtualVisit" />*@
+
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-3 px-md-5">
+                                        <input type="checkbox" id="chkbxAnyTimeClockIn" checked="checked" />
+                                        <label class="form-label">@Resource.AnyTimeClockIn</label> <i class="fa fa-question-circle" data-ng-tooltip="@Resource.AnyTimeClockInInfo"></i>
+                                    </div>
+                                    <div id="clockInTiminig">
+                                        <div class="col-sm-4 px-md-5">
+                                            <div class="float-left">
+                                                <label class="form-label">@Resource.StartTime:</label>
+                                                <input type="time" id="txtClockInStartTime" class="form-control" style="width: 120px;">
+                                            </div>
+                                            <div class="float-right">
+                                                <label class="form-label">@Resource.EndTime:</label>
+                                                <input type="time" id="txtClockInEndTime" class="form-control" style="width: 120px;">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <br />
+                                <div class="row">
+                                    <div class="col-sm-8 px-md-5">
+                                        <label class="form-label">@Resource.Note:</label>
+                                        <textarea class="form-control" id="notes" rows="5"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-danger" data-dismiss="modal"> @Resource.Cancel</button>
+                        <button type="button" class="btn btn-success" id="save-event">
+                            @Resource.Save
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="context-menu">
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/nurseschedule/js")
+<script type="text/javascript">
+    var chooseSchedule = '@Resource.ChooseSchedule';
+    var pleaseSelectEmployee = '@Resource.PleaseSelectEmployee';
+    var pleaseSelectPatient = '@Resource.PleaseSelectPatient';
+    var pleaseSelectPayor = '@Resource.PleaseSelectPayor';
+    var pleaseSelectCareType = '@Resource.PleaseSelectCareType';
+    var pleaseSelectAuthorizationCode = '@Resource.PleaseSelectAuthorizationCode';
+    var pleaseChooseSchedule = '@Resource.PleaseChooseSchedule';
+    var pleaseSelectADay = '@Resource.PleaseSelectADay';
+    var pleaseSelectClockinStartTime = '@Resource.PleaseSelectClockinStartTime';
+    var pleaseSelectClockinEndTime = '@Resource.PleaseSelectClockinEndTime';
+    var errorMessageNurseScheduler = '@Resource.ErrorMessageNurseScheduler';
+    var authorizationCodeInvalidStartDate = '@Resource.AuthorizationCodeInvalidStartDate';
+    var authorizationCodeInvalidEndDate = '@Resource.AuthorizationCodeInvalidEndDate';
+    var errorInvalidDayValue = '@Resource.ErrorInvalidDayValue';
+    var errorInvalidMonthDay = '@Resource.ErrorInvalidMonthDay';
+    var scheduleCreatedMessage = '@Resource.ScheduleCreated';
+    var scheduleUpdatedMessage = '@Resource.ScheduledUpdatedSuccessfully';
+    var errorMessage = '@Resource.ErrorOccured';
+    var errorMessageScheduleConflict = '@Resource.NurseScheduleConflict';
+</script>
+}

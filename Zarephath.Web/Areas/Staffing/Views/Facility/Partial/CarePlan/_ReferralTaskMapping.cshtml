@@ -1,0 +1,302 @@
+﻿@using Zarephath.Core.Models
+@model HC_AddReferralModel
+
+@Html.Hidden("hdnSetReferralTaskMappingModel", Common.SerializeObject(Model))
+
+<div class="row">
+
+    <div class="col-md-12 col-sm-12">
+        <div class="col-md-2 no-padding margin-bottom-10">
+            <select class="form-control" data-ng-model="SearchVisitTask.VisitTaskType"
+                    data-ng-init="SearchVisitTask.VisitTaskType=SearchVisitTask.VisitTaskType==null?'Task':SearchVisitTask.VisitTaskType"
+                    data-ng-change="SearchVisitTasks()">
+                <option value="@Resource.Task">@Resource.Task</option>
+                @*<option value="@Resource.Conclusion">@Resource.Conclusion</option>*@
+            </select>
+        </div>
+        <div class="col-md-1"></div>
+        <div class="col-md-2 no-padding margin-bottom-10">
+           
+        </div>
+    </div>
+
+
+
+    <div class="col-sm-6">
+        <form id="#frmRefVisitTask">
+            <div class="portlet-body compact" style="display: block;">
+                <div>
+                    <table class="table table-bordered table-striped table-condensed flip-content enlarg_tbl">
+                        <thead class="">
+                            <tr>
+                                <th></th>
+                                <th class="col-sm-7">
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('TaskDetail')">{{SearchVisitTask.VisitTaskType}}</a>
+                                    <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'TaskDetail'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                </th>
+                                <th class="col-sm-3">
+                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="VisitTaskListPager.sortColumn('CareType')">@Resource.CareType</a>
+                                    <span class="sortorder" data-ng-show="VisitTaskListPager.sortIndex === 'CareType'" data-ng-class="{reverse:VisitTaskListPager.reverse}"></span>
+                                </th>
+                                <th></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td></td>
+                                <td>
+                                    <div class="col-sm-12 no-left-padding">
+                                        <input type="text" class="input-xs form-control" data-ng-model="SearchVisitTask.VisitTaskDetail" placeholder="{{SearchVisitTask.VisitTaskType}}" />
+                                    </div>
+                                    @*<div class="col-sm-4 no-right-padding">
+                                            @Html.DropDownList("VisitTaskType", Common.VisitTaskType().ToSelectList("", "Name", "Value", @Resource.All, ""),
+                                                 new
+                                                 {
+                                                     data_ng_model = "SearchVisitTask.VisitTaskType",
+                                                     data_ng_init = "SearchVisitTask.VisitTaskType=SearchVisitTask.VisitTaskType==''?'':SearchVisitTask.VisitTaskType",
+                                                     @class = "form-control input-xs",
+
+                                                 })
+                                        </div>*@
+
+                                </td>
+                                <td>
+                                    <div class="col-sm-12 no-left-padding no-right-padding">
+                                        <select class="form-control input-xs" data-ng-model="CareTypeID" data-ng-change="SearchVisitTasks()" title="CareType">
+                                            <option value="">Select Position</option>
+                                            <option data-ng-repeat="option in CaretypeList" value="{{option.CareTypeID}}">{{option.CareType}}</option>
+                                        </select>
+                                    </div>
+                                </td>
+                                <td></td>
+                                <td class="cursor-pointer">
+                                    <button type="submit" data-ng-click="SearchVisitTasks()" class="btn btn-default btn-xs"><i class="fa fa-search-plus"></i></button>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td></td>
+                                <td colspan="4">
+                                    <a class="badge badge-success" data-ng-click="SelectAllForms(true)">@Resource.SelectAll</a>
+                                    <a class="badge badge-danger" data-ng-click="SelectAllForms(false)">@Resource.DeselectAll</a>
+                                </td>
+                                
+                            </tr>
+
+                            <tr dir-paginate="item in VisitTaskList | itemsPerPage: VisitTaskListPager.pageSize " total-items="VisitTaskListPager.totalRecords" current-page="VisitTaskListPager.currentPage" pagination-id="VisitTaskListPagerID">
+                                <td>
+                                    <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectForm(item)" val="item.IsChecked">
+                                </td>
+                                <td>
+                                    <div class="font-weight-600">
+                                        <span title="@Resource.Category">{{item.ParentCategoryName!=null?item.ParentCategoryName:''}}</span>
+                                        <span title="@Resource.SubCategory">{{item.VisitTaskCategoryName!=null? ' > ' + item.VisitTaskCategoryName:''}}</span>
+                                    </div>
+                                    <div>
+                                        {{item.VisitTaskDetail}}
+                                        <span data-ng-if="item.MinimumTimeRequired>0" class="pull-right"><u>{{item.MinimumTimeRequired}} &nbsp;@Resource.Mins</u></span>
+                                    </div>
+                                </td>
+                                <td title="{{item.CareType}}" class="text-align-center"><span class="badge badge-default">{{item.CareType ? item.CareType : '@Resource.NA'}}</span></td>
+                                <td title="{{item.VisitTaskType}}" class="text-align-center"><span class="badge badge-default">{{item.VisitTaskType=='@VisitTask.TaskType.Task'?'T':'C'}}</span></td>
+                                <td class="text-align-center font-size-16 cursor-pointer padding-top-7">
+                                    @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Add))
+                                    {
+                                        <i class="fa fa-plus-square-o " data-ng-click="AddReferralTaskMapping(item)" title="@Resource.Add"></i>
+                                    }
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </form>
+        @*<div class="col-sm-12" data-ng-if="ReferralInternalMessageList.length > 0">
+                <div class="pull-left col-sm-3 no-padding">
+                    @Resource.Showing <span data-ng-bind="(ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) -ReferralInternalMessageListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(ReferralInternalMessageListPager.pageSize == ReferralInternalMessageListPager.currentPageSize) ? (ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) :(ReferralInternalMessageListPager.pageSize * ReferralInternalMessageListPager.currentPage) - ReferralInternalMessageListPager.pageSize  + ReferralInternalMessageListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralInternalMessageListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                </div>
+                <div class="pull-right top">
+                    <dir-pagination-controls boundary-links="true" on-page-change="ReferralInternalMessageListPager.pageChanged(newPageNumber)" pagination-id="ReferralInternalMessageListPagerID"></dir-pagination-controls>
+                </div>
+            </div>*@
+    </div>
+    <div class="col-sm-1">
+        <div class="arrowWidth text-align-center padding-top-200px">
+            <button class="btn btn-default clearfix bg-color-blue position-relative left-minus-13px" data-ng-click="MoveFromTaskFormToMappedForm()">
+                <span class="font-size-12 padding-12px">Add</span>
+            </button>
+            <br />
+            <br />
+            <button class="btn btn-default clearfix bg-color-blue position-relative left-minus-13px" data-ng-click="MoveFromMappedFormToTaskForm()">
+                <span class="font-size-12">Remove</span>
+            </button>
+        </div>
+
+    </div>
+
+    <div class="col-sm-5" style="padding: 0px 18px 0px 0px;" >
+        <div class="portlet-body compact" style="display: block;">
+            <div>
+                <table class="table table-bordered table-striped table-condensed flip-content enlarg_tbl">
+                    <thead class="">
+                        <tr>
+                            <td></td>
+                            <th class="col-sm-9">@Resource.Mapped Duty</th>
+                            <th>@Resource.CareType</th>
+                            <th>@Resource.RequiredQ</th>
+                            <th class="width-50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <a class="badge badge-success" data-ng-click="SelectAllMappedForms(true)">@Resource.SelectAll</a>
+                                <a class="badge badge-danger" data-ng-click="SelectAllMappedForms(false)">@Resource.DeselectAll</a>
+                            </td>
+                        </tr>
+                        <tr data-ng-repeat="item in PatientTaskList | orderBy: '-VisitTaskID'">
+                            <td>
+                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectForm(item)" val="item.IsChecked">
+                            </td>
+                            <td>
+                                <div class="font-weight-600">
+                                    <span title="@Resource.Category">{{item.ParentCategoryName!=null?item.ParentCategoryName:''}}</span>
+                                    <span title="@Resource.SubCategory">{{item.VisitTaskCategoryName!=null? ' > ' + item.VisitTaskCategoryName:''}}</span>
+                                </div>
+                                <div>
+                                    {{item.VisitTaskDetail}}
+                                </div>
+                            </td>
+                            <td class="text-align-center"  title="{{item.CareType}}"> <span class="badge badge-default ng-binding">{{item.CareType ? item.CareType : '@Resource.NA'}}</span></td>
+                            <td class="text-align-center">
+                                {{item.IsRequired ? 'Yes' : 'No' }}
+                                @*<input type="checkbox" id="{{'#ReferralRadio-'+item.ReferralTaskMappingID }}"
+                                       class="uniformControls"
+                                       data-uniform-value="item.IsRequired"
+                                       data-ng-model="item.IsRequired"
+                                       data-ng-change="OnTaskChecked(item)" />*@
+
+                            </td>
+                            @*<td class="cursor-pointer text-align-center font-size-16" data-ng-click="DeleteRefTaskMapping(item,'task')">
+
+                                </td>*@
+                            <td class="font-size-16">
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Add))
+                                {
+                                    <a href="javascript:void(0);" class="cursor-pointer" data-ng-click="OpenTaskCommentModal(item)" title="@Resource.AddDetail"><i class="fa fa-plus"></i></a>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Delete))
+                                {
+                                    <i class="fa fa-trash-o font-red cursor-pointer" data-ng-click="DeleteRefTaskMapping(item,'task')" title="@Resource.Delete"></i>
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @*<div class="col-sm-5" data-ng-if="SearchVisitTask.VisitTaskType=='@Resource.Conclusion'">
+        <div class="portlet-body compact" style="display: block;">
+            <div>
+                <table class="table table-bordered table-striped table-condensed flip-content enlarg_tbl">
+                    <thead class="">
+                        <tr>
+                            <th></th>
+                            <th class="col-sm-9">@Resource.Mapped @Resource.Conclusion</th>
+                            <th>@Resource.CareType</th>
+                            <th>@Resource.RequiredQ</th>
+                            <th class="width-50px"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td colspan="5">
+                                <a class="badge badge-success" data-ng-click="SelectAllConclusionMappedForms(true)">@Resource.SelectAll</a>
+                                <a class="badge badge-danger" data-ng-click="SelectAllConclusionMappedForms(false)">@Resource.DeselectAll</a>
+                            </td>
+                        </tr>
+                        <tr data-ng-repeat="item in PatientConclusionList | orderBy: '-VisitTaskID'">
+                            <td>
+                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectForm(item)" val="item.IsChecked">
+                            </td>
+                            <td>
+                                <div class="font-weight-600">
+                                    <span title="@Resource.Category">{{item.ParentCategoryName!=null?item.ParentCategoryName:''}}</span>
+                                    <span title="@Resource.SubCategory">{{item.VisitTaskCategoryName!=null? ' > ' + item.VisitTaskCategoryName:''}}</span>
+                                </div>
+                                <div>
+                                    {{item.VisitTaskDetail}}
+                                </div>
+                            </td>
+                            <td title="{{item.CareType}}" class="text-align-center"><span class="badge badge-default">{{item.CareType ? item.CareType : '@Resource.NA'}}</span></td>
+                            <td class="text-align-center">
+                                <input type="checkbox" id="{{'#ReferralRadio-'+item.ReferralTaskMappingID }}"
+                                       class="uniformControls"
+                                       data-uniform-value="item.IsRequired"
+                                       data-ng-model="item.IsRequired"
+                                       data-ng-change="OnTaskChecked(item)" />
+
+                            </td>
+                            <td class="font-size-16">
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Add))
+                                {
+                                    <a href="javascript:void(0);" class="cursor-pointer" data-ng-click="OpenTaskCommentModal(item)" title="@Resource.AddDetail"><i class="fa fa-plus"></i></a>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_CarePlan_TaskMapping_Delete))
+                                {
+                                    <i class="fa fa-trash-o font-red cursor-pointer" title="@Resource.Delete" data-ng-click="DeleteRefTaskMapping(item)"></i>
+                                }
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>*@
+</div>
+@*<div class="clearfix col-lg-12">
+    <hr />
+    <button class="btn green-jungle pull-right" data-ng-click="SaveTaskFormDetails()">@Resource.Save</button>
+</div>*@
+<div class="modal fade" id="TaskCommentModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-sm" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <a class="text-decoration-none sbold uppercase ng-binding">
+                        <span>@Resource.TaskDetails</span>
+                    </a>
+                </h4>
+            </div>
+            <div class="modal-body">
+                <form id="addTaskCommentFrm">
+                    <div class="form-group">
+                        <label class="control-label">@Resource.Frequency</label>
+                        @*<input class="form-control input-sm" data-ng-model="TaskModel.Frequency" placeholder="@Resource.Frequency"
+                            data-val="true" data-val-required="@Resource.FrequencyRequired" id="TaskModel_Frequency" name="TaskModel.Frequency"/>*@
+                        <select class="form-control input-sm" data-ng-model="TaskModel.Frequency" data-ng-options="item.Name as item.Name for item in TaskFrequencyCodeList"
+                                data-val="true" data-val-required="@Resource.FrequencyRequired" id="TaskModel_Frequency" name="TaskModel.Frequency">
+                            <option value="">@Resource.Select</option>
+                        </select>
+                        <span class="field-validation-error" data-valmsg-for="TaskModel.Frequency" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label">@Resource.Comment</label>
+                        <textarea class="form-control input-sm" data-ng-model="TaskModel.Comment" placeholder="@Resource.Comment"
+                                  data-val="true" data-val-required="@Resource.CommentRequired" id="TaskModel_Comment" name="TaskModel.Comment"></textarea>
+                        <span class="field-validation-error" data-valmsg-for="TaskModel.Comment" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="btn-group">
+                        <a class="letter-space btn btn-sm green-jungle" data-ng-click="SaveTaskDetail()">@Resource.Save</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

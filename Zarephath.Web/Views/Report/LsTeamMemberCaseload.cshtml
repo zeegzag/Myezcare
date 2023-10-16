@@ -1,0 +1,467 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.LSTeamMemberCaseloads);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_LSTeamMemberCaseloads;
+}
+@model SetLSTeamMemberCaseloadPageModel
+
+@section styles{
+<link href="~/Assets/css/sitecss/bootstrap-editable.css" rel="stylesheet"/>
+}
+
+
+@Html.Hidden("hdnSetLSTeamMemberCaseloadPageModel", Common.SerializeObject(Model))
+<div data-ng-controller="LSTMCaseloadListController">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.LSTeamMemberCaseloads
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="portlet-body compact" style="display: block;">
+                <div class="table-responsive  overflow-i">
+                    <form id="frmLSTMCaseloadList">
+                        <table class="table table-bordered table-striped table-condensed flip-content lstm">
+
+                            <thead class="">
+                                <tr>
+                                    @*<th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('Status')">@Resource.Status
+                                            <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'Status'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span></a>
+                                    </th>*@
+                                    <th class="col-lg-2">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('ClientName')">@Resource.ClientLabel
+                                            <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span></a>
+                                        @*<span class="pull-right">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('Age')">@Resource.Age
+                                                <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'Age'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span></a>
+                                            <span>|</span>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('Gender')">@Resource.Sex
+                                                <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'Gender'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span></a>
+                                        </span>*@
+                                    </th>
+
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('Age')">@Resource.Age</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'Age'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('Gender')">@Resource.Sex</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'Gender'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+
+
+
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('Caseloads')">@Resource.Caseloads
+                                            <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'Caseloads'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span></a>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('AHCCCSID')">@Resource.AHCCCSID
+                                            <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'AHCCCSID'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span></a>
+                                    </th>
+
+
+                                    @*
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('ContractName')">@Resource.Payor</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'ContractName'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>*@
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('CompanyName')">@Resource.Agency</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'CompanyName'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('FaciliatorName')">@Resource.CM</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'FaciliatorName'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+                                    @* <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('ReferralDate')">@Resource.ReferralDate</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'ReferralDate'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>*@
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('ServicePlanDue')">@Resource.LSServicePlanDue</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'ServicePlanDue'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('CFServicePlanDue')">@Resource.CFServicePlanDue</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'CFServicePlanDue'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+
+                                    
+
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('ACServicePlanDue')">@Resource.AnsellCaseyDue</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'ACServicePlanDue'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+                                    @*<th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('OMLastCompleted')">@Resource.OMLastCompleted</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'OMLastCompleted'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>*@
+
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('OMNextDue')">@Resource.OMNextDue</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'OMNextDue'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="width-150px">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('Parent')">@Resource.Parent</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'Parent'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="col-lg-2">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="LSTMCaseloadListPager.sortColumn('ReferralLSTMCaseloadsComment')">@Resource.Comment</a>
+                                        <span class="sortorder" data-ng-show="LSTMCaseloadListPager.sortIndex === 'ReferralLSTMCaseloadsComment'" data-ng-class="{reverse:LSTMCaseloadListPager.reverse}"></span>
+                                    </th>
+                                </tr>
+                            </thead>
+
+
+                            <tbody>
+
+                                <tr class="compact-search-tr">
+                                    @* <td>
+                                        @Html.DropDownListFor(p => p.SearchLSTMCaseloadListModel.ReferralStatusID, Model.ReferralStatuses.ToSelectList(Model.SearchLSTMCaseloadListModel.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", Resource.SelectStatus, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_number = "",
+                                                                  id = "ReferralStatusID",
+                                                                  data_ng_model = "TempSearchLSTMCaseloadModel.ReferralStatusID",
+                                                                  data_ng_init = "TempSearchLSTMCaseloadModel.ReferralStatusID=TempSearchLSTMCaseloadModel.ReferralStatusID==''?null:TempSearchLSTMCaseloadModel.ReferralStatusID",
+                                                                  @class = "form-control input-sm",
+                                                                  data_val = false
+                                                              })
+                                    </td>*@
+
+                                    <td>
+                                        @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.ClientName, new { data_ng_model = "TempSearchLSTMCaseloadModel.ClientName", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                    </td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        @Html.DropDownListFor(p => p.SearchLSTMCaseloadListModel.CaseLoadID, Model.Employees.ToSelectList(Model.SearchLSTMCaseloadListModel.CaseLoadID.ToString() ?? "", "Name", "Value", Resource.SelectCaseload, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_number = "",
+                                                                  id = "CaseLoadID",
+                                                                  data_ng_model = "TempSearchLSTMCaseloadModel.CaseLoadID",
+                                                                  data_ng_init = "TempSearchLSTMCaseloadModel.CaseLoadID=TempSearchLSTMCaseloadModel.CaseLoadID==''?null:TempSearchLSTMCaseloadModel.CaseLoadID",
+                                                                  @class = "form-control input-sm",
+                                                                  data_val = false
+                                                              })
+                                    </td>
+                                    <td>
+                                        @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.AHCCCSID,
+                                                     new
+                                                         {
+                                                             data_ng_model = "TempSearchLSTMCaseloadModel.AHCCCSID",
+                                                             @class = "form-control input-sm",
+                                                             placeholder = Resource.AHCCCSID,
+                                                             maxlength = 15
+                                                         })</td>
+                                    @*<td></td>
+                                    <td></td>
+                                    <td>
+                                        @Html.DropDownListFor(p => p.SearchLSTMCaseloadListModel.PayorID, Model.Payors.ToSelectList(Model.SearchLSTMCaseloadListModel.PayorID.ToString() ?? "", "PayorName", "PayorID", Resource.SelectPayor, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_number = "",
+                                                                  id = "PayorID",
+                                                                  data_ng_model = "TempSearchLSTMCaseloadModel.PayorID",
+                                                                  data_ng_init = "TempSearchLSTMCaseloadModel.PayorID=TempSearchLSTMCaseloadModel.PayorID==''?null:TempSearchLSTMCaseloadModel.PayorID",
+                                                                  @class = "form-control input-sm",
+                                                                  data_val = false
+                                                              })
+                                    </td>*@
+                                    <td>
+                                        @Html.DropDownListFor(p => p.SearchLSTMCaseloadListModel.AgencyID, Model.Agencies.ToSelectList(Model.SearchLSTMCaseloadListModel.AgencyID.ToString() ?? "", "NickName", "AgencyID", Resource.SelectAgency, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_number = "",
+                                                                  id = "AgencyID",
+                                                                  data_ng_model = "TempSearchLSTMCaseloadModel.AgencyID",
+                                                                  data_ng_init = "TempSearchLSTMCaseloadModel.AgencyID=TempSearchLSTMCaseloadModel.AgencyID==''?null:TempSearchLSTMCaseloadModel.AgencyID",
+                                                                  @class = "form-control input-sm",
+                                                                  data_val = false
+                                                              })
+                                    </td>
+                                    <td>
+                                        @Html.DropDownListFor(p => p.SearchLSTMCaseloadListModel.CaseManagerID, Model.Facillator.ToSelectList(Model.SearchLSTMCaseloadListModel.CaseManagerID.ToString() ?? "", "Name", "CaseManagerID", Resource.SelectCaseManager, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_number = "",
+                                                                  id = "CaseManagerID",
+                                                                  data_ng_model = "TempSearchLSTMCaseloadModel.CaseManagerID",
+                                                                  data_ng_init = "TempSearchLSTMCaseloadModel.CaseManagerID=TempSearchLSTMCaseloadModel.CaseManagerID==''?null:TempSearchLSTMCaseloadModel.CaseManagerID",
+                                                                  @class = "form-control input-sm",
+                                                                  data_val = false
+                                                              })
+
+                                    </td>
+
+                                    @*<td>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.ReferralFromDate" ng-dateval="TempSearchLSTMCaseloadModel.ReferralFromDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.ReferralFromDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.From })
+                                        </div>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.ReferralToDate" ng-dateval="TempSearchLSTMCaseloadModel.ReferralToDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.ReferralToDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.ToTitleCase })
+                                        </div>
+                                    </td>*@
+                                    <td>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.ServiceFromDate" ng-dateval="TempSearchLSTMCaseloadModel.ServiceFromDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.ServiceFromDate, new {@class = "no-focus form-control input-sm", placeholder = @Resource.From})
+                                        </div>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.ServiceToDate" ng-dateval="TempSearchLSTMCaseloadModel.ServiceToDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.ServiceToDate, new {@class = "no-focus form-control input-sm", placeholder = @Resource.ToTitleCase})
+                                        </div>
+                                    </td>
+
+
+                                    <td>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.CFServiceFromDate" ng-dateval="TempSearchLSTMCaseloadModel.CFServiceFromDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.CFServiceFromDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.From })
+                                        </div>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.CFServiceToDate" ng-dateval="TempSearchLSTMCaseloadModel.CFServiceToDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.CFServiceToDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.ToTitleCase })
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.ACFromDate" ng-dateval="TempSearchLSTMCaseloadModel.ACFromDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.ACFromDate,
+                                            new
+                                            {
+                                                @class = "no-focus form-control input-sm",
+                                                placeholder = @Resource.From
+                                            })
+                                        </div>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.ACToDate" ng-dateval="TempSearchLSTMCaseloadModel.ACToDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.ACToDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.ToTitleCase })
+                                        </div>
+                                    </td>
+
+                                   @* <td>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.OMCompletedFromDate" ng-dateval="TempSearchLSTMCaseloadModel.OMCompletedFromDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.OMCompletedFromDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.From })
+                                        </div>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.OMCompletedToDate" ng-dateval="TempSearchLSTMCaseloadModel.OMCompletedToDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.OMCompletedToDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.ToTitleCase })
+                                        </div>
+                                    </td>*@
+
+                                    <td>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.OMNextDueFromDate" ng-dateval="TempSearchLSTMCaseloadModel.OMNextDueFromDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.OMNextDueFromDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.From })
+                                        </div>
+                                        <div class="input-group date no-focus" datepicker="TempSearchLSTMCaseloadModel.OMNextDueToDate" ng-dateval="TempSearchLSTMCaseloadModel.OMNextDueToDate">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.OMNextDueToDate, new
+                                            {
+                                                @class = "no-focus form-control input-sm",
+                                                placeholder = @Resource.ToTitleCase
+                                            })
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div>
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.Parent, new
+                                            {
+                                                data_ng_model = "TempSearchLSTMCaseloadModel.Parent",
+                                                @class = "form-control input-sm",
+                                                placeholder = Resource.Name,
+                                                maxlength = 50
+                                            })
+                                        </div>
+                                    </td>
+
+                                    <td>
+                                        <div class="col-lg-6 no-left-padding">
+                                            @Html.TextBoxFor(m => m.SearchLSTMCaseloadListModel.ReferralLSTMCaseloadsComment, new
+                                            {
+                                                data_ng_model = "TempSearchLSTMCaseloadModel.ReferralLSTMCaseloadsComment",
+                                                @class = "form-control input-sm pull-left",
+                                                placeholder = Resource.Comment,
+                                                maxlength = 50
+                                            })
+                                        </div>
+                                        <div class="col-lg-6 no-padding">
+                                            <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs " data-ng-click="SearchLSTMCaseload()"/>
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </div>
+                                    </td>
+
+                                </tr>
+
+                                <tr data-ng-class="{'deleted':referral.IsDeleted}" dir-paginate="referral in LSTMCaseloadList | itemsPerPage: LSTMCaseloadListPager.pageSize" total-items="LSTMCaseloadListPager.totalRecords" current-page="LSTMCaseloadListPager.currentPage" pagination-id="ReferralListPagerID">
+                                    @*<td>*@
+
+                                    @*    <span id="pop-status" data-ng-if="!referral.IsSaveAsDraft" class="conditionstatus badge-custom {{referral.Status | removeSpaces}}">{{referral.Status}}</span>
+                                    </td>*@
+
+                                    <td>
+                                        <a href="#" data-ng-href="/referral/addreferral/{{referral.EncryptedReferralID}}" data-ng-bind="referral.Name" target="_blank" class="moredark"></a>
+                                        <span>
+                                            <i class="fa fa-star priority" data-ng-if="referral.IsSaveAsDraft" title="@Resource.DraftTitle"></i>
+                                        </span>
+                                        @*<span class="pull-right">{{referral.Gender}}</span>
+                                        <span class="pull-right">{{referral.Age}}<span class="padding-left-right-5">|</span></span>*@
+                                    </td>
+                                    <td>
+                                        <span>{{referral.Age}}</span>
+                                    </td>
+                                    <td class="text-align-center">
+                                        <span data-ng-class="{'badge badge-danger':referral.Gender=='F'}">{{referral.Gender}}</span>
+                                    </td>
+                                    
+                                    <td>
+                                        <span data-ng-bind="referral.CaseLoads"></span>
+                                    </td>
+                                    <td>
+                                        <span data-ng-bind="referral.AHCCCSID? referral.AHCCCSID:'@Resource.NA'"></span>
+                                    </td>
+
+                                    @*
+                                    <td>
+                                        <span data-ng-bind="referral.ContractName"></span>
+                                    </td>*@
+                                    <td>
+                                        <span data-ng-bind="referral.CompanyName"></span>
+                                    </td>
+                                    <td>
+                                        @*<span data-ng-bind="referral.FaciliatorName"></span>*@
+                                        @*<a id="pop-CaseManagerDetail" class="conditioncomment editable text-decoration-none" data-toggle="popover" href="javascript:void(0);"
+                                           popover-html="#popover-CaseManagerDetail" ng-data="referral" ng-header="CaseManager Detail">{{ referral.FaciliatorName ? referral.FaciliatorName : '@Resource.NA'}}
+                                        </@*a>*@
+                                        <a href="javascript:void(0);" class="text-decoration-none moredark" data-ng-bind="referral.FaciliatorName" popover-closeable="true"
+                                            popover-trigger="click" common-detail-popover="referral" ng-template-selector="#CaseManagerDetailPopover" popover-width="300"></a>
+                                    </td>
+
+                                    @* <td>
+                                        <span data-ng-if="referral.ReferralDate!=null">{{ referral.ReferralDate ? ( referral.ReferralDate | dateformat | date: '@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}</span>
+                                    </td>*@
+
+                                    <td>
+                                        @*<span data-ng-if="referral.ServicePlanDue!=null" lblexpireduedate="referral.ServicePlanDue">{{ referral.ServicePlanDue ? ( referral.ServicePlanDue | dateformat | date: '@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}
+                                        </span>*@
+                                        <span lblexpireduedate="referral.ServicePlanDue">{{ referral.ServicePlanDue ? ( referral.ServicePlanDue | dateformat | date: '@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}
+                                        </span>
+                                    </td>
+                                     <td>
+                                        @*<span data-ng-if="referral.ServicePlanDue!=null" lblexpireduedate="referral.ServicePlanDue">{{ referral.ServicePlanDue ? ( referral.ServicePlanDue | dateformat | date: '@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}
+                                        </span>*@
+                                        <span data-ng-if="referral.EnrollToCFServicePlan" lblexpireduedate="referral.CFServicePlanDue">{{ referral.CFServicePlanDue ? ( referral.CFServicePlanDue | dateformat | date: '@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}
+                                        </span>
+                                    </td>
+                                    <td>
+
+                                        <span data-ng-if="referral.ACServicePlanDue==null && referral.Age >= 7" lblexpireduedate="referral.ACServicePlanDue"></span>
+
+                                        <span data-ng-if="referral.ACServicePlanDue!=null && referral.Age >= 7" lblexpireduedate="referral.ACServicePlanDue">{{ (referral.ACServicePlanDue | dateformat | date: '@ConfigSettings.ClientSideDateFormat') }}
+                                        </span>
+                                        <span data-ng-if="referral.Age < 7">{{'@Resource.NA'}}</span>
+
+                                    </td>
+                                    @*<td>
+                                        <span data-ng-if="referral.OMLastCompleted!=null">{{ referral.OMLastCompleted ? ( referral.OMLastCompleted |  dateformat | date: '@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}</span>
+                                    </td>*@
+                                    <td>
+                                        @*<span data-ng-if="referral.OMNextDue!=null" lblexpireduedate="referral.OMNextDue">{{ referral.OMNextDue ? ( referral.OMNextDue |  dateformat | date: '@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}</span>*@
+                                        <span lblexpireduedate="referral.OMNextDue">{{ referral.OMNextDue ? ( referral.OMNextDue |  dateformat | date: '@ConfigSettings.ClientSideDateFormat') : '@Resource.NA'}}</span>
+                                    </td>
+                                    <td>
+                                        @*<span data-ng-bind="referral.Parent"></span>*@
+                                        @*<a id="pop-ParentDetail" class="conditioncomment editable text-decoration-none" data-toggle="popover" href="javascript:void(0);"
+                                           popover-html="#popover-ParentDetail" ng-data="referral">{{ referral.Parent ? referral.Parent : '@Resource.NA'}}
+                                        </a>*@
+                                        <a href="javascript:void(0);" class="text-decoration-none moredark" data-ng-bind="referral.Parent" popover-closeable="true"
+                                            popover-trigger="click" common-detail-popover="referral" ng-template-selector="#ParentDetailPopover" popover-width="300"></a>
+                                    </td>
+                                    <td>
+                                        <a id="pop-comment" class="conditioncomment editable text-decoration-none moredark" data-toggle="popover" href="javascript:void(0);"
+                                            popover-html="#popover-comment" ng-value="referral.ReferralLSTMCaseloadsComment"
+                                            savecallback="SaveComment" ng-data="referral" ng-header="Comment">{{ referral.ReferralLSTMCaseloadsComment ? referral.ReferralLSTMCaseloadsComment : '@Resource.NA'}}
+                                        </a>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-12" data-ng-if="LSTMCaseloadList.length > 0">
+        <div class="col-sm-3 pull-left no-padding">
+            @Resource.Showing <span data-ng-bind="(LSTMCaseloadListPager.pageSize * LSTMCaseloadListPager.currentPage) - LSTMCaseloadListPager.pageSize  + 1"></span>
+            &nbsp;@Resource.To <span data-ng-bind="(LSTMCaseloadListPager.pageSize == LSTMCaseloadListPager.currentPageSize) ? (LSTMCaseloadListPager.pageSize * LSTMCaseloadListPager.currentPage) :(LSTMCaseloadListPager.pageSize * LSTMCaseloadListPager.currentPage) - LSTMCaseloadListPager.pageSize  + LSTMCaseloadListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="LSTMCaseloadListPager.totalRecords"></span>&nbsp;@Resource.Records
+        </div>
+        <div class="pull-right top pagination-sm">
+            <dir-pagination-controls boundary-links="true" max-size="LSTMCaseloadListPager.maxSize" on-page-change="LSTMCaseloadListPager.pageChanged(newPageNumber)" pagination-id="ReferralListPagerID"></dir-pagination-controls>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="LSTMCaseloadList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<div id="popover-comment" class="hidden">
+    <div>
+        <form class="form-inline editableform" style="">
+
+            <div class="control-group form-group">
+                <div>
+                    <div class="editable-input">
+                        @Html.TextAreaFor(p => p.SearchLSTMCaseloadListModel.ReferralLSTMCaseloadsComment,
+                                              new
+                                                  {
+                                                      id = "ReferralStatusID",
+                                                      @class = "form-control input-sm",
+                                                      data_ng_model = "ngValue",
+                                                      data_ng_init = "ngValue=ngValue==''?null:ngValue",
+                                                      maxlength = 500
+                                                  })
+                    </div>
+                    <div class="editable-buttons">
+                        <button type="submit" class="btn btn-primary btn-sm" data-ng-click="Save()"><i class="glyphicon glyphicon-ok"></i></button>
+                        <button type="button" class="btn btn-default btn-sm" data-ng-click="Cancel()"><i class="glyphicon glyphicon-remove"></i></button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script id="CaseManagerDetailPopover" type="text/ng-template">
+    @Html.Partial("_Partial/_LSTMCaseload_CaseManagerDetailPopover")
+</script>
+<script id="ParentDetailPopover" type="text/ng-template">   
+    @Html.Partial("_Partial/_LSTMCaseload_ParentDetailPopover")
+</script>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/report/lsteammembercaseload")
+
+    <script type="text/javascript">
+        var DeleteReferralConfirmMessage = '@Resource.DeleteReferralConfirmMessage';
+        var DeleteAllReferralConfirmMessage = '@Resource.DeleteAllReferralConfirmMessage';
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Referral)';
+        var ReferralDependencyExistMessage = '@Resource.ReferralDependencyExistMessage';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.Referral)';
+    </script>
+
+}

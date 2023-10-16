@@ -1,0 +1,156 @@
+﻿@model HC_AddReferralModel
+@{bool isEditMode = Model != null && Model.Referral.ReferralID > 0;}
+<div class="row">
+    <div class="col-sm-12">
+        <div class="fscontainer">
+            <div class="legend">
+                @Resource.PhysicianDetails
+                <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.PhysicianHelptext"
+                   data-ng-custom-class="tooltip-extra-z-index"></i>
+            </div>
+            <div class="patientContainermain">
+                <div class="row">
+                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                        <label class="control-label">@Resource.Physician</label>
+                        <table>
+                            <tr>
+                                <td>
+                                    <div class="replaceErrorDest">
+                                        <input type="text"
+                                               token-input
+                                               ng-val="ReferralModel.Referral.PhysicianID"
+                                               textfield='FirstName'
+                                               valuefield='PhysicianID'
+                                               searchurl="{{GetPhysicianListForAutoCompleteURL}}"
+                                               placeholder="@Resource.Physician"
+                                               tokenlimit='1'
+                                               onresultsformatter='PhysicianResultsFormatter'
+                                               ontokenformatter="PhysicianTokenFormatter"
+                                               ondeletecallback='RemovePhysician'
+                                               onaddedcallback="OnPhysicianAdded"
+                                               tokeninputobj="PhysicianTokenInputObj"
+                                               id="SearchPhysicianToken"
+                                               customclass="form-control input-sm" />
+                                    </div>
+                                    @Html.TextBoxFor(q => q.Referral.PhysicianID,
+                                          new
+                                          {
+                                              data_ng_model = "ReferralModel.Referral.PhysicianID ",
+                                              data_error_Count = "ReferralErrorCount.ReferralHistoryTab",
+                                              @class = "form-control hideErrorContent replaceErrorSource"
+                                          })
+                                    @Html.ValidationMessageFor(q => q.Referral.PhysicianID)
+                                </td>
+                                <td style="width:10px"></td>
+                                <td>
+                                    @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Physician_AddUpdate))
+                                    {
+                                        <div class="pull-right">
+                                            <a href="#AddPhysicianModal" data-toggle="modal" class="btn btn-sm green-jungle pull-right">
+                                                <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.AddPhysician
+                                            </a>
+                                            @*<a class="" data-ng-href="/hc/physician/addphysician" target="_new" ng-click="AddPhysicianModel('Hello')">@Resource.AddPhysician</a>*@
+                                            @*<a class="" data-ng-click="NewPhysician()">@Resource.AddPhysician</a>*@
+                                        </div>
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    @*<div class="form-group col-lg-2 col-md-4 col-sm-4">
+                            <a class="btn btn-sm btn-info" data-ng-click="AddPhysician()">
+                                <i class="fa fa-save ">&nbsp;&nbsp;</i>@Resource.Add
+                            </a>
+                            <a class="btn btn-sm border-dark bg-gray-color widget-title-color-gray" data-ng-click="CancelPhysician()">
+                                <i class="fa fa-remove ">&nbsp;&nbsp;</i>@Resource.Cancel
+                            </a>
+                        </div>*@
+                    @*<div class="form-group col-lg-3 col-md-4 col-sm-4">
+                                <label class="control-label">@Resource.Email</label>
+                                <input type="text" class="form-control input-sm" data-ng-model="ReferralModel.PhysicianModel.Email"
+                                       placeholder="@Resource.Email" readonly="readonly" />
+                                <a class="pull-right" data-ng-show="ReferralModel.PhysicianModel.Email" data-ng-attr-href="{{'mailto:'+ReferralModel.PhysicianModel.Email}}">@Resource.SendEmail</a>
+                            </div>
+                        <div class="form-group col-lg-3 col-md-4 col-sm-4">
+                            <label class="control-label">@Resource.Address</label>
+                            <input type="text" class="form-control input-sm" data-ng-model="ReferralModel.PhysicianModel.Address"
+                                   placeholder="@Resource.Address" readonly="readonly" />
+                        </div>
+                        <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.Phone</label>
+                        @Html.TextBoxFor(q => q.PhysicianModel.Phone, new
+                            {
+                                @readonly = "",
+                                @class = "form-control input-sm",
+                                data_ng_model = "ReferralModel.PhysicianModel.Phone",
+                                placeholder = @Resource.Phone,
+                                maxlength = 15
+                            })
+                        </div>*@
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12 mb-0" data-ng-if="ReferralModel.ReferralPhysicians.length > 0" data-ng-cloak>
+                        <div class="table-responsive">
+                            <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th><strong>@Resource.Physician</strong></th>
+                                        <th><strong>@Resource.Email</strong></th>
+                                        <th><strong>@Resource.Address</strong></th>
+                                        <th class="text-align-center"><strong>@Resource.Phone</strong></th>
+                                        <th class="text-align-center"><strong>@Resource.Specialist</strong></th>
+                                        <th class="width-20px"><strong>@Resource.Action</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-class="{'deleted':item.IsDeleted}" data-ng-repeat="item in ReferralModel.ReferralPhysicians">
+                                        <td>{{item.FirstName}} {{item.MiddleName}} {{item.LastName}}</td>
+                                        <td>{{item.Email}}</td>
+                                        <td>{{item.Address}}</td>
+                                        <td class="text-align-center">{{item.Phone}}</td>
+                                        <td class="text-align-center">{{item.PhysicianTypeID}}{{item.PhysicianType}}</td>
+                                        <td class="text-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_Physician_Delete))
+                                            {
+                                                <a data-ng-click="DeletePhysician(item,'Delete Records')"><i class="fa fa-remove curser-pointer"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade ReferralNote" id="AddPhysicianModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" data-ng-click="OnPhysicianAdded()" class="close" data-dismiss="modal" aria-label="Close" ><span aria-hidden="true">×</span></button>
+                
+            </div>
+            <div class="modal-body modal-lg" style="height:100%">
+                <iframe src="/hc/physician/PartialAddPhysician/" height="600" width="100%">
+
+                </iframe>
+        
+              
+            </div>
+            <div class="modal-footer">
+                <div class="row">
+                    <div class="col-sm-12 text-center">
+                        @*<button type="button" class="btn btn-danger" data-dismiss="modal" data-ng-click="ResetRNote()">@Resource.Cancel</button>
+                        <button type="submit" data-ng-click="SaveReferralNote()" class="btn green-jungle">@Resource.Save</button>*@
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

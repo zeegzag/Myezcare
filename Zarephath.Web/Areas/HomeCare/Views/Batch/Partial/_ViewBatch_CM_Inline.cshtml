@@ -1,0 +1,308 @@
+﻿@model HC_AddBatchModel
+
+<div class="" data-ng-attr-id="{{'model__ViewBatch-'+item.BatchID }}" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog " style="width:95%;">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>*@
+                <h4 class="modal-title page-title no-margin">
+                    <b>
+                        <span>
+                            <span class="font-size-18">
+                                @Resource.BatchClaimsDetailsGroupByClients
+                                <span class='badge badge-danger' data-ng-if="item.ViewBatchDetailsModel.IsBatchSent">Sent</span>
+                            </span>
+                            <span class="font-size-14">
+                                <span class='font-size-18 font-weight-400 '>
+                                    &nbsp;-&nbsp;
+                                    <small>
+                                        @Resource.Batch: #<b>{{item.ViewBatchDetailsModel.BatchID}}</b> &nbsp;/&nbsp;
+                                        @Resource.Payor: <b>{{item.ViewBatchDetailsModel.PayorName}}</b>
+                                    </small>
+                                </span>
+
+                                @*( <span>@Resource.Batch #{{item.ViewBatchDetailsModel.BatchID}}</span><span data-ng-if="item.ViewBatchDetailsModel.IsBatchSent"> -
+                    <span class="badge badge-danger">Sent</span></span> )*@
+                            </span>
+                        </span>
+                    </b>
+                    <br />
+                    <span class="font-size-14 margin-top-10">
+                        @Resource.ServiceDate:
+                        <b>
+                            <span class="padding-left-5">{{item.ViewBatchDetailsModel.StartDate | orgdate}}<span class="padding-left-right-2">-</span>{{item.ViewBatchDetailsModel.EndDate |dateformat}}</span>
+                        </b>
+                    </span>
+
+
+                    <div class="btn-group margin-left-10" data-ng-if="item.SetClaimAdjustmentFlag_ReferralIDs.length > 0">
+                        <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                            <b>Bulk Action - Mark As</b>
+                            <i class="fa fa-angle-down"></i>
+                        </button>
+                        <ul class="dropdown-menu pull-right">
+                            <li>
+                                <a data-ng-click="SetBulkClaimAdjustmentFlag(null,null, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Resend','@ClaimAdjustmentType.ClaimAdjustmentLevel_Claim')"><i class="fa fa-eraser"></i>@Resource.Resend</a>
+                            </li>
+                            <li>
+                                <a data-ng-click="SetBulkClaimAdjustmentFlag(null,null, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Void','@ClaimAdjustmentType.ClaimAdjustmentLevel_Claim')"><i class="fa fa-eraser"></i>@Resource.Void</a>
+                            </li>
+                            <li>
+                                <a data-ng-click="SetBulkClaimAdjustmentFlag(null,null, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Replacement','@ClaimAdjustmentType.ClaimAdjustmentLevel_Claim')"><i class="fa fa-exchange"></i>@Resource.Replacement</a>
+                            </li>
+                            <li>
+                                <a data-ng-click="SetBulkClaimAdjustmentFlag(null,null, item,'@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff','@ClaimAdjustmentType.ClaimAdjustmentLevel_Claim')"><i class="fa fa-file-text-o"></i>@Resource.WriteOff</a>
+                            </li>
+                            @*<li>
+                    <a href="javascript:void(0)" data-ng-click="SetBulkClaimAdjustmentFlag(null,null, item,'@ClaimAdjustmentType.ClaimAdjustmentType_DataValidation','@ClaimAdjustmentType.ClaimAdjustmentLevel_Claim')" data-toggle="modal"><i class="fa fa-file-text-o"></i>Data Validation</a>
+                </li>*@
+                            <li>
+                                <a href="javascript:void(0)" data-ng-click="SetBulkClaimAdjustmentFlag(null,null, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Other','@ClaimAdjustmentType.ClaimAdjustmentLevel_Claim')" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Other</a>
+                            </li>
+                            <li>
+                                <a href="javascript:void(0)" data-ng-click="SetBulkClaimAdjustmentFlag(null,null, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Remove','@ClaimAdjustmentType.ClaimAdjustmentLevel_Claim')" data-toggle="modal"><i class="fa fa-file-text-o"></i>Remove Marked Status</a>
+                            </li>
+
+
+
+                        </ul>
+                    </div>
+
+                </h4>
+            </div>
+
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="portlet-body compact" style="display: block;">
+                            @*<div class="space5"></div>*@
+                            @*<div class="col-lg-12" style="max-height: 400px;overflow: auto;" data-ng-show="item.PatientClaimsList.length > 0">*@
+                            <div class="col-lg-12" style="" data-ng-show="item.PatientClaimsList.length > 0">
+                                <div class="table-responsive table-ViewBatch-Inline">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead class="flip-content">
+                                            <tr>
+                                                <th class="" style="width:8% !important;"></th>
+                                                <th class="">
+                                                    <span>@Resource.Patient</span>
+                                                </th>
+                                                <th class="">
+                                                    <span>@Resource.Account #</span>
+                                                </th>
+                                                <th class="">
+                                                    <span>@Resource.Medicaid #</span>
+                                                </th>
+                                                <th class="">
+                                                    <span>@Resource.DOB</span>
+                                                </th>
+                                                <th class="">
+                                                    @*<span>@Resource.TotalClaims</span>*@
+                                                    <span>Total Line Items</span>
+                                                </th>
+                                                <th class="">
+                                                    <span>Billed Amt</span>
+                                                </th>
+
+                                                <th class="">
+                                                    <span>Total Allowed Amt</span>
+                                                </th>
+
+
+                                                <th class="">
+                                                    <span>Total Paid Amt</span>
+                                                </th>
+                                                <th class="width-90px text-align-center">
+                                                    <span>@Resource.Action</span>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody data-ng-repeat="itemPT in item.PatientClaimsList">
+                                            <tr id="openTrViewBatch{{item.BatchID}}{{$index}}">
+                                                <td>
+                                                    <input type="checkbox" class="unicheckbox" data-ng-model="itemPT.IsChecked" data-ng-change="SetClaimAdjustmentFlag_ClaimItemCheckBox(itemPT,item)" val="itemPT.IsChecked" title="Select Checkbox - You can get Bulk Action for Mark/Flag the claims">
+
+                                                    <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle" title="Expand / Collapse"
+                                                          data-ng-click="GetChildNoteDetailsOfClaim(itemPT,'#CNDetails-'+ item.BatchID+itemPT.ReferralID,item)"
+                                                          data-ng-attr-id="{{'CNDetails-'+ item.BatchID+itemPT.ReferralID }}"
+                                                          data-toggle="collapse"
+                                                          data-ng-attr-data-target="{{'#ChildNoteDetails-'+item.BatchID+itemPT.ReferralID }}">
+                                                    </span>
+
+                                                    <span class="curser-pointer font-size-18 font-blue fa fa-refresh" data-ng-click="GetChildNoteDetailsOfClaim(itemPT,'#CNDetails-'+ item.BatchID+itemPT.ReferralID, item, true)" title="Refresh"></span>
+                                                </td>
+                                                <td>{{itemPT.PatientName}}</td>
+                                                <td>{{itemPT.AHCCCSID}}</td>
+                                                <td>{{itemPT.CISNumber}}</td>
+                                                <td>{{itemPT.strDOB}}</td>
+                                                <td>{{itemPT.TotalClaims}}</td>
+                                                <td>{{itemPT.TotalAmount | orgcurrency}}</td>
+                                                <td>{{itemPT.TotalAllowedAmount | orgcurrency}}</td>
+                                                <td data-ng-class="{'bg-success': itemPT.TotalAmount == itemPT.TotalPaidAmount && itemPT.TotalAllowedAmount == itemPT.TotalPaidAmount ,  'bg-warning': itemPT.TotalAmount != itemPT.TotalPaidAmount && itemPT.TotalPaidAmount > 0 , 'bg-danger': itemPT.TotalAmount != itemPT.TotalPaidAmount &&  itemPT.TotalPaidAmount ==0}">
+                                                    {{itemPT.TotalPaidAmount | orgcurrency}}
+                                                </td>
+                                                <td class="text-align-center">
+                                                    <a data-ng-if="itemPT.PayorBillingType == '@Common.PayorEDIFileType.Professional.ToString()'" href="javascript:void(0);" data-ng-click="ShowCMS1500File(itemPT)" class="btn btn-xs blue">@Resource.CMS1500</a>
+                                                    <a data-ng-if="itemPT.PayorBillingType == '@Common.PayorEDIFileType.Institutional.ToString()'" href="javascript:void(0);" data-ng-click="ShowUB04File(itemPT)" class="btn btn-xs green">@Resource.UB04</a>
+                                                    @*<a href="javascript:void(0);" data-ng-click="ShowEmployeeVisits(itemPT)" class="btn btn-xs green float-right">@Resource.View @Resource.Visit </a>*@
+                                                </td>
+                                            </tr>
+                                            <tr data-ng-attr-id="{{'ChildNoteDetails-'+item.BatchID+itemPT.ReferralID }}" class="collapse collapseDestination">
+                                                <td colspan="10" style="background: #efefef !important; ">
+                                                    <div style="float: left; width: 100%; padding: 15px 25px 0 25px;">
+                                                        <div class="space5"></div>
+                                                        <div class="col-md-12 no-padding">
+                                                            <strong class="pull-left"><u>Child Note Details</u></strong>
+
+                                                            <div class="btn-group pull-left margin-left-20" data-ng-if="itemPT.SetClaimAdjustmentFlag_NoteIDs.length > 0">
+                                                                <button class="btn btn-primary btn-xs dropdown-toggle" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                                    <b>Bulk Action Items- Mark As</b>
+                                                                    <i class="fa fa-angle-down"></i>
+                                                                </button>
+                                                                <ul class="dropdown-menu pull-right">
+                                                                    <li>
+                                                                        <a data-ng-click="SetBulkClaimAdjustmentFlag(null,itemPT, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Resend','@ClaimAdjustmentType.ClaimAdjustmentLevel_Line')"><i class="fa fa-eraser"></i>@Resource.Resend</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a data-ng-click="SetBulkClaimAdjustmentFlag(null,itemPT, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Void','@ClaimAdjustmentType.ClaimAdjustmentLevel_Line')"><i class="fa fa-eraser"></i>@Resource.Void</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a data-ng-click="SetBulkClaimAdjustmentFlag(null,itemPT, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Replacement','@ClaimAdjustmentType.ClaimAdjustmentLevel_Line')"><i class="fa fa-exchange"></i>@Resource.Replacement</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a data-ng-click="SetBulkClaimAdjustmentFlag(null,itemPT, item,'@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff','@ClaimAdjustmentType.ClaimAdjustmentLevel_Line')"><i class="fa fa-file-text-o"></i>@Resource.WriteOff</a>
+                                                                    </li>
+                                                                    @*<li>
+                    <a href="javascript:void(0)" data-ng-click="SetBulkClaimAdjustmentFlag(null,itemPT, item,'@ClaimAdjustmentType.ClaimAdjustmentType_DataValidation','@ClaimAdjustmentType.ClaimAdjustmentLevel_Line')" data-toggle="modal"><i class="fa fa-file-text-o"></i>Data Validation</a>
+                </li>*@
+                                                                    <li>
+                                                                        <a href="javascript:void(0)" data-ng-click="SetBulkClaimAdjustmentFlag(null,itemPT, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Other','@ClaimAdjustmentType.ClaimAdjustmentLevel_Line')" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.Other</a>
+                                                                    </li>
+                                                                    <li>
+                                                                        <a href="javascript:void(0)" data-ng-click="SetBulkClaimAdjustmentFlag(null,itemPT, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Remove','@ClaimAdjustmentType.ClaimAdjustmentLevel_Line')" data-toggle="modal"><i class="fa fa-file-text-o"></i>Remove Marked Status</a>
+                                                                    </li>
+
+
+                                                                </ul>
+                                                            </div>
+
+                                                        </div>
+                                                        <div class="space5"></div>
+                                                        <div class="col-md-12 table-responsive tabbable-custom clear-both">
+                                                            <table class="table table-hover table-bordered table-striped table-condensed table-checkable ">
+                                                                <thead class="flip-content">
+                                                                    <tr>
+                                                                        <th class="width-60px"></th>
+                                                                        <th class="width-80px">@Resource.ClaimStatus</th>
+                                                                        <th>@Resource.ServiceCode</th>
+                                                                        <th class="width-60px">@Resource.ServiceTime (Day)</th>
+                                                                        <th class="width-60px">@Resource.Rate / @Resource.Unit</th>
+                                                                        <th class="width-60px">@Resource.BillingUnit</th>
+                                                                        <th class="width-100px">Billed Amt</th>
+                                                                        <th class="width-100px">Allowed Amt</th>
+                                                                        <th class="width-100px">Paid Amt</th>
+                                                                        <th class="width-115px">@Resource.Date</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody data-ng-repeat="cnItem in itemPT.ChildNoteList">
+                                                                    <tr>
+                                                                        <td data-ng-class="{
+                                                                            'badge-danger' :cnItem.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement',
+                                                                            'badge-warning':cnItem.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Void'  ,
+                                                                            'badge-success':cnItem.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff',
+                                                                            'badge-default':cnItem.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Resend',
+                                                                            @*'badge-default':cnItem.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_DataValidation',*@
+                                                                            'badge-default bg-grey-cascade':cnItem.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Other'
+                                                                            }"
+                                                                            data-ng-attr-title="{{cnItem.ClaimAdjustmentTypeID}}">
+
+
+                                                                            <input type="checkbox" class="unicheckbox" data-ng-model="cnItem.IsChecked" data-ng-change="SetClaimAdjustmentFlag_LineItemCheckBox(cnItem, itemPT)" val="cnItem.IsChecked" title="Select Checkbox - You can get Bulk Action for Mark/Flag the claims" />
+
+
+                                                                            <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle" data-ng-click="GetBatchNoteDetails(cnItem)" data-ng-attr-id="{{'BNDetails-'+item.BatchID+cnItem.BatchNoteID }}" title="Expand / Collapse"
+                                                                                  data-toggle="collapse" data-ng-attr-data-target="{{'#BatchNoteDetails-'+ item.BatchID+cnItem.BatchNoteID }}"></span>
+                                                                        </td>
+
+
+                                                                        <td>{{cnItem.ClaimStatus ? cnItem.ClaimStatus:'@Resource.NA'}}</td>
+
+                                                                        <td>{{(cnItem.CareType == null)? '' : cnItem.CareType + ' - ' }}{{cnItem.ServiceCode}}</td>
+                                                                        <td>{{cnItem.CalculatedServiceTime}}</td>
+                                                                        <td>{{cnItem.Rate  | orgcurrency}}</td>
+                                                                        <td>{{cnItem.CalculatedUnit}}</td>
+                                                                        <td>{{cnItem.CalculatedAmount  | orgcurrency}}</td>
+                                                                        <td>{{cnItem.ClaimAllowedAmount | orgcurrency}}</td>
+                                                                        <td>{{cnItem.ClaimPaidAmount | orgcurrency}}</td>
+                                                                        <td>{{cnItem.strServiceDate}}</td>
+                                                                    </tr>
+
+                                                                    @*asd*@
+                                                                    <tr data-ng-attr-id="{{'BatchNoteDetails-'+item.BatchID+cnItem.BatchNoteID }}" class="collapse collapseDestination" style="background: #ffffff00 !important;">
+                                                                        <td colspan="23">
+                                                                            <div class="space20"></div>
+                                                                            <div class="col-md-12">
+
+                                                                                <div class="tabbable tabbable-custom">
+                                                                                    <ul class="nav nav-tabs" id="adjudicationRelatedTabs">
+                                                                                        <li class="active">
+                                                                                            <a data-ng-attr-id="adjudicationDetails{{cnItem.BatchNoteID}}" data-ng-attr-data-target="#tab_Adjudication{{cnItem.BatchNoteID}}" data-toggle="tab">@Resource.AdjudicationHistory</a>
+                                                                                        </li>
+                                                                                        <li class="">
+                                                                                            <a data-ng-attr-id="batchHistory{{cnItem.BatchNoteID}}" data-ng-attr-data-target="#tab_BatchHistory{{cnItem.BatchNoteID}}" data-toggle="tab">@Resource.BatchHistory</a>
+                                                                                        </li>
+
+
+                                                                                        <li class="pull-right" data-ng-if="cnItem.ClaimAdjustmentTypeID">
+                                                                                            <span class="label" data-ng-class="{
+                                                                                            'label-danger':cnItem.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement',
+                                                                                            'label-warning':cnItem.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Void' ,
+                                                                                            'label-success':cnItem.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff',
+                                                                                            'label-default':cnItem.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Resend',
+                                                                                            @*'label-default':cnItem.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_DataValidation',*@
+                                                                                            'label-default  bg-grey-cascade':cnItem.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Other'
+                                                                                                  }">
+
+                                                                                                {{cnItem.ClaimAdjustmentTypeID}}
+                                                                                                <a data-ng-click="SetClaimAdjustmentFlag(cnItem,itemPT, item,'@ClaimAdjustmentType.ClaimAdjustmentType_Remove')"><i class="fa fa-remove"></i></a>
+                                                                                            </span>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                    <div class="tab-content">
+                                                                                        <div class="tab-pane active" data-ng-attr-id="tab_Adjudication{{cnItem.BatchNoteID}}">
+                                                                                            @Html.Partial("Partial/_AdjudicationHostory")
+                                                                                        </div>
+                                                                                        <div class="tab-pane" data-ng-attr-id="tab_BatchHistory{{cnItem.BatchNoteID}}">
+                                                                                            @Html.Partial("Partial/_BatchHistory")
+                                                                                        </div>
+                                                                                    </div>
+                                                                                </div>
+                                                                                <div class="clearfix"></div>
+                                                                            </div>
+                                                                        </td>
+                                                                    </tr>
+
+
+
+
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+
+            </div>
+
+        </div>
+    </div>
+</div>

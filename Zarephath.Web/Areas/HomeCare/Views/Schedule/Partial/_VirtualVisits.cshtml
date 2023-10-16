@@ -1,0 +1,222 @@
+﻿@using Zarephath.Core.Models.Entity
+@model VirtualVisitsListModel
+<div class="row">
+    <div class="col-sm-12">
+        <div class="portlet-body compact" style="display: block;">
+            <div class="">
+                <table class=" table table-bordered table-striped table-condensed flip-content table-checkable">
+
+                    <thead class="">
+                        <tr>
+                            @*<th class="width-50px text-align-left">
+                                    <div class="btn-group" data-ng-show="VirtualVisitsList.length > 0">
+                                        <input id="SelectAllVirtualVisits" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll(SelectAllCheckbox)" val="SelectAllCheckbox">
+                                            <label for="SelectAllVirtualVisits"></label>
+                                    </div>
+                                </th>*@
+
+                            <th class="text-align-left">
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="VirtualVisitsListPager.sortColumn('EmployeeName')">@Resource.EmployeeName</a>
+                                <span class="sortorder" data-ng-show="VirtualVisitsListPager.sortIndex === 'EmployeeName'" data-ng-class="{reverse:VirtualVisitsListPager.reverse}"></span>
+                            </th>
+                            <th>
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="VirtualVisitsListPager.sortColumn('ReferralName')">@Resource.Attendee</a>
+                                <span class="sortorder" data-ng-show="VirtualVisitsListPager.sortIndex === 'ReferralName'" data-ng-class="{reverse:VirtualVisitsListPager.reverse}"></span>
+                            </th>
+                            <th>
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="VirtualVisitsListPager.sortColumn('StartDate')">@Resource.StartTime</a>
+                                <span class="sortorder" data-ng-show="VirtualVisitsListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:VirtualVisitsListPager.reverse}"></span>
+                            </th>
+                            <th>
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="VirtualVisitsListPager.sortColumn('EndDate')">@Resource.EndTime</a>
+                                <span class="sortorder" data-ng-show="VirtualVisitsListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:VirtualVisitsListPager.reverse}"></span>
+                            </th>
+                            <th>
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="VirtualVisitsListPager.sortColumn('Payor')">@Resource.Payor</a>
+                                <span class="sortorder" data-ng-show="VirtualVisitsListPager.sortIndex === 'Payor'" data-ng-class="{reverse:VirtualVisitsListPager.reverse}"></span>
+                            </th>
+                            <th>
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="VirtualVisitsListPager.sortColumn('CareType')">@Resource.CareType</a>
+                                <span class="sortorder" data-ng-show="VirtualVisitsListPager.sortIndex === 'CareType'" data-ng-class="{reverse:VirtualVisitsListPager.reverse}"></span>
+                            </th>
+                            <th>
+                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="VirtualVisitsListPager.sortColumn('ScheduleStatusName')">@Resource.Status</a>
+                                <span class="sortorder" data-ng-show="VirtualVisitsListPager.sortIndex === 'ScheduleStatusName'" data-ng-class="{reverse:VirtualVisitsListPager.reverse}"></span>
+                            </th>
+                            <th class="text-align-center width-120px">
+                                @Resource.Action
+                            </th>
+                        </tr>
+                    </thead>
+
+
+                    <tbody>
+                        <tr class="compact-search-tr">
+                            @*<td></td>*@
+                            <td class="width-200px">
+                                <div>
+                                    @Html.DropDownListFor(p => p.SVVLModel.SearchVirtualVisitsListModel.EmployeeID, Model.SVVLModel.EmployeeList.ToSelectList(Model.SVVLModel.SearchVirtualVisitsListModel.EmployeeID.ToString() ?? "", "EmpGeneralNameFormat", "EmployeeID", Resource.Select, ""),
+                                                          new
+                                                          {
+                                                              id = Model.VisitType + "_EmployeeID",
+                                                              data_ng_model = "SearchVirtualVisitsModel.EmployeeID",
+                                                              data_ng_init = "SearchVirtualVisitsModel.EmployeeID=SearchVirtualVisitsModel.EmployeeID==''?null:SearchVirtualVisitsModel.EmployeeID",
+                                                              @class = "form-control input-sm",
+                                                              data_val = "false"
+
+                                                          })
+                                </div>
+                            </td>
+
+
+                            <td class="width-200px">
+                                @Html.TextBoxFor(m => m.SVVLModel.SearchVirtualVisitsListModel.ReferralName,
+                               new {
+                                   id = Model.VisitType + "_ReferralName",
+                                   data_ng_model = "SearchVirtualVisitsModel.ReferralName",
+                                   @class = "form-control input-sm",
+                                   placeholder = Resource.Attendee
+                               })
+                            </td>
+
+
+
+                            <td class="width-150px">
+                                <div class="input-group date no-focus" datepicker="SearchVirtualVisitsModel.StartDate" ng-dateval="SearchVirtualVisitsModel.StartDate" 
+                                     data-ng-mindate="SearchVirtualVisitsModel.StartMinDate"
+                                     data-ng-maxdate="SearchVirtualVisitsModel.StartMaxDate">
+                                    @Html.TextBoxFor(m => m.SVVLModel.SearchVirtualVisitsListModel.StartDate,
+                                                     new
+                                                     {
+                                                         id = Model.VisitType + "_StartTime",
+                                                         @class = "no-focus form-control input-sm dateInputMask",
+                                                         placeholder = Resource.StartTime
+                                                     })
+                                </div>
+                            </td>
+
+                            <td class="width-150px">
+                                <div class="input-group date no-focus" datepicker="SearchVirtualVisitsModel.EndDate" ng-dateval="SearchVirtualVisitsModel.EndDate"
+                                     data-ng-mindate="SearchVirtualVisitsModel.EndMinDate"
+                                     data-ng-maxdate="SearchVirtualVisitsModel.EndMaxDate">
+                                    @Html.TextBoxFor(m => m.SVVLModel.SearchVirtualVisitsListModel.EndDate,
+                                                     new
+                                                     {
+                                                         id = Model.VisitType + "_EndTime",
+                                                         @class = "no-focus form-control input-sm dateInputMask",
+                                                         placeholder = Resource.EndTime
+                                                     })
+                                </div>
+                            </td>
+
+                            <td></td>
+                            <td></td>
+
+                            <td></td>
+                            <td class="text-align-center">
+                                <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchVirtualVisits()" />
+                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                            </td>
+                        </tr>
+                        <tr dir-paginate="virtualvisit in VirtualVisitsList | itemsPerPage: VirtualVisitsListPager.pageSize" total-items="VirtualVisitsListPager.totalRecords" current-page="VirtualVisitsListPager.currentPage" pagination-id="VirtualVisitsListPagerID" data-ng-class="{'deleted':virtualvisit.IsDenied}">
+                            @*<td>
+                                    <span class="pull-left">
+                                        <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="virtualvisit.IsChecked" data-ng-change="SelectReferral(virtualvisit)" val="virtualvisit.IsChecked">
+                                    </span>
+                                </td>*@
+
+                            <td class="text-align-left">
+                                <span data-ng-bind="virtualvisit.EmployeeName"></span>
+                            </td>
+                            <td>
+                                <span data-ng-bind="virtualvisit.ReferralName"></span>
+                            </td>
+                            <td>
+                                <span>{{ virtualvisit.StartDate | orgdatetime }}</span>
+                            </td>
+                            <td>
+                                <span>{{ virtualvisit.EndDate | orgdatetime }}</span>
+                            </td>
+                            <td>
+                                <span data-ng-bind="virtualvisit.Payor"></span>
+                            </td>
+                            <td>
+                                <span data-ng-bind="virtualvisit.CareType"></span>
+                            </td>
+                            <td>
+                                <span data-ng-show="!virtualvisit.IsPCACompleted" data-ng-bind="virtualvisit.ScheduleStatusName"></span>
+                                <span data-ng-show="virtualvisit.IsPCACompleted">@Resource.Completed</span>
+                            </td>
+                            <td class="text-align-center">
+                                <div class="btn-group">
+                                    <button class="btn btn-default btn-xs dropdown-toggle green-haze-stripe" type="button" data-toggle="dropdown" aria-expanded="false">
+                                        <b>@Resource.Action</b>
+                                        <i class="fa fa-angle-down"></i>
+                                    </button>
+                                    <ul class="dropdown-menu pos-itm">
+                                        <li data-ng-show="!virtualvisit.IsPastVisit && !virtualvisit.IsPCACompleted && virtualvisit.EmployeeID === @SessionHelper.LoggedInID">
+                                            <a href="javascript:void(0);"
+                                               data-ng-click="OpenJoinMeeting(virtualvisit.ReferralID, virtualvisit.ScheduleID)">
+                                                <i class="fa fa-video-camera"></i>&nbsp; @Resource.StartVirtualVisit
+                                            </a>
+                                        </li>
+                                        <li data-ng-show="!virtualvisit.IsPastVisit && !virtualvisit.IsPCACompleted">
+                                            <a href="javascript:void(0);" data-ng-click="SendReminder(virtualvisit.ScheduleID, virtualvisit.ReferralID, virtualvisit.EmployeeID, true, false)">
+                                                <i class="fa fa-bell"></i>&nbsp; @Resource.SendSMSReminder
+                                            </a>
+                                        </li>
+                                        <li data-ng-show="!virtualvisit.IsPastVisit && !virtualvisit.IsPCACompleted">
+                                            <a href="javascript:void(0);" data-ng-click="SendReminder(virtualvisit.ScheduleID, virtualvisit.ReferralID, virtualvisit.EmployeeID, false, true)">
+                                                <i class="fa fa-bell"></i>&nbsp; @Resource.SendEmailReminder
+                                            </a>
+                                        </li>
+                                        <li data-ng-show="!virtualvisit.IsPastVisit && !virtualvisit.IsPCACompleted">
+                                            <a href="javascript:void(0);" data-ng-click="ChangeSchedule(virtualvisit)">
+                                                <i class="fa fa-clock-o"></i>&nbsp; @Resource.ChangeSchedule
+                                            </a>
+                                        </li>
+                                        <li data-ng-show="!virtualvisit.IsPastVisit && !virtualvisit.IsPCACompleted">
+                                            <a href="javascript:void(0);" data-ng-click="OpenCancelVisitModal(virtualvisit.ScheduleID)">
+                                                <i class="fa fa-trash"></i>&nbsp; @Resource.CancelVisit
+                                            </a>
+                                        </li>
+                                        <li data-ng-show="!virtualvisit.IsDenied">
+                                            <a href="javascript:void(0);" data-ng-mouseover="SearchReferralNotesModel.ReferralID = virtualvisit.ReferralID"
+                                               item-detail-popup data-ng-url="GetReferralNotesByModelURL" data-ng-search-model="SearchReferralNotesModel"
+                                               data-ng-template-selector="#patient-note-popover" data-popover-cloasble="true">
+                                                <i class="fa fa-sticky-note"></i>&nbsp; @Resource.View&nbsp;@Resource.Note
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-sm-12" data-ng-if="VirtualVisitsList.length > 0">
+    <div class="col-sm-3 pull-left no-padding">
+        @Resource.Showing <span data-ng-bind="(VirtualVisitsListPager.pageSize * VirtualVisitsListPager.currentPage) - VirtualVisitsListPager.pageSize  + 1"></span>
+        &nbsp;@Resource.To <span data-ng-bind="(VirtualVisitsListPager.pageSize == VirtualVisitsListPager.currentPageSize) ? (VirtualVisitsListPager.pageSize * VirtualVisitsListPager.currentPage) :(VirtualVisitsListPager.pageSize * VirtualVisitsListPager.currentPage) - VirtualVisitsListPager.pageSize  + VirtualVisitsListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="VirtualVisitsListPager.totalRecords"></span>&nbsp;@Resource.Records
+    </div>
+    <div class="pull-right top pagination-sm">
+        <dir-pagination-controls boundary-links="true" max-size="VirtualVisitsListPager.maxSize" on-page-change="VirtualVisitsListPager.pageChanged(newPageNumber)" pagination-id="VirtualVisitsListPagerID"></dir-pagination-controls>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-sm-12">
+        <div data-ng-if="VirtualVisitsList.length == 0">
+            <div class="row">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger">
+                        @Html.Raw(Resource.NoRecordsFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

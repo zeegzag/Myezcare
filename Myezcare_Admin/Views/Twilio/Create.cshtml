@@ -1,0 +1,111 @@
+﻿@{
+    ViewBag.Title = "Twilio SubAccount";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="page-bar">
+    <h3 class="page-title">
+        Create Subaccount
+    </h3>
+</div>
+<form id="frmTwilio">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <div class="form-group">
+                        <input type="text" id="accountName" class="form-control" placeholder="Name of account" required="required" />
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <input type="number" class="form-control" id="areaCode" placeholder="Area Code" required="required" />
+                        <i>
+                            WASHINGTON, DC: (202) , Florida, FL: (786)
+                        </i>
+                    </div>
+                    <br />
+                    <div class="form-group">
+                        <input type="text" class="form-control" id="countryPath" placeholder="Country path" required="required" />
+                        <i>i.e. United States: US</i>
+                    </div>
+                    <div class="form-group">
+                        <input type="submit" class="btn btn-success" value="Save" />
+                        <a href="/Twilio" class="btn btn-warning">Back</a>
+                    </div>
+                    <br />
+                    <br />
+                    ** <i><a href="https://www.twilio.com/pricing/csv/numbers" target="_blank">Download for more detail about country code and country path given by Twilio</a></i>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <table id="result_tbl" style="display: 1none; padding: 10px;">
+                    <tr>
+                        <td width="35%">Subaccount SID: </td>
+                        <td><b><span id="sub_sid"></span></b></td>
+                    </tr>
+                    <tr>
+                        <td>Subaccount Token: </td>
+                        <td><b><span id="sub_token"></span></b></td>
+                    </tr>
+                    <tr>
+                        <td>Phone Number: </td>
+                        <td><b><span id="phone_number"></span></b></td>
+                    </tr>
+                    <tr>
+                        <td>Notify Service SID: </td>
+                        <td><b><span id="nofify_sid"></span></b></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts{
+    <script type="text/javascript">
+
+        $(document).ready(function () {
+            $(".btn-success").on('click', function () {
+                
+                if ($("#accountName").val() == "" || $("#areaCode").val() == "" || $("#countryPath").val() == "") {
+                    alert("All fields are required to submit request.");
+                    return;
+                }                    
+
+                $(".btn-success").attr("disabled", true);
+                var queryObj = "?subAccountName=" + $("#accountName").val() + "&areaCode=" + $("#areaCode").val() + "&pathCountryCode=" + $("#countryPath").val();
+
+                $.ajax({
+                    type: 'POST',
+                    url: "/api/TwilioAPI/ConfigureSubAccount" + queryObj,
+                    dataType: 'json',
+                    success: function (result) {
+                        console.log(result)
+
+                        $("#result_tbl").show();
+
+                        $("#sub_sid").text(result.SubaccountSid);
+                        $("#sub_token").text(result.SubaccountToken);
+                        $("#phone_number").text(result.PhoneNumber);
+                        $("#nofify_sid").text(result.NotifyServiceSid);
+
+                        $("#accountName").val("");
+                        $("#areaCode").val("");
+                        $("#countryPath").val("");
+
+                        $(".btn-success").attr("disabled", false);
+                    },
+                    error: function (ex) {
+                        
+                        $("#result_tbl").hide();
+                        alert(JSON.parse(ex.responseText).MessageDetail);
+
+                        $(".btn-success").attr("disabled", false);
+                    },
+                });
+
+            });
+
+        });
+    </script>
+}

@@ -1,0 +1,392 @@
+﻿@{
+
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.AttendanceMaster);
+    ViewBag.SelectedMenuItem = Resource.SMI_AttendanceMaster;
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    CacheHelper chHelper = new CacheHelper();
+
+
+}
+@model HC_DayCare_SetScheduleAttendenceModel
+
+@Html.Hidden("hdnHC_DayCare_SetScheduleAttendenceModel", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="ScheduleDayCareAttendenceController" id="ScheduleDayCareAttendence" style="margin-top: -10px">
+
+    <div class="row">
+
+        <div>
+            <span class="btn btn-default btn-lg pull-left" title="Zoom In" data-ng-click="ZoomInOutClick('zoomin')" data-ng-show="ZoomInBtnShow"><i class="glyphicon glyphicon-zoom-in" aria-hidden="true" style=""></i> FULL SCREEN</span>
+            <span class="btn btn-default btn-lg pull-leftx" title="Zoom Out" data-ng-click="ZoomInOutClick('zoomout')" data-ng-hide="ZoomInBtnShow"><i class="glyphicon glyphicon-zoom-out" aria-hidden="true" style=""> EXIT FULL SCREEN</i></span>
+            <br />
+        </div>
+        <div class="attendace-main-header">
+            <div class="logo"><a href="#"><img src="@chHelper.LoginScreenLogo" alt="Logo"></a></div>
+            <h2 class="title">Checkin & Checkout Log</h2>
+        </div>
+
+        <div class="attendance-checkin-section  firstSection" data-ng-show="Section_PatientList_Visible">
+            <div class="attendanceform">
+                <div class="search-box no-padding">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 form-col search">
+                            <div class="search-col">
+                                <select class="form-control input-sm"
+                                        data-ng-init="TempSearchScheduledPatientModel.FacilityID=TempSearchScheduledPatientModel.FacilityID==''?null:TempSearchScheduledPatientModel.FacilityID.toString()"
+                                        data-ng-model="TempSearchScheduledPatientModel.FacilityID"
+                                        data-val="true" data-val-required="@Resource.FacilityRequired"
+                                        id="FacilityID"
+                                        name="TempSearchScheduledPatientModel.FacilityID"
+                                        data-ng-options="item.FacilityID as item.FacilityName for item in FacilityList">
+                                    <option value="">@Resource.SelectFacility</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-sm-6 form-col search">
+                            <div class="search-col">
+                                <input type="text" class="form-control" placeholder="Search Visitor/Patient" data-ng-model="TempSearchScheduledPatientModel.PatientName">
+                                <div class="search-btn"><button class="btn btn-primary btn-sm btnsearch" data-ng-click="SearchClick()">@Resource.Search</button></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="attendace-listing-section">
+                    <div class="row">
+                        <div class="col-md-6 col-sm-6 attendace-list-col" data-ng-repeat="patient in ScheduledPatientList">
+                            <div class="attendace-list-item">
+                                <div class="checkbox checkbox-primary">
+                                    <input id="checkbox{{patient.ScheduleID}}" type="checkbox" ng-model="patient.IsPatientNotAttendedSchedule" ng-change="PatientAttendanceActionModal(patient)" data-ng-disabled="patient.IsClockInCompleted==true">
+                                    <label for="checkbox{{patient.ScheduleID}}">
+                                        Not Visited Today
+                                    </label>
+
+                                    <div class="user-info-main" data-ng-class="{'VisitCompleted': patient.IsClockInCompleted==true}">
+                                        <div class="user-info">
+                                            <div class="user-image">
+                                                <img data-ng-if="!patient.ProfileImagePath" src="/Assets/images/Patient-icon.png" alt="User images">
+                                                <img data-ng-if="patient.ProfileImagePath" data-ng-src="{{patient.ProfileImagePath}}" alt="User image" style="height:100px">
+
+                                            </div>
+                                            <div class="user-name">{{patient.PatientName}}</div>
+                                        </div>
+                                        <div class="checkin-buton">
+                                            <button class="btn btn-primary btn-sm btnsearch" data-ng-show="patient.IsClockInCompleted==false" data-ng-click="Show_Section(Section_CheckIn_CheckOut,patient)" data-ng-disabled="patient.IsPatientNotAttendedSchedule==true">Check In</button>
+                                            <button class="btn btn-primary btn-sm btnsearch" data-ng-show="patient.IsClockInCompleted==true && patient.IsClockOutCompleted==false" data-ng-click="ShowTaskAsPermission(Section_TaskList,patient)" data-ng-disabled="patient.IsPatientNotAttendedSchedule==true">Check Out</button>
+                                            <button class="btn btn-primary btn-sm btnsearch" data-ng-show="patient.IsClockInCompleted==true && patient.IsClockOutCompleted==true" data-ng-click="Show_Section(Section_ViewAll,patient)">View Details</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="attendance-steps lastSection" data-ng-show="Section_CheckIn_CheckOut_Visible">
+            <div class="attendancestepsForm">
+                <div class="attendance-steps-content">
+                    <div class="image-header">
+                        <div class="user-image big">
+                            <img data-ng-if="!SelectedPatient.ProfileImagePath" src="/Assets/images/Patient-icon.png" alt="User images">
+                            <img data-ng-if="SelectedPatient.ProfileImagePath" id="avatar" class="profile-picture" alt="Avatar" data-ng-src="{{SelectedPatient.ProfileImagePath}}">
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 col-sm-12 col-xs-12">
+                        <div class="field">
+                            <div class="field-box">
+                                <div class="">
+                                    <div class="btn-group btn-block text-center">
+                                        <div data-ng-if="!IsFileUploading" class="fileUpload btn btn-xs btn-primary margin-right-0">
+                                            <span><i class="icon-plus"></i>&nbsp; Upload Photo</span>
+                                            <div>
+                                                <div class="">
+                                                    <input data-ng-if="SelectedPatient.ReferralID" id="ProfileImageUpload" type="file" name="files[]" class="upload" value="Browse"
+                                                           fileupload
+                                                           file-uploadurl="{{UploadProfileImage}}"
+                                                           beforesend="ProfileImageBeforeSend"
+                                                           aftersend="ProfileImageAfterSend"
+                                                           progress="ProfileImageProgress"
+                                                           filelist="UploadingFileList"
+                                                           onchange="loadFile(event)"
+                                                           limitmultifileuploads="1" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="font-sm col-md-12 no-padding margin-top-10">
+                                        <b class="font-red-thunderbird">@Resource.NoteLabel</b><i>@Html.Raw(Resource.SignatureImageNote)</i>
+                                    </div>
+                                    <div class="col-md-12 no-padding margin-top-20">
+                                        <div class="col-sm-12 no-padding" data-ng-repeat="filedata in UploadingFileList">
+                                            <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="attendance-steps-body">
+                        <div class="description-col">
+                            <table class="table table-hover">
+                                <tbody>
+                                    <tr>
+                                        <th width="210">Name:</th>
+                                        <td>{{SelectedPatient.PatientName}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th width="210">Date of Birth:</th>
+                                        <td>{{SelectedPatient.Dob ? (SelectedPatient.Dob|orgdate):'@Resource.NA'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th width="210">Visit Date:</th>
+                                        <td width="210">{{SelectedPatient.ScheduleStartDate ? (SelectedPatient.ScheduleStartDate|orgdate):'@Resource.NA'}}</td>
+                                    </tr>
+                                    <tr>
+                                        <th width="210">Check in Time:</th>
+                                        <td data-ng-if="SelectedPatient.IsClockInCompleted==false">
+                                            {{SelectedPatient.StrClockInTime ? (SelectedPatient.StrClockInTime):'--:-- --'}}
+                                        </td>
+                                        <td data-ng-if="SelectedPatient.IsClockInCompleted==true">
+                                            {{SelectedPatient.ClockInTime | timeformat }}
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="210">Attendance</th>
+                                        <td>
+                                            <input type="radio" name="radio" value="Present" data_ng_model="SelectedPatient.Attendence" checked style="height: 16px; width: 16px;" />
+                                            <label for="AttendanceType">Present</label>
+                                            <input type="radio" name="radio" value="Absent" data_ng_model="SelectedPatient.Attendence" style=" margin-left: 36px;  height: 16px; width: 16px;" />
+                                            <label for="AttendanceType">Absent</label>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <th width="210">Is Self Check in?:</th>
+                                        <td>
+                                            <input type="checkbox" class="uniformControls" id="checkboxIsSelf{{SelectedPatient.ScheduleID}}"
+                                                   data-ng-model="SelectedPatient.IsSelf"
+                                                   data-uniform-value="SelectedPatient.IsSelf"
+                                                   data-ng-change="ChangeIsSelf()" />
+                                            <br />
+                                            <div data-ng-show="!SelectedPatient.IsSelf">
+                                                Name:
+                                                <input type="text" class="form-control" placeholder="Enter Name" data-ng-model="SelectedPatient.Name">
+
+                                                Relation:
+                                                <select class="form-control input-md"
+                                                        data-ng-init="TempSearchScheduledPatientModel.FacilityID=TempSearchScheduledPatientModel.FacilityID==''?null:TempSearchScheduledPatientModel.FacilityID.toString()"
+                                                        data-ng-model="SelectedPatient.Relation"
+                                                        data-val="true"
+                                                        id="ddlRelation{{SelectedPatient.ScheduleID}}"
+                                                        name="ddlRelation{{SelectedPatient.ScheduleID}}"
+                                                        data-ng-options="item.Value as item.Name for item in Relations">
+                                                    <option value="">@Resource.Relation</option>
+                                                </select>
+
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <th width="210" data-ng-show="SelectedPatient.IsClockInCompleted==false || SelectedPatient.IsClockOutCompleted==true">Signature:</th>
+                                        <td>
+                                            <div data-ng-show="SelectedPatient.IsClockInCompleted==false || SelectedPatient.IsClockOutCompleted==true">
+                                                @*<b>Signature</b>
+                                                    <br />*@
+                                                <canvas width="800" height="200" style="touch-action: none;background-color:lightgray" id="CheckInSignature"></canvas>
+                                                <div data-ng-show="SelectedPatient.ShowSignatureError_ClockIN" class="color-red">Please add signature first.</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-show="SelectedPatient.IsClockInCompleted==true">
+                                        <th width="210">Check Out Time:</th>
+                                        <td>
+                                            <span data-ng-if="SelectedPatient.IsClockOutCompleted==false">{{SelectedPatient.StrClockOutTime ? (SelectedPatient.StrClockOutTime ):'--:-- --'}}</span>
+                                            <span data-ng-if="SelectedPatient.IsClockOutCompleted==true">{{SelectedPatient.ClockOutTime | timeformat}}</span>
+                                            @*{{SelectedPatient.StrClockOutTime ? (SelectedPatient.StrClockOutTime ):'--:-- --'}}*@
+
+                                            <br /><br />
+                                            <div>
+                                                <b>Signature</b>
+                                                <br />
+                                                <canvas width="800" height="200" style="touch-action: none;background-color:lightgray" id="CheckOutSignature"></canvas>
+                                                <div data-ng-show="SelectedPatient.ShowSignatureError_ClockOut" class="color-red">Please add signature first.</div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-show="SelectedPatient.IsClockInCompleted==true && SelectedPatient.IsClockOutCompleted==true">
+                                        <th>Task Details</th>
+                                        <td>
+
+                                            <div class="attendance-steps-content">
+
+                                                <div class="attendance-steps-body">
+
+                                                    <div class="checklist-col">
+                                                        <div class="checkbox checkbox-primary" data-ng-repeat="task in SelectedPatientTaskList" data-ng-class="{'VisitCompleted': task.IsSelected==true}">
+                                                            <input id="checkbox{{task.ReferralTaskMappingID}}" type="checkbox" data-ng-model="task.IsSelected" data-ng-change="SelectTask(task)" disabled="disabled">
+                                                            <label for="checkbox{{task.ReferralTaskMappingID}}">
+                                                                {{task.VisitTaskDetail}}
+                                                            </label>
+                                                            <div class="checkbox-block"><div class="checked-block"><img src="check-img.png" alt="check images"></div></div>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </td>
+                                    </tr>
+                                    @*<tr data-ng-hide="SelectedPatient.IsClockInCompleted==false">
+                                            <th width="210">
+                                                Signature
+                                                <div data-ng-hide="SelectedPatient.IsClockInCompleted==true && SelectedPatient.IsClockOutCompleted==true"><button type="button" class="btn btn-default" data-ng-click="ClearSignaturePad()">Clear Signature</button></div>
+                                            </th>
+                                            <td>
+                                                <canvas width="800" height="200" style="touch-action: none;background-color:lightgray"></canvas>
+                                                <div data-ng-show="SelectedPatient.ShowSignatureError" class="color-red">Please add signature first.</div>
+                                            </td>
+                                        </tr>*@
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="attendance-steps-footer">
+
+                        <button type="button" class="btn btn-default margin-right-20" data-ng-hide="ShowTaskList" data-ng-click="Show_Section(Section_PatientList)">Prev</button>
+                        <button type="button" class="btn btn-default margin-right-20" data-ng-show="ShowTaskList" data-ng-click="Show_Section(Section_TaskList,SelectedPatient)">Prev</button>
+
+
+                        <button type="button" class="btn btn-primary" data-ng-show="SelectedPatient.IsClockInCompleted==false" data-ng-click="CheckInOutSubmit(CheckType_CheckIn)">Submit</button>
+                        <button type="button" class="btn btn-primary" data-ng-show="SelectedPatient.IsClockInCompleted==true && SelectedPatient.IsClockOutCompleted==false" data-ng-click="CheckInOutSubmit(CheckType_CheckOut)">Submit</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="attendance-steps secondSection" data-ng-show="Section_TaskList_Visible">
+            <div class="attendancestepsForm">
+                <div class="attendance-steps-content">
+
+                    <div data-ng-show="SelectedPatient.ShowTaskError" class="color-red" style="font-size:22px;">Please select task first.</div>
+                    <div class="attendance-steps-body">
+
+                        <div class="checklist-col">
+                            <div class="row checkbox checkbox-primary" data-ng-repeat="task in SelectedPatientTaskList" data-ng-class="{'VisitCompleted': task.IsSelected==true}">
+                                <div>
+                                    <div class="">
+                                        <input id="checkbox{{task.ReferralTaskMappingID}}" type="checkbox" data-ng-model="task.IsSelected" data-ng-change="SelectTask(task)" style="float:left">
+                                        <label for="checkbox{{task.ReferralTaskMappingID}}">
+                                            {{task.VisitTaskDetail}}
+                                        </label>
+
+
+                                    </div>
+                                </div>
+                                <div style="float: right; width: 67% ">
+                                    <div style="position: inherit; padding-right: 6%; padding-left: 80%;">
+                                        <select class="form-control input-sm" title="@Resource.SelectTaskOption" style="width:100%"
+                                                name="task.TaskOptionID" data-ng-model="task.TaskOptionID" data-ng-change="SelectToption(task)">
+                                            <option value="0" selected>SelectTaskOption</option>
+                                            <option data-ng-repeat="option in VisitTaskOptionList | filter:task.VisitTaskID" data-ng-value="option.TaskOption">{{option.TaskOption}}</option>
+                                        </select>
+                                    </div>
+
+                                    <div class="checkbox-block"><div class="checked-block"><img src="check-img.png" alt="check images"></div></div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="attendance-steps-footer">
+                        <button type="button" class="btn btn-default  margin-right-20" data-ng-click="Show_Section(Section_PatientList)">Prev</button>
+                        <button type="button" class="btn btn-default margin-right-20" data-ng-click="Show_Section(Section_CheckIn_CheckOut,SelectedPatient)">Skip</button>
+                        <button type="button" class="btn btn-primary" data-ng-click="TaskSubmit(SelectedPatient)">Next</button>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+    @Html.Partial("Partial/DayCare/_SchAttendanceModalAction", new HC_DayCare_ScheduleAssignmentModel())
+
+    <div id="schAttendenceTypeModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-ng-click="ClosePatientAttendanceTypeActionModal()">&times;</button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <span>@Resource.PatientAttendence</span>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmschAttendenceTypeModal">
+                        <div class="clearfix">
+                            <div class="col-md-12 no-padding">
+                                <div class="form-group">
+                                    <div class="row">
+                                        <ul style="list-style-type: none;">
+                                            <li>
+                                                <input type="radio" id="Active{{schAttendenceTypeModalID}}" name="AppendixB" data_ng_model="schAttendenceTypeModalVal" value="Active">
+                                                <label for="Active">Active</label>
+                                            </li>
+                                            <li>
+                                                <input type="radio" id="Passive{{schAttendenceTypeModalID}}" name="AppendixB" data_ng_model="schAttendenceTypeModalVal" value="Passive">
+                                                <label for="Passive">Passive</label>
+                                            </li>
+                                            <li>
+                                                <input type="radio" id="Refused{{schAttendenceTypeModalID}}" name="AppendixB" data_ng_model="schAttendenceTypeModalVal" value="Refused">
+                                                <label for="Refused">Refused</label>
+                                            </li>
+                                            <li>
+                                                <input type="radio" id="Unable{{schAttendenceTypeModalID}}" name="AppendixB" data_ng_model="schAttendenceTypeModalVal" value="Unable">
+                                                <label for="Unable">Unable</label>
+                                            </li>
+                                        </ul>
+                                        <input type="hidden" id="schAttendenceReferralTaskMappingID" data_ng_model="schAttendenceReferralTaskMappingID" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+
+                <div class="modal-footer">
+                    <div>
+                        <a class="btn btn-sm btn-danger red" ng-click="ClosePatientAttendanceTypeActionModal()">@Resource.Cancel</a>
+                        <button type="button" class="btn btn-sm  btn-primary blue" ng-click="SelectAttendanceTask(schAttendenceReferralTaskMappingID,schAttendenceTypeModalVal)">@Resource.Save</button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/daycare/scheduleattendence")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/signature")
+<script type="text/javascript">
+        var DeleteConfirmationMessageForSchedule = '@string.Format(@Resource.DeleteConfirmationMessage, "Schedule Master")';
+        var AttendanceSkipPatientTaskPermission = '@Common.HasPermission(Constants.AttendanceSkipPatientTask)' == 'True';
+         var SkipPatientTaskMessage = '@Resource.SkipPatientTaskMessage';
+
+
+</script>
+}

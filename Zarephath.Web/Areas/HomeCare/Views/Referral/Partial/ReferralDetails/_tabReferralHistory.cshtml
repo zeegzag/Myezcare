@@ -1,0 +1,481 @@
+﻿@model HC_AddReferralModel
+@{bool isEditMode = Model != null && Model.Referral.ReferralID > 0;}
+
+@*@Html.Hidden("hdnAddReferralModel", Common.SerializeObject(Model))*@
+<style>
+    .clear {
+        background-color: antiquewhite;
+    }
+</style>
+@*<div class="row">
+        <div class="col-sm-12">
+            <div class="fscontainer">
+                <div class="legend">
+                    @Resource.PatientPreferencesAndSkills
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-lg-6 col-md-12 col-sm-12">
+                        <div class="form-group">
+                            <label class="control-label">@Resource.Preference</label>
+                            <input type="text"
+                                   token-input
+                                   ng-val="PreferenceName"
+                                   textfield='PreferenceName'
+                                   valuefield='PreferenceName'
+                                   searchurl="{{SearhSkillURL}}"
+                                   placeholder="@Resource.EnterPreference"
+                                   tokenlimit='1'
+                                   onresultsformatter='PreferenceResultsFormatter'
+                                   ontokenformatter="PreferenceTokenFormatter"
+                                   onaddedcallback='AddedPreference'
+                                   autoSelectFirstResult="true"
+                                   minChars="1"
+                                   tokeninputobj="PreferenceTokenObj"
+                                   id="ProductTagTkn"
+                                   customclass="form-control input-sm" />
+                        </div>
+                        <div class="form-group">
+                            <div class="badge_main">
+                                <span data-ng-repeat="item in ListPreference">
+                                    <span class="badge-default badge-success ">
+                                        {{item.PreferenceName}}
+                                        <a href="javascript:void(0)" data-ng-click="DeletePreference(item,$index)" class="fa fa-times" aria-hidden="true"></a>
+                                    </span>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-6 col-md-12 col-sm-12">
+                        <label class="control-label">@Resource.RequiredSkills</label>
+                        <div>
+                            <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                    selectpicker="ReferralSkillList" name="ReferralSkillList"
+                                    title="Select Skills">
+                                <option ng-repeat="item in SkillList" value="{{item.PreferenceID}}">{{item.PreferenceName}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+    </div>*@
+
+@*<div class="row">
+        <div class="col-sm-12">
+            <div class="fscontainer">
+                <div class="legend">
+                    @Resource.PhysicianDetails
+                    <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.PhysicianHelptext"
+                       data-ng-custom-class="tooltip-extra-z-index"></i>
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-lg-4 col-md-12 col-sm-12">
+                        <label class="control-label">@Resource.Physician</label>
+                        <div class="replaceErrorDest">
+                            <input type="text"
+                                   token-input
+                                   ng-val="ReferralModel.Referral.PhysicianID"
+                                   textfield='FirstName'
+                                   valuefield='PhysicianID'
+                                   searchurl="{{GetPhysicianListForAutoCompleteURL}}"
+                                   placeholder="@Resource.Physician"
+                                   tokenlimit='1'
+                                   onresultsformatter='PhysicianResultsFormatter'
+                                   ontokenformatter="PhysicianTokenFormatter"
+                                   ondeletecallback='RemovePhysician'
+                                   onaddedcallback="OnPhysicianAdded"
+                                   tokeninputobj="PhysicianTokenInputObj"
+                                   id="SearchPhysicianToken"
+                                   customclass="form-control input-sm" />
+                        </div>
+                        @Html.TextBoxFor(q => q.Referral.PhysicianID,
+                              new
+                              {
+                                  data_ng_model = "ReferralModel.Referral.PhysicianID ",
+                                  data_error_Count = "ReferralErrorCount.ReferralHistoryTab",
+                                  @class = "form-control hideErrorContent replaceErrorSource"
+                              })
+                        @Html.ValidationMessageFor(q => q.Referral.PhysicianID)
+                        <div class="pull-right">
+                            <a class="" data-ng-href="/hc/physician/addphysician" target="_new">@Resource.AddPhysician</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row portlet-body compact">
+                    <div class="form-group col-lg-9 col-md-9 col-sm-12 table-responsive" data-ng-if="ReferralModel.ReferralPhysicians.length > 0" data-ng-cloak>
+                        <div>
+                            <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th><strong>@Resource.Physician</strong></th>
+                                        <th><strong>@Resource.Email</strong></th>
+                                        <th><strong>@Resource.Address</strong></th>
+                                        <th class="text-align-center"><strong>@Resource.Phone</strong></th>
+                                        <th class="text-align-center"><strong>@Resource.PhysicianType</strong></th>
+                                        <th class="width-20px"><strong>@Resource.Action</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-class="{'deleted':item.IsDeleted}" data-ng-repeat="item in ReferralModel.ReferralPhysicians">
+                                        <td>{{item.FirstName}} {{item.MiddleName}} {{item.LastName}}</td>
+                                        <td>{{item.Email}}</td>
+                                        <td>{{item.Address}}</td>
+                                        <td class="text-align-center">{{item.Phone}}</td>
+                                        <td>{{item.PhysicianTypeID}}{{item.PhysicianType}}</td>
+                                        <td class="text-center">
+                                            <a data-ng-click="DeletePhysician(item,'Delete Records')"><i class="fa fa-remove curser-pointer"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+@*<div class="row">
+        <div class="col-sm-12">
+            <div class="fscontainer">
+                <div class="legend">
+                    @Resource.DxCodeDetails
+                    <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.DXCodeHelptext"
+                       data-ng-custom-class="tooltip-extra-z-index"></i>
+                </div>
+                <div class="row">
+                    @Html.TextBoxFor(q => q.DXCodeCount,
+                              new
+                              {
+                                  data_ng_model = "ReferralModel.DXCodeCount",
+                                  @class = "form-control hideErrorContent replaceErrorSource validateElement",
+                                  data_error_Count = "ReferralErrorCount.ReferralHistoryTab"
+                              })
+
+                    @Html.ValidationMessageFor(m => m.DXCodeCount)
+                    <div class="col-md-12">
+                        <div class="col-md-9 no-padding replaceErrorDest">
+                            <div class="form-group col-lg-6 col-md-12 col-sm-12">
+                                <label class="control-label">
+                                    @Resource.DXCode
+                                </label>
+                                <div class="">
+                                    <ul class="token-input-list">
+                                        <li style="width: 330px;">
+                                            <input class="form-control input-sm valid"  id="display" type="text" ng-model="Search" ng-change="SearchGetICD10Code(Search)" />
+                                            <span ng-if="Search"
+                                                  ng-click="clearText()"
+                                                  class="glyphicon glyphicon-remove form-control-feedback"
+                                                  style="cursor: pointer; pointer-events: all; width: 99px;line-height: 64px;"
+                                                  uib-tooltip="clear">
+                                            </span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="DxList" ng-if="Search1">
+                                    <div class="DXCode div1" ng-repeat="item in GetICD10CodeList | itemsPerPage: 10" ng-click="Click(item)">
+                                        <b>DX Code:</b>&nbsp;&nbsp;{{item.DXCodeWithoutDot}}&nbsp;({{item.DXCodeName}})<label class="DXCodeType">ICD 10</label><br />
+                                        <span style="color: #c41212;"><b>Description:</b></span>&nbsp;{{item.Description}}<br />
+
+
+                                    </div>
+                                </div>
+                            </div>
+
+                                <div class="form-group col-lg-3 col-md-12 col-sm-12">
+                                    <label class="control-label">@Resource.Precedence</label>
+                                    <div class="input-group col-md-12">
+                                        @Html.TextBoxFor(q => q.ReferralDXCodeMapping.Precedence, new
+                                         {
+                                             @class = "form-control input-sm",
+                                             data_ng_model = "ReferralModel.ReferralDXCodeMapping.Precedence",
+                                             placeholder = Resource.Precedence,
+                                             maxlength = 3,
+                                             key_press_validation = "Digit"
+                                         })
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-3 col-md-12 col-sm-12 margin-top-18">
+                                    <a class="btn btn-sm btn-info" data-ng-click="SaveReferralDXCodeMapping(item)">
+                                        <i class="fa fa-save ">&nbsp;&nbsp;</i>@Resource.Add
+                                    </a>
+                                    <a class="btn btn-sm border-dark bg-gray-color widget-title-color-gray" data-ng-click="CancelDXCodeMapping()">
+                                        <i class="fa fa-remove ">&nbsp;&nbsp;</i>@Resource.Cancel
+                                    </a>
+                                </div>
+                            </div>
+                    </div>
+                </div>
+                <div class="row col-md-12 portlet-body compact">
+                    <div class="form-group col-lg-9 col-md-9 col-sm-12 table-responsive" data-ng-if="ReferralModel.DxCodeMappingList.length > 0" data-ng-cloak>
+                        <div>
+                            <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                <thead>
+                                    <tr>
+                                        <th><strong>@Resource.Type</strong></th>
+                                        <th><strong>@Resource.DXCode</strong></th>
+                                        <th><strong>@Resource.Description</strong></th>
+                                        <th class="text-align-center"><strong>@Resource.Precedence</strong></th>
+                                        <th class="width-20px"><strong>@Resource.Action</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-class="{'deleted':dxCode.IsDeleted}" data-ng-repeat="dxCode in DxCodeMappingList">
+                                        <td>{{dxCode.DxCodeShortName }}</td>
+                                        <td>{{(dxCode.DXCodeWithoutDot ? dxCode.DXCodeWithoutDot :'@Resource.NA') +' (' + dxCode.DXCodeName +')'}}</td>
+                                        <td>{{dxCode.Description}}</td>
+                                        <td class="text-align-center">{{(dxCode.Precedence)? dxCode.Precedence :'@Resource.NA'}}</td>
+                                        <td class="text-center">
+                                            <a data-ng-click="EditDxCodeFromMapping(dxCode)"><i class="fa fa-edit curser-pointer"></i></a>
+                                            <a data-ng-click="DeleteDxCodeFromMapping(dxCode,'Delete Records')"><i class="fa fa-remove curser-pointer"></i></a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>*@
+
+@if (1 == 2)
+{
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="fscontainer">
+                <div class="legend">
+                    @Resource.PatientCarePlan
+                </div>
+
+                <div class="row">
+                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                        <label class="control-label"><b class="font-red">@Resource.NoteLabel</b> &nbsp; @Resource.ScheduleCarePlanNote</label>
+                    </div>
+                    <div>
+                        <div class="col-md-12 col-sm-12">
+                            <div class="form-group col-lg-2 col-md-4 col-sm-4">
+
+                                <label class="control-label">
+                                    @Resource.StartDate
+                                </label>
+                                <div class="input-group date" datepicker="">
+                                    <input class="form-control input-sm  dateInputMask" type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+
+
+                            </div>
+
+                            <div class="form-group col-lg-2 col-md-4 col-sm-4">
+
+                                <label class="control-label">
+                                    @Resource.EndDate
+                                </label>
+                                <div class="input-group date" datepicker="">
+                                    <input class="form-control input-sm  dateInputMask" type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+
+                            </div>
+                        </div>
+                        <br />
+                        <div class="form-group col-md-12 col-sm-12">
+                            <div class="mt-checkbox-inline ">
+
+                                <label class="mt-checkbox mt-checkbox-outline padding-care-plan">
+                                    <input data-ng-model="ReferralModel.Referral.MondaySchedule"
+                                           class="uniformControls" data-uniform-value="ReferralModel.Referral.MondaySchedule"
+                                           type="checkbox">@Resource.Monday<span></span>
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline padding-care-plan">
+                                        <input data-ng-model="ReferralModel.Referral.TuesdaySchedule"
+                                               class="uniformControls" data-uniform-value="ReferralModel.Referral.TuesdaySchedule"
+                                               type="checkbox">
+                                        @Resource.Tuesday<span></span>
+                                    </label>
+                                    <label class="mt-checkbox mt-checkbox-outline padding-care-plan">
+                                        <input data-ng-model="ReferralModel.Referral.WednesdaySchedule"
+                                               class="uniformControls" data-uniform-value="ReferralModel.Referral.WednesdaySchedule"
+                                               type="checkbox">@Resource.Wednesday<span></span>
+                                        </label>
+                                        <label class="mt-checkbox mt-checkbox-outline padding-care-plan">
+                                            <input data-ng-model="ReferralModel.Referral.ThursdaySchedule"
+                                                   class="uniformControls" data-uniform-value="ReferralModel.Referral.ThursdaySchedule"
+                                                   type="checkbox">@Resource.Thursday<span></span>
+                                            </label>
+
+                                            <label class="mt-checkbox mt-checkbox-outline padding-2">
+                                                <input data-ng-model="ReferralModel.Referral.FridaySchedule"
+                                                       class="uniformControls" data-uniform-value="ReferralModel.Referral.FridaySchedule"
+                                                       type="checkbox">@Resource.Friday<span></span>
+                                                </label>
+
+                                                <label class="mt-checkbox mt-checkbox-outline padding-care-plan">
+                                                    <input data-ng-model="ReferralModel.Referral.SaturdaySchedule"
+                                                           class="uniformControls" data-uniform-value="ReferralModel.Referral.SaturdaySchedule"
+                                                           type="checkbox">@Resource.Saturday<span></span>
+                                                    </label>
+
+                                                    <label class="mt-checkbox mt-checkbox-outline padding-care-plan">
+                                                        <input data-ng-model="ReferralModel.Referral.SundaySchedule"
+                                                               class="uniformControls" data-uniform-value="ReferralModel.Referral.SundaySchedule"
+                                                               type="checkbox">@Resource.Sunday<span></span>
+                                                        </label>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="space15"></div>
+                        }
+
+<div class="row">
+
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <form id="frmReferralHistory">
+            <div class="fscontainer">
+                <div class="legend">
+                    @Resource.ReferralHistory
+                </div>
+
+                <div class="patientContainermain">
+                    @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_ReferralHistory_AddUpdate))
+                    {
+                        <div class="row">
+
+
+                            <div class="form-group col-lg-2 col-md-4 col-sm-4">
+
+                                <label class="control-label required">
+                                    @Resource.ReferralDate
+                                    <i class="fa fa-question-circle" data-ng-tooltip="@Resource.FutureDateNotAllowed" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                </label>
+                                <div class="input-group date" datepicker="ReferralModel.ReferralHistoryItem.ReferralDate" ng-dateval="ReferralModel.ReferralHistoryItem.ReferralDate" data-ng-maxdate="CurrentDate">
+                                    <input class="form-control input-sm validateElement dateInputMask"
+                                           placeholder="@Resource.ReferralDate"
+                                           data-val="true"
+                                           data-val-required="@Resource.ReferralDateRequired" id="Referral_ReferralDate" maxlength="50" name="Referral.ReferralDate"
+                                           type="text">
+
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Referral.ReferralDate)
+
+                            </div>
+
+                            <div class="form-group col-lg-2 col-md-4 col-sm-4">
+
+                                <label class="control-label required">@Resource.ReferralSource</label>
+                                @Html.DropDownListFor(p => p.Referral.ReferralSourceID, Model.ReferralSources.ToSelectList(Model.Referral.ReferralSourceID.ToString() ?? "", "ReferralSourceName", "ReferralSourceID", @Resource.Select, ""),
+                                    new
+                                    {
+                                        convert_to_number = "",
+                                        data_ng_model = "ReferralModel.ReferralHistoryItem.ReferralSourceID",
+                                        data_ng_init = "ReferralModel.ReferralHistoryItem.ReferralSourceID=(ReferralModel.ReferralHistoryItem.ReferralSourceID==null || ReferralModel.ReferralHistoryItem.ReferralSourceID==0)?'':ReferralModel.ReferralHistoryItem.ReferralSourceID",
+                                        @class = "form-control input-sm validateElement requiredStrip",
+                                    })
+                                @Html.ValidationMessageFor(q => q.Referral.ReferralSourceID)
+
+                            </div>
+
+                            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                <label class="control-label">@Resource.ClosureDate</label>
+                                <div class="input-group date" datepicker="ReferralModel.ReferralHistoryItem.ClosureDate" ng-dateval="ReferralModel.ReferralHistoryItem.ClosureDate">
+
+                                    <input class="form-control input-sm validateElement dateInputMask" id="Referral_ClosureDate"
+                                           maxlength="50" name="Referral.ClosureDate" placeholder="@Resource.ClosureDate" type="text">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                                @Html.ValidationMessageFor(q => q.Referral.ClosureDate)
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-4 col-sm-4">
+                                <label class="control-label">@Resource.ClosureReason</label>
+                                @Html.TextBoxFor(q => q.Referral.ClosureReason, new
+                                    {
+                                       @class = "form-control input-sm validateElement",
+                                       data_ng_model = "ReferralModel.ReferralHistoryItem.ClosureReason",
+                                       placeholder = @Resource.ClosureReason,
+                                       maxlength = 500
+                                   })
+                                @Html.ValidationMessageFor(q => q.Referral.ClosureReason)
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-4 col-sm-4 margin-top-18">
+                                <a class="btn btn-sm btn-info" data-ng-click="SaveReferralHistoryItem()">
+                                    <i class="fa fa-save ">&nbsp;&nbsp;</i>{{ReferralModel.ReferralHistoryItem.IsEdit ? '@Resource.Update' : '@Resource.Add'}}
+                                </a>
+                                <a class="btn btn-sm border-light bg-gray-color widget-title-color-gray margin-left-10" data-ng-click="CancelReferralHistoryItem()">
+                                    <i class="fa fa-remove ">&nbsp;&nbsp;</i>@Resource.Cancel
+                                </a>
+                            </div>
+
+                        </div>
+                    }
+                    <div class="row">
+                        <div class="space25"></div>
+                        <div class="form-group col-lg-12 col-md-12 col-sm-12 mb-0" data-ng-if="ReferralHistoryList.length > 0" data-ng-cloak>
+                            <div class="table-responsive">
+                                <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="width-120px"><strong>@Resource.ReferralDate</strong></th>
+                                            <th class="width-250px"><strong>@Resource.ReferralSource</strong></th>
+                                            <th class="width-120px"><strong>@Resource.ClosureDate</strong></th>
+                                            <th><strong>@Resource.ClosureReason</strong></th>
+                                            <th class="width-20px"><strong>@Resource.Action</strong></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr data-ng-repeat="item in ReferralHistoryList">
+                                            <td>{{item.ReferralDate | dateformat | orgdate }}</td>
+                                            <td>{{item.ReferralSourceName}}</td>
+                                            <td>{{item.ClosureDate ? (item.ClosureDate | dateformat | orgdate) : '@Resource.NA'}}</td>
+                                            <td>{{item.ClosureReason}}</td>
+                                            <td class="text-center">
+                                                @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_ReferralHistory_AddUpdate))
+                                                {
+                                                    <a data-ng-click="EditReferralHistoryItem(item)"><i class="fa fa-edit curser-pointer"></i></a>
+                                                }
+                                                @if (Common.HasPermission(Constants.HC_Permission_PatientDetails_ReferralHistory_Delete))
+                                                {
+                                                    <a data-ng-click="DeleteReferralHistoryItem(item)" class="margin-left-05"><i class="fa fa-trash-o curser-pointer"></i></a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

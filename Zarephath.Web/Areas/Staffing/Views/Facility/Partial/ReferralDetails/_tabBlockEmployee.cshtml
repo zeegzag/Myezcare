@@ -1,0 +1,217 @@
+﻿@model RefBlockEmpPageModel
+
+@Html.Hidden("hdnSetBlockEmpPageModel", Common.SerializeObject(Model))
+<div class="row-fluid">
+    <div class="patientBlockEmployee">
+        <div class="row">
+            <div class="padding-bottom-10 col-lg-12 col-md-12 col-sm-12">
+                <div class=" no-left-padding col-lg-6 col-md-6 col-sm-12">
+                    <span class="label-italic">
+                        <b class="font-red-thunderbird">@Resource.BlockEmployees</b>
+                    </span>
+                </div>
+                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_BlockEmployees_Add))
+                {
+                    <div class="no-right-padding col-lg-6 col-md-6 col-sm-12">
+                        <a href="#NewBlockEmpView" data-ng-click="NewBlockEmpView()" class="btn btn-xs blue  pull-right" data-toggle="modal"><i class="fa fa-plus"></i>&nbsp;@Resource.BlockEmployees</a>
+                    </div>
+                }
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="row-fluid  col-lg-12 col-md-12 col-sm-12">
+                @*<form action="#" class="horizontal-form">*@
+                <div class="row-fluid" data-ng-show="BlockEmpList.length > 0">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+
+                        <div class="portlet-body compact ">
+                            <div id="windowTable" class="dataTables_wrapper ">
+                                <table class="table table-bordered table-striped table-hover table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="width-20px">
+                                                @Resource.Hash
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BlockEmpListPager.sortColumn('Employee')">@Resource.Employee
+                                                    <span class="sortorder" data-ng-show="BlockEmpListPager.sortIndex === 'Employee'" data-ng-class="{reverse:BlockEmpListPager.reverse}"></span></a>
+
+                                            </th>
+                                            <th class="col-lg-6">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BlockEmpListPager.sortColumn('BlockingReason')">@Resource.BlockingReason</a>
+                                                <span class="sortorder" data-ng-show="BlockEmpListPager.sortIndex === 'BlockingReason'" data-ng-class="{reverse:BlockEmpListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BlockEmpListPager.sortColumn('BlockingRequestedBY')">@Html.Raw(Resource.BlockingRequestedBYBR)</a>
+                                                <span class="sortorder" data-ng-show="BlockEmpListPager.sortIndex === 'BlockingRequestedBY'" data-ng-class="{reverse:BlockEmpListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-150px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="BlockEmpListPager.sortColumn('CreatedDate')">@Resource.BlockedDate</a>
+                                                <span class="sortorder" data-ng-show="BlockEmpListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:BlockEmpListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-50px">
+                                                @Resource.Action
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr dir-paginate="item in BlockEmpList | itemsPerPage: BlockEmpListPager.pageSize" total-items="BlockEmpListPager.totalRecords" current-page="BlockEmpListPager.currentPage" pagination-id="BlockEmpListPagerID">
+                                            <td>{{(BlockEmpListPager.pageSize * BlockEmpListPager.currentPage) - BlockEmpListPager.pageSize + ($index + 1) }}</td>
+                                            <td>{{item.Employee}}</td>
+                                            <td>{{item.BlockingReason}}</td>
+                                            <td>{{item.BlockingRequestedBy}}</td>
+                                            <td>{{item.CreatedDate | date:'@Resource._DateFormat'}}</td>
+                                            <td width="85">
+                                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_BlockEmployees_Delete))
+                                                {
+                                                    <a class="margin-left-05 btn btn-xs red" data-ng-click="DeleteBlockEmp(item)" title="@Resource.Delete"><i class="fa fa-trash"></i></a>
+                                                }
+                                                @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_BlockEmployees_Add))
+                                                {
+                                                    <a class="margin-left-05 btn btn-xs blue" data-ng-click="OpenBlockEmpEditModal(item)" title="@Resource.Edit"><i class="fa fa-edit"></i></a>
+                                                }
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="clearfix"></div>
+                    <div class="row">
+                        <div class="space20">
+                            <hr />
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <span>
+                                @Resource.Showing <span data-ng-bind="(BlockEmpListPager.pageSize * BlockEmpListPager.currentPage) - BlockEmpListPager.pageSize  + 1"></span>
+                                &nbsp;@Resource.To <span data-ng-bind="(BlockEmpListPager.pageSize == BlockEmpListPager.currentPageSize) ? (BlockEmpListPager.pageSize * BlockEmpListPager.currentPage) :(BlockEmpListPager.pageSize * BlockEmpListPager.currentPage) - BlockEmpListPager.pageSize  + BlockEmpListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="BlockEmpListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                @*<span class="padding-left-25 top pagination-sm" data-ng-show="AjaxStartBL">
+                                    @Resource.Loading
+                                    <img src="~/Assets/images/lazyload.gif" />
+                                </span>*@
+                            </span>
+
+                            <div class="pull-right top pagination-sm">
+                                <dir-pagination-controls boundary-links="true" max-size="BlockEmpListPager.maxSize"
+                                    on-page-change="BlockEmpListPager.pageChanged(newPageNumber)" pagination-id="BlockEmpListPagerID"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                @*</form>*@
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="BlockEmpList.length == 0">
+                            <span class="padding-left-25 top pagination-sm" data-ng-show="AjaxStart">
+                                @Resource.Loading
+                                <img src="~/Assets/images/lazyload.gif" />
+                            </span>
+                            <div class="row" data-ng-show="!AjaxStart">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+
+
+
+    <div class="modal fade" id="NewBlockEmpView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>@Resource.BlockEmployees</span></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmAddBlockEmpView" class="frmAddBlockEmpView">
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                        <label class="control-label required">@Resource.Employee</label>
+                                        @Html.DropDownListFor(p => p.ReferralBlockedEmployee.EmployeeID, Model.EmployeeList.ToSelectList(Model.ReferralBlockedEmployee.EmployeeID.ToString(), "EmployeeName", "EmployeeID", @Resource.Select, ""),
+                                              new
+                                                  {
+                                                      data_ng_model = "ReferralBlockedEmployee.EmployeeID",
+                                                      data_ng_init = "ReferralBlockedEmployee.EmployeeID=ReferralBlockedEmployee.EmployeeID==null?'':ReferralBlockedEmployee.EmployeeID.toString()",
+                                                      @class = "form-control input-sm requiredStrip",
+                                                      convert_to_number = ""
+                                                  })
+
+                                        @Html.ValidationMessageFor(q => q.ReferralBlockedEmployee.EmployeeID)
+                                    </div>
+
+                                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                        <label class="control-label required">@Resource.BlockingRequestedBY</label>
+                                        @Html.DropDownListFor(p => p.ReferralBlockedEmployee.BlockingRequestedBy, Common.GetBlockingRequestedBy().ToSelectList(Model.ReferralBlockedEmployee.BlockingRequestedBy, "Name", "Value", @Resource.Select, ""),
+                                              new
+                                                  {
+                                                      data_ng_model = "ReferralBlockedEmployee.BlockingRequestedBy",
+                                                      data_ng_init = "ReferralBlockedEmployee.BlockingRequestedBy=ReferralBlockedEmployee.BlockingRequestedBy==null?'':ReferralBlockedEmployee.BlockingRequestedBy.toString()",
+                                                      @class = "form-control input-sm requiredStrip",
+                                                  })
+
+                                        @Html.ValidationMessageFor(q => q.ReferralBlockedEmployee.BlockingRequestedBy)
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <label class="control-label required">@Resource.BlockingReason</label>
+                                        @Html.TextAreaFor(m => m.ReferralBlockedEmployee.BlockingReason,
+                                                         new
+                                                             {
+                                                                 data_ng_model = "ReferralBlockedEmployee.BlockingReason",
+                                                                 @class = "form-control input-sm requiredStrip",
+                                                                 placeholder = Resource.BlockingReason,
+                                                                 @rows = "8",
+                                                                 maxlength = 1000
+                                                             })
+                                        @Html.ValidationMessageFor(m => m.ReferralBlockedEmployee.BlockingReason)
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        @if (Common.HasPermission(Constants.HC_Permission_Patient_AddUpdate))
+                        {
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 text-center">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Close</button>
+                                    <button type="button" class="btn green-jungle" data-ng-click="SaveBlockEmp()">@Resource.Save</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+

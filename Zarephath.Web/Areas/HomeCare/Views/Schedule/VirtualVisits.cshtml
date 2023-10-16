@@ -1,0 +1,175 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, @Resource.VirtualVisits);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = @Resource.SMI_VirtualVisits;
+}
+@model SetVirtualVisitsListModel
+@Html.Hidden("hdnSetVirtualVisitsListModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="VirtualVisitsListController">
+    <div class="page-bar withFilter">
+        <h3 class="page-title">
+            @Resource.VirtualVisits
+        </h3>
+    </div>
+
+    <!-- Nav tabs -->
+    <ul id="visitTypes" class="nav nav-tabs nav-pills" role="tablist">
+        <li role="presentation" id="@Constants.HashUrl_VirtualVisits_TodaysVisits" class="active">
+            <a href="#@Constants.HashUrl_VirtualVisits_TodaysVisits" aria-controls="@Constants.HashUrl_VirtualVisits_TodaysVisits" role="tab" data-toggle="tab">@Resource.TodaysVisits</a>
+        </li>
+        <li role="presentation" id="@Constants.HashUrl_VirtualVisits_FutureVisits">
+            <a href="#@Constants.HashUrl_VirtualVisits_FutureVisits" aria-controls="@Constants.HashUrl_VirtualVisits_FutureVisits" role="tab" data-toggle="tab">@Resource.FutureVisits</a>
+        </li>
+        <li role="presentation" id="@Constants.HashUrl_VirtualVisits_PastVisits">
+            <a href="#@Constants.HashUrl_VirtualVisits_PastVisits" aria-controls="@Constants.HashUrl_VirtualVisits_PastVisits" role="tab" data-toggle="tab">@Resource.PastVisits</a>
+        </li>
+    </ul>
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div role="tabpanel" class="tab-pane active" id="tab_@Constants.HashUrl_VirtualVisits_TodaysVisits">
+            @Html.Partial("Partial/_VirtualVisits", new VirtualVisitsListModel { VisitType = Constants.HashUrl_VirtualVisits_TodaysVisits, SVVLModel = Model })
+        </div>
+        <div role="tabpanel" class="tab-pane" id="tab_@Constants.HashUrl_VirtualVisits_FutureVisits">
+            @Html.Partial("Partial/_VirtualVisits", new VirtualVisitsListModel { VisitType = Constants.HashUrl_VirtualVisits_FutureVisits, SVVLModel = Model })
+        </div>
+        <div role="tabpanel" class="tab-pane" id="tab_@Constants.HashUrl_VirtualVisits_PastVisits">
+            @Html.Partial("Partial/_VirtualVisits", new VirtualVisitsListModel { VisitType = Constants.HashUrl_VirtualVisits_PastVisits, SVVLModel = Model })
+        </div>
+    </div>
+
+    <div id="ChangeScheduleModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-ng-click="CloseScheduleModal()">&times;</button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <span>@Resource.ChangeSchedule</span>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmChangeSchedule">
+                        <div class="clearfix">
+                            <div class="col-md-12 no-padding">
+                                <div class="form-group">
+                                    <label>@Resource.SelectEmployee</label>
+                                    <select class="form-control input-sm" ng-model="ScheduleTimeDetail.EmployeeID" title="@Resource.SelectEmployee">
+                                        <option value="">@Resource.SelectEmployee</option>
+                                        <option data-ng-repeat="option in ChangeScheduleEmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>@Resource.ScheduleStartTime</label>
+                                    <input type="text" data-ng-model="ScheduleTimeDetail.StartTime" class="form-control input-xs time" time_input_mask="" />
+                                </div>
+                                <div class="form-group">
+                                    <label>@Resource.ScheduleEndTime</label>
+                                    <input type="text" data-ng-model="ScheduleTimeDetail.EndTime" class="form-control input-xs time" time_input_mask="" />
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <div>
+                        <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseScheduleModal()">@Resource.Cancel</button>
+                        <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="SaveNewSchedule()">@Resource.Save</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="CancelVisitModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-ng-click="CloseCancelVisitModal()">&times;</button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <span>@Resource.CancelVisit</span>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <span>@string.Format(Resource.DeleteConfirmationMessage, Resource.ScheduleMaster)</span><br /><br />
+                    <form id="frmCancelVisit">
+                        <div class="clearfix">
+                            <div class="col-md-12 no-padding">
+                                <div class="form-group">
+                                    <label class="control-label required">@Resource.CancelReason</label>
+                                    <textarea rows="5" class="form-control input-sm" data-ng-model="CancelVisitDetail.CancelReason" maxlength="1000"
+                                              placeholder="@Resource.CancelReason" data-val="true"
+                                              data-val-required="@Resource.ReasonRequired"
+                                              name="CancelReason" id="CancelReason"></textarea>
+                                    <span class="field-validation-valid" data-valmsg-for="Notes" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <div>
+                        <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseCancelVisitModal()">@Resource.Cancel</button>
+                        <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="CancelVisit()">@Resource.YesContinue</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@Html.Partial("~/Areas/HomeCare/Views/Shared/_VisitReasonActionModal.cshtml")
+
+<script id="patient-note-popover" type="text/ng-template">
+    <div class="col-sm-12 no-padding">
+        <table class="table table-bordered table-striped table-condensed flip-content" data-ng-if="DetailModel.length>0">
+            <thead class="">
+                <tr>
+                    <th width="40%" class="text-center">
+                        <span>@Resource.Note</span>
+                    </th>
+                    <th>
+                        <span>@Resource.AddedBy</span>
+                    </th>
+                    <th>
+                        <span>@Resource.AddedDate</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="item in DetailModel">
+                    <td title="Click on Notes">
+                        <span href="javascript:void(0);" class="display-block pull-left cursor-pointer" common-detail-popover="ABC" popover-trigger="click" data-content="{{item.Note}}"
+                              ng-header="@Resource.Notes">{{item.Note.length>50 ? item.Note.substr(0,50)+'...' :  item.Note}}</span>
+                    </td>
+                    <td>{{item.CreatedByName}}</td>
+                    <td>{{(item.CreatedDate ? item.CreatedDate.replace('/Date(','').replace(')/','') : item.CreatedDate) | orgdate}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div data-ng-if="DetailModel.length==0" class="padding-bottom-15px">
+            <span>
+                @Resource.NoPatientNotesFound
+            </span>
+        </div>
+    </div>
+</script>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/homecare/schedule/virtualvisit")
+
+    @Scripts.Render("~/Assets/js/viewjs/siteApp/Areas/HomeCare/Shared/_VisitReasonActionModal.js")
+    <script>
+        var HashUrl_VirtualVisits_TodaysVisits = '@Constants.HashUrl_VirtualVisits_TodaysVisits';
+        var HashUrl_VirtualVisits_FutureVisits = '@Constants.HashUrl_VirtualVisits_FutureVisits';
+        var HashUrl_VirtualVisits_PastVisits = '@Constants.HashUrl_VirtualVisits_PastVisits';
+
+        var cAppUserName = '@SessionHelper.UserName';
+        var cAppCompanyName = '@SessionHelper.CompanyName';
+        var cAppToken = '@Model.Token';
+        var cAppURL = '@(new CacheHelper().SiteBaseURLMonile)';
+    </script>
+}

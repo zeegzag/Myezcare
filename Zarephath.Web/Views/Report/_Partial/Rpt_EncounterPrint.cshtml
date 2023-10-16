@@ -1,0 +1,117 @@
+﻿@model ReportModel
+@Html.Hidden("hdnSetEncounterPrintModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptEncounterPrintController">
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon  ribbon-color-success uppercase">@Resource.EncounterPrintReport</div>
+        <p class="ribbon-content">
+            @Resource.EncounterPrintDetail
+        </p>
+        <hr />
+        <div>
+            <a class="btn btn-sm blue pull-right" href="#model__SearchRptEncounterPrint" data-toggle="modal">@Resource.GenerateReport</a>
+        </div>
+        <br />
+    </div>
+
+    <div class="modal fade" id="model__SearchRptEncounterPrint" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.EncounterPrintReport, Resource.SearchParameter)</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmSearchRptClientStatus">
+                                <div class="col-md-12 no-padding">
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.StartDate</label>
+                                        <div datepicker="SearchEncounterPrintModel.StartDate" data-ng-dateval="SearchEncounterPrintModel.StartDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchEncounterPrintModel.StartDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.StartDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.EndDate</label>
+                                        <div datepicker="SearchEncounterPrintModel.EndDate" ng-dateval="SearchEncounterPrintModel.EndDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchEncounterPrintModel.EndDate,
+                                                             new
+                                                                 {
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.EndDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-6 ">
+                                        <label class="control-label">@Resource.ClientLabel</label>
+                                        <input type="text"
+                                               token-input
+                                               ng-val="SearchEncounterPrintModel.ReferralID"
+                                               textfield='Name'
+                                               valuefield='ReferralID'
+                                               searchurl="{{GetReferralInfoforReportURL}}"
+                                               placeholder="@Resource.SearchClientInformation"
+                                               tokenlimit='1'
+                                               onresultsformatter='ReferralDetailResultsFormatter'                                       
+                                               ontokenformatter="ReferralTokenFormatter"            
+                                               ondeletecallback='RemoveReferral'                           
+                                               autoSelectFirstResult="false"
+                                               minChars="1"
+                                               tokeninputobj="EncounterTokenObj"
+                                               id="AddNoteReferralIDTkn"
+                                               customclass="form-control input-sm"
+                                               name="ReferralID" />
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6" style="display: none">
+                                        <label class="control-label">@Resource.EnableDisableClient</label>
+                                        @Html.DropDownListFor(m => m.SearchEncounterPrintModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchEncounterPrintModel.IsDeleted), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      id = "IsDeleted",
+                                                                      data_ng_model = "SearchEncounterPrintModel.IsDeleted",
+                                                                      data_ng_init = "SearchEncounterPrintModel.IsDeleted = SearchEncounterPrintModel.IsDeleted==null?'-1':SearchEncounterPrintModel.IsDeleted.toString()",
+                                                                      @class = "form-control input-sm"
+
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+                                    
+                                     <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="EPAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                             <span class="padding-left-5"><img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetSearchFilter()" data-dismiss="modal">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm blue"  id="btnEPDownload" data-loading-text="@Resource.DownloadingInProgress" data-ng-click="DownloadEncounterReportReport('#btnEPDownload')">@Resource.Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

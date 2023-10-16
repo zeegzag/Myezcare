@@ -1,0 +1,189 @@
+﻿var custModel1;
+
+controllers.EBFormController = function ($scope, $http, $timeout, $filter) {
+
+    custModel1 = $scope;
+    $scope.newInstance = function () {
+        return $.parseJSON($("#hdnEBFormModel").val());
+    };
+
+    $scope.EbFormModel = $scope.newInstance();
+
+    $scope.SearchEbForm = $scope.newInstance().SearchEbForm;
+    $scope.TempSearchEbForm = $scope.newInstance().SearchEbForm;
+
+    $scope.EmployeeList = $scope.newInstance().EmployeeList;
+    $scope.ReferralList = $scope.newInstance().ReferralList;
+
+    $scope.FormList = $scope.newInstance().FormList;
+    $scope.FormListPager = new PagerModule();
+    $scope.FormListPager.currentPage = 1;
+    $scope.FormListPager.SortClm = function (newPredicate) {
+        $scope.FormListPager.reverse = ($scope.FormListPager.sortIndex === newPredicate) ? !$scope.FormListPager.reverse : false;
+        $scope.FormListPager.sortIndex = newPredicate != undefined ? newPredicate : sortIndex;
+        $scope.FormListPager.sortDirection = $scope.FormListPager.reverse === true ? "DESC" : "ASC";
+    };
+    $scope.ResetSearchFilter = function () {
+        $timeout(function () {
+            $scope.SearchEbForm = $scope.newInstance().SearchEbForm;
+            $scope.TempSearchEbForm = $scope.newInstance().SearchEbForm;
+            $scope.FormListPager.currentPage = 1;
+        });
+    }
+
+
+
+    //#region Open New HTML Form
+
+
+    $scope.OpenNewHtmlForm = function (item) {
+        debugger;
+
+        
+
+        var data = $scope.newInstance().ConfigEBFormModel;
+        var jsonData = angular.toJson({ "username": data.ResuName, "password": data.ResuKey });
+        var postUrl = data.EBBaseSiteUrl + "/auth/login";
+
+
+        $.ajax({
+            type: 'POST',
+            url: postUrl,
+            crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
+            header: {
+                'Content-Type': 'application/json'
+            },
+            data: jsonData,
+            success: function (response, result) {
+                //debugger;
+                if (result === "success") {
+                    var newFormUrl = data.EBBaseSiteUrl + "/form/" + item.NameForUrl + "?version=" + item.Version + "&tenantGuid=" + response.tenantGuid;
+                    //var finalUrl = "/hc/referral/LoafIFrameForm?url=" + newFormUrl;
+                    // window.open(newFormUrl, "Test Window", 500);
+                    if ($scope.ChildWindow) {
+                        if ($scope.ChildTimer)
+                            clearInterval($scope.ChildTimer);
+                        $scope.ChildWindow.close();
+                    }
+                    $scope.ChildWindow = window.open(newFormUrl, "_blank", "height=600, width=700, status=yes, toolbar=no, menubar=no, location=no,addressbar=no");
+                    //$scope.ChildWindow.onunload = function () { console.log('Child window closed'); };
+
+                    //$scope.ChildTimer = setInterval(function () {
+                    //    if ($scope.ChildWindow.closed) {
+                    //        debugger;
+                    //        var data = $scope.ChildWindow.location;
+
+                    //        alert("Child window closed");
+                    //        clearInterval($scope.ChildTimer);
+                    //    }
+                    //}, 500);
+
+                    //$(document.body).append('<iframe id="myId" style="    background: wheat;width: 700px;    height: 500px;" >');
+                    //var iframe1 = $('iframe#myId');
+                    //iframe1.attr('src', newFormUrl);
+                    //iframe1.load(function () {
+                    //   // callback(this);
+                    //});
+
+
+
+                }
+
+            },
+            error: function (a, b, c) {
+
+            }
+        });
+
+
+
+    }
+
+    $scope.SavedNewHtmlForm = function (eBriggsFomrId) {
+        if ($scope.ChildWindow && $scope.ChildWindow.close) $scope.ChildWindow.close();
+        var jsonData = angular.toJson({ "EBriggsFomrID": eBriggsFomrId, "EmployeeID": $scope.TempSearchEbForm.EmployeeID, "ReferralID": $scope.TempSearchEbForm.ReferralID});
+        AngularAjaxCall($http, HomeCareSiteUrl.SaveNewEBFormURL, jsonData, "Post", "json", "application/json", false).
+            success(function (response) {
+                ShowMessages(response);
+            });
+    }
+
+    //#endregion
+
+};
+
+
+
+app.filter('filterForms', function () {
+    return function (formList, formFilter) {
+
+        var results = [];
+        var formVersionMap = {};
+        $.each(formList, function (index, form) {
+            //debugger;
+            var existingVersionForm = formVersionMap[form.Name];
+            var isCorrectVersion = !existingVersionForm || form.Version > existingVersionForm.Version;
+            if (isCorrectVersion && existingVersionForm) {
+                var existingIndex = results.indexOf(existingVersionForm);
+                if (existingIndex >= 0) {
+                    results.splice(existingIndex, 1);
+                }
+            }
+
+            if (isCorrectVersion) {
+                formVersionMap[form.Name] = form;
+            }
+
+            //var isCorrectVersion = true;
+            if (form.IsActive && isCorrectVersion) {
+                var hasShortName = ValideElement(formFilter.FormNumber) === false || form.Name.toUpperCase().indexOf(formFilter.FormNumber.toUpperCase()) > -1;
+                var hasLongName = ValideElement(formFilter.FormName) === false || form.FormLongName.toUpperCase().indexOf(formFilter.FormName.toUpperCase()) > -1;
+                //var hasLongName = (formFilter.FormName === '' || formFilter.FormName === null) || form.FormLongName.toUpperCase().indexOf(formFilter.FormName.toUpperCase()) > -1;
+                var hasCategory = ValideElement(formFilter.FormCategoryID) === false || formFilter.FormCategoryID == 0 || form.FormCategory.Id == formFilter.FormCategoryID;
+
+                var hasPkg = false;
+                if (hasShortName && hasLongName && hasCategory) {
+                    $.each(form.FormPackages, function (index, formPackage) {
+
+                        if (ValideElement(formFilter.MarketID) === false || formFilter.MarketID == 0) {
+                            hasPkg = true;
+                            return false;
+                        }
+
+                        if (formPackage.PackageId == formFilter.MarketID) {
+                            hasPkg = true;
+                            return false;
+                        }
+                    });
+                }
+
+                if (hasShortName && hasLongName && hasCategory && hasPkg) {
+                    results.push(form);
+                }
+            }
+        });
+
+        return results;
+    }
+});
+controllers.EBFormController.$inject = ['$scope', '$http', '$timeout', '$filter'];
+
+
+
+$(document).ready(function () {
+
+
+    var eventMethod = window.addEventListener ? "addEventListener" : "attachEvent";
+    var eventer = window[eventMethod];
+    var messageEvent = eventMethod == "attachEvent" ? "onmessage" : "message";
+
+    // Listen to message from child window
+    eventer(messageEvent, function (e) {
+        //console.log('parent received message!:  ', e.data);
+        custModel1.SavedNewHtmlForm(e.data);
+    }, false);
+
+});

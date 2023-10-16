@@ -1,0 +1,659 @@
+﻿@model AddReferralModel
+
+@*@Html.Hidden("hdnAddReferralModel", Common.SerializeObject(Model))*@
+
+<div class="col-lg-12 col-md-12 col-sm-12 no-padding">
+    <div>
+
+        @*data-ng-init="PageSourceDDL=CAreGiverList"*@
+        <strong>@Resource.PersonalInformation:</strong>
+        <div class="row">
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.FirstName</label>
+                @Html.TextBoxFor(q => q.Referral.FirstName, new
+           {
+               @class = "form-control input-sm required validateElement",
+               data_ng_model = "ReferralModel.Referral.FirstName",
+               data_error_Count = "ReferralErrorCount.ClientTab",
+               placeholder = @Resource.FirstName,
+               maxlength = 50
+           })
+                @Html.ValidationMessageFor(q => q.Referral.FirstName)
+            </div>
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.MiddleName</label>
+                @Html.TextBoxFor(q => q.Referral.MiddleName, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.Referral.MiddleName", placeholder = @Resource.MiddleName, maxlength = 50 })
+                @Html.ValidationMessageFor(q => q.Referral.MiddleName)
+            </div>
+
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.LastName</label>
+                @Html.TextBoxFor(q => q.Referral.LastName, new
+                    {
+                        @class = "form-control input-sm validateElement",
+                        data_ng_model = "ReferralModel.Referral.LastName",
+                        data_error_Count = "ReferralErrorCount.ClientTab",
+                        placeholder = @Resource.LastName,
+                        maxlength = 50
+                    })
+                @Html.ValidationMessageFor(q => q.Referral.LastName)
+            </div>
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.NickName</label>
+                @Html.TextBoxFor(q => q.Referral.ClientNickName,
+            new
+                {
+                    @class = "form-control input-sm",
+                    data_ng_model = "ReferralModel.Referral.ClientNickName",
+                    placeholder = @Resource.NickName,
+                    maxlength = 50
+                })
+                @Html.ValidationMessageFor(q => q.Referral.ClientNickName)
+            </div>
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3" id="data_1">
+                <label class="control-label required">@Resource.DateOfBirth
+                    @*<i class="fa fa-question-circle font-pink" data-ng-tooltip="@Resource.FutureDateNotAllowed"  data-ng-custom-class="tooltip-extra-z-index"  data-ngbg-color-class="bg-pink" data-ngbg-arrow-color-class="tooltip-arrow-pink"></i>*@
+                    <i class="fa fa-question-circle" data-ng-tooltip="@Resource.FutureDateNotAllowed"  data-ng-custom-class="tooltip-extra-z-index" ></i>
+                </label>
+                <span class="label label-danger label-sm pull-right">{{calculateAge(ReferralModel.Referral.Dob)}}</span>
+                <div id="dateDOB" class="input-group date" datepicker="ReferralModel.Referral.Dob" data-ng-dateval="ReferralModel.Referral.Dob"
+                    data-ng-maxdate="CurrentDate">
+                    @*data-ng-mindate="DOBValidDate"*@
+                    @*data-ng-model="ReferralModel.Referral.Dob"*@
+                    <input class="form-control input-sm validateElement dateInputMask" data-val="true"
+                        data-val-required="@Resource.DateOfBirthRequired" placeholder="@Resource.DateOfBirth" id="Referral_Dob" maxlength="10" name="Referral.Dob" data-error-Count="ReferralErrorCount.ClientTab"
+                           type="text" >@*onChange='ChangeDate()'*@
+
+                    @Html.ValidationMessageFor(m => m.Referral.Dob)
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+
+            @*<div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.Age</label>
+                <input type="text" class="form-control input-sm" data-ng-value="calculateAge(ReferralModel.Referral.Dob)" disabled>
+            </div>*@
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3 select2add">
+                <label class="control-label required">@Resource.Gender</label>
+                @Html.DropDownListFor(p => p.Referral.Gender, Model.GenderList.ToSelectList(Model.Referral.Gender ?? "", "Name", "Value", @Resource.SelectGender, ""),
+                                              new
+                                                  {
+                                                      data_ng_model = "ReferralModel.Referral.Gender",
+                                                      data_ng_init = "ReferralModel.Referral.Gender=ReferralModel.Referral.Gender==null?'':ReferralModel.Referral.Gender.toString()",
+                                                      @class = "form-control input-sm validateElement",
+                                                      data_error_Count = "ReferralErrorCount.ClientTab",
+                                                      //data_ng_setname = "ReferralModel.Referral.Name"
+                                                  })
+
+                @Html.ValidationMessageFor(q => q.Referral.Gender)
+            </div>
+
+            <div class="clearleft"></div>
+
+
+            @*<div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.ClientNumber</label>
+                @Html.TextBoxFor(q => q.Referral.ClientNumber,
+                new
+                    {
+                        @class = "form-control input-sm",
+                        data_ng_model = "ReferralModel.Referral.ClientNumber",
+                        placeholder = @Resource.ClientNumber,
+                        maxlength = 10
+                    })
+                @Html.ValidationMessageFor(q => q.Referral.ClientNumber)
+            </div>*@
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.AHCCCSID #</label>
+                <span data-ng-if="ReferralModel.Referral.IsEditMode">
+                    <a href="#UpdateAHCCCSID" data-ng-click="UpdateAHCCCSIDView()" class="pull-right" data-toggle="modal">@Resource.Edit</a>
+                </span>
+                @Html.TextBoxFor(q => q.Referral.AHCCCSID,
+                new
+                    {
+                        id = "AHCCCS_ID",
+                        @class = "form-control input-sm validateElement",
+                        data_error_Count = "ReferralErrorCount.ClientTab",
+                        data_ng_model = "ReferralModel.Referral.AHCCCSID",
+                        placeholder = @Resource.AHCCCSID,
+                        maxlength = 10,
+                        data_ng_readonly = "{{ReferralModel.Referral.IsEditMode}}"
+                    })
+                @Html.ValidationMessageFor(q => q.Referral.AHCCCSID)
+            </div>
+
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3" id="data_1">
+                <label class="control-label required">@Resource.AHCCCSVerificationDate</label>
+                <div class="input-group date" datepicker="ReferralModel.Referral.AHCCCSEnrollDate" ng-dateval="ReferralModel.Referral.AHCCCSEnrollDate">
+                    <input class="form-control input-sm dateInputMask validateElement"
+                           placeholder="@Resource.AHCCCSVerificationDate"
+                           id="Referral_AHCCCSEnrollDate" 
+                           maxlength="10" 
+                           name="Referral.AHCCCSEnrollDate"
+                           data-val="true"
+                           data-val-required="@Resource.AHCCCSVerificationDateRequired"
+                        data-error-Count="ReferralErrorCount.ClientTab"
+                           type="text" />
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+                @Html.ValidationMessageFor(q => q.Referral.AHCCCSEnrollDate)
+            </div>
+
+
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label ">@Resource.CIS #
+                    <i class="fa fa-question-circle" data-ng-tooltip="@Resource.CISRequiredForPY"  data-ng-custom-class="tooltip-extra-z-index"></i>
+                </label>
+                @Html.TextBoxFor(q => q.Referral.CISNumber,
+                new
+                    {
+                        @class = "form-control input-sm validateElement",//validateElement
+                        data_error_Count = "ReferralErrorCount.ClientTab",
+                        data_ng_model = "ReferralModel.Referral.CISNumber",
+                        //placeholder = @Resource.CISID,
+                        placeholder = @Resource.CISNumberLabel,
+                        maxlength = 12,
+                        key_press_validation = "Digit"
+                    })
+                @Html.ValidationMessageFor(q => q.Referral.CISNumber)
+
+
+                @Html.TextBoxFor(q => q.Referral.SelectedPayor,
+                new
+                    {
+                        @class = "form-control input-sm hideErrorContent",//validateElement
+                        data_ng_model = "ReferralModel.Referral.SelectedPayor",
+                    })
+                @Html.ValidationMessageFor(q => q.Referral.SelectedPayor)
+            </div>
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.Population</label>
+                @Html.TextBoxFor(q => q.Referral.Population,
+                new
+                    {
+                        @class = "form-control input-sm validateElement",
+                        data_error_Count = "ReferralErrorCount.ClientTab",
+                        data_ng_model = "ReferralModel.Referral.Population",
+                        placeholder = @Resource.Population,
+                        maxlength = 50
+                    })
+                @Html.ValidationMessageFor(q => q.Referral.Population)
+            </div>
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.HealthPlan</label>
+                @Html.TextBoxFor(q => q.Referral.HealthPlan,
+            new
+                {
+                    @class = "form-control input-sm",
+                    data_ng_model = "ReferralModel.Referral.HealthPlan",
+                    placeholder = @Resource.HealthPlan,
+                    maxlength = 50
+                })
+                @Html.ValidationMessageFor(q => q.Referral.HealthPlan)
+            </div>
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.PolicyNumber</label>
+                @Html.TextBoxFor(q => q.Referral.PolicyNumber,
+                                 new
+                                     {
+                                         @class = "form-control input-sm",
+                                         data_ng_model = "ReferralModel.Referral.PolicyNumber",
+                                         @placeholder = Resource.PolicyNumber,
+                                         maxlength = 100
+                                     })
+                @Html.ValidationMessageFor(q => q.Referral.PolicyNumber)
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.Title</label>
+                @Html.TextBoxFor(q => q.Referral.Title,
+                                 new
+                                     {
+                                         @class = "form-control input-sm validateElement",
+                                         data_error_Count = "ReferralErrorCount.ClientTab",
+                                         data_ng_model = "ReferralModel.Referral.Title",
+                                         @placeholder = Resource.XIX,
+                                         maxlength = 50
+                                     })
+                @Html.ValidationMessageFor(q => q.Referral.Title)
+            </div>
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.RecordRequestEmail</label>
+                @Html.TextBoxFor(q => q.Referral.RecordRequestEmail,
+                                 new
+                                     {
+                                         @class = "form-control input-sm  validateElement",
+                                         data_error_Count = "ReferralErrorCount.ClientTab",
+                                         data_ng_model = "ReferralModel.Referral.RecordRequestEmail",
+                                         placeholder = @Resource.RecordRequestEmail,
+                                         //maxlength = 50
+                                     })
+                @Html.ValidationMessageFor(q => q.Referral.RecordRequestEmail)
+            </div>
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.MonthlySummaryEmail</label>
+                @Html.TextBoxFor(q => q.Referral.MonthlySummaryEmail,
+                new
+                {
+                    @class = "form-control input-sm  validateElement",
+                    data_error_Count = "ReferralErrorCount.ClientTab",
+                    data_ng_model = "ReferralModel.Referral.MonthlySummaryEmail",
+                    placeholder = @Resource.MonthlySummaryEmail,
+                    //maxlength = 50
+                })
+                @Html.ValidationMessageFor(q => q.Referral.MonthlySummaryEmail)
+            </div>
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.RateCode</label>
+                @Html.TextBoxFor(q => q.Referral.RateCode, new
+                    {
+                        @class = "form-control input-sm ",
+                        data_ng_model = "ReferralModel.Referral.RateCode",
+                        placeholder = @Resource.RateCode,
+                        maxlength = 50
+                    })
+                @Html.ValidationMessageFor(q => q.Referral.RateCode)
+            </div>
+            <div class="form-group col-lg-2 col-md-3 col-sm-3" id="data_1">
+                <label class="control-label">@Resource.RateCodeStartDate</label>
+                <div id="dateDOB" class="input-group date" datepicker="ReferralModel.Referral.RateCodeStartDate" ng-dateval="ReferralModel.Referral.RateCodeStartDate" data-ng-maxdate="ReferralModel.Referral.RateCodeEndDate">
+                    @*<input class="form-control input-sm validateElement dateInputMask" data-val="true"
+                           id="Referral_RateCodeStartDate" maxlength="10"
+                           name="Referral.RateCodeStartDate"                           
+                           data-error-Count="ReferralErrorCount.ClientTab"                           
+                           placeholder="@Resource.RateCodeStartDate"
+                           type="text">*@
+                    @Html.TextBoxFor(m => m.Referral.RateCodeStartDate, new
+               {
+                   @class = "form-control input-sm validateElement dateInputMask",
+                   placeholder = Resource.RateCodeStartDate,
+                   @maxlength = "10",
+                   data_error_Count = "ReferralErrorCount.ClientTab"
+               })
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+                @Html.ValidationMessageFor(q => q.Referral.RateCodeStartDate)
+            </div>
+            <div class="form-group col-lg-2 col-md-3 col-sm-3" id="data_1">
+                <label class="control-label">@Resource.RateCodeEndDate</label>
+                <div id="dateDOB" class="input-group date" datepicker="ReferralModel.Referral.RateCodeEndDate" ng-dateval="ReferralModel.Referral.RateCodeEndDate" data-ng-mindate="ReferralModel.Referral.RateCodeStartDate">
+                    <input class="form-control input-sm validateElement dateInputMask" data-val="true"
+                           id="Referral_RateCodeEndDate" maxlength="10"
+                           name="Referral.RateCodeEndDate"
+                           placeholder="@Resource.RateCodeEndDate"
+                           data-error-Count="ReferralErrorCount.ClientTab"
+                           type="text">
+                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                </div>
+            </div>
+
+
+
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.Region</label>
+
+                @Html.DropDownListFor(p => p.Referral.RegionID, Model.RegionList.ToSelectList(Model.Referral.RegionID.ToString() ?? "", "RegionName", "RegionID", @Resource.SelectRegion, ""),
+                                      new
+                                          {
+                                              data_ng_model = "ReferralModel.Referral.RegionID",
+                                              data_ng_init = "ReferralModel.Referral.RegionID=ReferralModel.Referral.RegionID==''?null:ReferralModel.Referral.RegionID.toString()",
+                                              @class = "form-control input-sm validateElement",
+                                              data_error_Count = "ReferralErrorCount.ClientTab",
+                                              convert_to_number = ""
+                                              //data_ng_setname = "ReferralModel.Referral.RegionName"
+                                          })
+
+                @Html.ValidationMessageFor(q => q.Referral.RegionID)
+            </div>
+
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.LanguagePreference</label>
+
+
+                @Html.DropDownListFor(p => p.Referral.LanguageID, Model.LanguageList.ToSelectList(Model.Referral.LanguageID ?? "", "Name", "LanguageID", @Resource.SelectLanguage, ""),
+                                      new
+                                          {
+                                              data_ng_model = "ReferralModel.Referral.LanguageID",
+                                              data_ng_init = "ReferralModel.Referral.LanguageID=ReferralModel.Referral.LanguageID==''?null:ReferralModel.Referral.LanguageID.toString()",
+                                              @class = "form-control input-sm validateElement",
+                                              data_error_Count = "ReferralErrorCount.ClientTab",
+                                              //data_ng_setname = "ReferralModel.Referral.Name"
+                                          })
+
+                @Html.ValidationMessageFor(q => q.Referral.LanguageID)
+
+            </div>
+
+            @* <div class="clearleft"></div>*@
+
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.Status</label>
+
+
+                @Html.DropDownListFor(p => p.Referral.ReferralStatusID, Model.ReferralStatusList.ToSelectList(Model.Referral.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", @Resource.SelectStatus, ""),
+                                      new
+                                          {
+                                              data_ng_model = "ReferralModel.Referral.ReferralStatusID",
+                                              data_ng_init = "ReferralModel.Referral.ReferralStatusID==null?'':ReferralModel.Referral.ReferralStatusID.toString()",
+                                              @class = "form-control input-sm validateElement",
+                                              data_error_Count = "ReferralErrorCount.ClientTab",
+                                              //data_ng_setname = "ReferralModel.Referral.Status",
+                                              convert_to_number = "",
+                                              //data_ng_change="ReferralStatusChange(ReferralModel.Referral.ReferralStatusID)"
+
+                                          })
+
+                @Html.ValidationMessageFor(q => q.Referral.ReferralStatusID)
+
+
+            </div>
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label required">@Resource.Assignee</label>
+
+                @*@Html.DropDownListFor(p => p.Referral.Assignee, Model.EmployeeList.ToSelectList(Model.Referral.Assignee.ToString() ?? "", "EmployeeName", "EmployeeID", @Resource.SelectAssignee, ""),
+                                      new
+                                          {
+                                              convert_to_number = "",
+                                              data_ng_model = "ReferralModel.Referral.Assignee",
+                                              data_ng_init = "ReferralModel.Referral.Assignee=ReferralModel.Referral.Assignee==''?null:ReferralModel.Referral.Assignee.toString()",
+                                              @class = "form-control input-sm validateElement",
+                                              data_error_Count = "ReferralErrorCount.ClientTab",
+                                              //data_ng_setname = "ReferralModel.Referral.EmployeeName"
+                                          })*@
+                <select class="form-control input-sm"
+                        data-ng-init="ReferralModel.Referral.Assignee=ReferralModel.Referral.Assignee==''?null:ReferralModel.Referral.Assignee.toString()"
+                        data-ng-model="ReferralModel.Referral.Assignee"
+                        data-val="true" data-val-required="@Resource.AssigneeRequired"
+                        id="Assignee"
+                        name="ReferralModel.Referral.Assignee"
+                        convert-to-number="">
+                    <option value="">@Resource.SelectAssignee</option>
+                    <option data-ng-repeat="option in ReferralModel.EmployeeList | filter:AssigneeFilter(ReferralModel.Referral.Assignee)" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                </select>
+                @Html.ValidationMessageFor(q => q.Referral.Assignee)
+            </div>
+
+            @*<div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class="control-label">@Resource.Caseload</label>
+                <select class="form-control input-sm"
+                    data-ng-init="ReferralModel.Referral.Caseload=ReferralModel.Referral.Caseload==''?null:ReferralModel.Referral.Caseload.toString()"
+                    data-ng-model="ReferralModel.Referral.Caseload"
+                    id="Caseload"
+                    name="ReferralModel.Referral.Caseload"
+                    convert-to-number="">
+                    <option value="">@Resource.SelectCaseload</option>
+                    <option data-ng-repeat="option in ReferralModel.EmployeeList | filter:AssigneeFilter(ReferralModel.Referral.Caseload)" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                </select>
+                @Html.ValidationMessageFor(q => q.Referral.Caseload)
+            </div>*@
+
+            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                <label class=" control-label">@Resource.Caseload</label>
+                <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                    selectpicker="ReferralModel.Referral.ReferralCaseloadIDs" name="ReferralModel.Referral.ReferralCaseloadIDs"
+                    title="Caseload">
+                    <option data-ng-repeat="option in ReferralModel.EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                </select>
+                @Html.ValidationMessageFor(q => q.Referral.Caseload)
+            </div>
+
+        </div>
+
+
+        <div class="space10"></div>
+        <hr />
+        <div class="space1"></div>
+        <div>
+            <strong>@Resource.OrientationInformation:</strong>
+
+            <div class="row">
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3" id="data_2">
+                    <label class="control-label">@Resource.OrientationDate
+                        <i class="fa fa-question-circle" data-ng-tooltip="@Resource.FutureDateNotAllowed"  data-ng-custom-class="tooltip-extra-z-index"></i>
+                    </label>
+                    <div class="input-group date" datepicker="ReferralModel.Referral.OrientationDate" ng-dateval="ReferralModel.Referral.OrientationDate" data-ng-maxdate="CurrentDate">
+
+                        @Html.TextBoxFor(m => m.Referral.OrientationDate, new
+                   {
+                       @class = "form-control input-sm validateElement dateInputMask",
+                       placeholder = Resource.OrientationDate,
+                       @maxlength = "10",
+                       data_error_Count = "ReferralErrorCount.ClientTab"
+                   })
+                        @Html.ValidationMessageFor(q => q.Referral.OrientationDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+
+                        @*<input class="form-control input-sm validateElement dateInputMask" data-val="true"
+                               data-val-requiredif="@Resource.OrientationDateRequired"                               
+                               data-val-requiredif-dependentproperty="ReferralStatusID" data-val-requiredif-rule="required" data-val-requiredif-targetvalue="@((int)ReferralStatus.ReferralStatuses.Active)" id="Referral_OrientationDate" maxlength="10" name="Referral.OrientationDate"
+                               type="text" data-error-Count="ReferralErrorCount.ClientTab" placeholder="@Resource.OrientationDate">
+
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>*@
+                    </div>
+
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label" data-ng-class="{'required':ReferralModel.Referral.ReferralStatusID == ActiveStatus}">@Resource.DropOffLocation</label>
+
+                    <div class="input-group-sm">
+                        @Html.DropDownListFor(p => p.Referral.DropOffLocation, Model.TransportLocationList.ToSelectList(Model.Referral.DropOffLocation.ToString() ?? "", "Location", "TransportLocationID", @Resource.SelectLocation, ""),
+                                              new
+                                              {
+                                                  convert_to_number = "",
+                                                  data_ng_model = "ReferralModel.Referral.DropOffLocation",
+                                                  data_ng_init = "ReferralModel.Referral.DropOffLocation=ReferralModel.Referral.DropOffLocation==''?null:ReferralModel.Referral.DropOffLocation.toString()",
+                                                  @class = "form-control validateElement",
+                                                  data_error_Count = "ReferralErrorCount.ClientTab",
+
+                                              })
+                        @Html.ValidationMessageFor(q => q.Referral.DropOffLocation)
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label" data-ng-class="{'required':ReferralModel.Referral.ReferralStatusID == ActiveStatus}">@Resource.PickUpLocation</label>
+
+                    <div class="input-group-sm">
+                        @Html.DropDownListFor(p => p.Referral.PickUpLocation, Model.TransportLocationList.ToSelectList(Model.Referral.DropOffLocation.ToString() ?? "", "Location", "TransportLocationID", @Resource.SelectLocation, ""),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralModel.Referral.PickUpLocation",
+                                                  data_ng_init = "ReferralModel.Referral.PickUpLocation=ReferralModel.Referral.PickUpLocation==''?null:ReferralModel.Referral.PickUpLocation.toString()",
+                                                  @class = "form-control validateElement",
+                                                  convert_to_number = "",
+                                                  data_error_Count = "ReferralErrorCount.ClientTab",
+                                              })
+                        @Html.ValidationMessageFor(q => q.Referral.PickUpLocation)
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3 select2add">
+                    <label class="control-label" data-ng-class="{'required':ReferralModel.Referral.ReferralStatusID == ActiveStatus}">@Resource.FrequencyCode</label>
+                    <div class="input-group-sm">
+                        @Html.DropDownListFor(p => p.Referral.FrequencyCodeID, Model.FrequencyCodeList.ToSelectList(Model.Referral.FrequencyCodeID.ToString() ?? "", "Code", "FrequencyCodeID", @Resource.SelectFrequencyCode, ""),
+                                              new
+                                              {
+                                                  convert_to_number = "",
+                                                  data_ng_model = "ReferralModel.Referral.FrequencyCodeID",
+                                                  data_ng_init = "ReferralModel.Referral.FrequencyCodeID==''?null:ReferralModel.Referral.FrequencyCodeID.toString()",
+                                                  @class = "form-control validateElement",
+                                                  data_error_Count = "ReferralErrorCount.ClientTab"
+                                              })
+                    </div>
+                    @Html.ValidationMessageFor(q => q.Referral.FrequencyCodeID)
+                </div>
+
+
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+
+                    <label class="control-label">@Resource.NeedPrivateRoom</label>
+                    <div class="input-group-sm">
+
+                        @Html.DropDownListFor(p => p.Referral.NeedPrivateRoom, Model.PrivateRoomList.ToSelectList(Model.Referral.NeedPrivateRoom.ToString() ?? "", "Name", "Value"),
+                                              new
+                                              {
+
+                                                  data_ng_model = "ReferralModel.Referral.NeedPrivateRoom",
+                                                  data_ng_init = "ReferralModel.Referral.NeedPrivateRoom=(ReferralModel.Referral.NeedPrivateRoom=null?'':ReferralModel.Referral.NeedPrivateRoom.toString())",
+                                                  @class = "form-control",
+                                                  convert_to_boolean = ""
+                                              })
+                        @Html.ValidationMessageFor(q => q.Referral.NeedPrivateRoom)
+
+                    </div>
+                </div>
+
+                <div class="clearfix"></div>
+
+                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                    <label class="control-label">@Resource.ScheduleRequestDates
+
+                    </label>
+                    @Html.TextBoxFor(q => q.Referral.ScheduleRequestDates, new { @class = "form-control input-sm replaceErrorDest", data_ng_model = "ReferralModel.Referral.ScheduleRequestDates", placeholder = @Resource.ScheduleRequestDates, maxlength = 500 })
+                    <span class="form-group no-padding col-md-12 col-sm-12">@Html.Raw(Resource.SchReqDateHelpText)</span>
+                    @*<input data-val-required="@Resource.ValidScheduleRequestDateText"
+                           data-ng-model="ValidScheduleRequestDate" data-val="true"
+                           id="Referral_ValidScheduleRequestDate"
+                           class="form-control input-sm hideErrorContent validateElement replaceErrorSource"
+                           data-error-Count="ReferralErrorCount.ClientTab"
+                           name="Referral.ValidScheduleRequestDate"/>*@
+
+                    @*@Html.TextBoxFor(q => q.Referral.ScheduleRequestDateErrorCount,
+                                 new
+                                     {
+                                         data_ng_model = "ReferralModel.Referral.ScheduleRequestDateErrorCount",
+                                         @class = "form-control hideErrorContent replaceErrorSource validateElement",
+                                         data_error_Count = "ReferralErrorCount.ClientTab",
+                                     })
+
+                    @Html.ValidationMessageFor(m => m.Referral.ScheduleRequestDateErrorCount)*@
+                </div>
+
+
+                <div class="clearfix"></div>
+
+
+
+
+
+                <div class="form-group col-lg-4 col-md-6 col-sm-3">
+                    <label class="control-label">@Resource.PlacementRequirement</label>
+                    <div class="textarea-height-80px">
+                        @Html.TextAreaFor(q => q.Referral.PlacementRequirement, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.Referral.PlacementRequirement", placeholder = @Resource.PlacementRequirement, maxlength = 500 })
+                        @Html.ValidationMessageFor(q => q.Referral.PlacementRequirement)
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-4 col-md-6 col-sm-3">
+                    <label class="control-label">@Resource.BehavioralIssue</label>
+                    <div class="textarea-height-80px">
+                        @Html.TextAreaFor(q => q.Referral.BehavioralIssue, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.Referral.BehavioralIssue", placeholder = @Resource.BehavioralIssue, maxlength = 500 })
+                        @Html.ValidationMessageFor(q => q.Referral.BehavioralIssue)
+                    </div>
+                </div>
+
+                @*<div class="form-group col-lg-4 col-md-6 col-sm-3">
+                    <label class="control-label">@Resource.OtherInformation</label>
+                    <div class="textarea-height-80px">
+                        @Html.TextAreaFor(q => q.Referral.OtherInformation, new { @class = "form-control input-sm", data_ng_model = "ReferralModel.Referral.OtherInformation", placeholder = @Resource.OtherInformation, maxlength = 500 })
+                        @Html.ValidationMessageFor(q => q.Referral.OtherInformation)
+                    </div>
+                </div>*@
+
+
+            </div>
+
+
+        </div>
+    </div>
+
+
+    <div class="modal fade" id="UpdateAHCCCSID" tabindex="-1" role="dialog" aria-labelledby="UpdateAHCCCSID">
+        <div class="modal-dialog" role="UpdateAHCCCSID">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>@Resource.UpdateAHCCCSID</span></h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12 asd">
+                            <form id="frmUpdateAhcccsID" class="frmUpdateAhcccsID">
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <label class="control-label"><b>Note**:&nbsp;</b>@Html.Raw(Resource.UpdateAHCCCSWarning)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-6 col-md-6 col-sm-12">
+                                        <label class="control-label required">@Resource.NewAHCCCSID #</label>
+                                        @Html.TextBoxFor(q => q.ReferralAhcccsDetails.NewAHCCCSID,
+                                        new
+                                        {
+                                            id = "NewAHCCCSID",
+                                            @class = "form-control input-sm",
+                                            data_ng_model = "ReferralModel.ReferralAhcccsDetails.NewAHCCCSID",
+                                            placeholder = @Resource.AHCCCSID,
+                                            maxlength = 10
+                                        })
+                                        @Html.ValidationMessageFor(q => q.ReferralAhcccsDetails.NewAHCCCSID)
+                                        <span data-ng-show="!IsValidAHCCCS" class="font-red">@Resource.AHCCCSIDMissingInvalid</span>
+                                    </div>
+
+
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                        {
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                    <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Close</button>
+                                    <button type="button" class="btn green-jungle" data-ng-click="UpdateAHCCCSID()">@Resource.Save</button>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+

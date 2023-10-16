@@ -1,0 +1,118 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.AddReleaseNote);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ReleaseNoteAdd;
+}
+
+@model AddReleaseNoteModel
+@Html.Hidden("hdnAddreleaseNoteModel", Common.SerializeObject(Model))
+<div data-ng-controller="AddReleaseNoteController">
+    <form class="form-horizontal" id="frmReleaseNote">
+        <div class="page-bar">
+            <h3 class="page-title">
+                @(Model != null && Model.ReleaseNote != null && Model.ReleaseNote.ReleaseNoteID > 0 ? Resource.EditReleaseNote : @Resource.AddReleaseNote)
+                @*<small>@Resource.EnterTemplateInformation</small>*@
+                <input type="submit" data-ng-click="SaveReleaseNoteDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model.ReleaseNote != null && Model.ReleaseNote.ReleaseNoteID > 0 ? Resource.Update : @Resource.Save)" />
+                <a href="@Constants.ReleaseNoteListURL">
+                    <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                </a>
+            </h3>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.ReleaseNoteDetails
+                            </div>
+                            <div class="col-sm-12 ">
+                                <div class=" col-sm-12 form-group">
+                                    <label class="col-md-3 control-label required ">
+                                        @Resource.Title
+                                    </label>
+                                    <div class="col-md-7">
+
+                                        @Html.TextBoxFor(q => q.ReleaseNote.Title, new
+                                        {
+                                            @class = "form-control input-sm",
+                                            data_ng_model = "ReleaseNoteModel.ReleaseNote.Title",
+                                            placeholder = @Resource.Title,
+                                            maxlength = 500
+                                        })
+                                        @Html.ValidationMessageFor(q => q.ReleaseNote.Title)
+                                    </div>
+                                </div>
+                                <div class=" col-sm-12 form-group">
+                                    <label class="col-md-3 control-label required ">
+                                        @Resource.StartDate
+                                    </label>
+                                    <div class="col-md-3">
+                                        <div class="input-group date"
+                                             datepicker="ReleaseNoteModel.ReleaseNote.StartDate"
+                                             data-ng-dateval="ReleaseNoteModel.ReleaseNote.StartDate"
+                                             data-ng-maxdate="ReleaseNoteModel.ReleaseNote.EndDate">
+                                            @Html.TextBoxFor(q => q.ReleaseNote.StartDate,
+                                                                  new
+                                                                  {
+                                                                      @class = "form-control input-sm dateInputMask",
+                                                                      placeholder = Resource.StartDate
+                                                                  })
+                                            @Html.ValidationMessageFor(q => q.ReleaseNote.StartDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                    <label class="col-md-1 control-label required text-align-left">
+                                        @Resource.EndDate
+                                    </label>
+                                    <div class="col-md-3">
+                                        <div class="input-group date"
+                                             datepicker="ReleaseNoteModel.ReleaseNote.EndDate"
+                                             data-ng-dateval="ReleaseNoteModel.ReleaseNote.EndDate"
+                                             data-ng-mindate="ReleaseNoteModel.ReleaseNote.StartDate">
+
+                                            @Html.TextBoxFor(q => q.ReleaseNote.EndDate,
+                                                     new
+                                                     {
+                                                         @class = "form-control input-sm dateInputMask",
+                                                         placeholder = Resource.EndDate
+                                                     })
+                                            @Html.ValidationMessageFor(q => q.ReleaseNote.EndDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-3 control-label required">@Resource.Description</label>
+                                    <div class="col-md-7">
+                                        @Html.TextAreaFor(q => q.ReleaseNote.Description,
+                                                         new
+                                                         {
+                                                             data_ng_model = "ReleaseNoteModel.ReleaseNote.Description",
+                                                             id = "ReleaseNoteDescription",
+                                                             @class = "dirSummerNoteEditor form-control error_summer_note",
+                                                             @min_Height = "300"
+                                                         })
+                                        @Html.ValidationMessageFor(x => x.ReleaseNote.Description)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12 form-group no-margin ">
+                <input type="submit" data-ng-click="SaveReleaseNoteDetails()" class="btn btn-sm green-jungle pull-right"
+                       value="@(Model.ReleaseNote != null && Model.ReleaseNote.ReleaseNoteID > 0 ? Resource.Update : @Resource.Save)" />
+                <a href="@Constants.ReleaseNoteListURL">
+                    <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                </a>
+            </div>
+
+        </div>
+    </form>
+</div>
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/releasenote/addreleasenote")
+}

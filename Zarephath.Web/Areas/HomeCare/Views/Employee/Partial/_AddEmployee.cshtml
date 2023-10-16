@@ -1,0 +1,942 @@
+﻿@{
+    /**/
+
+    bool isEditMode = Model != null && Model.Employee.EmployeeID > 0;
+    bool isOrgHasAggregator = Common.IsOrgHasAggregator();
+}
+@model HC_AddEmployeeModel
+<style>
+    .bootstrap-select.width100:not([class*="col-"]) {
+        width: 100% !important;
+    }
+</style>
+<div id="tab_AddEmployee" class="tab-pane fade in active">
+    <form class="form-horizontal" id="frmAddEmployee">
+        <div class="row">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div id="tabs" class="addEmployeeTabs">
+                    <div class="tabbable tabbable-custom tabs-left">
+                        <div class="col-lg-12 col-md-12 col-sm-12 no-padding employeeTabsecond">
+                            <ul class="nav nav-tabs tabs-left">
+                                <li id="s1" class="active">
+                                    <a id="addEmployee_Information" href="#tab_EmployeeInformation" data-toggle="tab">
+                                        @Resource.EmployeeInformation
+                                    </a>
+                                </li>
+                                <li id="s2" class="tab-pane" style="margin-right: 10px;">
+                                    <a id="addEmployee_EmployeeDetail" href="#tab_EmployeeDetail" data-toggle="tab">
+                                        Employee Details
+                                    </a>
+                                </li>
+                                @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                                {
+                                    <li id="s3" class="tab-pane" style="margin-right: 10px;">
+                                        <a id="addEmployee_ContactDetail" href="#tab_ContactDetail" data-toggle="tab">
+                                            @Resource.EmergencyContactDetails
+                                        </a>
+                                    </li>
+                                }
+                                @if (Common.HasPermission(Constants.HC_Permission_Email_Signature))
+                                {
+                                    <li id="s3" class="tab-pane" style="margin-right: 10px;">
+                                        <a id="addEmployee_EmailSignature" href="#tab_EmailSignature" data-toggle="tab">
+                                            Email Signature
+                                        </a>
+                                    </li>
+                                }
+                                <li id="s4" class="tab-pane" style="margin-right: 10px;">
+                                    <a id="addEmployee_OverTimePay" href="#tab_EmployeeOverTimePay" data-toggle="tab">
+                                        Employee Blilling Hours
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="tab-content col-lg-12 col-md-12 col-sm-12">
+                            <div class="tab-pane active" id="tab_EmployeeInformation" style="min-height: 350px;">
+                                @if (isEditMode)
+                                {
+                                    <div class="identity-card-container">
+                                        <div class="card-block">
+                                            <div class="card-header">{{EmployeeModel.Organization.SiteName}}</div>
+                                            <div class="card-content">
+                                                <div class="card-content-left">
+                                                    <div class="profile-image">
+                                                        @if (Model.Employee.ProfileImagePath != null)
+                                                        {
+                                                            <img ng-src="{{EmployeeModel.Employee.ProfileImagePath}}" />
+                                                        }
+                                                        @if (Model.Employee.ProfileImagePath == null)
+                                                        {
+                                                            <img src="~/Assets/images/NoImage.png" style="height:100px" />
+                                                        }
+                                                    </div>
+                                                    <div class="content-text">
+                                                        <p class="big-name"><strong>{{EmployeeModel.Employee.EmployeeName}}</strong><br />{{EmployeeModel.Employee.DesignationName}}</p>
+                                                        <p class="small-text"><strong>EMP Id :</strong> &nbsp;{{EmployeeModel.Employee.EmployeeUniqueID}}</p>
+                                                        @*<p class="small-text"><strong>NPI # No.</strong> <br />{{EmployeeModel.Employee.HHA_NPI_ID}}</p>*@
+                                                    </div>
+                                                </div>
+                                                <div class="card-content-right">
+                                                    <div class="activated-div"><img data-ng-src="{{EmployeeModel.Organization.SiteLogo}}" /></div>
+                                                    <div style="height:15px"></div>
+                                                    <div class="signature-block"><img data-ng-src="{{EmployeeModel.Employee.TempSignaturePath}}" /><br /><p>Signatue</p></div>
+                                                </div>
+                                            </div>
+                                            <div class="card-footer">
+                                                Powered by <img src="~/Assets/images/marketing_logo.png" /> Myezcare LLC
+                                            </div>
+
+                                        </div>
+                                        <div class="print-btn"><a href="@Constants.HC_GenerateEmployeeIDCardPdf{{EmployeeModel.Employee.EncryptedEmployeeID}}" class="print">Print</a></div>
+                                    </div>
+                                }
+                                <div class="form-group row">
+                                    <div class="col-sm-12">
+                                        <div class="fscontainer">
+                                            <div class="legend">
+                                                @Resource.EmployeeInformation
+                                            </div>
+                                            <div class="employeeInfo">
+                                                <div class="col-md-12">
+                                                    <div class="row">
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label">@Resource.Designation</label>
+                                                                <div class="field-box">
+                                                                    @Html.DropDownListFor(p => p.Employee.Designation, Model.DesignationList.ToSelectList(Model.Employee.Designation.ToString() ?? "", "Name", "Value", Resource.SelectDesignation, ""),
+     new
+     {
+         data_ng_model = "EmployeeModel.Employee.Designation",
+         data_ng_init = "EmployeeModel.Employee.Designation=EmployeeModel.Employee.Designation==''?null:EmployeeModel.Employee.Designation.toString()",
+         @class = "form-control input-sm"
+     })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.Designation)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.EmployeeID</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.EmployeeUniqueID, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.EmployeeUniqueID", placeholder = @Resource.EmployeeID, maxlength = 100 })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.EmployeeUniqueID)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix visible-sm">
+                                                            <!-- clearfix sm cols every 2 -->
+                                                        </div>
+
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.FirstName</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.FirstName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.FirstName", placeholder = @Resource.FirstName, maxlength = 15 })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.FirstName)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label">@Resource.MiddleName</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.MiddleName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.MiddleName", placeholder = @Resource.MiddleName, maxlength = 15 })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.MiddleName)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix">
+                                                            <!-- clearfix all breakpoints -->
+                                                        </div>
+
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.LastName</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.LastName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.LastName", placeholder = @Resource.LastName, maxlength = 15 })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.LastName)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.Email</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.Email, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.Employee.Email", placeholder = @Resource.Email, maxlength = 50 })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.Email)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix visible-sm">
+                                                            <!-- clearfix sm cols every 2 -->
+                                                        </div>
+
+                                                        <div class="col-md-3 col-sm-6">
+                                                            @*@{ Html.EnableClientValidation(false); }*@
+                                                            <div class="field">
+                                                                <div id="data_1">
+                                                                    <label class="@("control-label" + (isOrgHasAggregator ? " required" : ""))">
+                                                                        @Resource.DateOfBirth
+                                                                        <i class="fa fa-question-circle" data-ng-tooltip="@Resource.FutureDateNotAllowed"></i>
+                                                                    </label>
+                                                                    <div class="input-group date" datepicker="EmployeeModel.Employee.DateOfBirth" data-ng-dateval="EmployeeModel.Employee.DateOfBirth"
+                                                                         data-ng-maxdate="CurrentDate">
+                                                                        <input class="form-control input-sm validateElement dateInputMask"
+                                                                               data-ng-model="Employee.DateOfBirth" data-val="@(isOrgHasAggregator? "true" : "false")"
+                                                                               @(isOrgHasAggregator ? "data-val-required=\"" + @Resource.DateOfBirthRequired + "\"" : "")
+                                                                               placeholder=@Resource.DateFormat id="Employee_DateOfBirth" maxlength="10" name="Employee.DateOfBirth" data-error-Count="EmployeeErrorCount.ClientTab"
+                                                                               type="text">
+                                                                        @Html.ValidationMessageFor(m => m.Employee.DateOfBirth)
+                                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field" data-ng-if="EmployeeModel.OrgTypeList.length>1">
+                                                                <label class="control-label required">@Resource.AssociatedWith</label>
+                                                                <div class="field-box">
+                                                                    <select class="form-control input-sm requiredStrip" multiple title="Select Organizations"
+                                                                            data-val="true" selectpicker="EmployeeModel.Employee.AssociateWith" name="EmployeeModel.Employee.AssociateWith">
+                                                                        <option data-ng-repeat="option in OrgTypeList" value="{{option.Value}}">{{option.Name}}</option>
+                                                                    </select>
+                                                                    @*@Html.DropDownListFor(p => p.Employee.AssociateWith, Model.OrgTypeList.ToSelectList(Model.Employee.AssociateWith ?? "", "Name", "Value", @Resource.SelectType, ""),
+                                                                        new
+                                                                        {
+                                                                            data_ng_model = "EmployeeModel.Employee.AssociateWith",
+                                                                            data_ng_init = "EmployeeModel.Employee.AssociateWith=EmployeeModel.Employee.AssociateWith==''?null:EmployeeModel.Employee.AssociateWith",
+                                                                            @class = "form-control input-sm",
+                                                                        })*@
+                                                                    @Html.ValidationMessageFor(q => q.Employee.AssociateWith)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix">
+                                                            <!-- clearfix all breakpoints -->
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.Gender</label>
+                                                                @*<label class="control-label required">@Resource.Gender</label>*@
+                                                                <div class="field-box">
+                                                                    @Html.DropDownListFor(p => p.Employee.EmpGender, Model.GenderList.ToSelectList(Model.Employee.EmpGender ?? "",
+                                                                   "Name",
+                                                                   "Value", @Resource.SelectGender, ""),
+                                                                     new
+                                                                     {
+                                                                         data_ng_model = "EmployeeModel.Employee.EmpGender",
+                                                                         data_ng_init = "EmployeeModel.Employee.EmpGender=EmployeeModel.Employee.EmpGender==''?null:" +
+                                                                         "EmployeeModel.Employee.EmpGender",
+                                                                         @class = "form-control input-sm autocomplete requiredStrip",
+                                                                         data_val = "true",
+                                                                         data_val_required = @Resource.Gender
+                                                                     })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.EmpGender)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            @*@{ Html.EnableClientValidation(false); }*@
+                                                            <div class="field">
+                                                                <div id="data_1">
+                                                                    <label class="control-label required">
+                                                                        @Resource.HireDate
+                                                                        <i class="fa fa-question-circle" data-ng-tooltip="@Resource.FutureDateNotAllowed"></i>
+                                                                    </label>
+                                                                    <div class="input-group date" datepicker="EmployeeModel.Employee.HireDate" data-ng-dateval="EmployeeModel.Employee.HireDate"
+                                                                         data-ng-maxdate="CurrentDate">
+                                                                        <input class="form-control input-sm validateElement dateInputMask" data-ng-model="Employee.HireDate" data-val="true"
+                                                                               data-val-required="@Resource.HireDateRequired"
+                                                                               placeholder="@Resource.HireDate" id="Employee_HireDate" maxlength="10" name="Employee.HireDate" data-error-Count="EmployeeErrorCount.ClientTab"
+                                                                               type="text">
+                                                                        @Html.ValidationMessageFor(m => m.Employee.HireDate)
+                                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix visible-sm">
+                                                            <!-- clearfix sm cols every 2 -->
+                                                        </div>
+
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label">@Resource.Facility</label>
+                                                                <div class="field-box">
+                                                                    @*@Html.DropDownListFor(p => p.Employee.FacilityID, Model.FacilityList.ToSelectList(Model.Employee.FacilityID.ToString() ?? "", "FacilityName", "FacilityID", Resource.SelectFacility, ""),
+                                                                        new
+                                                                        {
+                                                                            data_ng_model = "EmployeeModel.Employee.FacilityID",
+                                                                            data_ng_init = "EmployeeModel.Employee.FacilityID=EmployeeModel.Employee.FacilityID==''?null:EmployeeModel.Employee.FacilityID.toString()",
+                                                                            @class = "form-control input-sm"
+                                                                        })*@
+                                                                    <select class="width100 form-control  input-sm requiredStrip" multiple title="Select Facility"
+                                                                            data-val="true" selectpicker="EmployeeModel.Employee.FacilityID" name="EmployeeModel.Employee.FacilityID">
+                                                                        <option data-ng-repeat="option in FacilityList" value="{{option.FacilityID}}">{{option.FacilityName}}</option>
+                                                                    </select>
+                                                                    @Html.ValidationMessageFor(q => q.Employee.Designation)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.Address</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.Address,
+                     new
+                     {
+                         @class = "form-control input-sm address-autocomplete requiredStrip",
+                         data_ng_model = "EmployeeModel.Employee.Address",
+                         placeholder = @Resource.Address,
+                         maxlength = 99,
+                     })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix">
+                                                            <!-- clearfix all breakpoints -->
+                                                        </div>
+
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label">@Resource.ApartmentNo</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.ApartmentNo,
+                     new
+                     {
+                         @class = "form-control input-sm",
+                         data_ng_model = "EmployeeModel.Employee.ApartmentNo",
+                         placeholder = @Resource.ApartmentNo,
+                         maxlength = 50,
+                     })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.City</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.City,
+                     new
+                     {
+                         @class = "form-control input-sm city-autocomplete requiredStrip",
+                         data_ng_model = "EmployeeModel.Employee.City",
+                         placeholder = @Resource.City,
+                         maxlength = 49,
+                     })
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix visible-sm">
+                                                            <!-- clearfix sm cols every 2 -->
+                                                        </div>
+
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.ZipCode</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.ZipCode, new
+                                                               {
+                                                                   @class = "form-control input-sm zipcode-autocomplete requiredStrip",
+                                                                   data_ng_model = "EmployeeModel.Employee.ZipCode",
+                                                                   maxlength = Resource.ZipCodemaxlength,
+                                                                   placeholder = Resource.ZipCodePlaceholder,
+                                                                   dir_valid_number = ""
+                                                               })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.ZipCode)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label required">@Resource.State</label>
+                                                                <div class="field-box">
+                                                                    @Html.DropDownListFor(p => p.Employee.StateCode, Model.StateList.ToSelectList(Model.Employee.StateCode ?? "", "StateName", "StateCode", @Resource.SelectState, ""),
+                     new
+                     {
+                         data_ng_model = "EmployeeModel.Employee.StateCode",
+                         data_ng_init = "EmployeeModel.Employee.StateCode=EmployeeModel.Employee.StateCode==''?null:EmployeeModel.Employee.StateCode",
+                         @class = "form-control input-sm state-autocomplete requiredStrip",
+                     })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.StateCode)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix">
+                                                            <!-- clearfix all breakpoints -->
+                                                        </div>
+
+                                                        @if (isOrgHasAggregator)
+                                                        {
+                                                            <div class="col-md-3 col-sm-6">
+                                                                <div class="field">
+                                                                    <label class="control-label">@Resource.StateRegistrationID</label>
+                                                                    <div class="field-box">
+                                                                        @Html.TextBoxFor(q => q.Employee.StateRegistrationID,
+                                                                             new
+                                                                             {
+                                                                                 @class = "form-control input-sm",
+                                                                                 data_ng_model = "EmployeeModel.Employee.StateRegistrationID",
+                                                                                 placeholder = @Resource.StateRegistrationID
+                                                                             })
+                                                                        @Html.ValidationMessageFor(q => q.Employee.StateRegistrationID)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="col-md-3 col-sm-6">
+                                                                <div class="field">
+                                                                    <label class="control-label">@Resource.ProfessionalLicenseNumber</label>
+                                                                    <div class="field-box">
+                                                                        @Html.TextBoxFor(q => q.Employee.ProfessionalLicenseNumber,
+                                                                             new
+                                                                             {
+                                                                                 @class = "form-control input-sm",
+                                                                                 data_ng_model = "EmployeeModel.Employee.ProfessionalLicenseNumber",
+                                                                                 placeholder = @Resource.ProfessionalLicenseNumber,
+                                                                                 //required = true
+                                                                             })
+                                                                        @Html.ValidationMessageFor(q => q.Employee.ProfessionalLicenseNumber)
+                                                                        <div class="col-md-3 col-sm-6">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="clearfix visible-sm">
+                                                                <!-- clearfix sm cols every 2 -->
+                                                            </div>
+                                                        }
+
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label">@Resource.Latitude</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.Latitude,
+                     new
+                     {
+                         @class = "form-control input-sm",
+                         data_ng_model = "EmployeeModel.Employee.Latitude",
+                         placeholder = @Resource.Latitude,
+                         @readonly = "readonly"
+                     })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.Latitude)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label">@Resource.Longitude</label>
+                                                                <div class="field-box">
+                                                                    @Html.TextBoxFor(q => q.Employee.Longitude,
+                     new
+                     {
+                         @class = "form-control input-sm",
+                         data_ng_model = "EmployeeModel.Employee.Longitude",
+                         placeholder = @Resource.Longitude,
+                         @readonly = "readonly"
+                     })
+                                                                    @Html.ValidationMessageFor(q => q.Employee.Longitude)
+                                                                    <div class="col-md-3 col-sm-6">
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="clearfix visible-sm">
+                                                            <!-- clearfix sm cols every 2 -->
+                                                        </div>
+
+                                                        <div class="col-md-3 col-sm-6">
+                                                            <div class="field">
+                                                                <label class="control-label">@Resource.Groups</label>
+                                                                <div class="field-box">
+                                                                    <select class="form-control input-sm" multiple title="@Resource.Select"
+                                                                            data-val="true" selectpicker="SelectedGroups" data-ng-model="SelectedGroups" name="SelectedGroups"
+                                                                            data-ng-disabled="@(Common.HasPermission(Constants.HC_Permission_Employee_Group_AddUpdate) ? "false" : "true")">
+                                                                        <option data-ng-repeat="option in EmployeeModel.EmployeeGroupList" value="{{option.Value}}">{{option.Name}}</option>
+                                                                    </select>
+                                                                    @Html.ValidationMessageFor(q => q.Employee.GroupIDs)
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="col-md-3 col-sm-3">
+                                                            <div class="field">
+                                                                <label class="control-label">@Resource.AccountStatus</label>
+                                                                <div class="field-box">
+                                                                    <div class="custom_switch">
+                                                                        <input type="radio" id="radiocurrent" name="ratecurrent" data-ng-model="EmployeeModel.Employee.IsActive"
+                                                                               ng-value="false" />
+                                                                        <label for="radiocurrent">@Resource.Locked</label>
+                                                                        <input type="radio" id="radiocurrentDaily" name="ratecurrent" data-ng-model="EmployeeModel.Employee.IsActive"
+                                                                               ng-value="true" />
+                                                                        <label for="radiocurrentDaily">@Resource.Unlocked</label>
+                                                                        <span class="custom_switchwrapper"></span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        @if (Common.HasPermission(Constants.HC_Permission_Employee_Update_Location))
+                                                        {
+                                                            <div class="col-md-3 col-sm-3">
+                                                                <div class="field">
+                                                                    <label class="control-label">@Resource.UpdateLocation</label>
+                                                                    <div class="field-box">
+                                                                        <div class="custom_switch">
+                                                                            <input type="radio" id="radiolocyes" name="radioupdateloc" data-ng-model="EmployeeModel.Employee.CanUpdateCoordinate"
+                                                                                   ng-value="true" />
+                                                                            <label for="radiolocyes">@Resource.Yes</label>
+                                                                            <input type="radio" id="radiolocno" name="radioupdateloc" data-ng-model="EmployeeModel.Employee.CanUpdateCoordinate"
+                                                                                   ng-value="false" />
+                                                                            <label for="radiolocno">@Resource.No</label>
+                                                                            <span class="custom_switchwrapper"></span>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        }
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                </div>
+
+                                                <div class="col-md-4">
+                                                </div>
+                                            </div>
+
+                                            <div class="col-sm-12 no-padding">
+                                            </div>
+
+                                            @if (1 == 2)
+                                            {
+                                                <div class="space30"></div>
+                                                <div class="col-lg-12">
+                                                    <hr />
+                                                    <div><b class="font-red">**: </b>@Resource.GenerateGeographicalCoordinatesMsg</div>
+                                                    <div class="col-sm-3 no-left-padding margin-top-20">
+
+                                                        <div class="">
+                                                            @*<b>@Resource.Address :</b><span data-ng-bind="EmployeeModel.Employee.Address +','+EmployeeModel.Employee.City+'-'+EmployeeModel.Employee.ZipCode+','+EmployeeModel.Employee.StateCode"></span>*@
+                                                            <b>@Resource.Address : &nbsp;&nbsp;</b><span>{{EmployeeModel.Employee.Address}}</span><br />
+                                                            <b>@Resource.City : &nbsp;&nbsp;</b><span>{{EmployeeModel.Employee.City}}</span><br />
+                                                            <b>@Resource.ZipCode : &nbsp;&nbsp;</b><span>{{EmployeeModel.Employee.ZipCode}}</span><br />
+                                                            <b>@Resource.State : &nbsp;&nbsp;</b><span>{{EmployeeModel.Employee.StateCode}}</span>
+                                                        </div>
+                                                        <span class="btn btn-primary btn-sm margin-top-10" data-ng-click="GenerateGeoCode(false)">@Resource.GetGeographicalCoordinates</span>
+
+                                                    </div>
+                                                    <div class="col-lg-3 margin-top-10">
+                                                        <div class="form-group">
+                                                            <label class="control-label">@Resource.Latitude</label>
+                                                            <div class="">
+
+                                                                @Html.TextBoxFor(q => q.Employee.Latitude,
+                                                                        new
+                                                                        {
+                                                                            @class = "form-control input-sm",
+                                                                            data_ng_model = "EmployeeModel.Employee.Latitude",
+                                                                            placeholder = @Resource.Latitude,
+                                                                            @readonly = "readonly"
+                                                                        })
+                                                                @Html.ValidationMessageFor(q => q.Employee.Latitude)
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-group">
+                                                            <label class="control-label">@Resource.Longitude</label>
+                                                            <div class="">
+
+                                                                @Html.TextBoxFor(q => q.Employee.Longitude,
+                                                                        new
+                                                                        {
+                                                                            @class = "form-control input-sm",
+                                                                            data_ng_model = "EmployeeModel.Employee.Longitude",
+                                                                            placeholder = @Resource.Latitude,
+                                                                            @readonly = "readonly"
+                                                                        })
+                                                                @Html.ValidationMessageFor(q => q.Employee.Longitude)
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-sm-push-1 col-lg-5 margin-top-10" data-ng-show="EmployeeModel.Employee.Latitude">
+                                                        <div id="coords">
+                                                            <span>@Resource.Latitude: <b>{{EmployeeModel.Employee.Latitude}}</b> @Resource.Longitude: <b>{{EmployeeModel.Employee.Longitude}}</b></span>
+                                                        </div>
+                                                        <div id="gmap"></div>
+
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+
+                                </div>
+                                @if (Common.HasPermission(Constants.HC_Permission_Employee_EmployeeInfo_Add))
+                                {
+                                    <div class="col-md-12 form-group no-margin no-padding buttons-footer active">
+                                        @*<input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.Employee.EmployeeID > 0 ? Resource.Update : Resource.Save)" />*@
+                                        <a id="addEmployee_EmployeeDetail" href="#tab_EmployeeDetail" data-toggle="tab">
+                                            <input class="btn btn-sm green-jungle" type="button" data-ng-click="Next()" value="Next" style="width:70px" />
+                                        </a>
+                                        <a href="">
+                                            <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" data-ng-click="Cancel()" />
+                                        </a>
+                                    </div>
+                                }
+                            </div>
+                            @*<div class="tab-pane" id="tab_EmployeeContactInformation" style="min-height: 350px;">
+                                    @Html.Partial("Partial/_tabEmployeeContact")
+                                </div>*@
+                            <div class="tab-pane" id="tab_EmployeeDetail" style="min-height: 350px;">
+                                @Html.Partial("Partial/_tabEmployeeDetail")
+                            </div>
+                            @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                            {
+                                <div class="tab-pane" id="tab_ContactDetail" style="min-height: 350px;">
+                                    @Html.Partial("Partial/_tabEmployeeContact")
+                                </div>
+                            }
+                            @if (Common.HasPermission(Constants.HC_Permission_Email_Signature))
+                            {
+                                <div class="tab-pane" id="tab_EmailSignature" style="min-height: 350px;">
+                                    @Html.Partial("Partial/_EmployeeSignature")
+                                </div>
+                            }
+                            <div class="tab-pane" id="tab_EmployeeOverTimePay" style="min-height: 350px;">
+                                @Html.Partial("Partial/_tabOverTimePay")
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </form>
+</div>
+
+
+<div class="modal fade modal-scroll outComeForm" id="model_EmployeeAddContact" tabindex="-1" role="dialog" aria-hidden="true">
+    <form id="frmEmployeeAddContact">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title text-center"><strong>@Resource.EmergencyContactDetails</strong></h4>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div>
+                                <div class="row" data-ng-show="IsContactEditMode">
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <a href="#" class="btn btn-xs green-jungle pull-right" data-ng-click="EditSearchContact()" data-toggle="modal">
+                                            <i class="fa fa-pencil">&nbsp;&nbsp;</i>@Resource.EditContact
+                                        </a>
+                                    </div>
+
+                                </div>
+                                <div class="row" data-ng-if="!CanAddContact">
+                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                        <div class="alert alert-danger alert-dismissable">
+                                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true"></button>
+                                            <strong>@Resource.Hey</strong> @Resource.DuplicateContactTypeMessage
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" id="modal-body1">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.ContactType</label>
+                                        <div class="input-group-sm">
+                                            <select class="form-control requiredStrip"
+                                                    data-ng-init="EmployeeModel.AddAndListContactInformation.ContactTypeID=(EmployeeModel.AddAndListContactInformation.ContactTypeID==null || EmployeeModel.AddAndListContactInformation.ContactTypeID=='')?'':EmployeeModel.AddAndListContactInformation.ContactTypeID.toString()"
+                                                    data-ng-model="EmployeeModel.AddAndListContactInformation.ContactTypeID"
+                                                    data-val="true" data-val-required="@Resource.SelectContactType"
+                                                    id="AddAndListContactInformation_ContactTypeID"
+                                                    name="AddAndListContactInformation.ContactTypeID"
+                                                    data-ng-setname="EmployeeModel.AddAndListContactInformation.ContactTypeName" data-ng-class="{'valid': !(EmployeeModel.AddAndListContactInformation.ContactTypeID == null  || EmployeeModel.AddAndListContactInformation.ContactTypeID == '' )}"
+                                                    convert-to-number=""
+                                                    data-ng-disabled="DisableContactType">
+                                                <option value="">@Resource.SelectContactType</option>
+                                                @*disabled="disabled" style="cursor: no-drop; background: red;" convert-to-number = ""*@
+                                                <option data-ng-repeat='contact in EmployeeModel.ContactTypeList' value="{{contact.ContactTypeID}}">{{contact.ContactTypeName}}</option>
+                                            </select>
+
+
+
+
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.ContactTypeID)
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.FirstName</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.FirstName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.AddAndListContactInformation.FirstName", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.FirstName, maxlength = 50 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.FirstName)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.LastName</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.LastName, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.AddAndListContactInformation.LastName", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.LastName, maxlength = 50 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.LastName)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.Email</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.Email, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.AddAndListContactInformation.Email", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.Email, Email = 50 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Email)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.Phone1</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.Phone1, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.AddAndListContactInformation.Phone1", data_ng_disabled = "IsContactEditMode", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Phone1)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.OtherPhone</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.Phone2, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.AddAndListContactInformation.Phone2", data_ng_disabled = "IsContactEditMode", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Phone2)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label" data-ng-class="{'required': EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.EmployeePrimary_Placement)' || EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'}">@Resource.Address</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.Address, new { @class = "form-control input-sm address-autocomplete", data_ng_model = "EmployeeModel.AddAndListContactInformation.Address", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.Address, maxlength = 100 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Address)
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label">@Resource.ApartmentNo</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.ApartmentNo, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.AddAndListContactInformation.ApartmentNo", placeholder = @Resource.ApartmentNo, maxlength = 50 })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label" data-ng-class="{'required': EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.EmployeePrimary_Placement)' || EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'}">@Resource.City</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.City, new { @class = "form-control input-sm city-autocomplete", data_ng_model = "EmployeeModel.AddAndListContactInformation.City", data_ng_disabled = "IsContactEditMode", placeholder = @Resource.City, maxlength = 50 })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.City)
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label " data-ng-class="{'required': EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.EmployeePrimary_Placement)' || EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'}">@Resource.ZipCode</label>
+                                        @Html.TextBoxFor(q => q.AddAndListContactInformation.ZipCode, new
+                                   {
+                                       @class = "form-control input-sm zipcode-autocomplete",
+                                       data_ng_model = "EmployeeModel.AddAndListContactInformation.ZipCode",
+                                       maxlength = Resource.ZipCodemaxlength,
+                                       placeholder = Resource.ZipCodePlaceholder,
+
+                                       dir_valid_number = ""
+                                   })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.ZipCode)
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label" data-ng-class="{'required': EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.EmployeePrimary_Placement)' || EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'}">@Resource.State</label>
+                                        @*<select class="form-control input-sm" data-ng-model="ReferralModel.AddAndListContactInformation.State" data-ng-init="ReferralModel.AddAndListContactInformation.State='@Constants.DefaultStateCode'">
+                                                <option value="@Constants.DefaultStateCode">@Constants.DefaultStateName</option>
+                                            </select>*@
+
+
+                                        @Html.DropDownListFor(p => p.AddAndListContactInformation.State, Model.StateList.ToSelectList(Model.AddAndListContactInformation.State ?? "", "StateName", "StateCode", @Resource.SelectState, ""),
+                                        new
+                                        {
+                                            data_ng_model = "EmployeeModel.AddAndListContactInformation.State",
+                                            data_ng_init = "EmployeeModel.AddAndListContactInformation.State=EmployeeModel.AddAndListContactInformation.State==''?null:EmployeeModel.AddAndListContactInformation.State",
+                                            @class = "form-control input-sm state-autocomplete"
+                                        })
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.State)
+                                    </div>
+
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label required">@Resource.LanguagePreference</label>
+                                        <div class="validate-group input-group-sm">
+
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.LanguageID, Model.LanguageList.ToSelectList(Model.AddAndListContactInformation.LanguageID.ToString() ?? "", "Name", "LanguageID", @Resource.Select, ""),
+                            new
+                            {
+                                data_ng_model = "EmployeeModel.AddAndListContactInformation.LanguageID",
+                                data_ng_init = "EmployeeModel.AddAndListContactInformation.LanguageID=(EmployeeModel.AddAndListContactInformation.LanguageID==null || EmployeeModel.AddAndListContactInformation.LanguageID == '')?'':EmployeeModel.AddAndListContactInformation.LanguageID.toString()",
+                                @class = "form-control input-sm requiredStrip",
+                                data_ng_setname = "EmployeeModel.AddAndListContactInformation.Name",
+                                //data_ng_class = "{'valid': !(ReferralModel.AddAndListContactInformation.LanguageID == null  || ReferralModel.AddAndListContactInformation.LanguageID == '' )}",
+                                data_ng_disabled = "IsContactEditMode",
+                                convert_to_number = ""
+                            })
+
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.LanguageID)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="EmployeeModel.AddAndListContactInformation.ContactTypeID != '@((int)ContactType.ContactTypes.EmployeePrimary_Placement)' && EmployeeModel.AddAndListContactInformation.ContactTypeID != '@((int)ContactType.ContactTypes.Legal_Guardian)'">
+                                        <label class="control-label">@Resource.IsEmergencyContact?</label>
+                                        <div class="input-group-sm">
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.IsEmergencyContact, Model.EmergencyContactList.ToSelectList(Model.AddAndListContactInformation.IsEmergencyContact.ToString() ?? "", "Name", "Value", "", ""),
+                            new
+                            {
+                                data_ng_model = "EmployeeModel.AddAndListContactInformation.IsEmergencyContact",
+                                data_ng_init = "EmployeeModel.AddAndListContactInformation.IsEmergencyContact=(EmployeeModel.AddAndListContactInformation.IsEmergencyContact==null || EmployeeModel.AddAndListContactInformation.IsEmergencyContact=='')?'':EmployeeModel.AddAndListContactInformation.IsEmergencyContact.toString()",
+                                @class = "form-control input-sm",
+                                data_ng_setname = "EmployeeModel.AddAndListContactInformation.Name",
+                                //data_val = false
+                            })
+
+
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.IsEmergencyContact)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="EmployeeModel.AddAndListContactInformation.ContactTypeID == '@((int)ContactType.ContactTypes.Legal_Guardian)' && EmployeeModel.AddAndListContactInformation.IsDCSLegalGuardian=='true'">
+                                        <label class="control-label">@Resource.IsNoticeProviderOnFile?</label>
+                                        <div class="input-group-sm">
+                                            @Html.DropDownListFor(p => p.AddAndListContactInformation.IsNoticeProviderOnFile, Model.NoticeProviderOnFileList.ToSelectList(Model.AddAndListContactInformation.IsNoticeProviderOnFile.ToString() ?? "", "Name", "Value", "", ""),
+                            new
+                            {
+                                data_ng_model = "EmployeeModel.AddAndListContactInformation.IsNoticeProviderOnFile",
+                                data_ng_init = "EmployeeModel.AddAndListContactInformation.IsNoticeProviderOnFile=EmployeeModel.AddAndListContactInformation.IsNoticeProviderOnFile==null?'':EmployeeModel.AddAndListContactInformation.IsNoticeProviderOnFile.toString()",
+                                @class = "form-control input-sm",
+                                data_ng_setname = "EmployeeModel.AddAndListContactInformation.Name",
+                                //data_val = false
+
+                            })
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.IsNoticeProviderOnFile)
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="EmployeeModel.AddAndListContactInformation.ContactTypeID == '@((int)ContactType.ContactTypes.Relative)' || EmployeeModel.AddAndListContactInformation.ContactTypeID == '@((int)ContactType.ContactTypes.Relative2)'">
+                                        <label class="control-label">@Resource.RelationWithClient</label>
+                                        <div>
+                                            @Html.TextBoxFor(q => q.AddAndListContactInformation.Relation, new { @class = "form-control input-sm", data_ng_model = "EmployeeModel.AddAndListContactInformation.Relation", maxlength = 50, placeholder = @Resource.RelationWithClient })
+                                        </div>
+                                        @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Relation)
+                                    </div>
+
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.EmployeePrimary_Placement)' || EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'">
+                                        <label class="control-label">@Resource.Latitude</label>
+                                        <div class="input-group-sm">
+                                            @Html.TextBoxFor(q => q.AddAndListContactInformation.Latitude,
+                                                          new
+                                                          {
+                                                              @class = "form-control input-sm",
+                                                              data_ng_model = "EmployeeModel.AddAndListContactInformation.Latitude",
+                                                              placeholder = @Resource.Latitude,
+                                                              @readonly = "readonly"
+                                                          })
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Latitude)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4" data-ng-show="EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.EmployeePrimary_Placement)' || EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'">
+                                        <label class="control-label">@Resource.Longitude</label>
+                                        <div class="input-group-sm">
+                                            @Html.TextBoxFor(q => q.AddAndListContactInformation.Longitude,
+                                                          new
+                                                          {
+                                                              @class = "form-control input-sm",
+                                                              data_ng_model = "EmployeeModel.AddAndListContactInformation.Longitude",
+                                                              placeholder = @Resource.Longitude,
+                                                              @readonly = "readonly"
+                                                          })
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Longitude)
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    @if (1 == 2)
+                    {
+                        <div data-ng-show="EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.EmployeePrimary_Placement)' || EmployeeModel.AddAndListContactInformation.ContactTypeID=='@((int)ContactType.ContactTypes.Legal_Guardian)'">
+                            <div class="space30"></div>
+                            <div class="col-lg-12">
+                                <hr />
+                                <div><b class="font-red">**: </b>@Resource.GenerateGeographicalCoordinatesMsg</div>
+                                <div class="col-sm-4 no-left-padding margin-top-20">
+
+                                    <div class="">
+                                        @*<b>@Resource.Address :</b><span data-ng-bind="EmployeeModel.Employee.Address +','+EmployeeModel.Employee.City+'-'+EmployeeModel.Employee.ZipCode+','+EmployeeModel.Employee.StateCode"></span>*@
+                                        <b>@Resource.Address : &nbsp;&nbsp;</b><span>{{EmployeeModel.AddAndListContactInformation.Address}}</span><br />
+                                        <b>@Resource.City : &nbsp;&nbsp;</b><span>{{EmployeeModel.AddAndListContactInformation.City}}</span><br />
+                                        <b>@Resource.ZipCode : &nbsp;&nbsp;</b><span>{{EmployeeModel.AddAndListContactInformation.ZipCode}}</span><br />
+                                        <b>@Resource.State : &nbsp;&nbsp;</b><span>{{EmployeeModel.AddAndListContactInformation.State}}</span>
+                                    </div>
+                                    <span class="btn btn-primary btn-sm margin-top-10" data-ng-click="GenerateGeoCode(false)">@Resource.GetGeographicalCoordinates</span>
+
+                                </div>
+                                <div class="col-lg-3 margin-top-10">
+                                    <div class="form-group">
+                                        <label class="control-label">@Resource.Latitude</label>
+                                        <div class="">
+
+                                            @Html.TextBoxFor(q => q.AddAndListContactInformation.Latitude,
+                                                   new
+                                                   {
+                                                       @class = "form-control input-sm",
+                                                       data_ng_model = "EmployeeModel.AddAndListContactInformation.Latitude",
+                                                       placeholder = @Resource.Latitude,
+                                                       @readonly = "readonly"
+                                                   })
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Latitude)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="control-label">@Resource.Longitude</label>
+                                        <div class="">
+
+                                            @Html.TextBoxFor(q => q.AddAndListContactInformation.Longitude,
+                                                   new
+                                                   {
+                                                       @class = "form-control input-sm",
+                                                       data_ng_model = "EmployeeModel.AddAndListContactInformation.Longitude",
+                                                       placeholder = @Resource.Latitude,
+                                                       @readonly = "readonly"
+                                                   })
+                                            @Html.ValidationMessageFor(q => q.AddAndListContactInformation.Longitude)
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-5 margin-top-10" data-ng-show="EmployeeModel.AddAndListContactInformation.Latitude">
+                                    <div id="coords">
+                                        <span>
+                                            @Resource.Latitude: <b>{{EmployeeModel.AddAndListContactInformation.Latitude}}</b>
+                                            @Resource.Longitude: <b>{{EmployeeModel.AddAndListContactInformation.Longitude}}</b>
+                                        </span>
+                                    </div>
+                                    <div id="gmap"></div>
+
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+
+                </div>
+                <div class="modal-footer pull-center">
+                    <div class="col-lg-6 col-md-6 margin-bottom-5">
+                    </div>
+                    @*@if (Common.HasPermission(Constants.HC_Permission_Patient_AddUpdate))*@
+                    @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                    {
+                        <button class="btn btn-sm red" data-dismiss="modal">@Resource.Cancel </button>
+                        <input type="submit" data-ng-click="SaveEmployeeContact()" class="btn btn-sm green-jungle" value="@Resource.Save" />
+                    }
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+@*<script type="text/javascript" src="https://cdn.rawgit.com/AlphaGit/ng-pattern-restrict/master/src/ng-pattern-restrict.min.js"></script>*@

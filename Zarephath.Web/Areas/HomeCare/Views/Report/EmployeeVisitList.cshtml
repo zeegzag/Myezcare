@@ -1,0 +1,1992 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.TimeSheet);
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_EmployeeVisitReports;
+}
+
+@model SetEmployeeVisitListPage
+@Html.Hidden("hdnSetEmployeeVisitListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="EmployeeVisitListController">
+    @if (Model.IsPartial == false)
+    {
+        <div class="page-bar">
+            <h3 class="page-title">
+                @Resource.TimeSheet &nbsp;
+
+                <button class="btn blue btn-sm border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+
+                <div class="btn-group">
+                    @Html.DropDownListFor(m => m.SearchEmployeeVisitListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchEmployeeVisitListPage.IsDeleted), "Name", "Value", "", ""),
+                                                               new
+                                                               {
+                                                                   id = "IsDeleted",
+                                                                   data_ng_model = "TempSearchEmployeeVisitListPage.IsDeleted",
+                                                                   data_ng_init = "TempSearchEmployeeVisitListPage.IsDeleted = TempSearchEmployeeVisitListPage.IsDeleted==null?'-1':TempSearchEmployeeVisitListPage.IsDeleted.toString()",
+                                                                   @class = "form-control input-sm btn blue btn-sm border-grey-cascade",
+                                                                   data_ng_change = "SearchEmployeeVisit()"
+                                                               })
+                </div>
+
+                @if (Common.HasPermission(Constants.HC_Can_Approve_Bypass_ClockInOut))
+                {
+                    <div class="btn-group">
+                        @Html.DropDownListFor(m => m.SearchEmployeeVisitListPage.ActionTaken, Model.ActionFilter.ToSelectList(Convert.ToString(Model.SearchEmployeeVisitListPage.ActionTaken), "Name", "Value", "", ""),
+                                                                    new
+                                                                    {
+                                                                        id = "ActionTaken",
+                                                                        data_ng_model = "TempSearchEmployeeVisitListPage.ActionTaken",
+                                                                        data_ng_init = "TempSearchEmployeeVisitListPage.ActionTaken = TempSearchEmployeeVisitListPage.ActionTaken==null?'0':TempSearchEmployeeVisitListPage.ActionTaken.toString()",
+                                                                        @class = "form-control input-sm btn blue btn-sm border-grey-cascade",
+                                                                        data_ng_change = "SearchEmployeeVisit()"
+                                                                    })
+                    </div>
+                }
+
+                <div class="btn-group">
+                    @Html.DropDownListFor(m => m.SearchEmployeeVisitListPage.ServiceTypeID, Model.ServiceTypeList.ToSelectList(Convert.ToString(Model.SearchEmployeeVisitListPage.ServiceTypeID), "ServiceTypeName", "ServiceTypeID", Resource.ServiceType, ""),
+                                                               new
+                                                               {
+                                                                   id = "ServiceTypeID",
+                                                                   data_ng_model = "TempSearchEmployeeVisitListPage.ServiceTypeID",
+                                                                   data_ng_init = "TempSearchEmployeeVisitListPage.ServiceTypeID = TempSearchEmployeeVisitListPage.ServiceTypeID==null?'':TempSearchEmployeeVisitListPage.ServiceTypeID.toString()",
+                                                                   @class = "form-control input-sm btn blue btn-sm border-grey-cascade",
+                                                                   data_ng_change = "SearchServiceType()"
+                                                               })
+                </div>
+
+                <div class="btn-group">
+                    <button type="button" data-ng-click="OpenMissingTimesheetModal()" class="btn blue btn-sm border-grey-cascade">
+                        Open Missing Timesheets
+                    </button>
+                </div>
+            </h3>
+
+            <div class="tools width-100px margin-right-0">
+                <div class="drop-1">
+                    <button class="dropbtn">Census  <i class="fa fa-caret-down"></i></button>
+                    <div class="drop-1-content">
+                        <a id="tabBilling" href="javascript:void(0);" data-ng-click="ByBilling()"><b>By Billing</b></a>
+                        <a id="tabTimesheet" href="javascript:void(0);" data-ng-click="ByTimesheet()"><b>By Timesheet</b></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    <div class="portlet box" style="box-shadow: none;">
+        <div class="portlet-body table_font-size-12 no-padding" style="width:100%; min-height: auto !important;">
+            <div class="col-md-12 col-sm-12">
+                <div class="tabCustom" id="census">
+                    <div class="row" data-ng-show="showBilling">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: #90EE90 !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ClaimActionStatus='Billed'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{BilledCount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Billed</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: #FF7373 !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ClaimActionStatus='Not billed'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{NotBilledCount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Not billed</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: green !important;"
+                                 data-ng-click="SearchEmployeeVisitListPage.ClaimActionStatus='Paid'; GetEmployeeVisitList(false)"
+                                 data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{PaidCount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Paid</p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: #dede40 !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ClaimActionStatus='Denied'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{DeniedCount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Denied</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: #d3d3d3 !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ClaimActionStatus='Invalid'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{InvalidVisitCount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Invalid visits</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" data-ng-show="showTimesheet">
+                        <div class="col-lg-3 col-md-3 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: #FF7373 !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ActionTaken='4'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{NotIsPCACompletedcount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Incomplete Time Sheet</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: #90EE90 !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ActionTaken='5'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{IsPCACompletedcount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Complete Time Sheet</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: #d3d3d3 !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">0</p>
+                                </div>
+                                <p class="fnt-weght-pl">Clock-In not done</p>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: #dede40 !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ActionTaken='1'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{ARPcount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Approval Pending</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: green !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ActionTaken='2'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{ARAcount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl">Approval Approved</p>
+                            </div>
+                        </div>
+                        <div class="col-lg-3 col-md-6 col-sm-6 col-xs-12 text-center margin-top-25">
+                            <div class="brd-pdd-blu-lg-pl" style="border-color: red !important;" data-ng-model="TempSearchEmployeeVisitListPage.ActionTaken"
+                                 data-ng-click="SearchEmployeeVisitListPage.ActionTaken='3'; GetEmployeeVisitList(false)">
+                                <div class="brd-outer-blu-lg-pl">
+                                    <p class="txt-zone-pl">{{ARRcount}}</p>
+                                </div>
+                                <p class="fnt-weght-pl"> Approval Rejected</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="portlet-body" style="display: block;margin-bottom:15px;">
+            </div>
+        </div>
+    </div>
+    <div class="filter-cols">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+
+            @if (Model.IsPartial == false
+                 || (Model.IsPartial && Model.SearchRefCalender.ReferralID != null && Model.SearchRefCalender.ReferralID.Count > 0 && Common.HasPermission(Constants.HC_Permission_PatientIntake_TimeSheet_Delete))
+                 || (Model.IsPartial && Model.SearchRefCalender.EmployeeID != null && Model.SearchRefCalender.EmployeeID.Count > 0 && Common.HasPermission(Constants.HC_Permission_Empoyee_TimeSheet_Delete))
+                )
+            {
+                @*<div class="btn-group" data-ng-if="SelectedEmployeeVisitIds.length > 0">
+                        <button type="button" data-ng-click="DeleteEmployeeVisit()" class="btn blue btn-sm grey border-grey-cascade">
+                            <i class="fa fa-random margin-right-10"></i>{{TempSearchEmployeeVisitListPage.IsDeleted==0 ?'@Resource.DisableSelected' :(TempSearchEmployeeVisitListPage.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                        </button>
+                    </div>*@
+
+                @*<div class="btn-group" data-ng-if="SelectedEmployeeVisitIds.length > 0">
+                        <button type="button" data-ng-click="MarkAsCompleteEmployeeVisit(SelectedEmployeeVisitIds)" class="btn blue btn-sm grey border-grey-cascade">
+
+                            <i class="fa fa-random margin-right-10"></i>@Resource.MarkAsComplete
+
+
+                        </button>
+                    </div>*@
+            }
+            @*<div class="inline-block" >
+                    <select ng-model="TempSearchEmployeeVisitListPage.IsAuthExpired" data-ng-change="SearchEmployeeVisit()" name="PriorAuth"  class="form-control input-sm btn blue btn-sm grey border-grey-cascade">
+                        <option selected value="-1">@Resource.PriorAuthorization</option>
+                        <option  value="-1">ALL</option>
+                        <option value="1">Expired PriorAuth</option>
+                        <option value="0">Active PriorAuth</option>
+                    </select>
+                </div>*@
+
+
+
+
+            @*<div class="btn-group" data-ng-if="SelectedEmployeeVisitIds.length > 0">
+                        <button type="button" data-ng-click="MultiplePDFDownload()" class="btn blue btn-sm grey border-grey-cascade">
+                    <i class="fa fa-print margin-right-10"></i>Print PCA Timesheets
+                </button>
+                        <button type="button" data-ng-click="PrintBulkTimeSheetReportHomecare()" class="btn blue btn-sm grey border-grey-cascade">
+                            <i class="fa fa-print margin-right-10"></i>Print PCA Timesheets
+                        </button>
+                    </div>*@
+
+            <div class="inline-block">
+                <select ng-model="item.value" data-ng-change="GetCategoryList(item.value)" class="form-control input-sm btn blue btn-sm grey border-grey-cascade"
+                        data-ng-disabled="!(SelectedEmployeeVisitIds.length > 0)">
+                    <option selected value="">Select Bulk Type</option>
+                    <option ng-repeat="item in BulkTypeList" value="{{item.value}}" style="text-align: left;">{{item.name}}</option>
+                </select>
+            </div>
+            <div class="inline-block" data-ng-if="SelectedEmployeeVisitIds.length > 0 && CategoryList.length > 0">
+                <select ng-model="selectedBulkType.Category" class="form-control input-sm btn blue btn-sm grey border-grey-cascade" data-ng-if="PRcategory==false">
+                    <option selected value="">Category</option>
+                    <option ng-repeat="item in CategoryList" value="{{item.Value}}">{{item.Name}}</option>
+                </select>
+                <div class="dropdown" data-ng-if="PRcategory==true">
+                    <button class="btn  dropdown-toggle custom-dd" type="button" data-toggle="dropdown">
+                        <span>{{EmployeeVisit.AuthorizationCode}}</span>
+                        <span class="caret pull-right"></span>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li data-ng-repeat="item in CategoryList">
+                            <a href="#" style="font-size:12px" data-ng-click="SelectCategoryValue(item)">
+                                <span><b style="color: #c41212;">AuthCode:</b>{{item.Name}} &nbsp;<b style="color: #c41212;">CareType:</b>{{item.CareType}}</span>&nbsp;<span><b style="color: #c41212;">ServiceCode:</b>{{item.ServiceCode}}</span><br />
+                                <span><b style="color: #c41212;">StartDate:</b>{{item.StartDate}} &nbsp;<b style="color: #c41212;">EndDate:</b>{{item.EndDate}}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <div class="inline-block" data-ng-if="SelectedEmployeeVisitIds.length > 0 && CategoryList.length > 0">
+                <button type="button" data-ng-click="BulkUpdateDetail(selectedBulkType)" class="btn blue btn-sm  border-grey-cascade">Bulk Update</button>
+            </div>
+            <div class="inline-block pull-right" data-ng-show="EmployeeVisitList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="EmployeeVisitListPager.maxSize" on-page-change="EmployeeVisitListPager.pageChanged(newPageNumber)" pagination-id="EmployeeVisitListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+
+
+    <div class="emp-visit-table">
+
+        <div class="row form-group margin-top-8 margin-bottom-3">
+
+            <div class="col-sm-1 small-select padding-right-0">
+                <div class="fields">
+                    <label class="control-label">@Resource.Employee</label>
+                    @if (!SessionHelper.IsDayCare)
+                    {
+                        <select class="form-control input-sm" title="@Resource.Employee"
+                                data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.EmployeeID != null)"
+                                selectpicker="TempSearchEmployeeVisitListPage.EmployeeIDs" name="SearchEmpCalender.EmployeeID">
+                            <option data-ng-repeat="option in EmployeeVisitModel.EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                        </select>
+                    }
+                </div>
+            </div>
+
+            <div class="col-sm-1 small-select padding-right-0">
+                <div class="fields">
+                    <label class="control-label">@Resource.Patient</label>
+                    <select class="form-control input-sm" title="@Resource.Patient"
+                            data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.ReferralID != null)"
+                            selectpicker="TempSearchEmployeeVisitListPage.ReferralIDs" name="SearchEmpCalender.ReferralID">
+                        <option data-ng-repeat="option in EmployeeVisitModel.ReferralList" value="{{option.ReferralID}}">{{option.ReferralName}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-1 small-select padding-right-0">
+                <div class="fields">
+                    <label class="control-label">@Resource.Payor</label>
+                    <select class="form-control input-sm" title="@Resource.Payor"
+                            data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.PayorID != null)"
+                            selectpicker="TempSearchEmployeeVisitListPage.PayorIDs" name="SearchEmpCalender.PayorID">
+                        <option data-ng-repeat="option in EmployeeVisitModel.PayorList " value="{{option.PayorID}}">{{option.PayorName}}</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-sm-1 small-select padding-right-0">
+                <div class="fields">
+                    <label class="control-label">@Resource.CareType</label>
+                    <select class="form-control input-sm" title="@Resource.CareType"
+                            data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.CareTypeID != null)"
+                            selectpicker="TempSearchEmployeeVisitListPage.CareTypeIDs" name="SearchEmpCalender.CareTypeID">
+                        <option data-ng-repeat="option in EmployeeVisitModel.CareTypeList  " value="{{option.CareTypeID}}">{{option.CareType}}</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-1 small-select padding-right-0">
+                <div class="fields">
+                    <label class="control-label">Authorization</label>
+                    <select ng-model="TempSearchEmployeeVisitListPage.IsAuthExpired" data-ng-change="SearchEmployeeVisit()" name="PriorAuth" class="form-control input-sm  ">
+                        <option selected value="-1" style="text-align:left">@Resource.Select</option>
+                        <option value="-1" style="text-align:left">ALL</option>
+                        <option value="1" style="text-align:left">Expired PriorAuth</option>
+                        <option value="0" style="text-align:left">Active PriorAuth</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-sm-1 small-select padding-right-0">
+                <div class="fields">
+                    <label class="control-label">@Resource.StarDate</label>
+                    <div id="emp-visit-start-date" class="input-group date date-picker pull-right"
+                         datepicker="TempSearchEmployeeVisitListPage.StartDate" ng-dateval="TempSearchEmployeeVisitListPage.StartDate" data-ng-maxdate="TempSearchEmployeeVisitListPage.EndDate">
+                        @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StartDate, new
+                   {
+                       @class = "form-control input-sm dateInputMask",
+                       maxlength = "50",
+                       placeholder = Resource.DateFormat
+                   })
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-sm-1 small-select padding-right-0">
+                <div class="fields">
+                    <label class="control-label">@Resource.EndDate</label>
+                    <div id="emp-visit-end-date" class="input-group date date-picker pull-right"
+                         datepicker="TempSearchEmployeeVisitListPage.EndDate" ng-dateval="TempSearchEmployeeVisitListPage.EndDate" data-ng-maxdate="TempSearchEmployeeVisitListPage.EndDate">
+                        @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.EndDate, new
+                   {
+                       @class = "form-control input-sm dateInputMask",
+                       maxlength = "50",
+                       placeholder = Resource.DateFormat
+                   })
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+            </div>
+
+            @*<div class="col-sm-1 small-select padding-right-0">
+                    <div class="fields">
+                        <label class="control-label">@Resource.ClockInTime</label>
+                        @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StrStartTime,
+                            new
+                            {
+                                ng_model = "TempSearchEmployeeVisitListPage.StrStartTime",
+                                @class = "form-control input-sm time",
+                                placeholder = @Resource.StartTime,
+                            })
+                        @Html.ValidationMessageFor(m => m.SearchEmployeeVisitListPage.StrStartTime)
+                    </div>
+                </div>
+
+                <div class="col-sm-1 small-select padding-right-0">
+                    <div class="fields">
+                        <label class="control-label">@Resource.ClockOutTime</label>
+                        @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StrEndTime,
+                            new
+                            {
+                                ng_model = "TempSearchEmployeeVisitListPage.StrEndTime",
+                                @class = "form-control input-sm time",
+                                placeholder = @Resource.EndTime,
+                            })
+                        @Html.ValidationMessageFor(m => m.SearchEmployeeVisitListPage.StrEndTime)
+                    </div>
+                </div>*@
+
+            <div class="col-sm-2 padding-right-0 width-140px">
+                <div>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-default bg-gray-color" data-ng-click="SearchEmployeeVisit()">@Resource.Search</a>
+                    <a href="javascript:void(0);" class="btn btn-sm btn-default bg-gray-color" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="pull-right padding-top-5" data-ng-show="EmployeeVisitListAjaxStart">
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact " style="display: block;">
+                    <form id="frmEmployeeVisitList ">
+                        <div class="table-responsive employeetable ">
+                            <div class="employeearrow">
+                                <button id="left-scroll-button" class="btn btn-defualt btn-lg "><i class="fa fa-chevron-left"></i></button>
+                                <button id="right-scroll-button" class="btn btn-defualt  btn-lg "><i class="fa fa-chevron-right"></i></button>
+                            </div>
+                            @if (Common.HasPermission(Constants.HC_Can_Approve_Bypass_ClockInOut))
+                            {
+                                <div data-ng-init="HasPermission=true"></div>
+                            }
+                            else
+                            {
+                                <div data-ng-init="HasPermission=false"></div>
+                            }
+                            <table class="table table-bordered table-condensed flip-content empvisitlist_tbl employeetable">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @*@if (Common.HasPermission(Constants.Permission_DxCode_AddUpdate))
+        {*@
+                                        @*<th class="width-20px"></th>*@
+                                        <th class="width-20px">
+                                            <div class="btn-group" data-ng-show="EmployeeVisitList.length > 0">
+                                                <input id="SelectAllDxCode" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                <label for="SelectAllDxCode"></label>
+                                            </div>
+                                        </th>
+                                        @*}*@
+                                        <th class="width-250px">
+                                            @if (!SessionHelper.IsDayCare)
+                                            {
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('Name')">@Resource.EmployeeName</a>
+                                                <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'Name'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                            }
+                                            @if (SessionHelper.IsDayCare)
+                                            {
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('Name')">@Resource.FacilityName</a>
+                                                <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'Name'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                            }
+                                        </th>
+                                        <th style="width: 150px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('PatientName')">@Resource.PatientName</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-110px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('PayorName')"> @Resource.Payor</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'PayorName'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-110px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('CareType')">@Resource.CareType</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'CareType'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-110px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('CareType')">@Resource.AuthorizationCode</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'AuthorizationCode'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-150px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('StartDate')">@Resource.VisitDate</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-150px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('EndDate')">@Resource.VisitDay</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-110px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('Distance')">@Resource.Miles</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'Distance'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-110px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('ClockInTime')">@Resource.ClockInTime</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'ClockInTime'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-110px">
+                                            <span class="anchor_color" href="javascript:void(0);">ClockIn Mode</span>
+                                        </th>
+                                        <th class="width-110px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('ClockOutTime')">@Resource.ClockOutTime</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'ClockOutTime'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        @*<th class="width-110px">
+            <span class="anchor_color" href="javascript:void(0);">ClockOut Mode</span>
+        </th>*@
+                                        @*<th class="width-50px">
+            <span class="anchor_color" href="javascript:void(0);">PCA Complete</span>
+        </th>*@
+                                        <th class="width-110px">
+                                            @*<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('TimeSheetComplete')">Time Sheet Comlete hour</a>*@
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('TimeSheetComplete')">Total Time</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'TimeSheetComplete'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+
+                                            @*<span class="anchor_color" href="javascript:void(0);">Time Sheet Comlete hour</span>*@
+                                        </th>
+                                        <th class="width-110px">
+                                            @*<a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('TimeSheetComplete')">Time Sheet Comlete hour</a>*@
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('TimeSheetComplete')">@Resource.BillingAmount</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'TimeSheetComplete'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+
+                                            @*<span class="anchor_color" href="javascript:void(0);">Time Sheet Comlete hour</span>*@
+                                        </th>
+                                        <th class="width-110px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    @*<tr class="compact-search-tr">
+                                            <td>
+                                                <div class="btn-group" data-ng-show="EmployeeVisitList.length > 0">
+                                                    <input id="SelectAllDxCode" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                    <label for="SelectAllDxCode"></label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if (!SessionHelper.IsDayCare)
+                                                {
+                                                    <select class="form-control input-sm" title="@Resource.SelectEmployee"
+                                                            data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.EmployeeID != null)"
+                                                            selectpicker="TempSearchEmployeeVisitListPage.EmployeeIDs" name="SearchEmpCalender.EmployeeID">
+                                                        <option data-ng-repeat="option in EmployeeVisitModel.EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                                                    </select>
+                                                }
+
+                                            </td>
+                                            <td>
+                                                <select class="form-control input-sm" title="@Resource.SelectPatient"
+                                                        data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.ReferralID != null)"
+                                                        selectpicker="TempSearchEmployeeVisitListPage.ReferralIDs" name="SearchEmpCalender.ReferralID">
+                                                    <option data-ng-repeat="option in EmployeeVisitModel.ReferralList" value="{{option.ReferralID}}">{{option.ReferralName}}</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control input-sm" title="@Resource.SelectPayor"
+                                                        data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.PayorID != null)"
+                                                        selectpicker="TempSearchEmployeeVisitListPage.PayorIDs" name="SearchEmpCalender.PayorID">
+                                                    <option data-ng-repeat="option in EmployeeVisitModel.PayorList " value="{{option.PayorID}}">{{option.PayorName}}</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control input-sm" title="@Resource.SelectCareType"
+                                                        data-val="true" actions-box="true" multiple="multiple" disabled="@(Model.IsPartial == true && Model.SearchRefCalender.CareTypeID != null)"
+                                                        selectpicker="TempSearchEmployeeVisitListPage.CareTypeIDs" name="SearchEmpCalender.CareTypeID">
+                                                    <option data-ng-repeat="option in EmployeeVisitModel.CareTypeList  " value="{{option.CareTypeID}}">{{option.CareType}}</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                            </td>
+                                            <td>
+                                                <div id="emp-visit-start-date" class="input-group date date-picker pull-right"
+                                                     datepicker="TempSearchEmployeeVisitListPage.StartDate" ng-dateval="TempSearchEmployeeVisitListPage.StartDate" data-ng-maxdate="TempSearchEmployeeVisitListPage.EndDate">
+                                                    @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StartDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask",
+                                                   maxlength = "50",
+                                                   placeholder = Resource.DateFormat
+                                               })
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div id="emp-visit-end-date" class="input-group date date-picker pull-right"
+                                                     datepicker="TempSearchEmployeeVisitListPage.EndDate" ng-dateval="TempSearchEmployeeVisitListPage.EndDate" data-ng-maxdate="TempSearchEmployeeVisitListPage.EndDate">
+                                                    @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.EndDate, new
+                                               {
+                                                   @class = "form-control input-sm dateInputMask",
+                                                   maxlength = "50",
+                                                   placeholder = Resource.DateFormat
+                                               })
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StrStartTime,
+                                                new
+                                                {
+                                                    ng_model = "TempSearchEmployeeVisitListPage.StrStartTime",
+                                                    @class = "form-control input-sm time",
+                                                    placeholder = @Resource.StartTime,
+                                                })
+                                                @Html.ValidationMessageFor(m => m.SearchEmployeeVisitListPage.StrStartTime)
+                                            </td>
+                                            <td></td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.SearchEmployeeVisitListPage.StrEndTime,
+                                                    new
+                                                    {
+                                                        ng_model = "TempSearchEmployeeVisitListPage.StrEndTime",
+                                                        @class = "form-control input-sm time",
+                                                        placeholder = @Resource.EndTime,
+                                                    })
+                                                @Html.ValidationMessageFor(m => m.SearchEmployeeVisitListPage.StrEndTime)
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td class="text-align-center">
+                                                <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchEmployeeVisit()" />
+                                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                            </td>
+                                        </tr>*@
+
+                                    <tr data-ng-class="{'deleted':EmployeeVisit.IsDeleted,'bypassPendingBgColor':EmployeeVisit.ActionTaken==1 && HasPermission}" dir-paginate="EmployeeVisit in EmployeeVisitList | itemsPerPage: EmployeeVisitListPager.pageSize" total-items="EmployeeVisitListPager.totalRecords"
+                                        current-page="EmployeeVisitListPager.currentPage"
+                                        pagination-id="EmployeeVisitListPager_ID">
+                                        @*ng-style="{'background-color': EmployeeVisit.RowColor}">*@
+                                        @*@if (Common.HasPermission(Constants.Permission_DxCode_AddUpdate))
+        {*@
+                                        <td class="text-align-center">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisit.IsChecked" data-ng-change="SelectEmployeeVisit(EmployeeVisit)" val="EmployeeVisit.IsChecked">
+                                        </td>
+                                        @*}*@
+                                        <td data-ng-class="EmployeeVisit.RowMarkerClass" style="width:15%">
+                                            <div class="alert-mark">
+                                                @*&nbsp;*@
+                                                <span data-ng-if="EmployeeVisit.AnyActionMissing==0">
+                                                    <a class="text-decoration-none font-size-14 webpop" style="color: red !important;" item-detail-popup-new
+                                                       data-ng-model="EmployeeVisit" data-ng-template-selector="#employeevisit-popover" data-popover-cloasble="true">
+                                                        <i class="fa  fa-exclamation -circle"></i>
+                                                    </a>
+                                                </span>
+                                                <span data-ng-if="EmployeeVisit.AnyActionMissing==1">
+                                                    <a class="text-decoration-none font-size-14 webpop" style="color: green !important;" item-detail-popup-new
+                                                       data-ng-model="EmployeeVisit" data-ng-template-selector="#employeevisit-popover" data-popover-cloasble="true">
+                                                        <i class="fa fa-info-circle"></i>
+                                                    </a>
+                                                </span>
+                                                &nbsp;
+                                                @if (!SessionHelper.IsDayCare)
+                                                {<span>
+                                                        {{EmployeeVisit.Name}}
+                                                    </span>
+                                                }
+                                                @if (SessionHelper.IsDayCare)
+                                                {
+                                                    <span>
+                                                        {{EmployeeVisit.FacilityName}}
+                                                    </span>
+                                                }
+                                            </div>
+                                            @*<span data-ng-if="EmployeeVisit.ActionTaken==1"
+                  class="badge badge-pill badge-warning empActionTaken" style="background-color:#dede40 !important;">AR</span>
+            <span data-ng-if="EmployeeVisit.ActionTaken==2"
+                  class="badge badge-pill badge-success empActionTaken" style="background-color:green !important;">AR</span>
+            <span data-ng-if="EmployeeVisit.ActionTaken==3"
+                  class="badge badge-pill badge-danger empActionTaken" style="background-color:red !important;">AR</span>
+
+            <span data-ng-if="EmployeeVisit.IsByPassClockIn"
+                  class="badge badge-pill badge-success empActionTaken" style="background-color:green !important;" title="{{EmployeeVisit.ByPassReasonClockIn}}">byPass Clock-In</span>
+            <span data-ng-if="EmployeeVisit.IsByPassClockOut"
+                  class="badge badge-pill badge-success empActionTaken" style="background-color:green !important;" title="{{EmployeeVisit.ByPassReasonClockOut}}">byPass Clock-Out</span>*@
+                                        </td>
+                                        <td style="width:13%">
+                                            <span>
+                                                {{EmployeeVisit.PatientName}}
+                                            </span>
+                                        </td>
+                                        <td style="width:10%">
+                                            {{EmployeeVisit.PayorName }}
+                                            <br />
+                                            <span data-ng-show="EmployeeVisit.ClaimStatus=='Not Billed'" class="badge badge-danger ng-scope">{{EmployeeVisit.ClaimStatus}}</span>
+                                            <span data-ng-show="EmployeeVisit.ClaimStatus=='Pending'" class="badge badge-danger ng-scope">{{EmployeeVisit.ClaimStatus}}</span>
+                                            <span data-ng-show="EmployeeVisit.ClaimStatus=='Billed'" class="badge badge-info ng-scope">{{EmployeeVisit.ClaimStatus}}</span>
+                                            <span data-ng-show="EmployeeVisit.ClaimStatus=='Sent'" class="badge badge-green ng-scope">{{EmployeeVisit.ClaimStatus}}</span>
+                                            <span data-ng-show="EmployeeVisit.ClaimStatus=='Paid'" class="badge badge-green ng-scope">{{EmployeeVisit.ClaimStatus}}</span>
+                                            <span data-ng-show="EmployeeVisit.ClaimStatus=='Denied'" class="badge badge-danger ng-scope">{{EmployeeVisit.ClaimStatus}}</span>
+                                        </td>
+                                        <td style="width:10%">{{EmployeeVisit.CareType}}</td>
+                                        <td>
+                                            <div class=" dropdown" id="PriorAuth">
+                                                <span class=" dropdown-toggle" data-toggle="dropdown">
+                                                    <span data-ng-class="{'strikeRed':EmployeeVisit.IsAuthExpired}" style="font-size:12px;color:#337ab7" data-ng-click="GetPriorAuthDetails(EmployeeVisit)">{{EmployeeVisit.AuthorizationCode}}</span>
+                                                    @*<span class="caret pull-right" data-ng-if="EmployeeVisit.IsAuthExpired==true">Exp</span>*@
+                                                </span>
+                                                <ul class="dropdown-menu custom-PR">
+                                                    <li>
+                                                        <a href="#" style="font-size:11px">
+                                                            <span style="font-size:11px">
+                                                                <span class="ng-binding"><b style="color: #c41212;">AuthCode:</b>{{PrioAuthorizationList.ReferralBillingAuthorizationName}} &nbsp;<b style="color: #c41212;">CareType:</b>{{PrioAuthorizationList.CareType}}</span>&nbsp;<span class="ng-binding"><b style="color: #c41212;">ServiceCode:</b>{{PrioAuthorizationList.ServiceCode}}</span><br>
+                                                                <span class="ng-binding"><b style="color: #c41212;">Allocated:</b>{{PrioAuthorizationList.Allocated}} &nbsp;<b style="color: #c41212;">Unallocated:</b>{{PrioAuthorizationList.Unallocated}} &nbsp;<b style="color: #c41212;">Available:</b>{{PrioAuthorizationList.Available}}</span>&nbsp;<span class="ng-binding"><b style="color: #c41212;">Remaining:</b>{{PrioAuthorizationList.Remaining}}</span><br>
+                                                                <span class="ng-binding"><b style="color: #c41212;">StartDate:</b>{{PrioAuthorizationList.StartDates}}&nbsp;<b style="color: #c41212;">EndDate:</b>{{PrioAuthorizationList.EndDates}}</span>
+                                                            </span>
+                                                        </a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+                                        <td>{{EmployeeVisit.StartDate | orgdate }}</td>
+                                        <td>{{EmployeeVisit.EndDate ? (EmployeeVisit.EndDate | orgdate):'@Resource.NA' }}</td>
+                                        <td>{{EmployeeVisit.StrDistance}}</td>
+                                        <td style="width:6%">
+                                            <span data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.ClockInTime== null" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockInTime')">{{EmployeeVisit.ClockInTime | timeformat }}</span>
+                                            <a href="javascript:void(0);" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockInTime')" data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.ClockInTime!= null">{{EmployeeVisit.ClockInTime | timeformat }}</a>
+                                            <span ng_if="EmployeeVisit.IsEditable" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockInTime')">{{EmployeeVisit.ClockInTime | timeformat }}</span>
+                                        </td>
+                                        <td> <span>{{EmployeeVisit.ClockInMode }}</span></td>
+                                        <td style="width:6%">
+                                            <span data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockInTime')" data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.ClockOutTime == null">{{EmployeeVisit.ClockOutTime | timeformat}}</span>
+                                            <a href="javascript:void(0);" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockInTime')" data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.ClockOutTime != null">{{EmployeeVisit.ClockOutTime | timeformat}}</a>
+                                            <span ng_if="EmployeeVisit.IsEditable" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockInTime')">{{EmployeeVisit.ClockOutTime | timeformat}}</span>
+                                        </td>
+                                        @*<td> <span>{{EmployeeVisit.ClockOutMode }}</span></td>*@
+                                        <td class="text-align-center">
+                                            <span data-ng-if="EmployeeVisit.IsPCACompleted=='Completed'">
+                                                {{EmployeeVisit.TimeSheetCompleteHours}}
+                                            </span>
+                                        </td>
+                                        <td class="text-align-center">
+                                            <span data-ng-if="EmployeeVisit.IsPCACompleted=='Completed'">
+                                                {{EmployeeVisit.TotalAmount}}
+                                            </span>
+                                        </td>
+                                        <td class="text-align-center">
+                                            <div class="btn-group  dropup " data-ng-click="Cancel1(EmployeeVisit)">
+                                                <button class="btn btn-default btn-xs dropdown-toggle green-haze-stripe" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                    <b>@Resource.Action</b>
+                                                    <i class="fa fa-angle-down"></i>
+                                                </button>
+                                                <ul class="dropdown-menu  ">
+                                                    @*@if (Model.IsPartial == false
+                     || (Model.IsPartial && Model.SearchRefCalender.ReferralID != null && Model.SearchRefCalender.ReferralID.Count > 0 && Common.HasPermission(Constants.HC_Permission_PatientIntake_TimeSheet_Add))
+                     || (Model.IsPartial && Model.SearchRefCalender.EmployeeID != null && Model.SearchRefCalender.EmployeeID.Count > 0 && Common.HasPermission(Constants.HC_Permission_Empoyee_TimeSheett_Add))
+                    )
+                             {
+                                 <li>
+
+                                     <a href="javascript:void(0);" data-ng-click="EditEmployeeVisit(EmployeeVisit,'#StrEndTimeEdit'+$index)" data-ng-if="!EmployeeVisit.IsEditable" title="@Resource.Edit"><i class="fa fa-edit"></i>@Resource.Edit</a>
+                                 </li>
+                                 <li>
+                                     <a href="javascript:void(0);" data-ng-click="SaveEmployeeVisit(EmployeeVisit,'#StrEndTimeEdit'+$index)" data-ng-if="EmployeeVisit.IsEditable">@Resource.Save</a>
+                                 </li>
+                                 <li>
+                                     <a href="javascript:void(0);" data-ng-click="Cancel(EmployeeVisit)" data-ng-if="EmployeeVisit.IsEditable">@Resource.Cancel</a>
+                                 </li>
+
+                             }*@
+                                                    @if (Model.IsPartial == false
+                                               || (Model.IsPartial && Model.SearchRefCalender.ReferralID != null && Model.SearchRefCalender.ReferralID.Count > 0 && Common.HasPermission(Constants.HC_Permission_PatientIntake_TimeSheet_Delete))
+                                               || (Model.IsPartial && Model.SearchRefCalender.EmployeeID != null && Model.SearchRefCalender.EmployeeID.Count > 0 && Common.HasPermission(Constants.HC_Permission_Empoyee_TimeSheet_Delete))
+                                              )
+                                                    {
+                                                        <li>
+                                                            <a href="javascript:void(0);" data-ng-show="EmployeeVisit.IsDeleted && !EmployeeVisit.IsEditable" data-ng-click="DeleteEmployeeVisit(EmployeeVisit.EmployeeVisitID,'@Resource.Enable')" title="@Resource.Active"><i class="fa fa-recycle"></i>@Resource.Active</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="javascript:void(0);" data-ng-show="!EmployeeVisit.IsDeleted && !EmployeeVisit.IsEditable" data-ng-click="DeleteEmployeeVisit(EmployeeVisit.EmployeeVisitID,'@Resource.Disable')" title="@Resource.Delete"><i class="fa fa-trash"></i>@Resource.Delete</a>
+                                                        </li>
+                                                    }
+
+                                                    @if (Model.IsPartial == false
+                                                     || (Model.IsPartial && Model.SearchRefCalender.ReferralID != null && Model.SearchRefCalender.ReferralID.Count > 0 && Common.HasPermission(Constants.HC_Permission_PatientIntake_TimeSheet_Add))
+                                                     || (Model.IsPartial && Model.SearchRefCalender.EmployeeID != null && Model.SearchRefCalender.EmployeeID.Count > 0 && Common.HasPermission(Constants.HC_Permission_Empoyee_TimeSheett_Add))
+                                                    )
+                                                    {
+                                                        @*<li>
+                            <a href="javascript:void(0);" data-ng-click="OpenVisitNoteListModal($event,EmployeeVisit)" data-ng-if="!EmployeeVisit.IsEditable" title="@Resource.VisitNote"><i class="fa fa-eye"></i>@Resource.VisitNote</a>
+                        </li>*@
+
+
+
+                                                        if (Common.HasPermission(Constants.HC_Can_Approve_Bypass_ClockInOut))
+                                                        {
+                                                            <li>
+                                                                <a href="javascript:void(0);" data-ng-click="OpenBypassActionModal($event,EmployeeVisit)"
+                                                                   data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.IsApprovalRequired" title="Take Action"><i class="fa fa-wrench"></i>Take Action</a>
+                                                            </li>
+
+                                                        }
+                                                    }
+                                                    @*<li>
+                        <a href="@Constants.HC_GeneratePcaTimeSheetPdf{{EmployeeVisit.EncryptedEmployeeVisitID}}" target="_blank" title="@Resource.PrintPCATimeSheet" data-ng-if="!EmployeeVisit.IsEditable"><i class="fa fa-print"></i>@Resource.PrintPCATimeSheet</a>
+                    </li>*@
+                                                    @if (SessionHelper.IsHomeCare)
+                                                    {
+                                                        <li>
+                                                            <a href="javascript:void(0);" title="@Resource.PrintPCATimeSheet" data-ng-if="!EmployeeVisit.IsEditable" data-ng-click="PrintTimeSheetReportHomecare(EmployeeVisit.EmployeeVisitID)"><i class="fa fa-print"></i>@Resource.PrintPCATimeSheet</a>
+                                                        </li>
+                                                    }
+
+                                                    @if (SessionHelper.IsDayCare)
+                                                    {
+                                                        <li>
+                                                            <a href="javascript:void(0);" title="@Resource.PrintPCATimeSheet" data-ng-if="!EmployeeVisit.IsEditable" data-ng-click="PrintTimeSheetReportDaycare(EmployeeVisit.EmployeeVisitID)"><i class="fa fa-print"></i>@Resource.PrintPCATimeSheet</a>
+                                                        </li>
+                                                    }
+                                                    @*<li>
+
+                        <a href="javascript:void(0);" title="@Resource.PrintPCATimeSheet" data-ng-if="!EmployeeVisit.IsEditable" data-ng-click="PrintTimeSheetReport(EmployeeVisit.EmployeeVisitID)"><i class="fa fa-print"></i>@Resource.PrintPCATimeSheet</a>
+                    </li>*@
+                                                    <li>
+                                                        @*<a href="@Constants.HC_GeneratePcaTimeSheetForm{{EmployeeVisit.EmployeeVisitID}}" target="_blank" title="Edit TimeSheet" data-ng-if="!EmployeeVisit.IsEditable"><i class="fa fa-print"></i>EditPCATimeSheet</a>*@
+                                                        <a href="javascript:void(0);" data-ng-click="OpenVisitNoteListModal1($event,EmployeeVisit)" data-ng-if="!EmployeeVisit.IsEditable" title="Edit TimeSheet"><i class="fa fa-edit"></i>Edit TimeSheet</a>
+                                                    </li>
+                                                    <li>
+                                                        <a href="javascript:void(0);" data-ng-click="OpenVisitTaskDocumentListModal($event,EmployeeVisit)" title="@Resource.VisitTaskDocuments"><i class="fa fa-eye"></i>@Resource.VisitTaskDocuments</a>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                        </td>
+
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="EmployeeVisitList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(EmployeeVisitListPager.pageSize * EmployeeVisitListPager.currentPage) - EmployeeVisitListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(EmployeeVisitListPager.pageSize == EmployeeVisitListPager.currentPageSize) ? (EmployeeVisitListPager.pageSize * EmployeeVisitListPager.currentPage) :(EmployeeVisitListPager.pageSize * EmployeeVisitListPager.currentPage) - EmployeeVisitListPager.pageSize  + EmployeeVisitListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeVisitListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="EmployeeVisitListPager.maxSize" on-page-change="EmployeeVisitListPager.pageChanged(newPageNumber)" pagination-id="EmployeeVisitListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="VisitApprovalModal" role="dialog">
+        <div class="modal-dialog modal-full" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="CloseVisitApprovalModal()" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">Approve Visits</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="portlet-body compact" style="display: block;">
+                                <form id="frmEmployeeVisitApprovalList">
+                                    <div class="table-responsive employeetable">
+                                        <table class="table table-hover table-bordered table-striped table-condensed table-checkable empvisitlist_tbl employeetable">
+                                            <thead class="flip-content">
+                                                <tr>
+                                                    <th class="width-20px">
+                                                        <div class="btn-group" data-ng-show="VisitApprovalModal.VisitApprovalList.length > 0">
+                                                            <input id="SelectAllApprove" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllApproveCheckbox" data-ng-click="SelectAllApprove(!SelectAllApproveCheckbox)" val="SelectAllApproveCheckbox">
+                                                            <label for="SelectAllApprove"></label>
+                                                        </div>
+                                                    </th>
+                                                    <th class="width-250px">
+                                                        @Resource.EmployeeName
+                                                    </th>
+                                                    <th style="width: 150px">
+                                                        @Resource.PatientName
+                                                    </th>
+                                                    <th class="width-110px">
+                                                        @Resource.CareType
+                                                    </th>
+                                                    <th class="width-150px">
+                                                        @Resource.VisitDate
+                                                    </th>
+                                                    <th class="width-150px">
+                                                        @Resource.VisitDay
+                                                    </th>
+                                                    <th class="width-110px">
+                                                        @Resource.ClockInTime
+                                                        <div class="btn-group margin-top-5" data-ng-show="VisitApprovalModal.VisitApprovalList.length > 0">
+                                                            <input id="SelectAllIsClockInTimeChanged" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllIsClockInTimeChangedCheckbox" data-ng-click="SelectAllIsClockInTimeChanged(!SelectAllIsClockInTimeChangedCheckbox)" val="SelectAllIsClockInTimeChangedCheckbox"><span class="font-weight-400">Schedule time</span>
+                                                        </div> {{EmployeeVisit.TimeSheetCompleteHours}}
+                                                    </th>
+                                                    <th class="width-110px">
+                                                        @Resource.ClockOutTime
+                                                        <div class="btn-group margin-top-5" data-ng-show="VisitApprovalModal.VisitApprovalList.length > 0">
+                                                            <input id="SelectAllIsClockOutTimeChanged" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllIsClockOutTimeChangedCheckbox" data-ng-click="SelectAllIsClockOutTimeChanged(!SelectAllIsClockOutTimeChangedCheckbox)" val="SelectAllIsClockOutTimeChangedCheckbox"><span class="font-weight-400">Schedule time</span>
+                                                        </div>
+                                                    </th>
+                                                    <th class="width-400px">
+                                                        Note
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody data-ng-repeat="ApprovalVisit in VisitApprovalModal.VisitApprovalList">
+                                                <tr data-ng-class="{'deleted': !ApprovalVisit.CanApprove}">
+                                                    <td class="text-align-center">
+                                                        <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="ApprovalVisit.IsChecked" data-ng-change="SelectEmployeeVisitApprove(ApprovalVisit)" val="ApprovalVisit.IsChecked">
+                                                        <span class="collapseSource collapsed  curser-pointer font-size-18 font-blue fa fa-plus-circle" title="Expand / Collapse"
+                                                              data-ng-click="OnPage_GetApprovalVisitDetails(ApprovalVisit,'#OnPage_ApprovalVisitDetails-'+ApprovalVisit.EmployeeVisitID)"
+                                                              data-ng-attr-id="{{'OnPage_CNDetails-'+ApprovalVisit.EmployeeVisitID }}"
+                                                              data-toggle="collapse"
+                                                              data-ng-attr-data-target="{{'#OnPage_ApprovalVisitDetails-'+ApprovalVisit.EmployeeVisitID }}">
+                                                        </span>
+                                                    </td>
+                                                    <td>
+                                                        <a class="" data-ng-href="@Constants.HC_AddEmployee{{ApprovalVisit.EncryptedEmployeeID}}" target="_new">
+                                                            {{ApprovalVisit.Name}}
+                                                        </a>
+                                                    </td>
+                                                    <td>
+                                                        <a class="" data-ng-href="@Constants.HC_AddReferral{{ApprovalVisit.EncryptedReferralID}}" target="_new">
+                                                            {{ApprovalVisit.PatientName}}
+                                                        </a>
+                                                    </td>
+                                                    <td>{{ApprovalVisit.CareType}}</td>
+                                                    <td>{{ApprovalVisit.StartDate | orgdate }}</td>
+                                                    <td>{{ApprovalVisit.EndDate | date:'EEEE' }}</td>
+                                                    <td>
+                                                        <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="ApprovalVisit.IsClockInTimeChanged" data-ng-change="SelectEmployeeVisitClockInTimeChanged(ApprovalVisit)" val="ApprovalVisit.IsClockInTimeChanged"><span>Schedule time</span><br />
+                                                        <span data-ng-if="!ApprovalVisit.IsClockInTimeChanged">{{ApprovalVisit.ClockInTime | timeformat }}</span>
+                                                        <del data-ng-if="ApprovalVisit.IsClockInTimeChanged">{{ApprovalVisit.ClockInTime | timeformat }}<br /></del>
+                                                        <span data-ng-if="ApprovalVisit.IsClockInTimeChanged">{{ApprovalVisit.StartDate | timeformat }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="ApprovalVisit.IsClockOutTimeChanged" data-ng-change="SelectEmployeeVisitClockOutTimeChanged(ApprovalVisit)" val="ApprovalVisit.IsClockOutTimeChanged"><span>Schedule time</span><br />
+                                                        <span data-ng-if="!ApprovalVisit.IsClockOutTimeChanged">{{ApprovalVisit.ClockOutTime | timeformat}}</span>
+                                                        <del data-ng-if="ApprovalVisit.IsClockOutTimeChanged">{{ApprovalVisit.ClockOutTime | timeformat}}<br /></del>
+                                                        <span data-ng-if="ApprovalVisit.IsClockOutTimeChanged">{{ApprovalVisit.EndDate | timeformat }}</span>
+                                                    </td>
+                                                    <td>
+                                                        <div class="display-flex align-items-center">
+                                                            <textarea type="text" ng-model="ApprovalVisit.ApproveNote"
+                                                                      class="form-control input-sm"
+                                                                      placeholder="Note (Optional)"
+                                                                      id="ApproveNote{{$index}}"
+                                                                      name="ApproveNote{{$index}}"
+                                                                      rows="4">
+                                                            </textarea>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                                <tr data-ng-attr-id="{{'OnPage_ApprovalVisitDetails-'+ApprovalVisit.EmployeeVisitID }}" class="collapse collapseDestination OnPage_ApprovalVisitDetails">
+                                                    <td colspan="11" style="text-align: left;">
+
+                                                        <div class="modal-dialog" style="width:95%;">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h4 class="modal-title page-title no-margin">
+                                                                        <b>
+                                                                            <span>
+                                                                                <span class="font-size-18">
+                                                                                    VISIT DETAILS
+                                                                                </span>
+                                                                                <span class="font-size-14">
+                                                                                    <span class='font-size-18 font-weight-400 '>
+                                                                                        &nbsp;-&nbsp;
+                                                                                        <small>
+                                                                                            @Resource.Visit: #<b>{{ApprovalVisit.ApprovalVisitDetails.EmployeeVisitID}}</b>&nbsp;/&nbsp;
+                                                                                            @Resource.Payor: <b>{{ApprovalVisit.ApprovalVisitDetails.PayorName}}</b>&nbsp;/&nbsp;
+                                                                                            @Resource.AuthorizationCode: <b>{{ApprovalVisit.ApprovalVisitDetails.AuthorizationCode || '-'}}</b>
+                                                                                        </small>
+                                                                                    </span>
+
+
+                                                                                </span>
+                                                                            </span>
+                                                                        </b>
+                                                                        <br />
+                                                                        <span data-ng-if="ApprovalVisit.ApprovalVisitDetails.ClockInTime || ApprovalVisit.ApprovalVisitDetails.ClockOutTime" class="font-size-14 margin-top-10">
+                                                                            @Resource.ServiceDate:
+                                                                            <b>
+                                                                                <span data-ng-if="ApprovalVisit.ApprovalVisitDetails.ClockInTime" class="padding-left-5">{{ApprovalVisit.ApprovalVisitDetails.ClockInTime | orgdatetime }}</span>
+                                                                                <span data-ng-if="ApprovalVisit.ApprovalVisitDetails.ClockInTime && ApprovalVisit.ApprovalVisitDetails.ClockOutTime" class="padding-left-right-2">-</span>
+                                                                                <span data-ng-if="ApprovalVisit.ApprovalVisitDetails.ClockOutTime">{{ApprovalVisit.ApprovalVisitDetails.ClockOutTime | orgdatetime }}</span>
+                                                                            </b>
+                                                                        </span>
+
+                                                                    </h4>
+                                                                </div>
+                                                                <div class="modal-body">
+                                                                    <div class="row">
+                                                                        <div data-ng-class="{'col-sm-6':ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList2.length > 0, 'col-sm-12': !(ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList2.length > 0)}">
+                                                                            <table class="table table-hover table-bordered table-striped table-condensed table-checkable" style="margin-bottom: 3px;">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th class="text-align-left">Task</th>
+                                                                                        <th class="width-250px">Time</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr data-ng-class="{'deleted':EmployeeVisitNote.IsDeleted}" data-ng-repeat="EmployeeVisitNote in ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList1">
+                                                                                        <td class="text-align-left" data-ng-bind="EmployeeVisitNote.VisitTaskDetail"></td>
+                                                                                        <td>{{EmployeeVisitNote.ServiceTime | timeinhrs}}&nbsp;hrs</td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                        <div class="col-sm-6" data-ng-class="{'hidden': !(ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList2.length > 0)}">
+                                                                            <table class="table table-hover table-bordered table-striped table-condensed table-checkable" style="margin-bottom: 3px;">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th class="text-align-left">Task</th>
+                                                                                        <th class="width-250px">Time</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <tr data-ng-class="{'deleted':EmployeeVisitNote.IsDeleted}" data-ng-repeat="EmployeeVisitNote in ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList2">
+                                                                                        <td class="text-align-left" data-ng-bind="EmployeeVisitNote.VisitTaskDetail"></td>
+                                                                                        <td>{{EmployeeVisitNote.ServiceTime | timeinhrs}}&nbsp;hrs</td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row" data-ng-if="!(ApprovalVisit.ApprovalVisitDetails.EmployeeVisitNoteList.length > 0)">
+                                                                        <div class="col-sm-12">
+                                                                            <div class="alert alert-danger mb-0">
+                                                                                @Html.Raw(Resource.NoRecordsFound)
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+
+                                                                    <table class="table table-hover table-bordered table-striped table-condensed table-checkable" style="margin-top: 20px; margin-bottom: 3px;">
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th class="text-align-left" scope="col">Conclusion</th>
+                                                                                <th class="width-110px" scope="col">Yes/No</th>
+                                                                                <th scope="col">Notes</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr data-ng-repeat="EmployeeVisitConclusion in ApprovalVisit.ApprovalVisitDetails.EmployeeVisitConclusionList">
+                                                                                <td class="text-align-left" data-ng-bind="EmployeeVisitConclusion.VisitTaskDetail"></td>
+                                                                                <td>
+                                                                                    <i class="glyphicon glyphicon-ok text-success" data-ng-if="EmployeeVisitConclusion.Description==='YES'"></i>
+                                                                                    <i class="glyphicon glyphicon-remove text-danger" data-ng-if="EmployeeVisitConclusion.Description==='NO'"></i>
+                                                                                    <span data-ng-if="EmployeeVisitConclusion.Description==null">@Resource.NA</span>
+                                                                                </td>
+                                                                                <td data-ng-bind="EmployeeVisitConclusion.AlertComment"></td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
+                                                                    <div class="row" data-ng-if="!(ApprovalVisit.ApprovalVisitDetails.EmployeeVisitConclusionList.length > 0)">
+                                                                        <div class="col-sm-12">
+                                                                            <div class="alert alert-danger mb-0">
+                                                                                @Html.Raw(Resource.NoRecordsFound)
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" data-ng-if="!(VisitApprovalModal.VisitApprovalList.length > 0)">
+                        <div class="col-sm-12">
+                            <div class="alert alert-danger mb-0">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <button class="btn btn-success pull-right" data-ng-disabled="ApprovedEmployeeVisitIds.length === 0" ng-click="approveVisits();">Approve</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="VisitTaskDocumentListModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="CloseVisitTaskDocumentListModal()" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">@Resource.VisitTaskDocuments</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <div class="custom-table" data-ng-if="VisitTaskDocumentListModal.DocumentList.length > 0">
+                            <table class="table table-responsive margin-top-0 mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="width-10px"><strong>@Resource.TaskDetail</strong></th>
+                                        <th class="width-10px"><strong>@Resource.FormName</strong></th>
+                                        <th class="width-10px"><strong>@Resource.FormLongName</strong></th>
+                                        <th><strong>@Resource.DocName</strong></th>
+                                        <th class="width-100px"><strong>@Resource.Action</strong></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="form in VisitTaskDocumentListModal.DocumentList">
+                                        <td><div class="text-ellipsis width-150px" title="{{form.VisitTaskDetail}}">{{form.VisitTaskDetail}}</div></td>
+                                        <td><div class="text-ellipsis width-150px" title="{{form.FormName}}">{{form.FormName}}</div></td>
+                                        <td><div class="text-ellipsis width-150px" title="{{form.FormLongName}}">{{form.FormLongName}}</div></td>
+                                        <td><div class="text-ellipsis width-255px" title="{{form.DocFileName}}">{{form.DocFileName}}</div></td>
+                                        <td>
+                                            <button type="button" data-ng-if="form.ReferralTaskFormMappingID > 0" data-ng-click="ShowVisitNoteForm(form, 'pdf', VisitTaskDocumentListModal)" class="btn btn-xs btn-warning margin-right-05"><i class="fa fa-eye"></i></button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row" data-ng-if="!(VisitTaskDocumentListModal.DocumentList.length > 0)">
+                            <div class="col-sm-12">
+                                <div class="alert alert-danger mb-0">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*Edit timeSheet model open *@
+    <div id="EditTimeSheet" class="modal fade visitTimesheetModal" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title-header">
+                        <div class="title-head">
+                            <strong>Visit Time Sheet</strong>
+                        </div>
+                        <div class="dateOfService">
+                            <strong>Service Date</strong>:{{EmployeeVisit.ServiceDate | orgdate}}
+                        </div>
+                    </div>
+                    @*<button type="button" class="close" data-dismiss="modal">&times;</button>*@
+                    <button type="button" class="close" data-toggle="modal" data-target="#EditTimeSheet"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="pcatimesheetmainContainer">
+                        <!--Form Top Start Here -->
+                        <div class="pcatimesheetFormTop">
+                            <div class="row">
+                                <div class="form-group col-sm-4">
+                                    <label class="control-label">Patient/Client ID #</label>
+                                    <input class="form-control input-xs" disabled="" type="text" value="{{EmployeeVisit.BeneficiaryID}}">
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <label class="control-label">Patient / Client Name</label>
+                                    <input class="form-control input-xs" disabled="" type="text" value="{{EmployeeVisit.PatientName}}">
+                                </div>
+
+                                <div class="form-group col-sm-4">
+                                    <label class="control-label">Beneficiary ID #</label>
+                                    <input class="form-control input-xs" disabled="" type="text" value="{{EmployeeVisit.BeneficiaryID}}">
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <label class="control-label">HHA/PCA Name</label>
+                                    @* <input class="form-control input-xs" disabled="" type="text" value="{{EmployeeVisit.HHA_PCA_NP}}/{{EmployeeVisit.Name}}">*@
+                                    <select data-ng-if="EmployeeVisit.IsEditableAuth" id="patientPayor" class="form-control input-sm" data-ng-model="EmployeeVisit.EmployeeID"
+                                            data-val="true" data-original-title="@Resource.Select"
+                                            data-ng-options="item.EmployeeID as item.EmployeeName for item in EmployeeList">
+                                        <option value="">@Resource.SelectEmployee</option>
+                                    </select>
+                                    <input data-ng-if="!EmployeeVisit.IsEditableAuth" class="form-control input-xs" disabled="" type="text" value="{{EmployeeVisit.HHA_PCA_NP}}/{{EmployeeVisit.Name}}">
+                                </div>
+
+                                <div class="form-group col-sm-4">
+                                    <label class="control-label">@Resource.CareType</label>
+                                    <input class="form-control input-xs" disabled="" type="text" value="{{EmployeeVisit.CareType}}">
+                                </div>
+                                <!-- Kundan: New changes to edit prior autherization start -->
+                                <div class="form-group col-sm-4">
+                                    <label class="control-label">Payor / Insurance</label>
+                                    <select data-ng-if="EmployeeVisit.IsEditableAuth" id="patientPayor" class="form-control input-sm" data-ng-model="EmployeeVisit.PayorID"
+                                            data-val="true" data-original-title="@Resource.PatientPayor"
+                                            data-ng-options="item.PayorID as item.PayorName for item in ReferralPayorsMappingList" ng-change="GetPriorAutherizationCodes(EmployeeVisit)">
+                                        <option value="">@Resource.SelectPayor</option>
+                                    </select>
+                                    <input data-ng-if="!EmployeeVisit.IsEditableAuth" class="form-control input-xs" disabled="" type="text" value="{{EmployeeVisit.PayorName}}">
+                                </div>
+
+                                <div class="form-group col-sm-4">
+                                    <label class="control-label"> @Resource.AuthorizationCode </label>
+                                    @*<select data-ng-if="EmployeeVisit.IsEditableAuth" id="referralBillingAuthorizationID" class="form-control input-sm" data-ng-model="EmployeeVisit.ReferralBillingAuthorizationID"
+                                                data-val="true" data-original-title="@Resource.AuthorizationCode"
+                                                data-ng-options="item.Value as item.Name for item in PriorAutherizationCodeList">
+                                            <option value="">@Resource.Select</option>
+                                        </select>*@
+                                    <div class=" dropdown" data-ng-if="EmployeeVisit.IsEditableAuth" id="referralBillingAuthorizationID">
+                                        <button class="btn  dropdown-toggle custom-dd" type="button" data-toggle="dropdown">
+                                            <span style="font-size:12px">{{EmployeeVisit.AuthorizationCode}}</span>
+                                            <span class="caret pull-right"></span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li data-ng-repeat="item in PriorAutherizationCodeList" data-ng-model="EmployeeVisit.ReferralBillingAuthorizationID">
+                                                <a href="#" style="font-size:11px" data-ng-click="SelectValue(item)">
+                                                    <span><b style="color: #c41212;">AuthCode:</b>{{item.Name}} &nbsp;<b style="color: #c41212;">CareType:</b>{{item.CareType}}</span>&nbsp;<span><b style="color: #c41212;">ServiceCode:</b>{{item.ServiceCode}}</span><br />
+                                                    <span><b style="color: #c41212;">StartDate:</b>{{item.StartDate}} &nbsp;<b style="color: #c41212;">EndDate:</b>{{item.EndDate}}</span>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <input data-ng-if="!EmployeeVisit.IsEditableAuth" class="form-control input-xs" disabled="" type="text" value="{{EmployeeVisit.AuthorizationCode}}">
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <span data-ng-if="EmployeeVisit.AuthorizationCode" class="btn btn-xs btn-success"
+                                          data-ng-mouseover="SearchAuthServiceCodesModel.ReferralBillingAuthorizationID = EmployeeVisit.ReferralBillingAuthorizationID"
+                                          data-ng-mouseleave="OnLeaveAuthServiceCodesModel()"
+                                          title="View Authorization Details"
+                                          item-detail-popup data-ng-url="GetAuthServiceCodesURL"
+                                          data-ng-search-model="SearchAuthServiceCodesModel"
+                                          data-ng-template-selector="#authServiceCode-popover">
+                                        <i class="fa fa-eye"></i>&nbsp;&nbsp; View Authorization Details
+                                    </span>
+
+                                </div>
+                                <div class="form-group col-sm-4 pull-right width-auto">
+                                    <a href="javascript:void(0);" data-ng-click="EditPayorAuth(EmployeeVisit)" data-ng-if="!EmployeeVisit.IsEditableAuth" title="Edit Payor / Insurance" class="letter-space btn btn-sm green-jungle pull-right">@Resource.Edit</a>
+                                    <a href="javascript:void(0);" data-ng-click="UpdateEmployeeVisitPayorAutherizationCode(EmployeeVisit)" data-ng-if="EmployeeVisit.IsEditableAuth" title="Save" class="btn btn-sm green-jungle pull-right margin-right-10">@Resource.Save</a>
+                                    <a href="javascript:void(0);" data-ng-click="CancelEditPayorAuth(EmployeeVisit)" data-ng-if="EmployeeVisit.IsEditableAuth" title="Cancel" class="red btn btn-sm btn-primary pull-right">@Resource.Cancel</a>
+                                </div>
+                                <!-- Kundan: New changes to edit prior autherization end -->
+                            </div>
+                        </div>
+                        <!--Form Top End Here -->
+                        <div class="pcatimesheetFormmiddle">
+                            <div class="row">
+                                <div class="form-group col-sm-8">
+                                    <div class="schedule">
+                                        <h4>Schedule</h4>
+                                        <div class="row scheduleRow">
+                                            <div class="form-group col-sm-4 small">
+                                                <label>Date</label>
+                                                <input class="form-control input-xs" type="text" disabled value="{{EmployeeVisit.Date | orgdate}}">
+                                            </div>
+                                            <div class="form-group col-sm-4 small">
+                                                <label style="width: 206px;">Start Time</label>
+                                                <input class="form-control input-xs" type="text" disabled value="{{EmployeeVisit.StartDate | orgtime}}">
+                                            </div>
+
+                                            <div class="form-group col-sm-4 small">
+                                                <label style="width: 150px;">End Time</label>
+                                                <input class="form-control input-xs" type="text" disabled value="{{EmployeeVisit.EndDate | orgtime}}">
+                                            </div>
+                                        </div>
+                                        <div class="row" id="ClockIn">
+                                            <div class="form-group col-sm-6">
+                                                @*<input class="form-control input-xs rounded" type="text" value="" placeholder="Clock in Time">*@
+                                                <label>ClockIn Time :</label>
+                                                <div class="row">
+                                                    <div class="col-sm-8">
+                                                        <a href="javascript:void(0);" data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.ClockInTime!= null" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockInTime')">{{EmployeeVisit.ClockInTime | timeformat }}</a>
+                                                        <div class="input-group date date-picker pull-right" data-ng-if="EmployeeVisit.IsEditable"
+                                                             datepicker="EmployeeVisit.StrStartDateEdit" ng-dateval="EmployeeVisit.StrStartDateEdit" data-val="true">
+                                                            <input type="text" ng_model="EmployeeVisit.StrStartDateEdit"
+                                                                   class="form-control input-sm dateInputMask"
+                                                                   maxlength="50"
+                                                                   placeholder=@Resource.DateFormat
+                                                                   id="EmployeeVisit.ClockInTime" />
+                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        @*<a href="javascript:void(0);" data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.ClockInTime!= null" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockInTime')">{{EmployeeVisit.ClockInTime | timeformat }}</a>*@
+                                                        <input type="text" ng_model="EmployeeVisit.StrStartTimeEdit"
+                                                               class="form-control input-sm time"
+                                                               placeholder=@Resource.StartTime
+                                                               ng_if="EmployeeVisit.IsEditable"
+                                                               time_input_mask=""
+                                                               id="StrStartTimeEdit{{$index}}" />
+                                                    </div>
+                                                </div>
+
+
+                                            </div>
+                                            <div class="form-group col-sm-6">
+                                                @*<input class="form-control input-xs rounded" type="text" value="" placeholder="Clock out Time">*@
+                                                <label>ClockOut Time :</label>
+                                                <div class="row">
+                                                    <div class="col-sm-8">
+                                                        <a href="javascript:void(0);" data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.ClockOutTime!= null" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockOutTime')">{{EmployeeVisit.ClockOutTime | timeformat}}</a>
+                                                        <div class="input-group date date-picker pull-right" data-ng-if="EmployeeVisit.IsEditable"
+                                                             datepicker="EmployeeVisit.StrEndDateEdit" ng-dateval="EmployeeVisit.StrEndDateEdit" data-val="true">
+                                                            <input type="text" ng_model="EmployeeVisit.StrEndDateEdit"
+                                                                   class="form-control input-sm dateInputMask"
+                                                                   maxlength="50"
+                                                                   placeholder=@Resource.DateFormat
+                                                                   id="EmployeeVisit.ClockOutTime" />
+                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="col-sm-4">
+                                                        @*<a href="javascript:void(0);" data-ng-if="!EmployeeVisit.IsEditable && EmployeeVisit.ClockOutTime != null" data-ng-click="OpenClockInClockOutMapModal($event,EmployeeVisit,'ClockOutTime')">{{EmployeeVisit.ClockOutTime | timeformat }}</a>*@
+                                                        <input type="text" ng_model="EmployeeVisit.StrEndTimeEdit"
+                                                               class="form-control input-sm time"
+                                                               placeholder=@Resource.EndTime
+                                                               ng_if="EmployeeVisit.IsEditable"
+                                                               time_input_mask=""
+                                                               id="StrEndTimeEdit{{$index}}" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="btn-row text-right col-sm-12 btns-col">
+                                                <a href="javascript:void(0);" data-ng-click="EditEmployeeVisit(EmployeeVisit,'#StrEndTimeEdit'+$index)" data-ng-if="!EmployeeVisit.IsEditable" title="Edit ClockIn ClockOut Time" class="letter-space btn btn-sm green-jungle pull-left">@Resource.Edit</a>
+                                                <a href="javascript:void(0);" data-ng-click="SaveEmployeeVisit(EmployeeVisit,'#StrEndTimeEdit'+$index)" data-ng-if="EmployeeVisit.IsEditable" title="Save" class="btn btn-sm green-jungle pull-left margin-right-10">@Resource.Save</a>
+                                                <a href="javascript:void(0);" data-ng-click="Cancel(EmployeeVisit)" data-ng-if="EmployeeVisit.IsEditable" title="E" class="red btn btn-sm btn-primary pull-left">@Resource.Cancel</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-4">
+                                    <div class="approval">
+                                        <h4>Approval</h4>
+                                        <div class="row">
+                                            <div class="form-group col-sm-8">
+                                                <select class="form-control input-sm" data-ng-model="EmployeeVisit.Reason" data-ng-change="ClearText()">
+                                                    <option selected> Select Reason</option>
+                                                    <option value="Approval">ByPass Approval Required Notes</option>
+                                                    <option value="Rejection">ByPass Rejection Required Notes</option>
+                                                </select>
+                                                <textarea class="form-control input-sm" data-ng-model="EmployeeVisit.ByPassReasonsClockIn" maxlength="1000"
+                                                          placeholder="ByPass Reason" data-val="true"></textarea>
+
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <div data-ng-if="EmployeeVisit.ActionTaken !== null && EmployeeVisit.ActionTaken == 2" class="text-center">
+                                                    <img src="~/Assets/images/Accepted.png" alt="Italian Trulli" style="padding-left: 0px; width: auto; max-width: 100%;" />
+                                                </div>
+                                                <div data-ng-if="EmployeeVisit.ActionTaken !== null && EmployeeVisit.ActionTaken == 3" class="text-center">
+                                                    <img src="~/Assets/images/Rejected.png" style="padding-left: 0px; width: auto; max-width: 100%;" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-sm-12">
+                                                <div class="btn-row text-left btns-col">
+                                                    <a href="#" class="btn btn-sm green-jungle mr-5" data-ng-click="ActionTaken(EmployeeVisit,true)">Approve</a>
+                                                    <a href="#" class="red btn btn-sm" data-ng-click="SaveByPassReasonNote1(EmployeeVisit,true)">Reject</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="custom-table">
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    @*VisitTask & Conclusion start*@
+                                    <form id="#frmRefVisitTask" novalidate="novalidate" class="ng-pristine ng-valid">
+                                        <div class="portlet-body compact" style="display: block;">
+                                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                                <li class="nav-item active ">
+                                                    <a class="nav-link active" id="tast-tab" data-toggle="tab" href="#tast" data-ng-click="AddClassTask()" role="tab" aria-controls="tast" aria-selected="true">Task</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" id="Conclusion-tab" data-toggle="tab" href="#Conclusion" data-ng-click="RemoveClassConclusion()" role="tab" aria-controls="Conclusion" aria-selected="false">Conclusion</a>
+                                                </li>
+                                                <li class="nav-item">
+                                                    <a class="nav-link" id="Deviation-tab" data-toggle="tab" href="#Deviation" data-ng-click="RemoveClassDeviation()" role="tab" aria-controls="Deviation" aria-selected="false">Deviation</a>
+                                                </li>
+                                            </ul>
+                                            <a class="letter-space pull-right add btn btn-sm green-jungle" id="task" data-ng-click="AddVisitNote()">Add Task</a>
+                                            <a class="letter-space pull-right add btn btn-sm green-jungle hide" id="conclusion1" data-ng-click="AddVisitConclusion()">Add Conclusion</a>
+                                            <a class="letter-space pull-right add btn btn-sm green-jungle hide" id="Deviation1" data-ng-click="OpenDeviationModal()">Add Deviation</a>
+                                            <div class="tab-content" id="myTabContent">
+                                                <div class="tab-pane fade active in" id="tast" role="tabpanel" aria-labelledby="Task-tab">
+                                                    <div class="responsiveSm">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    @*<th scope="col"></th>*@
+                                                                    <th>Task</th>
+                                                                    <th>Time</th>
+                                                                    <th width="120">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr data-ng-class="{'deleted':EmployeeVisitNote.IsDeleted}" dir-paginate="EmployeeVisitNote in EmployeeVisitNoteList | itemsPerPage: EmployeeVisitNoteListPager.pageSize" total-items="EmployeeVisitNoteListPager.totalRecords" current-page="EmployeeVisitNoteListPager.currentPage" pagination-id="EmployeeVisitNoteListPager_ID">
+                                                                    @*<th scope="row"><input class="form-check-input" type="checkbox" value=""></th>*@
+                                                                    <td data-ng-bind="EmployeeVisitNote.VisitTaskDetail"></td>
+                                                                    <td class="hidden" data-ng-bind="EmployeeVisitNote.Description"></td>
+                                                                    <td>{{EmployeeVisitNote.ServiceTime | timeinhrs}}&nbsp;hrs</td>
+                                                                    <td>
+                                                                        <button type="button" data-ng-if="EmployeeVisitNote.TaskForms > 0" data-ng-click="ShowVisitNoteForms(EmployeeVisitNote)" class="btn btn-xs btn-warning margin-right-05"><i class="fa fa-columns"></i></button>
+                                                                        <button type="button" data-ng-click="AddVisitNote(EmployeeVisitNote)" class="btn btn-xs btn-primary margin-right-05"><i class="fa fa-edit"></i></button>
+                                                                        <button type="button" data-ng-show="EmployeeVisitNote.IsDeleted" data-ng-click="DeleteEmployeeVisitNote(EmployeeVisitNote.EmployeeVisitNoteID,'@Resource.Enable')" class="btn btn-xs btn-success">@Resource.Enable</button>
+                                                                        <button type="button" data-ng-show="!EmployeeVisitNote.IsDeleted" data-ng-click="DeleteEmployeeVisitNote(EmployeeVisitNote.EmployeeVisitNoteID,'@Resource.Disable')" class="btn btn-xs btn-danger"><i class="fa fa-trash"></i></button>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="Conclusion" role="tabpanel" aria-labelledby="Conclusion-tab">
+                                                    <div class="responsiveSm">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">Conclusion</th>
+                                                                    <th scope="col">Yes/No</th>
+                                                                    <th scope="col">Notes</th>
+                                                                    <th scope="col" width="120">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr data-ng-repeat="EmployeeVisitConclusion in EmployeeVisitConclusionList">
+                                                                    <td data-ng-bind="EmployeeVisitConclusion.VisitTaskDetail"></td>
+                                                                    <td>
+                                                                        <i class="glyphicon glyphicon-ok text-success" data-ng-if="EmployeeVisitConclusion.Description==='YES'"></i>
+                                                                        <i class="glyphicon glyphicon-remove text-danger" data-ng-if="EmployeeVisitConclusion.Description==='NO'"></i>
+                                                                        <span data-ng-if="EmployeeVisitConclusion.Description==null">@Resource.NA</span>
+                                                                    </td>
+                                                                    <td data-ng-bind="EmployeeVisitConclusion.AlertComment"></td>
+                                                                    <td>
+                                                                        <a href="javascript:void(0);" data-ng-click="AddVisitConclusion(EmployeeVisitConclusion)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                        @*<a href="javascript:void(0);" data-ng-show="EmployeeVisitNote.IsDeleted" data-ng-click="DeleteEmployeeVisitConclusion(EmployeeVisitConclusion)" class="btn btn-xs green">@Resource.Enable</a>*@
+                                                                        <a href="javascript:void(0);" data-ng-show="!EmployeeVisitNote.IsDeleted" data-ng-click="DeleteEmployeeVisitConclusion(EmployeeVisitConclusion)" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="Deviation" role="tabpanel" aria-labelledby="Deviation-tab">
+                                                    <div class="responsiveSm">
+                                                        <table class="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th scope="col">Deviation Notes</th>
+                                                                    <th scope="col">Deviation Type</th>
+                                                                    <th scope="col">Deviation Time</th>
+                                                                    <th scope="col">Action</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody data-ng-repeat="Deviation in DeviationNotesList">
+                                                                <tr>
+                                                                    <th scope="row">{{Deviation.DeviationNotes}}</th>
+                                                                    <th scope="row">{{Deviation.DeviationType}}</th>
+                                                                    <th scope="row">{{Deviation.DeviationTime}}</th>
+                                                                    @*<td>01:00 hrs</td>*@
+                                                                    <td width="100">
+                                                                        <a href="#" data-ng-click="EditDeviation(Deviation)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                        <a href="#" data-ng-click="DeleteDeviation(Deviation)" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                                    </td>
+                                                                </tr>
+
+                                                            </tbody>
+                                                            @*<tfoot>
+                                                                    <tr>
+                                                                        <th scope="col">Total</th>
+                                                                        <th colspan="2">02:10 hrs</th>
+                                                                    </tr>
+                                                                </tfoot>*@
+                                                        </table>
+                                                        <p class="note">
+                                                            Note: Sum of the clock in to clockout time and deviation time should not
+                                                            greater than total shift hrs.
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="col-sm-6 devation-col">
+                                    <ul class="nav nav-tabs" id="myTab2" role="tablist">
+                                        <li class="nav-item active">
+                                            <a class="nav-link active" id="deviation-tab" data-toggle="tab" href="#" role="tab" aria-controls="deviation" aria-selected="true">ByPassReason Notes</a>
+                                        </li>
+                                    </ul>
+                                    <form id="frmDeviationList">
+                                        <div class="table-responsive tabbable-custom">
+                                            <div class="tab-content" id="myTabContent2">
+                                                <div class="tab-pane fade show active in" id="deviation" role="tabpanel" aria-labelledby="deviation-tab">
+                                                    <div class="responsiveSm">
+                                                        <div class="approval" style="height:120px">
+                                                            <div class="row">
+                                                                <div class="col-sm-6">
+                                                                    <strong>@Resource.BypassReasonForClockIn </strong><br />
+                                                                    <div data-ng-if="EmployeeVisit.IsByPassClockIn" style="padding-top:2px">
+                                                                        <span data-ng-if="IsShow!=true">{{EmployeeVisit.ByPassReasonClockIn}}</span>
+                                                                        <input class="form-control " type="text" ng-model="EmployeeVisit.ByPassReasonClockIn" data-ng-if="IsShow==true && EmployeeVisit.IsByPassClockIn" />
+                                                                    </div>
+                                                                </div>
+
+                                                                <div class="col-sm-6">
+                                                                    <strong>@Resource.BypassReasonForClockOut </strong><br />
+                                                                    <div data-ng-if="EmployeeVisit.IsByPassClockOut" style="padding-top:2px">
+                                                                        <span data-ng-if="IsShow!=true">{{EmployeeVisit.ByPassReasonClockOut}}</span>
+                                                                        <input class="form-control " type="text" ng-model="EmployeeVisit.ByPassReasonClockOut" data-ng-if="IsShow==true && EmployeeVisit.IsByPassClockOut" />
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <div class="btn-row text-left btns-col" style="padding-top:14px">
+                                                                <a href="javascript:void(0);" ng-click="EditByPassReasonNote()" title="Edit ClockIn ClockOut Time" class="letter-space btn btn-sm blue pull-left mr-5 ng-scope" data-ng-if="!IsShow">Edit</a>
+                                                                <a href="javascript:void(0);" ng-click="SaveByPassReasonNotes(EmployeeVisit)" title="Edit ClockIn ClockOut Time" class="letter-space btn btn-sm green-jungle pull-left ng-scope" data-ng-if="IsShow">Save</a>
+                                                                <a href="javascript:void(0);" ng-click="EditByPassReasonCancel(EmployeeVisit)" title="Edit ClockIn ClockOut Time" class="letter-space btn btn-sm red pull-left ng-scope" data-ng-if="IsShow">Cancel</a>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!---Edit ClockIn ClockOut time-->
+
+                    <div class="footer-btn">
+                        @if (Model.IsPartial == false
+                                                  || (Model.IsPartial && Model.SearchRefCalender.ReferralID != null && Model.SearchRefCalender.ReferralID.Count > 0 && Common.HasPermission(Constants.HC_Permission_PatientIntake_TimeSheet_Add))
+                                                  || (Model.IsPartial && Model.SearchRefCalender.EmployeeID != null && Model.SearchRefCalender.EmployeeID.Count > 0 && Common.HasPermission(Constants.HC_Permission_Empoyee_TimeSheett_Add))
+                                                 )
+                        {
+                            if (Common.HasPermission(Constants.HC_Can_Approve_Bypass_ClockInOut))
+                            {
+                                @*<button class="btn btn-sm yellow" data-ng-click="OpenBypassActionModal($event,EmployeeVisit)"
+                                            data-ng-if="EmployeeVisit.ActionTaken !== null && EmployeeVisit.ActionTaken != 3 && EmployeeVisit.ActionTaken != 2 && (EmployeeVisit.ActionTaken == 0 || EmployeeVisit.IsApprovalRequired == false)" title="Take Action">
+                                        Approval Required
+                                    </button>
+                                    <button class="btn btn-sm red" data-ng-click="OpenBypassActionModal($event,EmployeeVisit)"
+                                            data-ng-if="EmployeeVisit.ActionTaken !== null && EmployeeVisit.ActionTaken == 3" title="Take Action">
+                                        Denied
+                                    </button>
+                                    <button class="btn btn-sm green-jungle" data-ng-click="OpenBypassActionModal($event,EmployeeVisit)"
+                                            data-ng-if="EmployeeVisit.ActionTaken !== null && EmployeeVisit.ActionTaken == 2 && EmployeeVisit.IsApprovalRequired == true" disabled title="Take Action">
+                                        Approved
+                                    </button>*@
+
+                            }
+
+                        }
+                        @*<button class="btn btn-sm blue" data-ng-click="OpenBypassActionModal($event,EmployeeVisit)" data-ng-if="EmployeeVisit.ByPassReasonClockIn == null ||''" title="Take Action"> Add Note </button>*@
+                        <div class="btn-group">
+                            <button data-ng-if="EmployeeVisit.ActionTaken == 2 && !EmployeeVisit.IsPCACompleted == 1" class="btn btn-sm green-jungle" title="Complete timeSheet" data-ng-click="SavePCAComplete(EmployeeVisit)">Complete</button>
+                            <button data-ng-if="EmployeeVisit.ActionTaken == 2 && !EmployeeVisit.IsPCACompleted == 0" disabled class="btn btn-sm green-jungle" title="Complete timeSheet" data-ng-click="SavePCAComplete(EmployeeVisit)">Complete</button>
+                        </div>
+                        <button data-ng-if="EmployeeVisit.ActionTaken == null || EmployeeVisit.ActionTaken == 0" class="btn btn-sm gray" title="Complete timeSheet">Complete</button>
+                        <div class="btn-group" data-ng-if="EmployeeVisit.ActionTaken !== null && EmployeeVisit.ActionTaken == 2">
+                            @*<a href="@Constants.HC_GeneratePcaTimeSheetPdf{{EmployeeVisit.EncryptedEmployeeVisitID}}" target="_blank" title="Print PCA TimeSheet" data-ng-if="!EmployeeVisit.IsEditable" class="letter-space btn btn-sm green-jungle"><i class="fa fa-print"></i>Print TimeSheet</a>
+                                <a href="@Constants.HC_GeneratePcaTimeSheetPdf{{EmployeeVisit.EncryptedEmployeeVisitID}}" target="_blank" title="Print PCA TimeSheet" data-ng-if="!EmployeeVisit.IsEditable" class="letter-space btn btn-sm green-jungle"><i class="fa fa-print"></i>Print TimeSheet</a>*@
+                            <button target="_blank" title="Print PCA TimeSheet" class="letter-space btn btn-sm green-jungle" data-ng-click="PrintPCATimeSheet(EmployeeVisit.EncryptedEmployeeVisitID)"><i class="fa fa-print"></i>Print TimeSheet</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+    @*Akhilesh changes ebd*@
+    <div id="deviationModal" class="modal fade" role="dialog">
+        <div class="modal-dialog modal-sm" role="document">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title"><b>Deviation Notes</b></h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <label class="control-label">Deviation Type</label>
+                            <select class="form-control" title="DeviationType"
+                                    name="DeviationType"
+                                    data-ng-model="Deviation.DeviationID" ng-options="option.DeviationID as option.DeviationType for option in EmployeeVisitModel.DeviationList">
+                                <option value="" selected="selected">Select</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Deviation Time</label>
+                            <div class="margin-top-5"></div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <label class="control-label">@Resource.Hours</label>
+                                    <select class="form-control input-sm" data-ng-model="Deviation.Hours" data-ng-options="v.Value as v.Name for v in HourList"
+                                            data-val="true" data-val-required="@Resource.HoursRequired" id="VisitNote_Hours" name="VisitNote.Hours">
+                                        <option value="">@Resource.Hours</option>
+                                    </select>
+                                    <span class="field-validation-error" data-valmsg-for="Deviation.Hours" data-valmsg-replace="true"></span>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="control-label">@Resource.Minutes</label>
+                                    <select class="form-control input-sm" data-ng-model="Deviation.Minutes" data-ng-options="v.Value as v.Name for v in MinuteList"
+                                            data-val="true" data-val-required="@Resource.MinutesRequired" id="VisitNote_Minutes" name="VisitMinutes.Minutes">
+                                        <option value="">@Resource.Minutes</option>
+                                    </select>
+                                    <span class="field-validation-error" data-valmsg-for="Deviation.Minutes" data-valmsg-replace="true"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="control-label">Deviation Notes</label>
+                            <textarea rows="2" class="form-control input-sm" data-ng-model="Deviation.DeviationNotes" maxlength="500" placeholder="Deviation Remark" data-val="true" style="margin: 0px 302px 0px 0px; width: 265px; height: 98px;"></textarea>
+                        </div>
+                        <div class="btn-group">
+                            <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveDeviationNotes()">Save</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="ClockInClockOutAdressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; width:151%; margin-left:-23%">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="ClockInClockOutAdressModelClosed()" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5"></h4>
+                </div>
+                <div class="modal-body">
+                    <div style=" padding-top: 10px; ">
+                        <img src="~/Assets/images/red-map-pin.png" style="width:20px;height:20px" />
+                        <span data-ng-if="!ClockInClockOutMap.IsByPassClockIn">ClockInTime Location : (<b>{{ClockInClockOutMap.ClockInTimeLatitude}}/ {{ClockInClockOutMap.ClockInTimeLongitude}}</b>)</span>
+                        <span data-ng-if="ClockInClockOutMap.IsByPassClockIn">ByPass Clock-In Location : (<b>{{ClockInClockOutMap.ClockInTimeLatitude}}/ {{ClockInClockOutMap.ClockInTimeLongitude}}</b>)</span>
+
+                        <img src="~/Assets/images/green-map-pin.png" style="width:20px;height:20px" />
+                        <span data-ng-if="!ClockInClockOutMap.IsByPassClockOut">ClockOutTime Location  : (<b>{{ClockInClockOutMap.ClockOutTimeLatitude}}/ {{ClockInClockOutMap.ClockOutTimeLongitude}}</b>)</span>
+                        <span data-ng-if="ClockInClockOutMap.IsByPassClockOut">ByPass Clock-Out Location  : (<b>{{ClockInClockOutMap.ClockOutTimeLatitude}}/ {{ClockInClockOutMap.ClockOutTimeLongitude}}</b>)</span>
+                    </div>
+                    <div style=" padding-top: 10px; ">
+
+                    </div>
+                    <div style=" padding-top: 10px; ">
+                        <img src="~/Assets/images/yellow-map-pin.png" style="width:20px;height:20px">
+                        <span>Signed Location  : (<b>{{ClockInClockOutMap.SignedLatitude}}/ {{ClockInClockOutMap.SignedLongitude}}</b>)</span>
+
+                        <img src="~/Assets/images/blue-map-pin.png" style="width:20px;height:20px" />
+                        <span>Patient Registered Location  : (<b>{{ClockInClockOutMap.PatientLatitude}}/ {{ClockInClockOutMap.PatientLongitude}}</b>)</span>
+                    </div>
+                    <div style=" padding-top: 10px;padding-bottom:10px; ">
+
+                    </div>
+                    <div id="ClockInOutmap"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ByPassActionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>*@
+                    <button type="button" class="close" aria-label="Close" data-ng-click="ByPassActionModelClosed()"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        ByPass Reason
+                        <span class="badge badge-warning pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Pending)">@Resource.Pending</span>
+                        <span class="badge badge-green pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Approved)">@Resource.Approved</span>
+                        <span class="badge badge-danger pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Rejected)">@Resource.Rejected</span>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    @*<div class="col-sm-12" data-ng-if="ByPassDetail.IVRClockIn">
+                            {{ByPassDetail.IsApprovalRequired}}{{ByPassDetail.IVRClockIn}}{{ByPassDetail.IVRClockOut}}a
+                        </div>
+                        <div class="col-sm-12" data-ng-if="ByPassDetail.IVRClockOut">
+                            {{ByPassDetail.IsApprovalRequired}}{{ByPassDetail.IVRClockIn}}{{ByPassDetail.IVRClockOut}}b
+                        </div>*@
+                    <div @*data-ng-if="!EmployeeVisit.ByPassReasonClockIn == null ||''"*@>
+                        <textarea rows="3" class="form-control input-sm" data-ng-model="BypassDetail.ByPassReasonsClockIn" maxlength="1000"
+                                  placeholder="ByPass Reason" data-val="true"></textarea>
+                    </div>
+                    <div class="col-sm-12" data-ng-if="BypassDetail.IsByPassClockIn">
+                        <strong>@Resource.BypassReasonForClockIn </strong>{{BypassDetail.ByPassReasonClockIn}}
+                        <hr data-ng-if="BypassDetail.IsByPassClockIn && BypassDetail.IsByPassClockOut" />
+                    </div>
+                    <div class="col-sm-12" data-ng-if="BypassDetail.IsByPassClockOut">
+                        <strong>@Resource.BypassReasonForClockOut </strong>{{BypassDetail.ByPassReasonClockOut}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-lg-5 pull-right">
+                        <button type="button" class="btn btn-sm green-jungle" data-ng-click="ActionTaken(BypassDetail,true)">@Resource.Approve</button>
+                        <button type="button" class="btn btn-sm red" data-ng-click="SaveByPassReasonNote1(BypassDetail,true)">@Resource.Reject</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="TimeSheetInfoModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" aria-label="Close" data-ng-click="TimeSheetInfoModalClosed()"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        Timesheet Action(s)
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.TotalcreatedTask" val="EmployeeVisitMark.TotalcreatedTask" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            <b>{{EmployeeVisitMark.TotalcreatedTask}}</b> Task(s) Created
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.SurveyCompleted" val="EmployeeVisitMark.SurveyCompleted" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            SurveyCompleted
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.IsByPassClockIn" val="EmployeeVisitMark.IsByPassClockIn" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            IsByPassClockIn
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.IsByPassClockOut" val="EmployeeVisitMark.IsByPassClockOut" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            IsByPassClockOut
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.IsSigned" val="EmployeeVisitMark.IsSigned" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            IsSigned
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.IsEarlyClockIn" val="EmployeeVisitMark.IsEarlyClockIn" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            IsEarlyClockIn
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.IVRClockIn" val="EmployeeVisitMark.IVRClockIn" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            IVRClockIn
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.IVRClockOut" val="EmployeeVisitMark.IVRClockOut" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            IVRClockOut
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.IsPCACompleted" val="EmployeeVisitMark.IsPCACompleted" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                            IsPCACompleted
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="row">
+                                        <div class="col-md-2">
+                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="EmployeeVisitMark.IVRClockOut" val="EmployeeVisitMark.IVRClockOut" disabled />
+                                        </div>
+                                        <div class="col-md-10">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-lg-5 pull-right">
+                        <button type="button" class="btn btn-sm red" data-ng-click="TimeSheetInfoModalClosed()">@Resource.Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*<div class="row">
+            <div class="col-sm-12">
+                <div data-ng-if="EmployeeVisitList.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>*@
+    <div class="modal fade" id="ClockInClockOutAdressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; width:151%; margin-left:-23%">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" ng-click="ClockInClockOutAdressModelClosed()" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5"></h4>
+                </div>
+                <div class="modal-body">
+                    <div style=" padding-top: 10px; ">
+                        <img src="~/Assets/images/red-map-pin.png" style="width:20px;height:20px" />
+                        <span data-ng-if="!ClockInClockOutMap.IsByPassClockIn">ClockInTime Location : (<b>{{ClockInClockOutMap.ClockInTimeLatitude}}/ {{ClockInClockOutMap.ClockInTimeLongitude}}</b>)</span>
+                        <span data-ng-if="ClockInClockOutMap.IsByPassClockIn">ByPass Clock-In Location : (<b>{{ClockInClockOutMap.ClockInTimeLatitude}}/ {{ClockInClockOutMap.ClockInTimeLongitude}}</b>)</span>
+
+                        <img src="~/Assets/images/green-map-pin.png" style="width:20px;height:20px" />
+                        <span data-ng-if="!ClockInClockOutMap.IsByPassClockOut">ClockOutTime Location  : (<b>{{ClockInClockOutMap.ClockOutTimeLatitude}}/ {{ClockInClockOutMap.ClockOutTimeLongitude}}</b>)</span>
+                        <span data-ng-if="ClockInClockOutMap.IsByPassClockOut">ByPass Clock-Out Location  : (<b>{{ClockInClockOutMap.ClockOutTimeLatitude}}/ {{ClockInClockOutMap.ClockOutTimeLongitude}}</b>)</span>
+                    </div>
+                    <div style=" padding-top: 10px; ">
+
+                    </div>
+                    <div style=" padding-top: 10px; ">
+                        <img src="~/Assets/images/yellow-map-pin.png" style="width:20px;height:20px">
+                        <span>Signed Location  : (<b>{{ClockInClockOutMap.SignedLatitude}}/ {{ClockInClockOutMap.SignedLongitude}}</b>)</span>
+
+                        <img src="~/Assets/images/blue-map-pin.png" style="width:20px;height:20px" />
+                        <span>Patient Registered Location  : (<b>{{ClockInClockOutMap.PatientLatitude}}/ {{ClockInClockOutMap.PatientLongitude}}</b>)</span>
+                    </div>
+                    <div style=" padding-top: 10px;padding-bottom:10px; ">
+
+                    </div>
+                    <div id="ClockInOutmap"></div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="ByPassActionModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    @*<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>*@
+                    <button type="button" class="close" aria-label="Close" data-ng-click="ByPassActionModelClosed()"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        @Resource.BypassDetails
+                        <span class="badge badge-warning pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Pending)">@Resource.Pending</span>
+                        <span class="badge badge-green pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Approved)">@Resource.Approved</span>
+                        <span class="badge badge-danger pull-right margin-right-10" data-ng-if="BypassDetail.ActionTaken==@((int)EmployeeVisit.BypassActions.Rejected)">@Resource.Rejected</span>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    @*<div class="col-sm-12" data-ng-if="ByPassDetail.IVRClockIn">
+                            {{ByPassDetail.IsApprovalRequired}}{{ByPassDetail.IVRClockIn}}{{ByPassDetail.IVRClockOut}}a
+                        </div>
+                        <div class="col-sm-12" data-ng-if="ByPassDetail.IVRClockOut">
+                            {{ByPassDetail.IsApprovalRequired}}{{ByPassDetail.IVRClockIn}}{{ByPassDetail.IVRClockOut}}b
+                        </div>*@
+                    <div class="col-sm-12" data-ng-if="BypassDetail.IsByPassClockIn">
+                        <strong>@Resource.BypassReasonForClockIn </strong>{{BypassDetail.ByPassReasonClockIn}}
+                        <hr data-ng-if="BypassDetail.IsByPassClockIn && BypassDetail.IsByPassClockOut" />
+                    </div>
+                    <div class="col-sm-12" data-ng-if="BypassDetail.IsByPassClockOut">
+                        <strong>@Resource.BypassReasonForClockOut </strong>{{BypassDetail.ByPassReasonClockOut}}
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <div class="col-lg-5 pull-right">
+                        <button type="button" class="btn btn-sm green-jungle" data-ng-click="ActionTaken(BypassDetail,true)">@Resource.Approve</button>
+                        <button type="button" class="btn btn-sm red" data-ng-click="OpenBypassRejectReasonModal(BypassDetail)">@Resource.Reject</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="EmployeeVisitList.length == 0">
+                <div class="col-lg-12">
+                    <div class="alert alert-danger">
+                        @Html.Raw(Resource.NoRecordsFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Partial("Partial/_EmployeeVisitNoteList", Model)
+
+    @Html.Partial("Partial/_MissingTimeSheet", Model)
+
+    @Html.Partial("~/Areas/HomeCare/Views/Shared/_VisitReasonActionModal.cshtml")
+</div>
+
+<script id="authServiceCode-popover" type="text/ng-template">
+    <div class="col-sm-12 no-padding">
+        <table class="table table-bordered table-striped table-condensed flip-content" data-ng-if="DetailModel.length>0">
+            <thead>
+                <tr>
+                    <td>@Resource.Modifiers</td>
+                    <td>@Resource.Taxonomy</td>
+                    <td>@Resource.RevenueCode</td>
+                    <td>@Resource.Rate</td>
+                    <td>@Resource.PerUnitValue</td>
+                    <td>@Resource.RoundUpMinutes</td>
+                    <td>@Resource.MaxUnit</td>
+                    <td>@Resource.DailyUnit</td>
+                </tr>
+            </thead>
+            <tbody>
+                <tr data-ng-repeat="item in DetailModel">
+                    <td>{{item.Modifiers ? item.Modifiers : '@Resource.NA' }}</td>
+                    <td>{{item.Taxonomy ? item.Taxonomy : '@Resource.NA'}}</td>
+                    <td>{{item.RevenueCode ? item.RevenueCode : '@Resource.NA' }}</td>
+                    <td>{{item.Rate}}</td>
+                    <td>{{item.PerUnitValue}}</td>
+                    <td>{{item.RoundUpMinutes}}</td>
+                    <td>{{item.MaxUnit ? item.MaxUnit : '@Resource.NA' }}</td>
+                    <td>{{item.DailyUnit}}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div data-ng-if="DetailModel.length==0" class="padding-bottom-15px">
+            <span>
+                No Service Code found.
+            </span>
+        </div>
+    </div>
+</script>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/employeevisitlist")
+
+    @Scripts.Render("~/Assets/js/viewjs/siteApp/Areas/HomeCare/Shared/_VisitReasonActionModal.js")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.EmployeeVisit)';
+        var VTFDeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.VisitTaskForm)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.EmployeeVisit)';
+        var StrtEndTimeRequired = '@Resource.StrtEndTimeRequired';
+        var GenerateBillingNote = '@Resource.GenerateBillingNotes';
+        var ConfirmationForBillingNote = '@Resource.ConfirmationForBillingNote';
+    </script>
+    <script id="employeevisit-popover" type="text/ng-template">
+        @Html.Partial("Partial/_EmployeeVisitInformationTipPopover")
+    </script>
+
+
+}

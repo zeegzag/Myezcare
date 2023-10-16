@@ -1,0 +1,14 @@
+﻿
+
+create procedure [dbo].[GetNoteCategory]
+(
+   @id bigint
+)
+as
+begin
+select d.Title as Title,d.DDMasterID AS Value
+		from DDMaster d
+	inner join 	lu_DDMasterTypes ld on ld.DDMasterTypeID=d.ItemType
+		where d.ItemType=ld.DDMasterTypeID 
+		      and ld.Name='Note Category' order by d.Title
+end

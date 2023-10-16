@@ -1,0 +1,617 @@
+﻿@model AddReferralModel
+
+<div class="form-group row">
+    <div class="col-sm-12">
+        @*<h4><strong>@Resource.AnsellCaseyReviewDetails</strong></h4>
+    <hr class="clear-both" />*@
+        <form id="frmSearchReferralOutcomeMeasurement">
+            <div class="row">
+                <div class="form-group col-lg-10 col-md-10 col-sm-10 no-padding">
+                    <input id="hideErrorContent" type="text" class="hideErrorContent">
+                    <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.StarDate</label>
+                        <div class="input-group date" datepicker="SearchReferralOutcomeMeasurement.StartDate" ng-dateval="SearchReferralOutcomeMeasurement.StartDate">
+                            <input
+                                class="form-control input-sm  dateInputMask" placeholder="@Resource.StarDate"
+                                id="SearchReferralOutcomeMeasurement_StartDate" maxlength="50" name="SearchReferralOutcomeMeasurement.StartDate"
+                                type="text"/>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+
+                    </div>
+                    <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.EndDate</label>
+                        <div class="input-group date" datepicker="SearchReferralOutcomeMeasurement.EndDate" ng-dateval="SearchReferralOutcomeMeasurement.EndDate">
+                            <input
+                                class="form-control input-sm dateInputMask" placeholder="@Resource.EndDate"
+                                id="SearchReferralOutcomeMeasurement_EndDate" maxlength="50" name="SearchReferralOutcomeMeasurement.EndDate"
+                                type="text"/>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-4 col-sm-4 padding-top-18">
+                        <label class="control-label"></label>
+                        <button type="submit" class="btn btn-sm btn-primary " data-ng-click="GetReferralOutcomeMeasurementList()">
+                            @Resource.Search
+                        </button>
+                        <a class="btn btn-sm grey border-grey-cascade" data-ng-click="ResetReferralOutcomeMeasurement()">
+                            @Resource.Reset
+                        </a>
+                    </div>
+
+                </div>
+                <div class="col-lg-2 col-md-2 col-sm-2">
+                    <a href="javascript:void(0);" class="btn btn-xs green-jungle pull-right" data-ng-click="OpenReferralOutcomeMeasurement()">
+                        <i class="fa fa-plus">&nbsp;&nbsp;</i> @Resource.OutcomesMeasurement
+                    </a>
+                </div>
+
+            </div>
+        </form>
+
+
+        <div data-ng-if="ReferralOutcomeMeasurementList.length > 0">
+
+            <div class="row padding-left-right-10 ">
+                <div class="col-md-12">
+                    <div class="scroller1" data-rail-visible="1" data-rail-color="yellow" data-handle-color="#a1b2bd">
+                        <span><strong>@Resource.Name: </strong><span>{{Referral.FullName}}</span></span>
+
+                        <span><strong>@Resource.AHCCCSID: </strong><span>#{{Referral.AHCCCSID}}</span></span>
+                    </div>
+                </div>
+                <div class="col-md-12 compact">
+                    <div class="table-responsive">
+                        <table class="schAssignment_table table-advance table-bordered table-condensed outComeTable">
+                            <tr>
+                                <th class="width-250px"></th>
+                                <th class="width-80px text-align-center" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">
+                                    <a href="javascript:;" data-ng-click="OpenReferralOutcomeMeasurement(referralOM.ReferralOutcomeMeasurementID)">{{referralOM.OutcomeMeasurementDate|dateformat}}</a>
+                                </th>
+                                <th class="width-20px text-align-center">Avg</th>
+                            </tr>
+                            <tr>
+                                <th data-ng-init="ReferralOutcomeMeasurementList.TotalROM1=2">@Resource.ROM1</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.WorkCommunity}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM1/TotalROMCount) |number:2}}</td>
+                            </tr>
+                            <tr>
+                                <th>@Resource.ROM2</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.ScheduledAppointment}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM2/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Resource.ROM3</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.AskForHelp}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM3/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Resource.ROM4</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.CommunicateEffectively}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM4/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+
+                            <tr>
+                                <th>@Resource.ROM5</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.PositiveBehavior}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM5/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+
+                            <tr>
+                                <th>@Resource.ROM6</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.QualityFriendship}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM6/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+
+                            <tr>
+                                <th>@Resource.ROM7</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.RespectOther}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM7/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Resource.ROM8</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.StickUp}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM8/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Resource.ROM9</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.LifeSkillGoals}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM9/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Resource.ROM10</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.StayOutOfTrouble}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM10/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Resource.ROM11</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.SuccessfulInSchool}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM11/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Resource.ROM12</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.SuccessfulInLiving}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM12/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                            <tr>
+                                <th>@Resource.ROM13</th>
+                                <td class="text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">{{referralOM.AdulthoodNeeds}}
+                                </td>
+                                <td class="bg-default">{{(TotalROM13/TotalROMCount) |number:2}}</td>
+                            </tr>
+
+                             <tr>
+                                <th></th>
+                                 <td class="width-80px text-align-right" data-ng-repeat="referralOM in ReferralOutcomeMeasurementList">
+                                     <a class="" data-ng-click="DeleteReferralOutcomeMeasurement(referralOM.ReferralOutcomeMeasurementID)" title="@Resource.Delete">
+                                         <i class="fa fa-trash"></i>
+                                     </a>
+                                 </td>
+                                 <td class="bg-default"></td>
+                            </tr>
+
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row" data-ng-if="GraphSeriesOutcomeMeasurementList.length>0">
+            <br class="clearfix" />
+            <div class="space20"></div>
+            <div class="col-md-10 padding-left-25">
+                <div class="jqChart-Graph-OM" jq-chart  data-ng-title="@Resource.OutcomesMeasurement : {{Referral.LastName+', '+Referral.FirstName}} "    data-ng-series="GraphSeriesOutcomeMeasurementList" style="width: 100%;height: 350px;"></div>
+                <span class="cursor-pointer" data-ng-click="PrintOutcomeMeasurementGraph()">@Resource.PrintThisGraph</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+
+
+<div class="modal fade modal-scroll outComeForm" id="model_OutComeMeasurement" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <form id="frmModelOM">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+                    <h4 class="modal-title text-center"><strong>@Resource.OutcomesMeasurement</strong></h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="row">
+                        <div class="col-sm-12 no-padding padding-bottom-10px">
+
+                            <div class="col-sm-6 no-right-padding">
+                                <strong class="col-sm-4 no-right-padding">@Resource.ClientName</strong>
+                                <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                    <input type="text" class="form-control input-sm height-19px" id="Text59" name="inputMiddleName" readonly="readonly" data-ng-value="Referral.LastName+', '+Referral.FirstName">
+                                </div>
+                            </div>
+
+
+                            <div class="col-sm-6 no-right-padding">
+                                <strong class="col-sm-4 no-right-padding">@Resource.AHCCCSID:</strong>
+                                <div class="col-sm-8  form-group form-md-line-input no-left-padding">
+                                    <input type="text" class="form-control input-sm height-19px" id="Text76" name="inputMiddleName" readonly="readonly" data-ng-value="Referral.AHCCCSID">
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+
+                    <div class="row">
+                        <div class="col-sm-12 no-padding">
+                            <div class="col-sm-6 no-right-padding">
+                                <strong class="col-sm-4 no-right-padding">@Resource.CompletedBy:</strong>
+                                <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                    <input type="text" class="form-control input-sm height-19px" id="Text56" name="inputMiddleName" readonly="readonly" data-ng-value="ReferralOutcomeMeasurementModel.CompletedBy">
+                                </div>
+                            </div>
+                            <div class="col-sm-6 no-right-padding">
+                                <strong class="col-sm-4 no-right-padding">@Resource.DateOfReview</strong>
+                                <div class="col-sm-8 form-group form-md-line-input no-left-padding">
+                                    <div class="input-group date" datepicker="ReferralOutcomeMeasurementModel.AssessmentDate" data-ng-dateval="ReferralOutcomeMeasurementModel.OutcomeMeasurementDate">
+
+                                        @Html.TextBoxFor(q => q.ReferralOutcomeMeasurement.OutcomeMeasurementDate,
+                                                     new
+                                                         {
+                                                             @class = "form-control input-sm dateInputMask height-19px",
+                                                             placeholder = Constants.GlobalDateFormat,
+                                                             @maxlength = "10"
+                                                         })
+                                        @Html.ValidationMessageFor(q => q.ReferralOutcomeMeasurement.OutcomeMeasurementDate)
+
+                                        <span class="input-group-addon no-padding"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <div class="space20"></div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <p class="col-sm-12">
+                                <strong>@Resource.OutcomesMeasurementDetailsPara</strong>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="col-sm-12">
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM1</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="WorkCommunity" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.WorkCommunity" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                        <span></span>
+                                        </label>
+                                    </div>
+
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM2</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="ScheduledAppointment" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.ScheduledAppointment" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                            <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM3</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="AskForHelp" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.AskForHelp" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                        <span></span>
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM4</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="CommunicateEffectively" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.CommunicateEffectively" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                        <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM5</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="PositiveBehavior" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.PositiveBehavior" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                        <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM6</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="QualityFriendship" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.QualityFriendship" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                        <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM7</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="RespectOther" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.RespectOther" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                        <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM8</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="StickUp" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.StickUp" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                        <span></span>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM9</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+                                    <div class="col-md-2 col-sm-2" data-ng-repeat="item in ReferralModel.LU_OutcomeMeasurementOption">
+                                        <label class="mt-radio mt-radio-outline">
+                                            <input type="radio" name="LifeSkillGoals" id="Radio1" data-ng-model="ReferralOutcomeMeasurementModel.LifeSkillGoals" data-ng-value="item.OutcomeMeasurementOptionID">
+                                            {{item.OutcomeMeasurementOption}}
+                                        <span></span>
+                                        </label>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM10</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+
+                                    @foreach (var item in Common.SetYesNoForOMList())
+                                    {
+                                        <div class="col-md-2 col-sm-2">
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="StayOutOfTrouble" id="Radio53" data-ng-model="ReferralOutcomeMeasurementModel.StayOutOfTrouble" data-ng-value="@item.Value">
+                                                @item.Name
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    }
+
+                                    <div class="col-md-3 col-sm-3">
+                                        <label>@Resource.IfNo</label>
+                                    </div>
+
+                                    <div class="col-md-4 col-sm-5 form-group form-md-line-input">
+                                        <input type="text" class="form-control" name="name" placeholder="" data-ng-model="ReferralOutcomeMeasurementModel.StayOutOfTroubleText" autocomplete="off" maxlength="200">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM11</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+
+                                    @foreach (var item in Common.SetYesNoForOMList())
+                                    {
+                                        <div class="col-md-2 col-sm-2">
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="SuccessfulInSchool" id="Radio53" data-ng-model="ReferralOutcomeMeasurementModel.SuccessfulInSchool" data-ng-value="@item.Value">
+                                                @item.Name
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    }
+
+                                    <div class="col-md-3 col-sm-3">
+                                        <label>@Resource.IfNo</label>
+                                    </div>
+
+                                    <div class="col-md-4 col-sm-5 form-group form-md-line-input">
+                                        <input type="text" class="form-control" name="name" placeholder="" data-ng-model="ReferralOutcomeMeasurementModel.SuccessfulInSchoolText" autocomplete="off" maxlength="200">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM12</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+
+                                    @foreach (var item in Common.SetYesNoForOMList())
+                                    {
+                                        <div class="col-md-2 col-sm-2">
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="SuccessfulInLiving" id="Radio53" data-ng-model="ReferralOutcomeMeasurementModel.SuccessfulInLiving" data-ng-value="@item.Value">
+                                                @item.Name
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    }
+
+                                    <div class="col-md-3 col-sm-3">
+                                        <label>@Resource.IfNo</label>
+                                    </div>
+
+                                    <div class="col-md-4 col-sm-5 form-group form-md-line-input">
+                                        <input type="text" class="form-control" name="name" placeholder="" data-ng-model="ReferralOutcomeMeasurementModel.SuccessfulInLivingText" autocomplete="off" maxlength="200">
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="row">
+                                <div class="col-sm-12 form-group">
+                                    <strong>@Resource.ROM13</strong>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12 form-group no-padding">
+
+                                    @foreach (var item in Common.SetYesNoForOMList())
+                                    {
+                                        <div class="col-md-2 col-sm-2">
+                                            <label class="mt-radio mt-radio-outline">
+                                                <input type="radio" name="AdulthoodNeeds" id="Radio53" data-ng-model="ReferralOutcomeMeasurementModel.AdulthoodNeeds" data-ng-value="@item.Value">
+                                                @item.Name
+                                                <span></span>
+                                            </label>
+                                        </div>
+                                    }
+
+                                    <div class="col-md-3 col-sm-3">
+                                        <label>@Resource.IfNo</label>
+                                    </div>
+                                    <div class="col-md-4 col-sm-5 form-group form-md-line-input">
+                                        <input type="text" class="form-control" name="name" data-ng-model="ReferralOutcomeMeasurementModel.AdulthoodNeedText" placeholder="" autocomplete="off" maxlength="200">
+                                    </div>
+
+                                </div>
+                            </div>
+                            @*<div class="space10"></div>
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <div class="col-sm-7 form-group form-md-line-input">
+                                    <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-if="ReferralOutcomeMeasurementModel.Signature" data-ng-src="{{'@(ConfigSettings.AmazonS3Url + ConfigSettings.ZarephathBucket)/'+ ReferralOutcomeMeasurementModel.Signature}}" />
+                                    <strong>@Resource.BHPSignatureCredentials</strong>
+                                </div>
+
+                            </div>
+                        </div>*@
+                        </div>
+
+                    </div>
+                </div>
+            <div class="modal-footer">
+                 @if (Common.HasPermission(Constants.Permission_ReviewMeasurement_OutcomesMeasurement_AddUpdate))
+                 {
+
+                     <button class="btn btn-sm red" data-dismiss="modal">@Resource.Cancel</button>
+                     <button class="btn btn-sm green-jungle" data-ng-click="SaveReferralOutcomeMeasurement()">@Resource.Save</button>
+                 }
+            </div>
+
+            </div>
+        </form>
+    </div>
+    <!-- /.modal-content -->
+</div>
+

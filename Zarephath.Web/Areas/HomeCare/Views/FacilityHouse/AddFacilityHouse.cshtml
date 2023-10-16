@@ -1,0 +1,379 @@
+﻿@model HC_SetFacilityHouseModel
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.FacilityHouseModel.FacilityID > 0 ? Resource.EditFacilityHouse : Resource.AddFacilityHouse));
+    bool boolIsPartialView = ViewBag.IsPartialView != null;
+    string isPartialView = boolIsPartialView ? "1" : "0";
+    Layout = ViewBag.IsPartialView == null ? "~/Views/Shared/_Layout.cshtml" : "~/Views/Shared/_EmptyLayout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_FacilityHouseAdd;
+    bool isEditMode = Model.FacilityHouseModel.FacilityID > 0;
+}
+
+@Html.Hidden("hdnFacilityHouseModel", Common.SerializeObject(Model))
+@Html.Hidden("IsPartialView", isPartialView)
+<div data-ng-controller="AddFacilityHouseController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditFacilityHouse : @Resource.AddFacilityHouse)
+            <small>@Resource.EnterFacilityDetail</small>
+            <input type="submit" data-ng-click="SaveFacilityHouseDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.FacilityHouseModel.FacilityID > 0 ? Resource.Update : Resource.Save)" />
+            @if (boolIsPartialView)
+            {
+                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+            }
+            else
+            {
+                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+            }
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <form id="frmaddFacilityId" class="form-horizontal">
+                @*@{ Html.EnableClientValidation(false); }*@
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.FacilityHouseDetails
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    @*<div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label">
+                                                @Resource.ParentFacility
+                                            </label>
+                                            <div class="col-md-8 input-group">
+                                            @Html.DropDownListFor(p => p.FacilityHouseModel.ParentFacilityID, Model.ParentFacilityList.ToSelectList(Model.FacilityHouseModel.ParentFacilityID.ToString() ?? "", "FacilityName", "ParentFacilityID", Resource.Select, ""),
+                                                           new
+                                                           {
+                                                               convert_to_number = "",
+                                                               data_ng_model = "FacilityHouseModel.ParentFacilityID",
+                                                               data_ng_init = "FacilityHouseModel.ParentFacilityID=FacilityHouseModel.ParentFacilityID==''?null:FacilityHouseModel.ParentFacilityID.toString()",
+                                                               @class = "form-control input-sm",
+                                                               data_ng_change = "GetParentFacilityHouse(FacilityHouseModel.ParentFacilityID)",
+                                                               data_val = "false"
+                                                           })
+                                                <div class="font-sm"><small><b class="font-red-thunderbird">@Resource.NoteLabel</b><i> @Resource.ParentFacilityNote</i></small> </div>
+                                            </div>
+                                        </div>*@
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.FacilityName
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.FacilityHouseModel.FacilityName, new { data_ng_model = "FacilityHouseModel.FacilityName", @class = "form-control input-sm", placeholder = Resource.FacilityName, maxlength = 100 })
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.FacilityName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.Address
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextAreaFor(m => m.FacilityHouseModel.Address, new { data_ng_model = "FacilityHouseModel.Address", @class = "form-control input-sm requiredStrip", placeholder = Resource.Address, maxlength = 100, rows = "3" })
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.Address)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.City
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(m => m.FacilityHouseModel.City, new { data_ng_model = "FacilityHouseModel.City", @class = "form-control input-sm", placeholder = Resource.City, maxlength = 50 })
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.City)
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group col-sm-12">
+                                             @Html.LabelFor(m => m.FacilityHouseModel.State, new { @class = "col-md-4 control-label required" })
+                                            <div class="col-md-8 input-group">
+                                                @Html.TextBoxFor(m => m.FacilityHouseModel.State, new { data_ng_model = "FacilityHouseModel.State", @class = "form-control input-sm", placeholder = Resource.State, maxlength = 10 })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.State)
+                                        </div>*@
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.State
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.DropDownListFor(p => p.FacilityHouseModel.State, Model.StateCodeListModel.ToSelectList("", "StateName", "StateCode", @Resource.Select, ""),
+                                            new
+                                            {
+                                                data_ng_model = "FacilityHouseModel.State",
+                                                data_ng_init = "FacilityHouseModel.State=FacilityHouseModel.State==null?'':FacilityHouseModel.State.toString()",
+                                                @class = "form-control input-sm requiredStrip"
+                                            })
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.State)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-4 control-label required">
+                                            @Resource.ZipCode
+                                        </label>
+                                        <div class="col-md-8 col-sm-8 no-padding ">
+                                            @Html.TextBoxFor(m => m.FacilityHouseModel.ZipCode, new { data_ng_model = "FacilityHouseModel.ZipCode", @class = "form-control input-sm", placeholder = Resource.ZipCodePlaceholder, maxlength = Resource.ZipCodemaxlength })
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.ZipCode)
+                                            @*<zipcode class="Add-Facility-Zipcode" type="text" ng-model="FacilityHouseModel.ZipCode" required="ZipCode is required" modelid="ZipCode" />*@
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        @Html.LabelFor(m => m.FacilityHouseModel.Phone, new { @class = "col-md-4 col-sm-4 control-label" })
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.Phone, new { @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.Phone", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        @Html.LabelFor(m => m.FacilityHouseModel.Cell, new { @class = "col-md-4 col-sm-4 control-label" })
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.Cell, new { @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.Cell", maxlength = 15, placeholder = "(XXX) XXX-XXXX", phone_input = "" })
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        @Html.LabelFor(m => m.FacilityHouseModel.RegionID, new { @class = "col-md-4 col-sm-4 control-label" })
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.DropDownListFor(p => p.FacilityHouseModel.RegionID, Model.RegionList.ToSelectList(Model.FacilityHouseModel.RegionID.ToString() ?? "", "RegionName", "RegionID", Resource.SelectRegion, ""),
+                                            new
+                                            {
+                                                convert_to_number = "",
+                                                data_ng_model = "FacilityHouseModel.RegionID",
+                                                data_ng_init = "FacilityHouseModel.RegionID=FacilityHouseModel.RegionID==''?null:FacilityHouseModel.RegionID.toString()",
+                                                @class = "form-control input-sm"
+                                            })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.RegionID)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        @Html.LabelFor(m => m.FacilityHouseModel.County, new { @class = "col-md-4 col-sm-4 control-label" })
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.County, new { @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.County", maxlength = 50, placeholder = Resource.County })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.County)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        @Html.LabelFor(m => m.FacilityHouseModel.GSA, new { @class = "col-md-4 col-sm-4 control-label" })
+                                        <div class="col-md-8 col-sm-8 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.GSA, new { @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.GSA", dir_Valid_Number = "", maxlength = 5, placeholder = Resource.GSA })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.GSA)
+                                    </div>
+                                    <div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 col-sm-4 control-label">@Resource.Equipments</label>
+                                            <div class="col-md-8 col-sm-8 input-group">
+                                                <input type="text"
+                                                       token-input
+                                                       ng-val="EquipmentName"
+                                                       textfield='EquipmentName'
+                                                       valuefield='EquipmentName'
+                                                       searchurl="{{SearhEquipmentURL}}"
+                                                       placeholder="@Resource.EnterEquipment"
+                                                       tokenlimit='1'
+                                                       onresultsformatter='EquipmentResultsFormatter'
+                                                       ontokenformatter="EquipmentTokenFormatter"
+                                                       onaddedcallback='AddedEquipment'
+                                                       additional-filter-text='ignoreIds'
+                                                       additional-filter-value='TempSelectedEquipmentIDs.toString()'
+                                                       autoSelectFirstResult="false"
+                                                       minChars="0"
+                                                       tokeninputobj="EquipmentTokenObj"
+                                                       id="ProductTagTkn"
+                                                       customclass="form-control input-sm" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12" data-ng-show="ListEquipment.length>0">
+                                            <div class="col-md-4 col-sm-4 control-label"></div>
+                                            <div class="col-md-8 col-sm-8 input-group">
+                                                <div class="badge_main">
+                                                    <span data-ng-repeat="item in ListEquipment">
+                                                        <span class="badge-default badge-success ">
+                                                            {{item.EquipmentName}}
+                                                            <a href="javascript:void(0)" data-ng-click="DeleteEquipment(item,$index)" class="fa fa-times" aria-hidden="true"></a>
+                                                        </span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group col-sm-12">
+                                            @Html.LabelFor(m => m.FacilityHouseModel.FacilityColorScheme, new { @class = "col-md-4 control-label" })
+                                            <div class="col-md-8 input-group">
+                                                @Html.TextBoxFor(q => q.FacilityHouseModel.FacilityColorScheme, new { @class = "form-control input-sm color-picker minicolors-input", data_position = "bottom right", size = "7", data_ng_model = "FacilityHouseModel.FacilityColorScheme", placeholder = Resource.FacilityColorScheme })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.FacilityColorScheme)
+                                        </div>*@
+                                </div>
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-5 control-label">
+                                            @Resource.BadCapacity  &nbsp;
+                                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.HomeCapacity" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="col-md-8 col-sm-7 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.BadCapacity, new { @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.BadCapacity", dir_Valid_Number = "", maxlength = 5, placeholder = Resource.BadCapacity })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.BadCapacity)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-5 control-label">
+                                            # Private Rooms  &nbsp;
+                                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.PrivateRoom_s_" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="col-md-8 col-sm-7 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.PrivateRoomCount, new { max = "{{FacilityHouseModel.BadCapacity > 0 ? FacilityHouseModel.BadCapacity : FacilityHouseModel.PrivateRoomCount }}", @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.PrivateRoomCount ", dir_Valid_Number = "", maxlength = 5, placeholder = Resource.PrivateRoomCount })
+                                            <div class="font-sm"><small><b class="font-red-thunderbird">@Resource.NoteLabel</b><i>@Resource.FacilityNote</i></small> </div>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.PrivateRoomCount)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        @Html.LabelFor(m => m.FacilityHouseModel.SiteType, new { @class = "col-md-4 col-sm-5 control-label" })
+                                        <div class="col-md-8 col-sm-7 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.SiteType, new { @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.SiteType", maxlength = 100, placeholder = Resource.SiteType })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.SiteType)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        @Html.LabelFor(m => m.FacilityHouseModel.ProviderType, new { @class = "col-md-4 col-sm-5 control-label" })
+                                        <div class="col-md-8 col-sm-7 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.ProviderType, new { @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.ProviderType", maxlength = 50, placeholder = Resource.ProviderType })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.ProviderType)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-5 control-label">
+                                            @Resource.Licensure
+                                        </label>
+                                        <div class="col-md-8 col-sm-7 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.Licensure, new { @class = "form-control input-sm", data_ng_model = "FacilityHouseModel.Licensure", maxlength = 100, placeholder = Resource.Licensure })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.Licensure)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-5 control-label">
+                                            @Resource.LicensureRenewalDate
+                                        </label>
+                                        <div class="col-md-8 col-sm-7 input-group date" datepicker="FacilityHouseModel.LicensureRenewalDate" ng-dateval="FacilityHouseModel.LicensureRenewalDate">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.LicensureRenewalDate, new { @class = "form-control input-sm dateInputMask", maxlength = 10, placeholder = Resource.LicensureRenewalDate })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.LicensureRenewalDate)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-5 control-label">
+                                            @Resource.FirePermitDate
+                                        </label>
+                                        <div class="col-md-8 col-sm-7 input-group date" datepicker="FacilityHouseModel.FirePermitDate" ng-dateval="FacilityHouseModel.FirePermitDate">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.FirePermitDate, new { @class = "form-control input-sm dateInputMask", maxlength = 10, placeholder = Resource.FirePermitDate })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.FacilityHouseModel.FirePermitDate)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-5 control-label">
+                                            @Resource.NPI
+                                        </label>
+                                        <div class="col-md-8 col-sm-7 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.NPI,
+                                                    new{
+                                                          id = "NPI",
+                                                          @class = "form-control input-sm",
+                                                          data_ng_model = "FacilityHouseModel.NPI",
+                                                          dir_valid_number = "",
+                                                          maxlength = 10,
+                                                          placeholder = "XXXXXXXXXX",
+                                                          data_ng_disabled = "false"
+                                                      })
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.NPI)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-5 control-label">
+                                            @Resource.AHCCCSID #
+                                        </label>
+                                        <div class="col-md-8 col-sm-7 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.AHCCCSID,
+                                                        new
+                                                        {
+                                                            id = "AHCCCS_ID",
+                                                            @class = "form-control input-sm",
+                                                            data_ng_model = "FacilityHouseModel.AHCCCSID",
+                                                            dir_valid_number = "",
+                                                            maxlength = 6,
+                                                            placeholder = "XXXXXX",
+                                                            data_ng_disabled = "false"
+                                                        })
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.AHCCCSID)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 col-sm-5 control-label">
+                                            @Resource.EIN
+                                        </label>
+                                        <div class="col-md-8 col-sm-7 input-group">
+                                            @Html.TextBoxFor(q => q.FacilityHouseModel.EIN,
+                                                      new
+                                                      {
+                                                          id = "EIN",
+                                                          @class = "form-control input-sm",
+                                                          data_ng_model = "FacilityHouseModel.EIN",
+                                                          dir_Valid_Number = "",
+                                                          maxlength = 9,
+                                                          placeholder = "XXXXXXXXX",
+                                                        })
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.EIN)
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label">@Resource.ApprovedPayors</label>
+                                            <div class="col-md-8 no-padding">
+                                                <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                                                    selectpicker="FacilityHouseModel.SelectedPayors" name="FacilityHouseModel.SelectedPayors"
+                                                    title="Select payors">
+                                                    <option ng-repeat="item in PayorList" value="{{item.PayorID}}">{{item.PayorName}}</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label">
+                                                @Resource.ScheduleStatus
+                                            <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.DefaultScheduleStatusText" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                            </label>
+                                            <div class="col-md-8 input-group">
+                                            @Html.DropDownListFor(p => p.FacilityHouseModel.DefaultScheduleStatusID, Model.ScheduleStatuses.ToSelectList((Model.FacilityHouseModel.DefaultScheduleStatusID.HasValue ? Model.FacilityHouseModel.DefaultScheduleStatusID.ToString() : ""), "ScheduleStatusName", "ScheduleStatusID", Resource.SelectStatus, ""),
+                                                           new
+                                                           {
+                                                               convert_to_number = "",
+                                                               data_ng_model = "FacilityHouseModel.DefaultScheduleStatusID",
+                                                               data_ng_init = "FacilityHouseModel.DefaultScheduleStatusID=FacilityHouseModel.DefaultScheduleStatusID==''?null:FacilityHouseModel.DefaultScheduleStatusID.toString()",
+                                                               @class = "form-control input-sm"
+                                                           })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.FacilityHouseModel.DefaultScheduleStatusID)
+                                        </div>*@
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space15"></div>
+                        <div class="col-md-12 form-group text-center">
+                            <input type="submit" data-ng-click="SaveFacilityHouseDetails()" class="btn btn-sm green-jungle" value="@(Model != null && Model.FacilityHouseModel.FacilityID > 0 ? Resource.Update : Resource.Save)" />
+                            @if (boolIsPartialView)
+                            {
+                                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint" value="@Resource.Cancel" />
+                            }
+                            else
+                            {
+                                <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint" value="@Resource.Cancel" />
+                            }
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/facilityhouse/addfacilityhouse")
+}

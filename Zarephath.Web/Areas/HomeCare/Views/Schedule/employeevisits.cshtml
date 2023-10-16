@@ -1,0 +1,525 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, @Resource.EmployeeVisit);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = @Resource.SMI_EmployeeVisit;
+}
+@model HC_SetEmployeeVisitsPage
+@Html.Hidden("hdnSetEmployeeVisitsPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="EmployeeVisitController">
+    <div class="page-bar withFilter">
+        <h3 class="page-title">
+            @Resource.EmployeeVisit
+        </h3>
+    </div>
+    <div class="fscontainer">
+        <div class="row margin-left-5">
+            @*<div class="legend">
+                    @Resource.FleetManagement
+                </div>*@
+            <div class="employeeInfo">
+                <div class="col-md-12">
+                    <div class="row">
+                        <div class="col-md-3 col-sm-6">
+                            <div class="field">
+                                <label class="control-label required">  @Resource.Employee  </label>
+                                <div class="field-box">
+                                    @Html.DropDownListFor(p => p.SearchReferralEmployeeModel.EmployeeID, Model.EmployeeList.ToSelectList("", "EmployeeName", "EmployeeID", @Resource.Select, ""),
+                                     new
+                                     {
+                                         data_ng_model = "SearchReferralEmployeeModel.EmployeeID",
+                                         data_ng_init = "SearchReferralEmployeeModel.EmployeeID=SearchReferralEmployeeModel.EmployeeID==null?'':SearchReferralEmployeeModel.EmployeeID",
+                                         @class = "form-control input-sm requiredStrip",
+                                         data_val_required = "The Employee is required.",
+                                         data_val_number = "The Employee is required.",
+                                         data_ng_change = "change()"
+                                     })
+                                    @Html.ValidationMessageFor(m => m.SearchReferralEmployeeModel.EmployeeID)
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6">
+                            <div class="field">
+                                <label class="control-label required">   @Resource.Date</label>
+                                <div class="field-box">
+                                    <div id="emp-visit-slot-date" class="input-group date date-picker pull-right"
+                                         datepicker="SearchReferralEmployeeModel.SlotDate"
+                                         ng-dateval="SearchReferralEmployeeModel.SlotDate">
+                                        @Html.TextBoxFor(m => m.SearchReferralEmployeeModel.SlotDate, new
+                                   {
+                                       @class = "form-control input-sm dateInputMask",
+                                       maxlength = "50",
+                                       placeholder = Resource.DateFormat
+                                   })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3 col-sm-6">
+                                <div class="field mt-10 ">
+                                    <label>
+                                        <input type="radio" name="radio" value="1" data-ng-change="change()"
+                                               data-ng-model="SearchReferralEmployeeModel.TransportationType" checked 
+                                                />
+                                        <span>@Resource.TransportationAssignment</span>
+                                    </label>
+                                    <label>
+                                        <input type="radio" name="radio" value="2"  data-ng-change="change()"
+                                               data-ng-model="SearchReferralEmployeeModel.TransportationType" 
+                                                />
+                                        <span>@Resource.TransportAssignmentGroup</span>
+                                    </label>
+                                </div>
+                            </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <section style=" height: 69vh;">
+        <div class="">
+            <div class="row">
+                <div class="col-md-4 col-sm-12" style="padding-right: 0px;">
+
+                    <div class="pat-profile">
+                        <div class="well well-sm">
+                            <div class="row" style="">
+                                <div class="col-md-12 col-sm-12" style="max-height: 60vh; overflow-y: scroll;">
+                                    <div class="card-profile" style="margin-bottom:5px;" data-ng-repeat="item in ReferralEmployeeModelList">
+                                        <div class="card p-2 m-2" style="
+    padding: 5px;
+    background-color: #fff;padding-left:10px;
+">
+                                            <h6>
+                                                {{item.Name}}
+                                            </h6>
+                                            <small>
+                                                <cite title="{{item.Address}}, {{item.ZipCode}}">
+                                                    {{item.Address}}, {{item.ZipCode}}, {{item.City}}, {{item.State}} <i class="glyphicon glyphicon-map-marker">
+                                                    </i>
+                                                </cite>
+                                            </small>
+                                            <p>
+
+                                                <i class="fa fa-envelope"></i> {{item.Email}}
+                                                <br>
+                                                <i class="fa fa-phone"></i>
+                                                <a data-ng-show="item.Phone1 != null" href="tel:{{item.Phone1}}">{{item.Phone1}}</a>
+                                                &nbsp;
+                                                <a data-ng-show="item.Phone2 != null" href="tel:{{item.Phone2}}">{{item.Phone2}}</a>
+                                                &nbsp;
+                                                <a data-ng-show="item.OtherPhone != null" href="tel:{{item.OtherPhone}}">{{item.OtherPhone}}</a>
+
+                                                <br>&nbsp;
+                                                @*<i class="fa fa-calendar"></i>January 1st, 1900*@
+
+                                                @*<i class="fa fa-envelope"></i>email@example.com
+                                                    <br>
+                                                    <i class="fa fa-browser"></i><a href="https://developer.mozilla.org/en-US/">https://developer.mozilla.org</a>
+                                                    <br>
+                                                    <i class="fa fa-calendar"></i>January 1st, 1900
+                                                                                    data-toggle="modal" data-target="#view"
+                                                *@
+
+                                                <a href="#" data-ng-click="ViewReferral(item)" class="view-btn view-map-bg pull-right">
+                                                    @Resource.View
+                                                </a>
+                                            </p>
+                                            <small>
+                                                <cite data-ng-show="item.ClockInTime != null">
+                                                    pickup :
+                                                    {{item.ClockInTime |orgdatetime }}
+                                                </cite><br data-ng-show="item.ClockInTime != null" />
+                                                       <cite data-ng-show="item.ClockOutTime != null">
+                                                           drop :
+                                                           {{item.ClockOutTime |orgdatetime }}
+                                                       </cite>
+                                            </small>
+                                        </div>
+
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div data-ng-if="ReferralEmployeeModelList.length == 0">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="alert alert-danger">
+                                                            @Resource.NoRecordFound
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- view Modal -->
+                                    <div class="modal fade" id="view" tabindex="-1" role="dialog" aria-labelledby="ViewLabel" aria-hidden="true">
+                                        <div class="modal-dialog" role="document">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <!-- <h5 class="modal-title" id="exampleModalLabel">Modal title</h5> -->
+                                                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                        <span aria-hidden="true">×</span>
+                                                    </button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="container-fluid mx-4">
+                                                        <div class="tab-details">
+
+                                                            @*<form class="view-form ng-pristine ng-valid" novalidate="novalidate">
+        </form>*@
+
+
+                                                            <div class="form-group row">
+                                                                <label for="fname" class="col-sm-3 col-form-label">@Resource.Name:</label>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="text" class="form-control  input-sm " id="fname" name="fname"
+                                                                           disabled value="{{ReferralSelected.Name}}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="email" class="col-sm-3 col-form-label">@Resource.Email:</label>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="email" class="form-control  input-sm " id="email" name="email"
+                                                                           disabled value="{{ReferralSelected.Email}}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="phone" class="col-sm-3 col-form-label">@Resource.Phone:</label>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <input type="tel" class="form-control  input-sm  " id="phone1" name="phone1"
+                                                                           disabled value="{{ReferralSelected.Phone1}}">
+
+                                                                    <input data-ng-show="item.Phone2 != null" type="tel" class="form-control input-sm " id="phone2" name="phone2"
+                                                                           disabled value="{{ReferralSelected.Phone2}}">
+
+                                                                    <input type="tel" data-ng-show="item.OtherPhone != null" class="form-control input-sm " id="OtherPhone" name="OtherPhone"
+                                                                           disabled value="{{ReferralSelected.OtherPhone}}">
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="message" class="col-sm-3 col-form-label">@Resource.Address:</label>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <textarea class="form-control input-sm " id="message" name="message" rows="3"
+                                                                              disabled>{{ReferralSelected.Address}}, {{ReferralSelected.ZipCode}}, {{ReferralSelected.City}}, {{ReferralSelected.State}}
+                                                                    </textarea>
+                                                                </div>
+                                                            </div>
+                                                            <div class="form-group row">
+                                                                <label for="message" class="col-sm-3 col-form-label">@Resource.Note:</label>
+                                                                <div class="col-md-6 col-sm-12">
+                                                                    <textarea class="form-control input-sm " id="message" name="message" rows="3"
+                                                                              disabled>{{ReferralSelected.Note}}
+                                                                    </textarea>
+                                                                </div>
+                                                            </div>
+
+                                                            <div class="d-flex">
+                                                                <div class="col-md-4 col-sm-12">
+                                                                    <button type="button" data-ng-show="ReferralSelected.ClockInTime == null && IsToday" class="btn  btn-cstm" data-ng-click="SavePickUpDrop(1)">@Resource.PickUp</button>
+                                                                    <button type="button" disabled data-ng-show="ReferralSelected.ClockInTime != null || IsToday == false" class="btn  btn-cstm disabled">@Resource.PickUp</button>
+                                                                </div>
+                                                                <div class="col-md-4 col-sm-12">
+                                                                    <button type="button" data-ng-show="ReferralSelected.ClockOutTime == null && IsToday" class="btn btn-cstm" data-ng-click="SavePickUpDrop(2)">@Resource.DropOff</button>
+                                                                    <button type="button" disabled data-ng-show="ReferralSelected.ClockOutTime != null || IsToday == false " class="btn btn-cstm disabled">@Resource.DropOff</button>
+                                                                </div>
+                                                                <div class="col-md-4 col-sm-12">
+                                                                    <button type="button" class="btn btn-cstm" data-ng-click="Openmap(ReferralSelected)">@Resource.Direction <i class="fa fa-location-arrow"></i></button>
+                                                                </div>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8 col-sm-12" style="padding-left:0px;">
+                    @*<iframe data-ng-show="ReferralEmployeeModelList.length > 0" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d28010.24522012188!2d77.14288904453619!3d28.651314174794106!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x390d031059f952a9%3A0x62bc0534101d7ca7!2sNirula's%20Patel%20Nagar!5e0!3m2!1sen!2sin!4v1647455612898!5m2!1sen!2sin"
+                        width="100%" height="100%" style="border: 0;height: 65vh" allowfullscreen="" loading="lazy"></iframe>*@
+                    <div id="map" style="width:100%; border: 0;height: 65vh;min-height:300px;"></div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+
+@section Scripts{ 
+    @Scripts.Render("~/assets/js/viewjs/siteapp/areas/homecare/schedule/employeevisit.js")
+
+    @Scripts.Render("~/Assets/js/viewjs/siteApp/Areas/HomeCare/Shared/_VisitReasonActionModal.js")
+
+@*<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDtanl4KIfto7tQVbK746T9p7KKg880UvQ&v=weekly&channel=2"
+        async></script>*@
+    <script>
+        var HashUrl_VirtualVisits_TodaysVisits = '@Constants.HashUrl_VirtualVisits_TodaysVisits';
+        var HashUrl_VirtualVisits_FutureVisits = '@Constants.HashUrl_VirtualVisits_FutureVisits';
+        var HashUrl_VirtualVisits_PastVisits = '@Constants.HashUrl_VirtualVisits_PastVisits';
+
+        var cAppUserName = '@SessionHelper.UserName';
+        var cAppCompanyName = '@SessionHelper.CompanyName';
+        var cAppToken = '';
+        var cAppURL = '@(new CacheHelper().SiteBaseURLMonile)';
+    </script>
+    <style type="text/css">
+        a.view-btn {
+            padding: 10px;
+            background: #ced4da;
+            color: black;
+            border-radius: 5px;
+            width: fit-content;
+            font-size: 12px;
+        }
+
+        .card-profile {
+            /*max-height: 450px;*/
+            max-height: 72vh;
+            overflow-y: auto;
+        }
+
+        input.input-sm.dateInputMask {
+            border: 1px solid #e9ecef;
+            border-radius: 3px;
+            padding: 10px;
+            margin-left: 10px;
+        }
+
+        .card {
+            box-shadow: rgba(99, 99, 99, 0.2) 0px 2px 8px 0px;
+        }
+        /* scrollbar-css */
+        .card-profile::-webkit-scrollbar-track {
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            width: 10px;
+            background-color: #F5F5F5;
+        }
+
+        .card-profile::-webkit-scrollbar {
+            width: 10px;
+            background-color: #F5F5F5;
+        }
+
+        .card-profile::-webkit-scrollbar-thumb {
+            border-radius: 10px;
+            -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+            background-image: linear-gradient( 120deg, #1b1c6c 0%, #972005 100%);
+        }
+
+        body {
+            background-color: #fff;
+        }
+
+        .table-bordered {
+            border: 1px solid #e7ecf1;
+            background-color: #fff;
+            vertical-align: middle;
+        }
+
+        .form-control {
+            position: relative;
+            z-index: 2;
+            float: left;
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        /*[type="radio"]:checked,
+        [type="radio"]:not(:checked) {
+            position: absolute;
+            left: -9999px;
+        }
+
+            [type="radio"]:checked + label,
+            [type="radio"]:not(:checked) + label {
+                position: relative;
+                padding-left: 28px;
+                cursor: pointer;
+                line-height: 20px;
+                display: inline-block;
+                color: #666;
+            }
+
+                [type="radio"]:checked + label:before,
+                [type="radio"]:not(:checked) + label:before {
+                    content: '';
+                    position: absolute;
+                    left: 0;
+                    top: 0;
+                    width: 20px;
+                    height: 21px;
+                    border: 1px solid #ddd;
+                    border-radius: 100%;
+                    background: #fff;
+                }*/
+
+        .close {
+            background: #972005;
+            opacity: 1;
+            border-radius: 50%;
+            color: #fff;
+            /* height: 45px; */
+            width: 60px;
+            /* width: 45px; */
+            margin: 1;
+        }
+
+        [type="radio"]:checked + label:after,
+        [type="radio"]:not(:checked) + label:after {
+            content: '';
+            width: 12px;
+            height: 12px;
+            background: #1b1c6c;
+            position: absolute;
+            top: 4px;
+            left: 4px;
+            border-radius: 100%;
+            -webkit-transition: all 0.2s ease;
+            transition: all 0.2s ease;
+        }
+
+        [type="radio"]:not(:checked) + label:after {
+            opacity: 0;
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+
+        [type="radio"]:checked + label:after {
+            opacity: 1;
+            -webkit-transform: scale(1);
+            transform: scale(1);
+        }
+
+        .table thead tr th {
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .view-map-bg {
+            background-color: #1b1c6c !important;
+            color: white !important;
+            font-weight: 600 !important;
+        }
+
+        .input-group.date.date-picker input {
+            font-size: 12px !important;
+        }
+
+        .table {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 20px;
+        }
+
+            .table thead tr td {
+                font-size: 12px;
+                font-weight: 600;
+            }
+
+        .btn-cstm {
+            display: block;
+            width: 5 0%;
+            background: #972005;
+            border-radius: 5px;
+            height: 44px;
+            margin-top: 30px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            font-size: 14px;
+            color: #fff;
+        }
+        /* new css */
+        .search-box {
+            width: 100%;
+            position: relative;
+            display: flex;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #111d5e;
+            border-radius: 10px 0 0 10px;
+            border-right: none;
+            outline: none;
+            font-size: 15px;
+            color: #212529;
+            background: none;
+        }
+
+        .search-button {
+            text-align: center;
+            height: 51px;
+            width: 40px;
+            outline: none;
+            cursor: pointer;
+            border: 4px solid #111d5e;
+            border-radius: 0 10px 10px 0;
+            border-left: none;
+            background: none;
+            font-size: 20px;
+            border-left: 4px solid #111d5e;
+        }
+
+        .glyphicon {
+            margin-bottom: 10px;
+            margin-right: 10px;
+        }
+
+        small {
+            display: block;
+            line-height: 1.428571429;
+            color: #999;
+        }
+    </style>
+    <script type="text/javascript">
+        var map;
+        var infoWindow = new google.maps.InfoWindow();
+        function EmployeeVisitShowMap(referral) {
+            map = new google.maps.Map(document.getElementById("map"), {
+                zoom: 10,
+                center: { lat: referral.Latitude, lng: referral.Longitude },
+            });
+        }
+
+
+        function EmployeeVisitAddMarker(referrals) {
+            referrals.forEach((referralitem, i) => {
+                var position = { lat: referralitem.Latitude, lng: referralitem.Longitude };
+                var title = referralitem.Name;
+                var marker = new google.maps.Marker({
+                    position,
+                    map,
+                    title: `${i + 1}. ${title}`,
+                    label: `${i + 1}`,
+                    optimized: false,
+                });
+
+                // Add a click listener for each marker, and set up the info window.
+                marker.addListener("click", () => {
+                    infoWindow.close();
+                    infoWindow.setContent(marker.getTitle());
+                    infoWindow.open(marker.getMap(), marker);
+                });
+
+            });
+        };
+
+
+    </script>
+}

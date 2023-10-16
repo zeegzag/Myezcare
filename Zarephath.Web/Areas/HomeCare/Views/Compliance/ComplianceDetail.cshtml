@@ -1,0 +1,579 @@
+﻿﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.DocumentCategorization);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ComplianceDetail;
+}
+
+@model ComplianceModel
+
+@Html.Hidden("hdnComplianceModel", Common.SerializeObject(Model))
+<div data-ng-controller="ComplianceController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.DocumentCategorization
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="col-sm-12">
+                <div class="form-group row">
+                    <div class="fscontainer">
+                        <div class="row">
+                            <div class="col-lg-10 col-md-9 col-sm-12">
+
+                                <div class="legend">
+                                    @Resource.EditDocumentManagement
+                                </div>
+                            </div>
+                            <div class="form-group col-lg-2 col-md-3 col-sm-12">
+                                @*<label class="control-label">&nbsp;</label>*@
+                                <div>
+                                    <button type="submit" data-ng-click="SaveCompliance()" class="btn btn-sm green-jungle">@Resource.Save</button>
+                                    <a href="javascript:void(0);" data-ng-click="Cancel()" class="btn btn-sm red-mint">@Resource.Cancel</a>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                        @if (Common.HasPermission(Constants.HC_Permission_Compliance_AddUpdate))
+                        {
+                            <form id="frmCompliance">
+                                <div class="col-sm-12">
+                                    <div id="scroll">
+                                        <div class="row">
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                <label class="control-label required">@Resource.UserType</label>
+                                                @Html.DropDownListFor(p => p.Compliance.UserType, Model.UserTypeList.ToSelectList("", "Name", "Value", @Resource.Select, ""),
+                                                new
+                                                {
+                                                    data_ng_model = "Compliance.UserType",
+                                                    data_ng_init = "Compliance.UserType=Compliance.UserType==''?null:Compliance.UserType",
+                                                    @class = "form-control input-sm requiredStrip",
+                                                    data_ng_change = "GetAssigneeList()",
+                                                    convert_to_number = ""
+                                                })
+                                                @Html.ValidationMessageFor(q => q.Compliance.UserType)
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                <label class="control-label required">@Resource.Assignee</label>
+                                                <select name="Assignee" class="form-control input-sm requiredStrip" data-ng-options="item.Value as item.Name for item in ComplianceModel.AssigneeList" data-ng-model="Compliance.Assignee">
+                                                    <option value="">@Resource.Select</option>
+                                                </select>
+                                                @Html.ValidationMessageFor(q => q.Compliance.Assignee)
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-3 col-sm-4">
+                                                <label class="control-label required">@Resource.DocumentationType</label>
+                                                @Html.DropDownListFor(p => p.Compliance.DocumentationType, Model.DocumentationTypeList.ToSelectList("", "Name", "Value", @Resource.Select, ""),
+                                                new
+                                                {
+                                                    data_ng_model = "Compliance.DocumentationType",
+                                                    data_ng_init = "Compliance.DocumentationType=Compliance.DocumentationType==''?null:Compliance.DocumentationType",
+                                                    @class = "form-control input-sm requiredStrip",
+                                                    convert_to_number = "",
+                                                    ng_disabled = "Compliance.UserType==1?true:false"
+                                                })
+                                                @Html.ValidationMessageFor(q => q.Compliance.UserType)
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-3 col-sm-4">
+                                                <label class="control-label required">@Resource.SectionSubSection</label>
+                                                @Html.DropDownListFor(p => p.Compliance.Type, Common.SetDirectoryTypeList().ToSelectList("", "Name", "Value", @Resource.Select, ""),
+                                                new
+                                                {
+                                                    data_ng_model = "Compliance.Type",
+                                                    data_ng_init = "Compliance.Type=Compliance.Type==''?null:Compliance.Type",
+                                                    @class = "form-control input-sm requiredStrip",
+                                                    data_ng_change = "GetDirectoryList();"
+                                                })
+                                                @Html.ValidationMessageFor(q => q.Compliance.Type)
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-3 col-sm-4" data-ng-if="Compliance.Type=='@Constants.SubDirectory' && Compliance.Type!=null">
+                                                <label class="control-label required">@Resource.Section</label>
+                                                <select class="form-control input-sm" data-ng-options="item.Value as item.Name for item in ComplianceModel.DirectoryList" data-ng-model="Compliance.ParentID"
+                                                        id="Compliance_ParentID" name="Compliance.ParentID" data-val="true" data-val-required="@Resource.SectionRequired">
+                                                    <option value="">@Resource.Select</option>
+                                                </select>
+                                                <span class="field-validation-valid" data-valmsg-for="Compliance.ParentID" data-valmsg-replace="true"></span>
+
+                                                @*@Html.DropDownListFor(p => p.Compliance.ParentID, Model.DirectoryList.ToSelectList("", "Name", "Value", @Resource.Select, ""),
+                                                    new
+                                                    {
+                                                        data_ng_model = "Compliance.ParentID",
+                                                        data_ng_init = "Compliance.ParentID=Compliance.ParentID==''?null:Compliance.ParentID",
+                                                        @class = "form-control input-sm",
+                                                        convert_to_number = ""
+                                                    })
+                                                    @Html.ValidationMessageFor(q => q.Compliance.ParentID)*@
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-3 col-sm-4">
+                                                <label class="control-label required">
+                                                    {{Compliance.Type=='Directory' ? 'Section' : Compliance.Type=='SubDirectory' ? 'Subsection' : ''}} @Resource.Name
+                                                </label>
+                                                @Html.TextBoxFor(p => p.Compliance.DocumentName,
+                                                   new
+                                                   {
+                                                       data_ng_model = "Compliance.DocumentName",
+                                                       @class = "form-control input-sm",
+                                                       @placeholder = Resource.Name,
+                                                       @maxlength = 100
+                                                   })
+                                                @Html.ValidationMessageFor(q => q.Compliance.DocumentName)
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-3 col-sm-4">
+                                                <label class="control-label required">
+                                                    @Resource.Role
+                                                </label>
+                                                <div class="requiredStrip" ng-dropdown-multiselect="" options="RolesList" selected-model="SelectedRole" checkboxes="true" title="@Resource.SelectRole" extra-settings="RoleSettings"></div>
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-2 col-sm-2" data-ng-if="Compliance.Type=='@Constants.Directory' && Compliance.Type!=null">
+                                                <label class="control-label required">@Resource.ColorScheme</label>
+                                                @Html.TextBoxFor(p => p.Compliance.Value,
+                                                   new
+                                                   {
+                                                       data_ng_model = "Compliance.Value",
+                                                       @class = "form-control input-sm color-picker minicolors-input",
+                                                       @placeholder = Resource.ColorScheme,
+                                                       @maxlength = 50
+                                                   })
+                                                @Html.ValidationMessageFor(q => q.Compliance.Value)
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-3 col-sm-4">
+                                                <label class="control-label ">
+                                                    @Resource.IsTimeBased
+                                                    <i class="fa fa-question-circle" data-ng-tooltip="@Resource.IsTimeBasedMessage" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                </label>
+                                                @Html.DropDownListFor(p => p.Compliance.IsTimeBased, Common.SetYesNoList().ToSelectList("", "Name", "Value"),
+                                                new
+                                                {
+                                                    data_ng_model = "Compliance.IsTimeBased",
+                                                    data_ng_init = "Compliance.IsTimeBased='0'",
+                                                    @class = "form-control input-sm",
+                                                    data_ng_change = "OnUserTypeChange(Compliance.UserType)",
+                                                    convert_to_number = ""
+                                                })
+                                                @Html.ValidationMessageFor(q => q.Compliance.IsTimeBased)
+                                            </div>
+
+                                            <div class="form-group col-lg-3 col-md-3OpenModel()col-sm-3" data-ng-if="Compliance.EBFormID!=null">
+                                                <label class="control-label text-decoration-underline">Mapped Form :</label>
+                                                <div>
+                                                    <a href="javascript:void(0);" data-ng-click="OpenNewHtmlForm(Compliance)">{{Compliance.FormName}}</a>
+                                                    <a class="padding-left-15" href="javascript:void(0);" data-ng-click="OpenMapFormModel()" title="Edit Mapping"><i class="fa fa-edit"></i></a>
+                                                    <a href="javascript:void(0);" data-ng-click="RemoveMappedForm()" title="Remove Mapping"><i class="fa fa-remove"></i></a>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-2 col-sm-12" data-ng-if="Compliance.EBFormID==null">
+                                                <label class="control-label" style="width:100%;">&nbsp;</label>
+                                                <button type="button" class="btn btn-sm button" data-ng-click="OpenMapFormModel()">@Resource.MapForm</button>
+                                            </div>
+                                            <div class="form-group col-lg-2 col-md-2 col-sm-4">
+                                                <div class="col-md-12 col-sm-12">
+                                                    <div class="field">
+                                                        <label class="control-label">@Resource.ShowToAll</label>
+                                                        <div class="field-box">
+                                                            <div class="custom_switch">
+                                                                <input type="radio" id="radioShowSectionYes" name="radioAddSection" data-ng-model="Compliance.ShowToAll"
+                                                                       ng-value="true" />
+                                                                <label for="radioShowSectionYes">@Resource.Yes</label>
+                                                                <input type="radio" id="radioShowSectionNo" name="radioAddSection" data-ng-model="Compliance.ShowToAll"
+                                                                       ng-value="false" />
+                                                                <label for="radioShowSectionNo">@Resource.No</label>
+                                                                <span class="custom_switchwrapper"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="space1"></div>
+                                            <hr />
+                                            <div class="space1"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        }
+
+                        @if (Common.HasPermission(Constants.HC_Permission_Compliance_List))
+                        {
+                            <div>
+                                <div class="row">
+                                    <div class="col-md-12 col-sm-12 col-xs-12">
+
+                                        <div class="btn-group">
+                                            <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                                                <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                                            </button>
+                                        </div>
+
+                                        <div class="btn-group">
+                                            @Html.DropDownListFor(m => m.SearchComplianceListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchComplianceListPage.IsDeleted), "Name", "Value", "", ""),
+                                               new
+                                               {
+                                                   id = "IsDeleted",
+                                                   data_ng_model = "TempSearchComplianceListPage.IsDeleted",
+                                                   data_ng_init = "TempSearchComplianceListPage.IsDeleted = TempSearchComplianceListPage.IsDeleted==null?'-1':TempSearchComplianceListPage.IsDeleted.toString()",
+                                                   @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                   data_ng_change = "SearchCompliance()"
+                                               })
+                                        </div>
+                                        @if (Common.HasPermission(Constants.HC_Permission_Compliance_Sorting))
+                                        {
+                                            <div class="btn-group">
+
+                                                <button class="btn blue btn-sm grey border-grey-cascade pushme2 " data-ng-if="arrowShow==false" data-ng-click="OpenModel()"
+                                                        id="changeorder" style="border-radius: 4px">
+                                                    Change Display Order
+                                                </button>
+                                                <button class="btn btn-sm green-jungle pushme2 " type="submit" data-ng-click="ResetSearchFilter()" data-ng-if="arrowShow==true" id="done" style="border-radius: 4px">
+                                                    Done
+                                                </button>
+                                                <button class="btn btn-sm red-mint pushme2 " data-ng-click="ResetSearchFilter()" data-ng-if="arrowShow==true" id="cancel" style=" margin-left: 4px; border-radius:4px">
+                                                    Cancel
+                                                </button>
+
+                                                <div class="modal fade" id="ChangeDisplayOrderModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+                                                    <div class="modal-dialog modal-lg" role="document" style="width:300px;height:250px">
+                                                        <div class="modal-content">
+                                                            <div class="modal-header">
+                                                                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseChangeDisplayOrderModel()"><span aria-hidden="true">×</span></button>
+                                                                <h4 class="modal-title" style="border-bottom: 1px solid gray; padding: 4px 33px; font-weight: 500; ">Change Display Order</h4>
+                                                            </div>
+                                                            <div class="modal-body">
+                                                                <div class="row">
+                                                                    <div class="col-md-12 col-sm-12">
+                                                                        <form id="frmRTSMaster">
+                                                                            <div class="col-md-12 col-md-12 no-padding" style=" padding: 0px 15px !important;">
+                                                                                <label>
+                                                                                    <input type="radio" name="radio" value="1" data_ng_model="TempSearchComplianceListPage.UserType" checked style="height: 16px; width: 16px;" />
+                                                                                    <span style="font-size:17px">Employee</span>
+                                                                                </label>
+                                                                                <label>
+                                                                                    <input type="radio" name="radio" value="2" data_ng_model="TempSearchComplianceListPage.UserType" style=" margin-left: 36px;  height: 16px; width: 16px;" />
+                                                                                    <span style="font-size:17px">Referral</span>
+                                                                                </label>
+
+                                                                                <div class="col-lg-12 col-md-12 col-sm-12 margin-top-17">
+                                                                                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="SearchCompliance() ; OnCloseChangeDisplayOrderModel()">@Resource.Ok</button>
+                                                                                    <button type="button" class="btn btn-sm red-mint" data-ng-click="OnCloseChangeDisplayOrderModel()" style="float:right;">@Resource.Cancel</button>
+
+                                                                                </div>
+                                                                            </div>
+                                                                        </form>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        }
+                                        @if (Common.HasPermission(Constants.HC_Permission_Compliance_Delete))
+                                        {
+                                            <div class="btn-group" data-ng-if="SelectedComplianceIds.length > 0">
+                                                <button type="button" data-ng-click="DeleteCompliance()" class="btn blue btn-sm grey border-grey-cascade">
+                                                    <i class="fa fa-random margin-right-10"></i>
+                                                    {{TempSearchComplianceListPage.IsDeleted==0?'@Constants.DisableSelected' :(TempSearchComplianceListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                                                </button>
+                                            </div>
+                                        }
+                                        <div class="inline-block pull-right" data-ng-show="ComplianceList.length > 0">
+                                            <div class="inline-block pull-right" data-ng-show="ComplianceList.length > 0">
+                                                <div class="pull-right margin-left-5">
+                                                    <dir-pagination-controls boundary-links="true" max-size="ComplianceListPager.maxSize" on-page-change="ComplianceListPager.pageChanged(newPageNumber)" pagination-id="ComplianceListPagerID"></dir-pagination-controls>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space20"></div>
+                                </div>
+
+                                <div>
+                                    <div class="row">
+                                        <div class="col-sm-15">
+                                            <div class="portlet-body" style="display: block;">
+                                                <form id="FrmComplianceList">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                        <div class="portlet-body compact">
+                                                            <div class="dataTables_wrapper">
+                                                                <table class="table table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                                    <thead class="flip-content">
+                                                                        <tr>
+                                                                            <th data-ng-if="arrowShow==true"></th>
+
+                                                                            @if (Common.HasPermission(Constants.HC_Permission_Compliance_Delete))
+                                                                            {
+                                                                                <th class="width-20px"></th>
+                                                                            }
+                                                                            <th>
+                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ComplianceListPager.sortColumn('UserType')">@Resource.UserType</a>
+                                                                                <span class="sortorder" data-ng-show="ComplianceListPager.sortIndex === 'UserType'" data-ng-class="{reverse:ComplianceListPager.reverse}"></span>
+                                                                            </th>
+                                                                            <th>
+                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ComplianceListPager.sortColumn('DocumentationType')">@Resource.DocumentationType</a>
+                                                                                <span class="sortorder" data-ng-show="ComplianceListPager.sortIndex === 'DocumentationType'" data-ng-class="{reverse:ComplianceListPager.reverse}"></span>
+                                                                            </th>
+                                                                            <th>
+                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ComplianceListPager.sortColumn('ParentType')">@Resource.ParentType</a>
+                                                                                <span class="sortorder" data-ng-show="ComplianceListPager.sortIndex === 'ParentType'" data-ng-class="{reverse:ComplianceListPager.reverse}"></span>
+                                                                            </th>
+                                                                            <th>
+                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ComplianceListPager.sortColumn('Type')">@Resource.Type</a>
+                                                                                <span class="sortorder" data-ng-show="ComplianceListPager.sortIndex === 'Type'" data-ng-class="{reverse:ComplianceListPager.reverse}"></span>
+                                                                            </th>
+                                                                            <th>
+                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ComplianceListPager.sortColumn('DocumentName')">@Resource.Name</a>
+                                                                                <span class="sortorder" data-ng-show="ComplianceListPager.sortIndex === 'DocumentName'" data-ng-class="{reverse:ComplianceListPager.reverse}"></span>
+                                                                            </th>
+                                                                            <th>
+                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ComplianceListPager.sortColumn('IsTimeBased')">@Resource.IsTimeBased</a>
+                                                                                <span class="sortorder" data-ng-show="ComplianceListPager.sortIndex === 'IsTimeBased'" data-ng-class="{reverse:ComplianceListPager.reverse}"></span>
+                                                                            </th>
+                                                                            <th>
+                                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ComplianceListPager.sortColumn('ShowToAll')">@Resource.ShowToAll</a>
+                                                                                <span class="sortorder" data-ng-show="ComplianceListPager.sortIndex === 'ShowToAll'" data-ng-class="{reverse:ComplianceListPager.reverse}"></span>
+                                                                            </th>
+                                                                            <th class="width-220px" style="text-align:center">@Resource.Action</th>
+                                                                        </tr>
+                                                                    </thead>
+
+                                                                    <tbody>
+                                                                        <tr class="compact-search-tr">
+                                                                            <td data-ng-if="arrowShow==true"></td>
+
+                                                                            @if (Common.HasPermission(Constants.HC_Permission_Compliance_Delete))
+                                                                            {
+                                                                                <td>
+                                                                                    <div class="btn-group" data-ng-show="ComplianceList.length > 0">
+                                                                                        <input id="SelectAllCompliance" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                                                        <label for="SelectAllCompliance"></label>
+                                                                                    </div>
+                                                                                </td>
+
+                                                                            }
+
+                                                                            <td>
+                                                                                @Html.DropDownListFor(m => m.SearchComplianceListPage.UserType, Model.UserTypeList.ToSelectList("", "Name", "Value", @Resource.Select, "-1"),
+                                                                                new
+                                                                                {
+                                                                                    id = "UserType",
+                                                                                    data_ng_model = "TempSearchComplianceListPage.UserType",
+                                                                                    data_ng_init = "TempSearchComplianceListPage.UserType = TempSearchComplianceListPage.UserType==null?'-1':TempSearchComplianceListPage.UserType.toString()",
+                                                                                    @class = "form-control input-sm"
+                                                                                })
+                                                                            </td>
+                                                                            <td>
+                                                                                @Html.DropDownListFor(p => p.SearchComplianceListPage.DocumentationType, Model.DocumentationTypeList.ToSelectList("", "Name", "Value", @Resource.Select, "-1"),
+                                                                                 new
+                                                                                 {
+                                                                                     data_ng_model = "TempSearchComplianceListPage.DocumentationType",
+                                                                                     data_ng_init = "TempSearchComplianceListPage.DocumentationType=TempSearchComplianceListPage.DocumentationType==null?'-1':TempSearchComplianceListPage.DocumentationType.toString()",
+                                                                                     @class = "form-control input-sm"
+                                                                                 })
+                                                                            </td>
+
+                                                                            <td>
+                                                                                @Html.TextBoxFor(m => m.SearchComplianceListPage.ParentName, new { data_ng_model = "TempSearchComplianceListPage.ParentName", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                                                            </td>
+                                                                            <td>
+                                                                                @Html.DropDownListFor(p => p.SearchComplianceListPage.Type, Common.SetDirectoryTypeList().ToSelectList("", "Name", "Value", @Resource.Select, null),
+                                                                                 new
+                                                                                 {
+                                                                                     data_ng_model = "TempSearchComplianceListPage.Type",
+                                                                                     data_ng_init = "TempSearchComplianceListPage.Type=TempSearchComplianceListPage.Type==null?'':TempSearchComplianceListPage.Type",
+                                                                                     @class = "form-control input-sm"
+                                                                                 })
+                                                                            </td>
+                                                                            <td>
+                                                                                @Html.TextBoxFor(m => m.SearchComplianceListPage.DocumentName, new { data_ng_model = "TempSearchComplianceListPage.DocumentName", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                                                            </td>
+                                                                            <td>
+                                                                                @Html.DropDownListFor(p => p.SearchComplianceListPage.IsTimeBased, Common.SetYesNoList().ToSelectList("", "Name", "Value", @Resource.Select, "-1"),
+                                                                                 new
+                                                                                 {
+                                                                                     data_ng_model = "TempSearchComplianceListPage.IsTimeBased",
+                                                                                     data_ng_init = "TempSearchComplianceListPage.IsTimeBased=TempSearchComplianceListPage.IsTimeBased==null?'-1':TempSearchComplianceListPage.IsTimeBased.toString()",
+                                                                                     @class = "form-control input-sm"
+                                                                                 })
+                                                                            </td>
+                                                                            <td>
+                                                                                <select class="form-control input-sm" data-ng-model="TempSearchComplianceListPage.ShowToAll">
+                                                                                    <option value="-1">Select</option>
+                                                                                    <option value="1">Yes</option>
+                                                                                    <option value="0">No</option>
+                                                                                </select>
+                                                                            </td>
+                                                                            <td class="text-align-center">
+                                                                                <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchCompliance()" />
+                                                                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                                                            </td>
+                                                                        </tr>
+                                                                        <tr data-ng-class="{'deleted':Compliance.IsDeleted}" dir-paginate="Compliance in ComplianceList | itemsPerPage: ComplianceListPager.pageSize" total-items="ComplianceListPager.totalRecords" current-page="ComplianceListPager.currentPage" pagination-id="ComplianceListPagerID">
+
+                                                                            <td id="sortarrow" data-ng-if="arrowShow==true" class="pushme2" style="width: 40px;  ">
+
+
+                                                                                <a href="#" class="up" ng-show="!$first" ng-click="moveUp($index,Compliance)">
+                                                                                    <i class="fa fa-arrow-up" aria-hidden="true"></i>
+                                                                                </a>
+                                                                                <a href="#" class="dropdown" ng-show="!$last" ng-click=" moveDown($index,Compliance)">
+                                                                                    <i class="fa fa-arrow-down" aria-hidden="true"></i>
+
+                                                                                </a>
+
+                                                                            </td>
+
+                                                                            @if (Common.HasPermission(Constants.HC_Permission_Compliance_Delete))
+                                                                            {
+                                                                                <td>
+                                                                                    <input type="checkbox" class="unicheckbox" data-ng-if="IsEditable(Compliance)" data-ng-model="Compliance.IsChecked" data-ng-change="SelectCompliance(Compliance)" val="Compliance.IsChecked">
+                                                                                </td>
+                                                                            }
+                                                                            <td>{{Compliance.str_UserType}}</td>
+                                                                            <td>{{Compliance.str_DocumentationType}}</td>
+                                                                            <td>{{Compliance.ParentName}}</td>
+                                                                            <td>
+                                                                                @*{{Compliance.Type=='Directory' ? @Resource.Section : @Resource.SubSection}}*@
+                                                                                {{Compliance.Type=='Directory' ? '@Resource.Section': '@Resource.SubSection'}}
+                                                                            </td>
+                                                                            <td>{{Compliance.DocumentName}}</td>
+                                                                            <td>{{Compliance.str_IsTimeBased}}</td>
+                                                                            <td>
+                                                                                {{Compliance.ShowToAll=='0' ? '@Resource.No': '@Resource.Yes'}}
+                                                                            </td>
+                                                                            <td class="text-align-center">
+                                                                                @if (Common.HasPermission(Constants.HC_Permission_Compliance_AddUpdate))
+                                                                                {
+                                                                                    <a href="javascript:void(0);" data-ng-if="IsEditable(Compliance)" data-ng-click="EditCompliance(Compliance)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                                }
+                                                                                @if (Common.HasPermission(Constants.HC_Permission_Compliance_Delete))
+                                                                                {
+                                                                                    <span data-ng-if="IsEditable(Compliance)">
+                                                                                        <a href="javascript:void(0);" data-ng-show="Compliance.IsDeleted" data-ng-click="DeleteCompliance(Compliance,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                                        <a href="javascript:void(0);" data-ng-show="!Compliance.IsDeleted" data-ng-click="DeleteCompliance(Compliance,'Disable')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                                                    </span>
+                                                                                }
+                                                                            </td>
+
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12" data-ng-if="ComplianceList.length > 0">
+                                            <div class="pull-left col-sm-3 no-padding">
+                                                @Resource.Showing <span data-ng-bind="(ComplianceListPager.pageSize * ComplianceListPager.currentPage) - ComplianceListPager.pageSize  + 1"></span>
+                                                &nbsp;@Resource.To <span data-ng-bind="(ComplianceListPager.pageSize == ComplianceListPager.currentPageSize) ? (ComplianceListPager.pageSize * ComplianceListPager.currentPage) :(ComplianceListPager.pageSize * ComplianceListPager.currentPage) - ComplianceListPager.pageSize  + ComplianceListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ComplianceListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                            </div>
+                                            <div class="pull-right top pagination-sm">
+                                                <dir-pagination-controls boundary-links="true" max-size="ComplianceListPager.maxSize" on-page-change="ComplianceListPager.pageChanged(newPageNumber)" pagination-id="ComplianceListPagerID"></dir-pagination-controls>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-sm-12">
+                                            <div data-ng-if="ComplianceList.length == 0">
+                                                <div class="row">
+                                                    <div class="col-lg-12">
+                                                        <div class="alert alert-danger">
+                                                            @Html.Raw(Resource.NoRecordsFound)
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                        }
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <br class="clear-both" />
+
+
+
+    <div class="modal fade" id="mapFormModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                    <h4 class="caption margin-bottom-0 margin-top-5">
+                        <a class="text-decoration-none sbold uppercase ng-binding">
+                            @Resource.MapFormWithDocument
+                        </a>
+                    </h4>
+                </div>
+                <div class="modal-body">
+
+                    <div class="table-responsive tabbable-custom form-table-overflow">
+
+                        <table class="table table-bordered table-striped table-condensed flip-content">
+                            <thead class="flip-content">
+                                <tr>
+                                    <th class="width-min-107px">
+                                        @Resource.FormNumber
+                                    </th>
+                                    <th>
+                                        @Resource.FormName
+                                    </th>
+                                    <th width="120" style="text-align:center">@Resource.Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="compact-search-tr">
+                                    <td colspan="2">
+                                        <input class="form-control input-sm" placeholder="Search by Form Number, Name or Tags" data-ng-model="frmSearch" />
+                                    </td>
+                                    <td></td>
+                                </tr>
+                                <tr data-ng-repeat="form in OrganizationFormList | filter: frmSearch">
+                                    <td>{{ form.Name }}</td>
+                                    <td>
+                                        <a data-ng-click="OpenNewHtmlForm(form)">{{ form.FormLongName }}</a>
+                                    </td>
+                                    <td>
+                                        <a href="javascript:void(0);" data-ng-click="SelectForm(form)" class="btn btn-xs blue">@Resource.Select</a>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/compliance/compliance")
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.DirectorySubDirectory)';
+        var DeleteConfirmationMessageWithNote = '@(Html.Raw(Resource.DeleteDirSubDirWithNote))';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.DirectorySubDirectory)';
+        var NotEditableComplianceIDs = [@Constants.PatientAuthorizationsComplianceID, @Constants.VisitsComplianceID];
+    </script>
+}
+<style>
+    .custom_switch {
+        width: 100px !important;
+    }
+</style>

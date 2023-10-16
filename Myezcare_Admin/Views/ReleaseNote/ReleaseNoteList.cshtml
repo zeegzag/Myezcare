@@ -1,0 +1,228 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.ReleaseNoteList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ReleaseNoteList;
+}
+
+@model SetReleaseNoteListPage
+@Html.Hidden("hdnSetReleaseNoteListPage", Common.SerializeObject(Model))
+<div data-ng-controller="ReleaseNoteListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.ReleaseNoteList &nbsp;@*<small>@Resource.ReleaseNoteListInformation</small>*@
+
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @*@if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                {
+                    <div class="btn-group" data-ng-show="ReleaseNoteList.length > 0">
+                        <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                            <input id="SelectAllDxCode" class="unicheckbox text-align-center" data-ng-show="ReleaseNoteList.length > 0" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                            <label for="SelectAllDxCode"></label>
+                        </span>
+                    </div>
+                }*@
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchReleaseNoteListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchReleaseNoteListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                                     new
+                                                                                     {
+                                                                                         id = "IsDeleted",
+                                                                                         data_ng_model = "TempSearchReleaseNoteListPage.IsDeleted",
+                                                                                         data_ng_init = "TempSearchReleaseNoteListPage.IsDeleted = TempSearchReleaseNoteListPage.IsDeleted==null?'-1':TempSearchReleaseNoteListPage.IsDeleted.toString()",
+                                                                                         @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                                         data_ng_change = "SearchReleaseNote()"
+                                                                                     })
+            </div>
+            @*@if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+            {*@
+                <div class="btn-group" data-ng-if="SelectedReleaseNoteIds.length > 0">
+                    <button type="button" data-ng-click="DeleteReleaseNote()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchReleaseNoteListPage.IsDeleted==0 ?'@Resource.DisableSelected' :(TempSearchReleaseNoteListPage.IsDeleted==1?'@Resource.EnableSelected':'@Resource.EnableDisableInverse')}}
+                    </button>
+                </div>
+            @*}
+            @if (Common.HasPermission(Constants.HC_Permission_Physician_AddUpdate))
+            {*@
+                <div class="btn-group padding-left-15">
+                    <a href="@Constants.ReleaseNoteAddURL" class="btn btn-sm letter-space green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.ReleaseNote</a>
+                </div>
+            @*}*@
+            <div class="inline-block pull-right" data-ng-show="ReleaseNoteList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="ReleaseNoteListPager.maxSize" on-page-change="ReleaseNoteListPager.pageChanged(newPageNumber)" pagination-id="ReleaseNoteListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmDxCodeList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                        {*@
+                                            <th class="width-20px"></th>
+                                        @*}*@
+                                        <th class="width-250px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReleaseNoteListPager.sortColumn('Title')">@Resource.Title</a>
+                                            <span class="sortorder" data-ng-show="ReleaseNoteListPager.sortIndex === 'Title'" data-ng-class="{reverse:ReleaseNoteListPager.reverse}"></span>
+                                        </th>
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReleaseNoteListPager.sortColumn('Description')">@Resource.Description</a>
+                                            <span class="sortorder" data-ng-show="ReleaseNoteListPager.sortIndex === 'Description'" data-ng-class="{reverse:ReleaseNoteListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-120px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReleaseNoteListPager.sortColumn('StartDate')">@Resource.StartDate</a>
+                                            <span class="sortorder" data-ng-show="ReleaseNoteListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:ReleaseNoteListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-120px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReleaseNoteListPager.sortColumn('EndDate')">@Resource.EndDate</a>
+                                            <span class="sortorder" data-ng-show="ReleaseNoteListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:ReleaseNoteListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-130px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_Physician_Delete))
+                                        {*@
+                                            <td class="text-align-center">
+                                                <input id="SelectAllReleaseNote" class="unicheckbox text-align-center" data-ng-show="ReleaseNoteList.length > 0" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                            </td>
+                                        @*}*@
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchReleaseNoteListPage.Title,
+                                            new
+                                            {
+                                                data_ng_model = "TempSearchReleaseNoteListPage.Title",
+                                                @class = "form-control input-sm",
+                                                placeholder = Resource.Title,
+                                                maxlength = 200
+                                            })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchReleaseNoteListPage.Description,
+                                            new
+                                            {
+                                                data_ng_model = "TempSearchReleaseNoteListPage.Description",
+                                                @class = "form-control input-sm",
+                                                placeholder = Resource.Description
+                                            })
+                                        </td>
+                                        <td>
+                                            <div class="input-group date"
+                                            datepicker="TempSearchReleaseNoteListPage.StartDate"
+                                            data-ng-dateval="TempSearchReleaseNoteListPage.StartDate">
+                                            @Html.TextBoxFor(q => q.SearchReleaseNoteListPage.StartDate,
+                                                     new
+                                                     {
+                                                         @class = "form-control input-sm dateInputMask",
+                                                         placeholder = Resource.StartDate
+                                                     })
+                                            @Html.ValidationMessageFor(q => q.SearchReleaseNoteListPage.StartDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div class="input-group date"
+                                            datepicker="TempSearchReleaseNoteListPage.EndDate"
+                                            data-ng-dateval="TempSearchReleaseNoteListPage.EndDate">
+                                            @Html.TextBoxFor(q => q.SearchReleaseNoteListPage.EndDate,
+                                                     new
+                                                     {
+                                                         @class = "form-control input-sm dateInputMask",
+                                                         placeholder = Resource.EndDate
+                                                     })
+                                            @Html.ValidationMessageFor(q => q.SearchReleaseNoteListPage.EndDate)
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </td>
+                                        <td class="text-align-center">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchReleaseNote()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+
+                                    <tr data-ng-class="{'deleted':ReleaseNote.IsDeleted}" dir-paginate="ReleaseNote in ReleaseNoteList | itemsPerPage: ReleaseNoteListPager.pageSize" total-items="ReleaseNoteListPager.totalRecords" current-page="ReleaseNoteListPager.currentPage" pagination-id="ReleaseNoteListPager_ID">
+                                        @*@if (Common.HasPermission(Constants.HC_Permission_ReleaseNote_Delete))
+                                        {*@
+                                            <td class="text-align-center">
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="ReleaseNote.IsChecked" data-ng-change="SelectReleaseNote(ReleaseNote)" val="ReleaseNote.IsChecked">
+                                            </td>
+                                        @*}*@
+                                        <td>{{ReleaseNote.Title}}</td>
+                                        <td ng-bind-html="ReleaseNote.Description"></td>
+                                        <td>{{ReleaseNote.StartDate | dateformat}}</td>
+                                        <td>{{ReleaseNote.EndDate==null ? '@Resource.NA' : (ReleaseNote.EndDate | dateformat)}}</td>
+                                        <td class="text-align-center">
+                                            @*@if (Common.HasPermission(Constants.HC_Permission_ReleaseNote_AddUpdate))
+                                            {*@
+                                            <a href="{{ AddReleaseNoteURL + ReleaseNote.EncryptedReleaseNoteID}}" class="btn btn-xs blue">@Resource.Edit </a>
+                                            @*}
+                                            @if (Common.HasPermission(Constants.HC_Permission_ReleaseNote_Delete))
+                                            {*@
+                                            <a href="javascript:void(0);" data-ng-show="ReleaseNote.IsDeleted" data-ng-click="DeleteReleaseNote(ReleaseNote.ReleaseNoteID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                            <a href="javascript:void(0);" data-ng-show="!ReleaseNote.IsDeleted" data-ng-click="DeleteReleaseNote(ReleaseNote.ReleaseNoteID,'@Resource.Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                            @*}*@
+
+                                            <a target="_blank" href="{{ ViewReleaseNoteURL + ReleaseNote.EncryptedReleaseNoteID}}" 
+                                               class="btn btn-xs btn-success ng-scope" title="@Resource.ViewReleaseNote">
+                                                <i class="fa fa-eye"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="ReleaseNoteList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(ReleaseNoteListPager.pageSize * ReleaseNoteListPager.currentPage) - ReleaseNoteListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(ReleaseNoteListPager.pageSize == ReleaseNoteListPager.currentPageSize) ? (ReleaseNoteListPager.pageSize * ReleaseNoteListPager.currentPage) :(ReleaseNoteListPager.pageSize * ReleaseNoteListPager.currentPage) - ReleaseNoteListPager.pageSize  + ReleaseNoteListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReleaseNoteListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="ReleaseNoteListPager.maxSize" on-page-change="ReleaseNoteListPager.pageChanged(newPageNumber)" pagination-id="ReleaseNoteListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ReleaseNoteList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/releasenote/releasenotelist")
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.ReleaseNote)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.ReleaseNote)';
+    </script>
+}

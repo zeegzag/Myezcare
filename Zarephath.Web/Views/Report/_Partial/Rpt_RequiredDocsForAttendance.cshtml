@@ -1,0 +1,114 @@
+﻿@model ReportModel
+@Html.Hidden("hdnSetReqDocsForAttendanceModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptReqDocsForAttendanceModel">
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon  ribbon-color-warning uppercase">@Resource.ReqDocsForAttendanceModel</div>
+        <p class="ribbon-content">
+            @Resource.ReqDocsForAttendanceDetail
+        </p>
+        <hr />
+        <div>
+            <a class="btn btn-sm blue-steel pull-right" href="#model__SearchReqDocsForAttendanceModel" data-toggle="modal">@Resource.GenerateReport</a>
+        </div>
+        <br />
+    </div>
+    <form id="frmSearchReqDocsForAttendanceModel" target="_blank">
+        <div class="modal fade" id="model__SearchReqDocsForAttendanceModel" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.ReqDocsForAttendanceModel, Resource.SearchParameter)</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-sm-12">
+
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Region</label>
+                                        @Html.DropDownListFor(m => m.SearchReqDocsForAttendanceModel.RegionID, Model.Region.ToSelectList(Convert.ToString(Model.SearchReqDocsForAttendanceModel.RegionID), "RegionName", "RegionID", "", ""), new
+                                            {
+                                                id = "RegionID",
+                                                data_ng_model = "SearchReqDocsForAttendanceModel.RegionID",
+                                                data_ng_init = "SearchReqDocsForAttendanceModel.RegionID='1'",
+                                                //data_ng_init = "SearchReqDocsForAttendanceModel.RegionID=(SearchScheduleAttendanceModel.RegionID == null || SearchScheduleAttendanceModel.RegionID==0)?'':SearchScheduleAttendanceModel.RegionID",
+                                                @class = "form-control input-sm",
+
+                                            })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.StartDate</label>
+                                        <div datepicker="SearchReqDocsForAttendanceModel.StartDate" ng-dateval="SearchReqDocsForAttendanceModel.StartDate" class="input-group date">
+                                            <input class="form-control input-sm dateInputMask" data-val="False"
+                                                id="StartDate"
+                                                name="otherStartDate"
+                                                placeholder="mm/dd/yy"
+                                                type="text">
+                                            @* @Html.TextBox("otherStartDate",
+                                                          new
+                                                              {
+                                                                  id = "StartDate",
+                                                                  name = "otherStartDate",
+                                                                  @class = "no-focus form-control input-sm dateInputMask",
+                                                                  placeholder = Resource.StartDate,
+                                                                  data_val = false
+                                                              })*@
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        <input type="hidden" id="Start" name="SearchReqDocsForAttendanceModel.StartDate" value="{{SearchReqDocsForAttendanceModel.StartDate  | dateformat:'YYYY/MM/DD'}}" />
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.EndDate</label>
+                                        <div datepicker="SearchReqDocsForAttendanceModel.EndDate" ng-dateval="SearchReqDocsForAttendanceModel.EndDate" class="input-group date">
+                                            <input class="form-control input-sm dateInputMask" data-val="False"
+                                                id="EndDate"
+                                                name="otherEndDate"
+                                                placeholder="mm/dd/yy"
+                                                type="text">
+                                            @*  @Html.TextBox("otherEndDate",
+                                                             new
+                                                                 {
+                                                                     id = "EndDate",
+                                                                     name = "otherEndDate",
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.EndDate,
+                                                                     data_val = false
+                                                                 })*@
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        <input type="hidden" id="End" name="SearchReqDocsForAttendanceModel.EndDate" value="{{ SearchReqDocsForAttendanceModel.EndDate  | dateformat:'YYYY/MM/DD'}}" />
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="AttendanceAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                            <span class="padding-left-5">
+                                                <img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm btn-default" data-dismiss="modal" aria-label="Close" data-ng-click="ResetSearchFilter()">@Resource.Cancel</button>
+                        <button type="button" class="btn btn-sm blue"  id="btnReqAttendanceDownload" data-loading-text="@Resource.DownloadingInProgress"  data-ng-click="DownloadReqDocsForAttendanceReport('#btnReqAttendanceDownload')">@Resource.Download</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+
+</div>

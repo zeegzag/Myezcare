@@ -1,0 +1,274 @@
+﻿@model ReportModel
+@Html.Hidden("hdnSetClientInformationModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="RptClientInformationController">
+    <div class="mt-element-ribbon bg-grey-steel">
+        <div class="ribbon  ribbon-color-default uppercase">@Resource.ClientInformationReport</div>
+        <p class="ribbon-content">
+            @Resource.ClientInformationDetail
+        </p>
+        <hr />
+        <div>
+            <a class="btn btn-sm blue pull-right" href="#model__SearchRptClientInformation" data-toggle="modal">@Resource.GenerateReport</a>
+        </div>
+        <br />
+    </div>
+
+    <div class="modal fade" id="model__SearchRptClientInformation" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1">@string.Format("{0} {1}", Resource.ClientInformationReport, Resource.SearchParameter)</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <form id="frmSearchRptClientStatus">
+                                <div class="col-md-12 no-padding">
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Name</label>
+                                        @Html.TextBoxFor(m => m.SearchReportModel.ClientName, new { data_ng_model = "SearchReportModel.ClientName", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Payor</label>
+                                        @Html.DropDownListFor(p => p.SearchReportModel.PayorID, Model.Payors.ToSelectList(Model.SearchReportModel.PayorID.ToString() ?? "", "PayorName", "PayorID", Resource.SelectPayor, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "PayorID",
+                                                                      data_ng_model = "SearchReportModel.PayorID",
+                                                                      data_ng_init = "SearchReportModel.PayorID=SearchReportModel.PayorID==''?null:SearchReportModel.PayorID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Status</label>
+                                        @Html.DropDownListFor(p => p.SearchReportModel.ReferralStatusID, Model.ReferralStatuses.ToSelectList(Model.SearchReportModel.ReferralStatusID.ToString() ?? "", "Status", "ReferralStatusID", Resource.SelectStatus, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "ReferralStatusID",
+                                                                      data_ng_model = "SearchReportModel.ReferralStatusID",
+                                                                      data_ng_init = "SearchReportModel.ReferralStatusID=SearchReportModel.ReferralStatusID==''?null:SearchReportModel.ReferralStatusID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    @if (Common.HasPermission(Constants.Permission_View_All_Referral))
+                                    {
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                            <label class="control-label">@Resource.Assignee</label>
+                                            @Html.DropDownListFor(p => p.SearchReportModel.AssigneeID, Model.Assignee.ToSelectList(Model.SearchReportModel.AssigneeID.ToString() ?? "", "Name", "EmployeeID", Resource.SelectAssignee, ""),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          id = "AssigneeID",
+                                                                          data_ng_model = "SearchReportModel.AssigneeID",
+                                                                          data_ng_init = "SearchReportModel.AssigneeID=SearchReportModel.AssigneeID==''?null:SearchReportModel.AssigneeID",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false
+                                                                      })
+                                        </div>
+                                    }
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.CheckListCompleted</label>
+                                        @Html.DropDownListFor(m => m.SearchReportModel.ChecklistID, Model.Checklist.ToSelectList(Convert.ToString(Model.SearchReportModel.ChecklistID), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "ChecklistID",
+                                                                      data_ng_model = "SearchReportModel.ChecklistID",
+                                                                      data_ng_init = "SearchReportModel.ChecklistID = SearchReportModel.ChecklistID==null?'-1':SearchReportModel.ChecklistID.toString()",
+                                                                      @class = "form-control input-sm"
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.ClinicalReviewdone</label>
+                                        @Html.DropDownListFor(m => m.SearchReportModel.ClinicalReviewID, Model.ClinicalReview.ToSelectList(Convert.ToString(Model.SearchReportModel.ClinicalReviewID), "Name", "Value", "", "0"),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "ClinicalReviewID",
+                                                                      data_ng_model = "SearchReportModel.ClinicalReviewID",
+                                                                      data_ng_init = "SearchReportModel.ClinicalReviewID = SearchReportModel.ClinicalReviewID==null?'-1':SearchReportModel.ClinicalReviewID.toString()",
+                                                                      @class = "form-control input-sm"
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.CaseManagerNotify</label>
+                                        @Html.DropDownListFor(m => m.SearchReportModel.NotifyCaseManagerID, Model.NotifyCaseManager.ToSelectList(Convert.ToString(Model.SearchReportModel.NotifyCaseManagerID), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+
+                                                                      id = "NotifyCaseManagerID",
+                                                                      data_ng_model = "SearchReportModel.NotifyCaseManagerID",
+                                                                      data_ng_init = "SearchReportModel.NotifyCaseManagerID = SearchReportModel.NotifyCaseManagerID==null?'-1':SearchReportModel.NotifyCaseManagerID.toString()",
+                                                                      @class = "form-control input-sm",
+
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Service</label>
+                                        @Html.DropDownListFor(m => m.SearchReportModel.ServiceID, Model.Services.ToSelectList(Convert.ToString(Model.SearchReportModel.ServiceID), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "ServiceID",
+                                                                      data_ng_model = "SearchReportModel.ServiceID",
+                                                                      data_ng_init = "SearchReportModel.ServiceID = SearchReportModel.ServiceID==null?'-1':SearchReportModel.ServiceID.toString()",
+                                                                      @class = "form-control input-sm"
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.CaseManager</label>
+                                        @Html.DropDownListFor(p => p.SearchReportModel.CaseManagerID, Model.Facillator.ToSelectList(Model.SearchReportModel.CaseManagerID.ToString() ?? "", "Name", "CaseManagerID", Resource.SelectFacillator, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "CaseManagerID",
+                                                                      data_ng_model = "SearchReportModel.CaseManagerID",
+                                                                      data_ng_init = "SearchReportModel.CaseManagerID=SearchReportModel.CaseManagerID==''?null:SearchReportModel.CaseManagerID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Agency</label>
+                                        @Html.DropDownListFor(p => p.SearchReportModel.AgencyID, Model.Agencies.ToSelectList(Model.SearchReportModel.AgencyID.ToString() ?? "", "NickName", "AgencyID", Resource.SelectAgency, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "AgencyID",
+                                                                      data_ng_model = "SearchReportModel.AgencyID",
+                                                                      data_ng_init = "SearchReportModel.AgencyID=SearchReportModel.AgencyID==''?null:SearchReportModel.AgencyID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>
+
+                                    @*<div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.AgencyLocation</label>
+                                        @Html.DropDownListFor(p => p.SearchReportModel.AgencyLocationID, Model.AgencyLocations.ToSelectList(Model.SearchReportModel.AgencyLocationID.ToString() ?? "", "LocationName", "AgencyLocationID", Resource.SelectAgencyLocation, ""),
+                                                              new
+                                                                  {
+                                                                      convert_to_number = "",
+                                                                      id = "AgencyLocationID",
+                                                                      data_ng_model = "SearchReportModel.AgencyLocationID",
+                                                                      data_ng_init = "SearchReportModel.AgencyLocationID=SearchReportModel.AgencyLocationID==''?null:SearchReportModel.AgencyLocationID",
+                                                                      @class = "form-control input-sm",
+                                                                      data_val = false
+                                                                  })
+                                    </div>*@
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.IsDraft</label>
+                                        @Html.DropDownListFor(m => m.SearchReportModel.IsSaveAsDraft, Model.Draft.ToSelectList(Convert.ToString(Model.SearchReportModel.IsSaveAsDraft), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      id = "IsSaveAsDraft",
+                                                                      data_ng_model = "SearchReportModel.IsSaveAsDraft",
+                                                                      data_ng_init = "SearchReportModel.IsSaveAsDraft = SearchReportModel.IsSaveAsDraft==null?'-1':SearchReportModel.IsSaveAsDraft.toString()",
+                                                                      @class = "form-control input-sm"
+                                                                  })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.AHCCCSID</label>
+                                        @Html.TextBoxFor(m => m.SearchReportModel.AHCCCSID, new { data_ng_model = "SearchReportModel.AHCCCSID", @class = "form-control input-sm", placeholder = Resource.AHCCCSID, maxlength = 20 })
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.CISNumber</label>
+                                        @Html.TextBoxFor(m => m.SearchReportModel.CISNumber, new { data_ng_model = "SearchReportModel.CISNumber", @class = "form-control input-sm", placeholder = "CIS Number", maxlength = 20 })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.Region</label>
+                                        @Html.DropDownListFor(m => m.SearchReportModel.RegionID, Model.Region.ToSelectList(Convert.ToString(Model.SearchReportModel.RegionID), "RegionName", "RegionID", Resource.SelectRegion, ""), new
+                                                                  {
+                                                                      id = "RegionID",
+                                                                      data_ng_model = "SearchReportModel.RegionID",
+                                                                      data_ng_init = "SearchReportModel.RegionID=SearchReportModel.RegionID==''?null:SearchReportModel.RegionID",
+                                                                      @class = "form-control input-sm",
+                                                                      convert_to_number = ""
+
+                                                                  })
+                                    </div>
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.ReferralStartDate</label>
+                                        <div datepicker="SearchReportModel.StartDate" ng-dateval="SearchReportModel.StartDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchReportModel.StartDate,
+                                                             new
+                                                                 {
+                                                                     //data_ng_model = "SearchReportModel.StartDate",
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ReferralStartDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                        <label class="control-label ">@Resource.ReferralEndDate</label>
+                                        <div datepicker="SearchReportModel.EndDate" ng-dateval="SearchReportModel.EndDate" class="input-group date">
+                                            @Html.TextBoxFor(m => m.SearchReportModel.EndDate,
+                                                             new
+                                                                 {
+                                                                     //data_ng_model = "SearchReportModel.EndDate",
+                                                                     @class = "no-focus form-control input-sm dateInputMask",
+                                                                     placeholder = Resource.ReferralEndDate,
+                                                                     data_val = false
+                                                                 })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-4 col-md-4 col-sm-4 col-xs-6">
+                                        <label class="control-label">@Resource.EnableDisableClient</label>
+                                        @Html.DropDownListFor(m => m.SearchReportModel.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchReportModel.IsDeleted), "Name", "Value", "", ""),
+                                                              new
+                                                                  {
+                                                                      id = "IsDeleted",
+                                                                      data_ng_model = "SearchReportModel.IsDeleted",
+                                                                      data_ng_init = "SearchReportModel.IsDeleted = SearchReportModel.IsDeleted==null?'-1':SearchReportModel.IsDeleted.toString()",
+                                                                      @class = "form-control input-sm"
+
+                                                                  })
+                                    </div>
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="NoRecordsFoundFlag">
+                                        <div class="badge badge-danger">
+                                            @Resource.NoRecordFoundForReport
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12 reportlabel " data-ng-show="ClientInformationAjaxCall">
+                                        <div>
+                                            @Resource.DownloadingInProgress
+                                             <span class="padding-left-5"><img src="~/Assets/images/lazyload.gif" /></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetSearchFilter()" data-dismiss="modal">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm blue" id="btnClientInformationDownload" data-loading-text="@Resource.DownloadingInProgress"  data-ng-click="DownloadClientInformationReport('#btnClientInformationDownload')">@Resource.Download</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>

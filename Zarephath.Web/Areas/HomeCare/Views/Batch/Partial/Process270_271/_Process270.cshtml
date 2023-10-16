@@ -1,0 +1,303 @@
+﻿@model AddProcess270271Model
+@Html.Hidden("hdnAddProcess270Model", Common.SerializeObject(Model))
+<div>
+    <div class="row">
+        <form id="frmProcess270">
+            <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <label class="control-label">@Resource.Payor</label>
+                    <div>
+                        <div class="transportation-dropdown">
+                            <select class="form-control input-sm selectpicker" data-buttonstyle="btn-sm btn-default"
+                                    multiple="multiple"
+                                    title="@Resource.All" id="PayorIDs"
+                                    selectpicker="AddProcess270Model.PayorIDs"
+                                    name="AddProcess270Model.PayorIDs">
+                                <option data-ng-repeat="option in Process270Model.PayorList" value="{{option.Value}}">{{option.Name}}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <label class=" control-label">@Resource.ReferralStatus</label>
+                    <select class="form-control input-sm selectpicker" multiple data-buttonstyle="btn-sm btn-default"
+                        selectpicker="AddProcess270Model.ReferralStatusIDs" name="AddProcess270Model.ReferralStatusIDs"
+                        title="@Resource.All">
+                        <option data-ng-repeat="option in Process270Model.ReferralStatuses" value="{{option.ReferralStatusID}}">{{option.Status}}</option>
+                    </select>
+                </div>
+
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-2 display-none">
+                    <label class="control-label">@Resource.Service</label>
+                    <div>
+                        @Html.DropDownListFor(p => p.AddProcess270Model.ServiceIDs, Model.ServiceList.ToSelectList(Model.AddProcess270Model.ServiceIDs ?? "", "Name", "Value"), new
+                                {
+                                    convert_to_string = "",
+                                    data_ng_model = "AddProcess270Model.ServiceIDs",
+                                    data_ng_init = "AddProcess270Model.ServiceIDs=AddProcess270Model.ServiceIDs==''?null:AddProcess270Model.ServiceIDs.toString()",
+                                    @class = "form-control input-sm",
+                                })
+
+                    </div>
+                </div>
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <label class="control-label">@Resource.ClientLabel</label>
+                    <div>
+                        @Html.TextBoxFor(q => q.AddProcess270Model.Name, new
+                               {
+                                   data_ng_model = "AddProcess270Model.Name",
+                                   @class = "form-control  input-sm ",
+                                   placeholder = Resource.SearchClient
+
+                               })
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <label class="control-label">@Resource.EligibilityCheckDate</label>
+                    <div class="input-group date" datepicker="AddProcess270Model.EligibilityCheckDate"
+                        data-ng-dateval="AddProcess270Model.EligibilityCheckDate">
+                        @Html.TextBoxFor(q => q.AddProcess270Model.EligibilityCheckDate,
+                                             new
+                                                 {
+                                                     @class = "form-control input-sm dateInputMask",
+                                                     placeholder = Resource.EligibilityCheckDate,
+                                                 })
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3 no-right-padding">
+                    <label class="control-label"></label>
+                    <div>
+                        <div class="btn-group">
+                            <button type="submit" id="process270Submit" class="btn btn-sm green-jungle" data-ng-click="Generate270File()">@Resource.Generate270File</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="space20">
+                <hr />
+            </div>
+        </form>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="btn-group" data-ng-show="Process270List.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAll270Files" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAll270Files"></label>
+                    </span>
+                </div>
+                <div class="btn-group">
+                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                    </button>
+                </div>
+
+
+                <div class="btn-group">
+                    @Html.DropDownListFor(m => m.SearchProcess270ListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchProcess270ListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempSearchProcess270ListPage.IsDeleted",
+                                                                          data_ng_init = "TempSearchProcess270ListPage.IsDeleted = TempSearchProcess270ListPage.IsDeleted==null?'-1':TempSearchProcess270ListPage.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchProcess270Files()"
+                                                                      })
+                </div>
+                <div class="btn-group" data-ng-if="SelectedProcess270Ids.length > 0">
+                    <button type="button" data-ng-click="DeleteProcess270File()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchProcess270ListPage.IsDeleted==0?'@Constants.DisableSelected' :(TempAgencyListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}</button>
+                </div>
+
+                <div class="btn-group margin-left-20PR">
+                    <div class="top pagination-sm" data-ng-show="AjaxStart">
+                        @Resource.Loading
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+                <div class="inline-block pull-right" data-ng-show="Process270List.length > 0">
+                    <div class="inline-block pull-right" data-ng-show="Process270List.length > 0">
+                        <div class="pull-right margin-left-5">
+                            <dir-pagination-controls boundary-links="true" max-size="Process270ListPager.maxSize" on-page-change="Process270ListPager.pageChanged(newPageNumber)" pagination-id="Process270ListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="space20"></div>
+
+            </div>
+        </div>
+
+        <div>
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="portlet-body" style="display: block;">
+                        <div class="table-responsive">
+                            <form id="frmCaseManagerList">
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+                                            <th class="width-20px"></th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process270ListPager.sortColumn('Payors')">@Resource.Payors</a>
+                                                <span class="sortorder" data-ng-show="Process270ListPager.sortIndex === 'Payors'" data-ng-class="{reverse:Process270ListPager.reverse}"></span>
+                                            </th>
+                                            @*<th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process270ListPager.sortColumn('Services')">@Resource.Services</a>
+                                                <span class="sortorder" data-ng-show="Process270ListPager.sortIndex === 'Services'" data-ng-class="{reverse:Process270ListPager.reverse}"></span>
+                                            </th>*@
+
+                                            <th class="width-160px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process270ListPager.sortColumn('ClientName')">@Resource.ClientLabel</a>
+                                                <span class="sortorder" data-ng-show="Process270ListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:Process270ListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width-100px">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process270ListPager.sortColumn('EligibilityCheckDate')">
+                                                    @Resource.Date
+                                                    <i class="fa fa-question-circle font-size-16" data-ng-tooltip="@Resource.EligibilityCheckDate" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                </a>
+                                                <span class="sortorder" data-ng-show="Process270ListPager.sortIndex === 'EligibilityCheckDate'" data-ng-class="{reverse:Process270ListPager.reverse}"></span>
+                                            </th>
+
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process270ListPager.sortColumn('FileName')">@Resource.FileName</a>
+                                                <span class="sortorder" data-ng-show="Process270ListPager.sortIndex === 'FileName'" data-ng-class="{reverse:Process270ListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process270ListPager.sortColumn('FileSize')">@Resource.FileSize</a>
+                                                <span class="sortorder" data-ng-show="Process270ListPager.sortIndex === 'FileSize'" data-ng-class="{reverse:Process270ListPager.reverse}"></span>
+                                            </th>
+
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process270ListPager.sortColumn('AddedBy')">@Resource.AddedBy</a>
+                                                <span class="sortorder" data-ng-show="Process270ListPager.sortIndex === 'AddedBy'" data-ng-class="{reverse:Process270ListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="Process270ListPager.sortColumn('AddedDate')">@Resource.AddedDate</a>
+                                                <span class="sortorder" data-ng-show="Process270ListPager.sortIndex === 'AddedDate'" data-ng-class="{reverse:Process270ListPager.reverse}"></span>
+                                            </th>
+                                            <th class="width120">@Resource.Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr class="compact-search-tr">
+                                            <td></td>
+                                            <td>
+                                                @Html.DropDownListFor(m => m.SearchProcess270ListPage.PayorID, Model.PayorList.ToSelectList(Convert.ToString(Model.SearchProcess270ListPage.PayorID), "Name", "Value", Resource.All, ""), new
+                                                {
+                                                    id = "PayorID",
+                                                    data_ng_model = "TempSearchProcess270ListPage.PayorID",
+                                                    data_ng_init = "SearchProcess270ListPage.PayorID=SearchProcess270ListPage.PayorID==''?null:SearchProcess270ListPage.PayorID",
+                                                    @class = "input-sm",
+                                                    convert_to_number = "",
+                                                    data_val = "false"
+                                                })
+                                            </td>
+                                            @*<td>
+                                                @Html.DropDownListFor(p => p.SearchProcess270ListPage.ServiceID, Model.ServiceList.ToSelectList(Model.SearchProcess270ListPage.ServiceID ?? "", "Name", "Value"), new
+                                                    {
+                                                        convert_to_string = "",
+                                                        data_ng_model = "TempSearchProcess270ListPage.ServiceID",
+                                                        data_ng_init = "TempSearchProcess270ListPage.ServiceID=TempSearchProcess270ListPage.ServiceID==''?null:TempSearchProcess270ListPage.ServiceID.toString()",
+                                                        @class = "form-control input-sm",
+                                                        data_val = "false"
+                                                    })
+                                            </td>*@
+                                            <td>
+                                                @Html.TextBoxFor(m => m.SearchProcess270ListPage.Name, new { data_ng_model = "TempSearchProcess270ListPage.Name", @class = "form-control input-sm", placeholder = Resource.Name, maxlength = 50 })
+                                            </td>
+                                            <td>
+                                                <div class="input-group date no-focus" datepicker="TempSearchProcess270ListPage.EligibilityCheckDate" ng-dateval="TempSearchProcess270ListPage.EligibilityCheckDate">
+                                                    @Html.TextBoxFor(m => m.SearchProcess270ListPage.EligibilityCheckDate, new { @class = "no-focus form-control input-sm", placeholder = @Resource.EligibilityCheckDate })
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @Html.TextBoxFor(m => m.SearchProcess270ListPage.FileName, new { data_ng_model = "TempSearchProcess270ListPage.FileName", @class = "form-control input-sm", placeholder = Resource.FileName, maxlength = 50 })
+                                            </td>
+                                            <td></td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>
+                                                <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchProcess270Files()"/>
+                                                <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                            </td>
+                                        </tr>
+
+
+                                        <tr data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in Process270List | itemsPerPage: Process270ListPager.pageSize" total-items="Process270ListPager.totalRecords" current-page="Process270ListPager.currentPage" pagination-id="Process270ListPagerID">
+                                            <td>
+                                                <input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" data-ng-change="SelectProcess270File(item)" val="item.IsChecked">
+                                            </td>
+                                            <td>{{item.Payors ? item.Payors :'@Resource.NA'}}</td>
+                                            @*<td>
+                                                <span data-ng-if="item.ServiceIDs=='@Resource.AllServicesText'">@Resource.AllServices
+                                                    <i class="fa fa-question-circle font-size-16" data-ng-tooltip="{{item.ServiceIDs}}" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                </span>
+                                                <span data-ng-if="item.ServiceIDs!='@Resource.AllServicesText'">{{item.ServiceIDs ? item.ServiceIDs :'@Resource.NA'}}</span>
+
+                                            </td>*@
+                                            <td>{{item.Name ? item.Name :'@Resource.NA'}}
+                                                <i class="fa fa-question-circle font-size-16 pull-right" data-ng-tooltip="{{item.ReferralStatuses}}" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                
+                                            </td>
+                                            <td>{{item.EligibilityCheckDate ? (item.EligibilityCheckDate | date:'@Resource._DateFormat') : '@Resource.NA'}}</td>
+                                            <td><a target="_blank" data-ng-attr-href="{{item.AWSSignedFilePath}}">{{item.FileName}}</a></td>
+                                            <td>{{item.StrFileSize ? item.StrFileSize:'0'}}</td>
+                                            <td>{{item.StrDisplayName ? item.StrDisplayName:'@Resource.NA'}}</td>
+                                            <td>{{item.CreatedDate ? (item.CreatedDate | date:'@Resource._DateFormat') : '@Resource.NA'}}</td>
+                                            <td>
+                                                <a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteProcess270File(item.Edi270271FileID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteProcess270File(item.Edi270271FileID,'@Resource.Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12" data-ng-if="Process270List.length > 0">
+                    <div class="col-sm-3 pull-left no-padding">
+                        @Resource.Showing <span data-ng-bind="(Process270ListPager.pageSize * Process270ListPager.currentPage) - Process270ListPager.pageSize  + 1"></span>
+                        &nbsp;@Resource.To <span data-ng-bind="(Process270ListPager.pageSize == Process270ListPager.currentPageSize) ? (Process270ListPager.pageSize * Process270ListPager.currentPage) :(Process270ListPager.pageSize * Process270ListPager.currentPage) - Process270ListPager.pageSize  + Process270ListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="Process270ListPager.totalRecords"></span>&nbsp;@Resource.Records
+                    </div>
+                    <div class="pull-right top pagination-sm">
+                        <dir-pagination-controls boundary-links="true" max-size="Process270ListPager.maxSize" on-page-change="Process270ListPager.pageChanged(newPageNumber)" pagination-id="Process270ListPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div data-ng-if="Process270List.length == 0  ">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>

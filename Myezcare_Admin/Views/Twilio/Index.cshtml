@@ -1,0 +1,114 @@
+﻿@{
+    ViewBag.Title = "Twilio SubAccounts";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<div>
+    <div class="page-bar">
+        <h3 class="page-title">
+            Twilio Subaccounts
+            <a href="~/Twilio/Create" class="btn btn-sm letter-space green-jungle pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>Add Subaccount</a>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-8 col-md-offset-2">
+            <div class="portlet-body compact" style="display: block;">
+                <table id="sub-accounts" class="table table-pinned table-bordered table-striped table-condensed">
+                    <thead>
+                        <tr>
+                            <th width="35%">ACCOUNT NAME</th>
+                            <th width="25%">SID</th>
+                            <th width="10%">STATUS</th>
+                            <th width="20%">CREATED ON</th>
+                            <th width="10%"></th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <span id="total_subaccounts"></span>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="OrganizationList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts{
+
+    <script type="text/javascript">
+        function deleteAccount(sid, name) {
+            var queryObj = "?status=closed&name=" + name + "&subAccountId=" + sid + "";
+
+            $.ajax({
+                type: 'POST',
+                url: "/api/TwilioAPI/UpdateSubAccount" + queryObj,
+                dataType: 'json',
+                success: function (result) {
+                    alert("Account deleted successfully");
+                    window.location.href = "/Twilio";
+                },
+                error: function (ex) {
+                    alert(JSON.parse(ex.responseText).MessageDetail);
+                },
+            });
+        }
+
+        $(document).ready(function () {
+            //Loging data
+
+            $.ajax({
+                type: 'GET',
+                url: "/api/TwilioAPI/ListAllAccounts",
+                dataType: 'json',
+                success: function (result) {
+                    console.log(result);
+                    for (var i = 0; i < result.length; i++) {
+
+                        var status = '';
+                        if (result[i].status == 'active') {
+                            status = '<span class="badge badge-pill badge-success">' + result[i].status.toUpperCase() + '</span>';
+                        }
+                        else if (result[i].status == 'suspended') {
+                            status = '<span class="badge badge-pill badge-warning">' + result[i].status.toUpperCase() + '</span>';
+                        }
+                        else if (result[i].status == 'closed') {
+                            status = '<span class="badge badge-pill badge-danger">' + result[i].status.toUpperCase() + '</span>';
+                        }
+                        else {
+                            status = '<span class="badge badge-pill badge-light">' + result[i].status.toUpperCase() + '</span>';
+                        }
+
+                        if (result[i].sid != '@(System.Configuration.ConfigurationManager.AppSettings["accountSid"].ToString())') {
+
+                            $('#sub-accounts').find('tbody').append('<tr>' +
+                                '<td><a href="/Twilio/Usage?sid=' + result[i].sid + '&token=' + result[i].auth_token +'">' + result[i].friendly_name + '</a></td>' +
+                                //'<td>' + result[i].friendly_name + '</td>' +
+                                '<td>' + result[i].sid + '</td > ' +
+                                '<td>' + status + '</td>' +
+                                '<td>' + result[i].date_created + '</td>' +
+                                '<td><a href="/Twilio/Edit/' + result[i].sid + '" class="btn btn-xs bg-green font-white" title="Esign Form"><i class="fa fa-edit"></i></a>&nbsp;&nbsp;' +
+                                '<a href="#"  onclick=deleteAccount("' + encodeURIComponent(result[i].sid) + '","' + encodeURIComponent(result[i].friendly_name) + '") class="btn btn-xs bg-red font-white" title="Esign Form"><i class="fa fa-remove"></i></a></td ></tr >');
+                        }
+                    }
+
+                    $("#total_subaccounts").html((result.length - 1) + " subaccount(s) found..");
+                },
+                error: function (ex) {
+                    alert(JSON.parse(ex.responseText).MessageDetail);
+                },
+            });
+
+        })
+    </script>
+}

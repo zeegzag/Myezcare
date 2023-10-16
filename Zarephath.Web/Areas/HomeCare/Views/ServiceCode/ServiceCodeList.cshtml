@@ -1,0 +1,206 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.ServiceCodeList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ServiceCodeList;
+}
+
+@model HC_SetServiceCodeListPage
+@Html.Hidden("hdnSetServiceCodeListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="ServiceCodeListController">
+
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.ServiceCodeList &nbsp;@*<small>@Resource.ServiceCodeInformation</small>*@
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @if (1 == 2)
+            {
+                <div class="btn-group" data-ng-show="ServiceCodeList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllServiceCode" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllServiceCode"></label>
+                    </span>
+                </div>
+            }
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            @if (Common.HasPermission(Constants.HC_Permission_ServiceCode_AddUpdate))
+            {
+                <div class="btn-group padding-left-15">
+                    <a href="" ng-click="ServicecodeEditModel(item.EncryptedServiceCodeID)" class="btn btn-sm green-jungle letter-space pull-right"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.ServiceCode</a>
+                </div>
+            }
+
+            @if (1 == 2)
+            {
+                <div class="btn-group">
+                    @*@Html.DropDownListFor(m => m.SearchServiceCodeListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchServiceCodeListPage.IsDeleted), "Name", "Value", "", ""),
+                        new
+                        {
+                            id = "IsDeleted",
+                            data_ng_model = "TempServiceCodeListPage.IsDeleted",
+                            data_ng_init = "TempServiceCodeListPage.IsDeleted = TempServiceCodeListPage.IsDeleted==null?'-1':TempServiceCodeListPage.IsDeleted.toString()",
+                            @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                            data_ng_change = "SearchServiceCode()"
+                        })*@
+                </div>
+                <div class="btn-group" data-ng-if="SelectedServiceCodeIds.length > 0">
+                    @*<button type="button" data-ng-click="DeleteServiceCode()" class="btn blue btn-sm grey border-grey-cascade">
+                            <i class="fa fa-random margin-right-10"></i>
+                            {{SearchServiceCodeListPage.IsDeleted==0?'@Constants.DisableSelected' :(SearchServiceCodeListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                        </button>*@
+                </div>
+            }
+
+            <div class="inline-block pull-right" data-ng-show="ServiceCodeList.length > 0">
+                <div class="inline-block pull-right" data-ng-show="ServiceCodeList.length > 0">
+                    <div class="pull-right margin-left-5">
+                        <dir-pagination-controls boundary-links="true" max-size="ServiceCodeListPager.maxSize" on-page-change="ServiceCodeListPager.pageChanged(newPageNumber)" pagination-id="ServiceCodeListPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div class="space20"></div>
+
+        </div>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div>
+                        <form id="frmServiceCodeList">
+                            <table class="table table-responsive table-bordered table-striped table-condensed flip-content table-checkable">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="display-none"></th>
+                                        <th class="width-120px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServiceCodeListPager.sortColumn('ServiceCode')">@Resource.ServiceCode</a>
+                                            <span class="sortorder" data-ng-show="ServiceCodeListPager.sortIndex === 'ServiceCode'" data-ng-class="{reverse:ServiceCodeListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-250px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServiceCodeListPager.sortColumn('Modifier')">@Resource.Modifier</a>
+                                            <span class="sortorder" data-ng-show="ServiceCodeListPager.sortIndex === 'Modifier'" data-ng-class="{reverse:ServiceCodeListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServiceCodeListPager.sortColumn('ServiceName')">@Resource.ServiceName</a>
+                                            <span class="sortorder" data-ng-show="ServiceCodeListPager.sortIndex === 'ServiceName'" data-ng-class="{reverse:ServiceCodeListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServiceCodeListPager.sortColumn('AccountCode')">@Resource.AccountCode</a>
+                                            <span class="sortorder" data-ng-show="ServiceCodeListPager.sortIndex === 'AccountCode'" data-ng-class="{reverse:ServiceCodeListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ServiceCodeListPager.sortColumn('IsBillable')">@Resource.Billable</a>
+                                            <span class="sortorder" data-ng-show="ServiceCodeListPager.sortIndex === 'IsBillable'" data-ng-class="{reverse:ServiceCodeListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-120px" style="text-align:center">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        <td class="display-none"></td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchServiceCodeListPage.ServiceCode, new { data_ng_model = "TempServiceCodeListPage.ServiceCode", @class = "form-control input-sm", placeholder = Resource.ServiceCode, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchServiceCodeListPage.ModifierName, new { data_ng_model = "TempServiceCodeListPage.ModifierName", @class = "form-control input-sm", placeholder = Resource.ModifierName, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchServiceCodeListPage.ServiceName, new { data_ng_model = "TempServiceCodeListPage.ServiceName", @class = "form-control input-sm", placeholder = Resource.ServiceName, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchServiceCodeListPage.AccountCode, new { data_ng_model = "TempServiceCodeListPage.AccountCode", @class = "form-control input-sm", placeholder = Resource.AccountCode })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(m => m.SearchServiceCodeListPage.IsBillable, Common.SetYesNoList().ToSelectList(Convert.ToString(Model.SearchServiceCodeListPage.IsBillable), "Name", "Value", Resource.Select, "-1"), new
+                                            {
+                                               id = "IsBillable",
+                                               data_ng_model = "TempServiceCodeListPage.IsBillable",
+                                               data_ng_init = "TempServiceCodeListPage.IsBillable=TempServiceCodeListPage.IsBillable==''?null:TempServiceCodeListPage.IsBillable",
+                                               @class = "form-control input-sm",
+                                               convert_to_number = "",
+                                               data_val = "false"
+                                            })
+                                        </td>
+                                        <td class="text-align-center" width="130">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchServiceCode()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':ServiceCodeList.IsDeleted}" dir-paginate="item in ServiceCodeList | itemsPerPage: ServiceCodeListPager.pageSize" total-items="ServiceCodeListPager.totalRecords" current-page="ServiceCodeListPager.currentPage" pagination-id="ServiceCodeListPagerID">
+                                        <td class="display-none"></td>
+                                        <td data-ng-bind="item.ServiceCode ? item.ServiceCode : '@Resource.NA'"></td>
+                                        <td data-ng-bind="item.Modifier ? item.Modifier : '@Resource.NA'"></td>
+                                        <td data-ng-bind="item.ServiceName ? item.ServiceName : '@Resource.NA'"></td>
+                                        <td data-ng-bind="item.AccountCode ? item.AccountCode : '@Resource.NA'"></td>
+                                        <td data-ng-bind="item.IsBillable ? item.IsBillable : '@Resource.NA'"></td>
+                                        <td class="text-align-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_ServiceCode_AddUpdate))
+                                            {
+                                                <a data-ng-click="ServicecodeEditModel(item.EncryptedServiceCodeID)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                            }
+                                            @if (Common.HasPermission(Constants.HC_Permission_ServiceCode_AddUpdate))
+                                            {
+                                                <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteServiceCode(item.ServiceCodeID,'@Resource.Disable')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="ServiceCodeList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(ServiceCodeListPager.pageSize * ServiceCodeListPager.currentPage) - ServiceCodeListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(ServiceCodeListPager.pageSize == ServiceCodeListPager.currentPageSize) ? (ServiceCodeListPager.pageSize * ServiceCodeListPager.currentPage) :(ServiceCodeListPager.pageSize * ServiceCodeListPager.currentPage) - ServiceCodeListPager.pageSize  + ServiceCodeListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ServiceCodeListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="ServiceCodeListPager.maxSize" on-page-change="ServiceCodeListPager.pageChanged(newPageNumber)" pagination-id="ServiceCodeListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ServiceCodeList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="servicecode_fixedAside" class="asideBar-right fixed">
+        <div class="listContentinner">
+            <div class="closeasidebar" data-ng-click="ServicecodeEditModelClosed()"><i class="fa fa-close"></i></div>
+            <iframe id="servicecode_fixedAsidelDDLBindIFrame" style="position:absolute; top:2%;  bottom:0px; right:0px; width:100%; min-height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/servicecode/servicecodelist")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.ServiceCode)';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.ServiceCode)';
+    </script>
+}

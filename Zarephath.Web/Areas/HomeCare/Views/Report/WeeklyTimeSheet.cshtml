@@ -1,0 +1,244 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.WeeklyTimeSheet);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    // Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_DMAS_90;
+}
+
+
+@model SetEmployeeVisitListPage
+@Html.Hidden("hdnSetEmployeeVisitListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="DMASFormsController">
+    @if (Model.IsPartial == false)
+    {
+        <div class="page-bar">
+            <h3 class="page-title">
+                Weekly TimeSheet &nbsp;
+            </h3>
+        </div>
+    }
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+            <form id="frmEmpBillingReportlist">
+                <div class="col-md-2 padding-right-5 no-left-padding">
+                    <label class="control-label">@Resource.SelectPatient</label>
+                    <select class="form-control input-sm" ng-model="ReferralName" title="@Resource.SelectPatient">
+                        <option value="">Select Patient </option>
+                        <option data-ng-repeat="option in EmployeeVisitModel.ReferralList" value="{{option.ReferralName}},{{option.ReferralID}},{{option.ServiceType}}">{{option.ReferralName}}</option>
+                    </select>
+                </div>
+                @*<div class="col-md-2 padding-right-5 no-left-padding" >
+                        <label class="control-label">@Resource.SelectPatient</label>
+                        <select class="form-control input-sm" ng-model="ReferralID" title="@Resource.SelectPatient">
+                            <option data-ng-repeat="option in EmployeeVisitModel.ReferralList | filter:ReferralName" selected value="{{option.ReferralID}}">{{option.ReferralID}}</option>
+                        </select>
+                    </div>*@
+                <div class="col-md-2 padding-right-5 no-left-padding">
+                    <label class="control-label">@Resource.SelectCareType</label>
+                    <select class="form-control input-sm" ng-model="CareTypeID" title="@Resource.SelectCareType">
+                        <option value="">Select CareType</option>
+                        <option data-ng-repeat="option in CaretypeList" value="{{option.DDMasterID}}">{{option.Title}}</option>
+                    </select>
+                </div>
+                <div class="col-md-2 padding-right-5 no-left-padding">
+                    <label class="control-label">@Resource.StartDate</label>
+                    <div class="input-group date"
+                         datepicker="TempSearchEmployeeVisitListPage.StartDate"
+                         ng-dateval="TempSearchEmployeeVisitListPage.StartDate">
+                        @Html.TextBoxFor(q => q.SearchEmployeeVisitNoteListPage.StartDate,
+                 new
+                 {
+                     @class = "form-control input-sm dateInputMask",
+                     placeholder = Resource.StartDate
+                 })
+                        @Html.ValidationMessageFor(q => q.SearchEmployeeVisitNoteListPage.StartDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="col-md-2 padding-right-5 no-left-padding">
+                    <label class="control-label">@Resource.EndDate</label>
+                    <div class="input-group date"
+                         datepicker="TempSearchEmployeeVisitListPage.EndDate"
+                         ng-dateval="TempSearchEmployeeVisitListPage.EndDate">
+                        @Html.TextBoxFor(q => q.SearchEmployeeVisitNoteListPage.EndDate,
+                 new
+                 {
+                     @class = "form-control input-sm dateInputMask",
+                     placeholder = Resource.StartDate
+                 })
+                        @Html.ValidationMessageFor(q => q.SearchEmployeeVisitNoteListPage.EndDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="col-md-2 padding-right-5 no-left-padding margin-top-18">
+                    @Html.DropDownListFor(m => m.SearchEmployeeVisitListPage.ServiceTypeID, Model.ServiceTypeList.ToSelectList(Convert.ToString(Model.SearchEmployeeVisitListPage.ServiceTypeID), "ServiceTypeName", "ServiceTypeID", Resource.ServiceType, ""),
+                                                               new
+                                                               {
+                                                                   id = "WeeklytimeSheetServiceTypeID",
+                                                                   data_ng_model = "TempSearchEmployeeVisitListPage.ServiceTypeID",
+                                                                   data_ng_init = "TempSearchEmployeeVisitListPage.ServiceTypeID = TempSearchEmployeeVisitListPage.ServiceTypeID==null?'':TempSearchEmployeeVisitListPage.ServiceTypeID.toString()",
+                                                                   @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                   data_ng_change = "SearchServiceType()"
+                                                               })
+                </div>
+                <div class="col-md-2 padding-right-5 no-left-padding margin-top-18">
+                    <button class="btn btn-sm btn-primary" data-ng-click="SearchDMAS90Report()">
+                        <i class="fa fa-search"></i>&nbsp;&nbsp;@Resource.Search
+                    </button>
+                    <button class="btn btn-sm grey border-grey-cascade" data-ng-click="ResetSearchFilter()">
+                        <i class="fa fa-close"></i>&nbsp;&nbsp;@Resource.Reset
+                    </button>
+                </div>
+
+            </form>
+
+        </div>
+        <div class="space20"></div>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmEmployeeVisitList ">
+                        <div class="table-responsive tabbable-custom">
+                            @if (Common.HasPermission(Constants.HC_Can_Approve_Bypass_ClockInOut))
+                            {
+                                <div data-ng-init="HasPermission=true"></div>
+                            }
+                            else
+                            {
+                                <div data-ng-init="HasPermission=false"></div>
+                            }
+                            <table class="table table-bordered table-striped table-condensed flip-content empvisitlist_tbl">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-20px"></th>
+                                        <th style="width: 1px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('PatientName')">@Resource.PatientName</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'PatientName'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-150px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('StartDate')">@Resource.ScheduleStartDate</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'StartDate'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-150px">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeVisitListPager.sortColumn('EndDate')">@Resource.ScheduleEndDate</a>
+                                            <span class="sortorder" data-ng-show="EmployeeVisitListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:EmployeeVisitListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="width-140px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody ng-repeat="option in DMAS_90FormsList.StartDayofWeekModel">
+                                    <tr>
+                                        <td></td>
+                                        <td>{{option.ReferralFirstName }} {{option.ReferralLastName}} <input style="visibility:hidden" ng-model="option.ReferralID"></td>
+                                        <td>{{option.startDate | date:'@Resource._DateFormat' }} <input style="visibility:hidden" ng-model="option.startDate"> </td>
+                                        <td>{{option.EndDate | date:'@Resource._DateFormat'}} <input style="visibility:hidden" ng-model="option.EndDate"></td>
+                                        <td>
+                                            <a href="/hc/report/GenerateWeeklyTimeSheetPdfURL?StartDate={{option.startDate}}&EndDate={{option.EndDate}}&CareType={{CareTypeID}}&ReferralID={{option.ReferralID}} " ng-model="DMASFormValue" title="@Resource.PrintDMAS_90Forms" class="btn btn-xs yellow-mint"><i class="fa fa-print"></i></a>
+                                            @*<a href="" data-toggle="modal" data-ng-click="CloseModel(option)" title="Print Report" class="btn btn-xs yellow-mint"><i class="fa fa-print"></i></a>*@
+                                        </td>
+
+                                    </tr>
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="EmployeeVisitList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(EmployeeVisitListPager.pageSize * EmployeeVisitListPager.currentPage) - EmployeeVisitListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(EmployeeVisitListPager.pageSize == EmployeeVisitListPager.currentPageSize) ? (EmployeeVisitListPager.pageSize * EmployeeVisitListPager.currentPage) :(EmployeeVisitListPager.pageSize * EmployeeVisitListPager.currentPage) - EmployeeVisitListPager.pageSize  + EmployeeVisitListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeVisitListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                @*<div class="pull-right top pagination-sm">
+                        <dir-pagination-controls boundary-links="true" max-size="EmployeeVisitListPager.maxSize" on-page-change="EmployeeVisitListPager.pageChanged(newPageNumber)" pagination-id="EmployeeVisitListPager_ID"></dir-pagination-controls>
+                    </div>*@
+            </div>
+        </div>
+        <div class="modal fade" id="myModal" role="dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content" style=" width: 44%;margin-left: 50%;margin-top: 21%">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                        <h4 class="modal-title">Add Additional notes</h4>
+                    </div>
+                    <div class="modal-body">
+                        <form id="frmNewReferralNote">
+                            <div class="row">
+                                <div class="col-sm-12">
+
+                                    <div class="row">
+                                        <div class="form-group col-sm-12">
+                                            <div class="col-sm-8">
+                                                @*<textarea rows="5" class="form-control input-sm" data-ng-model="AdditionalNotes" maxlength="100"
+                                                    placeholder="@Resource.Note" data-val="true"
+                                                    name="Notes" id="Notes" data-ng-change="Onclick()" style="width:157%"></textarea>*@
+                                                <input type="text" name="" class="txtbx1" data-ng-model="AdditionalNotes" style="width: 342px; height:25px" maxlength="100" />
+                                                <input type="text" name="" class="txtbx1" data-ng-model="AdditionalNotes1" style="width: 342px; height:25px" maxlength="100" />
+                                                <span id="NoteReq" hidden style="color:red">Notes are required.</span>
+                                                <span class="field-validation-valid" data-valmsg-for="Notes" data-valmsg-replace="true"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <button title="Add AdditionNotes" ng-click="AdditionNotes()">Add Note</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button title="Weekly TimeSheet Print" data-ng-click="WeeklyTimeSheet_Print()">Print</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="EmployeeVisitList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+@Html.Partial("Partial/_EmployeeVisitNoteList", Model)
+</div>
+
+
+@section Scripts{
+    @*@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/employeevisitlist")*@
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/DMASForm")
+
+    @*<script type="text/javascript">
+            var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.EmployeeVisit)';
+            var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.EmployeeVisit)';
+            var StrtEndTimeRequired = '@Resource.StrtEndTimeRequired';
+            var GenerateBillingNote = '@Resource.GenerateBillingNotes';
+            var ConfirmationForBillingNote = '@Resource.ConfirmationForBillingNote';
+        </script>*@
+}
+<style>
+    .txtbx1 {
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: none;
+        border-bottom: 1px solid black;
+    }
+</style>

@@ -1,0 +1,178 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Totalpatient);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_Totalpatient;
+}
+@model patientTotalReportListModel
+@Html.Hidden("hdnPatientTotalReport", Common.SerializeObject(Model))
+
+<div data-ng-controller="PatientTotalReportController">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.Totalpatient</h3>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+            <form id="frmEmpBillingReportlist">
+                <div class="col-md-2 padding-right-5 no-left-padding">
+                    <label class="control-label">@Resource.StartDate</label>
+                    <div class="input-group date"
+                         datepicker="TempSearchPatientTotalReportListPage.StartDate"
+                         ng-dateval="TempSearchPatientTotalReportListPage.StartDate">
+                        @Html.TextBoxFor(q => q.SearchPatientTotalReportListPage.StartDate,
+                             new
+                             {
+                                 @class = "form-control input-sm dateInputMask",
+                                 placeholder = Resource.StartDate
+                             })
+                        @Html.ValidationMessageFor(q => q.SearchPatientTotalReportListPage.StartDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="col-md-2 padding-right-5 no-left-padding">
+                    <label class="control-label">@Resource.EndDate</label>
+                    <div class="input-group date"
+                         datepicker="TempSearchPatientTotalReportListPage.EndDate"
+                         ng-dateval="TempSearchPatientTotalReportListPage.EndDate">
+                        @Html.TextBoxFor(q => q.SearchPatientTotalReportListPage.EndDate,
+                             new
+                             {
+                                 @class = "form-control input-sm dateInputMask",
+                                 placeholder = Resource.StartDate
+                             })
+                        @Html.ValidationMessageFor(q => q.SearchPatientTotalReportListPage.EndDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+                <div class="col-md-2 padding-right-5 no-left-padding margin-top-18">
+                    <button class="btn btn-sm btn-primary" data-ng-click="SearchPatientTotalReport()">
+                        <i class="fa fa-search"></i>&nbsp;&nbsp;@Resource.Search
+                    </button>
+                    <button class="btn btn-sm grey border-grey-cascade" data-ng-click="ResetSearchFilter()">
+                        <i class="fa fa-close"></i>&nbsp;&nbsp;@Resource.Reset
+                    </button>
+                </div>
+                @*<div class="pull-right excel-export">
+            <a href='@Url.Action("GeneratePatientActivePdfurl", "Report", new { StartDate ={{ formSpam.idNote}}, EndDate= "03/31/2019"})' title="@Resource.PDFDownload">
+                <i class="font-red-soft fa fa-file-pdf-o" style="font-size: 25px;"></i>
+            </a>
+        </div>*@
+                <div class="pull-right excel-export DateRange">
+                    <a href="@Constants.HC_GeneratePatientActivePdfURL?{{DateRange}}" ng-model="DateRange" title="@Resource.PDFDownload">
+                        <i class="font-red-soft fa fa-file-pdf-o" style="font-size: 25px;"></i>
+                    </a>
+                </div>
+            </form>
+            @*<div class="btn-group">
+                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                    </button>
+                </div>*@
+            <div class="inline-block pull-right" data-ng-show="PatientTotalReportList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" on-page-change="PatientTotalReportListPager.pageChanged(newPageNumber)" pagination-id="PatientTotalReportListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive">
+                        <table class="table table-pinned table-bordered table-striped table-condensed">
+                            <thead class="flip-content">
+                                <tr>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);">@Resource.Sl_No</a>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientTotalReportListPager.sortColumn('ReferralID')">@Resource.patientID</a>
+                                        <span class="sortorder" data-ng-show="PatientTotalReportListPager.sortIndex === 'ReferralID'" data-ng-class="{reverse:PatientTotalReportListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);">@Resource.PatientName</a>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);">@Resource.Gender</a>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="PatientTotalReportListPager.sortColumn('AHCCCSID')">@Resource.AHCCCSID</a>
+                                        <span class="sortorder" data-ng-show="PatientTotalReportListPager.sortIndex === 'AHCCCSID'" data-ng-class="{reverse:PatientTotalReportListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);">@Resource.HealthPlan</a>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);">@Resource.CreatedDate</a>
+                                    </th>
+                                    <th>
+                                        <a class="anchor_color" href="javascript:void(0);">@Resource.UpdatedDate</a>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr data-ng-class="{'deleted':ptnttotalreport.IsDeleted}" dir-paginate="ptnttotalreport in PatientTotalReportList | itemsPerPage: PatientTotalReportListPager.pageSize" total-items="PatientTotalReportListPager.totalRecords" current-page="PatientTotalReportListPager.currentPage" pagination-id="PatientTotalReportListPagerID">
+                                    <td data-ng-bind="ptnttotalreport.Row"></td>
+                                    <td data-ng-bind="ptnttotalreport.ReferralID"></td>
+                                    <td>
+                                        {{(ptnttotalreport.Name == null || ptnttotalreport.Name =='') ? 'N/A' : ptnttotalreport.Name }}
+                                    </td>
+                                    <td>
+                                        {{(ptnttotalreport.Gender == null || ptnttotalreport.Gender =='') ? 'N/A' : ptnttotalreport.Gender }}
+                                    </td>
+                                    <td>
+                                        {{(ptnttotalreport.AHCCCSID == null || ptnttotalreport.AHCCCSID =='') ? 'N/A' : ptnttotalreport.AHCCCSID }}
+                                    </td>
+                                    <td>
+                                        {{(ptnttotalreport.HealthPlan == null || ptnttotalreport.HealthPlan =='') ? 'N/A' : ptnttotalreport.HealthPlan }}
+                                    </td>
+                                    <td>
+                                        {{(ptnttotalreport.CreatedDate == null || ptnttotalreport.CreatedDate =='') ? 'N/A' : ptnttotalreport.CreatedDate | date:'@Resource._DateFormat'}}
+                                    </td>
+                                    <td>
+                                        {{(ptnttotalreport.UpdatedDate == null || ptnttotalreport.UpdatedDate =='') ? 'N/A' : ptnttotalreport.UpdatedDate | date:'@Resource._DateFormat'}}
+                                    </td>
+                                    @*<td data-ng-bind="ptnttotalreport.BillableAmount"></td>*@
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <br />
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="PatientTotalReportList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(PatientTotalReportListPager.pageSize * PatientTotalReportListPager.currentPage) - PatientTotalReportListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(PatientTotalReportListPager.pageSize == PatientTotalReportListPager.currentPageSize) ? (PatientTotalReportListPager.pageSize * PatientTotalReportListPager.currentPage) :(PatientTotalReportListPager.pageSize * PatientTotalReportListPager.currentPage) - PatientTotalReportListPager.pageSize  + PatientTotalReportListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PatientTotalReportListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" on-page-change="PatientTotalReportListPager.pageChanged(newPageNumber)" pagination-id="PatientTotalReportListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="PatientTotalReportList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/report/PatientTotalreport")
+}

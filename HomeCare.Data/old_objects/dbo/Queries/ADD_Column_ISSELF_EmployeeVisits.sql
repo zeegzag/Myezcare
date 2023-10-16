@@ -1,0 +1,4 @@
+﻿ALTER TABLE EmployeeVisits
+	ADD IsSelf BIT NULL,
+	Name NVARCHAR(100) NULL,
+	Relation NVARCHAR(100) NULL;

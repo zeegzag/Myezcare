@@ -1,0 +1,136 @@
+﻿@{
+    ViewBag.Title = Resource.PatientCalender;
+    Layout = Model.IsPartial ? null : "~/Views/Shared/_Layout.cshtml";
+    //Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_RefCalenderModel;
+}
+@model HC_RefCalenderModel
+@Html.Hidden("hdnRefCalenderModel", Common.SerializeObject(Model))
+@section Styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/schedule/scheduleassignmentinhome")
+}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.22/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js"></script>
+@*<script src="https://code.angularjs.org/1.4.1/angular.js"></script>*@
+<div data-ng-controller="ReferralCalenderController" class="employeeCalanderWrapper referralCalendarWrapper">
+    @{ Html.EnableClientValidation(false); }
+    <div class="row">
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <form id="frmRefCalender">
+                <div class="formInnerMain">
+                    <div class="form-group col-lg-3 col-md-4 col-sm-4">
+                        @*<label class="control-label">@Resource.Employee</label>*@
+                        <div>
+                            <select class="form-control input-sm" single="single" title="@Resource.SelectPatient"
+                                    data-val="true"
+                                    selectpicker="SearchRefCalender.ReferralID"
+                                    @*options="RefCalenderModel.ReferralList"*@
+                                    name="SearchRefCalender.ReferralID"
+                                    actions-box="true"
+                                    name="SearchRefCalender" ng-disabled="{{RefCalenderModel.IsPartial}}">
+                                <option data-ng-repeat="option in RefCalenderModel.ReferralList" value="{{option.ReferralID}}">{{option.ReferralName}}</option>
+                            </select>
+                        </div>
+                    </div><!--Form group End-->
+
+                    <div class="form-group col-lg-3 col-md-4 col-sm-4">
+                        @*<label class="control-label">@Resource.Employee</label>*@
+                        <div>
+                            <select class="form-control input-sm" single="single" title="@Resource.SelectEmployee"
+                                    data-val="true"
+                                    selectpicker="SearchRefCalender.EmployeeID" name="SearchRefCalender.EmployeeID"
+                                    name="SearchRefCalender">
+                                <option data-ng-repeat="option in RefCalenderModel.EmployeeList" value="{{option.EmployeeID}}">{{option.EmployeeName}}</option>
+                            </select>
+                        </div>
+                    </div><!--Form group End-->
+
+                    <div class="form-group col-lg-2 col-md-3 col-sm-4">
+                        <div class="input-group date" datepicker="SearchRefCalender.StartDate"
+                             data-ng-dateval="SearchRefCalender.StartDate">
+                            @Html.TextBoxFor(q => q.SearchRefCalender.StartDate,
+                                new
+                                {
+                                    @class = "form-control input-sm",
+                                    placeholder = "StartDate",
+                                })
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div><!--Form group End-->
+
+                    <div class="form-group col-lg-2 col-md-3 col-sm-12">
+                        <button type="button" class="btn btn-sm btn-primary"
+                                data-ng-click="SeachAndGenerateCalenders()" title="@Resource.Search">
+                            @Resource.Search
+                        </button>
+                        @*<button type="button" class="btn btn-default border-grey-cascade margin-left-10 btn-sm" data-ng-click="CalenderRefresh()"  title="@Resource.Refresh">
+                                @Resource.Refresh
+                            </button>*@
+                    </div><!--Form group End-->
+                </div>
+
+                @*<div ng-click="printToCart('CalenderPrint')" style="font-size: 25px;padding-left: 315px">
+                        <i class="font-red-soft fa fa-file-pdf-o" ></i>
+                    </div>*@
+
+                <div class="calenderBottomBtn">
+                    <button type="button" class="btn btn-primary btn-sm fc-RefreshBtn-button fc-corner-right" ng-click="printToCart('CalenderPrint')" title="Print PDF" style="margin-left: 38px;height: 27px;">
+                        Print PDF
+                    </button>
+                </div>
+            </form><!--End Form Here-->
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="margin-bottom-15 " data-ng-repeat="calenderItem in CalendarList" id="CalenderPrint">
+
+                        <div data-ng-scalender="calenderItem" class="has-toolbar customCalender"
+                             data-ng-editable="false"
+                             data-ng-draggable="false"
+                             data-ng-droppable="false"
+                             data-ng-defaultview="'month'"
+                             data-ng-weekstartday="@Common.GetCalWeekStartDay()"
+                             data-ng-aspectratio="2.65"
+                             data-ng-startdate="SearchEmpCalender.StartDate"
+                             data-ng-get-event-list="GetScheduleList"
+                             data-ng-resourcelist="GetResourcesList"
+                             data-ng-on-event-render="EventRender"
+                             data-ng-on-resource-render="ResourceRender"
+                             @*
+                                 data-ng-on-event-order="EventOrder"
+                                 data-ng-on-day-render="DayRender"
+                                 ng-after-all-event-render="AllEventRender"
+                                 data-ng-startdate="SelectedWeekObj.StartDate"
+                                 data-ng-hiddendays="SelectedWeekObj.WeekDaysToHide"*@>
+                        </div>
+                    </div>
+                </div>
+            </div><!--Row End-->
+        </div>
+    </div><!--Row End-->
+</div>
+
+<!--Script Start Here-->
+<script id="empReource" type="text/ng-template">
+    <span>
+        <span class="text-decoration-none font-size-12" data-ng-bind="DataModel.resourceObj.EmployeeName"></span>
+        <span style="padding: 10px;float: left;" data-ng-style="{'background-color':DataModel.resourceObj.eventColor}"></span>
+    </span>
+</script>
+
+<script id="calendereventmarker" type="text/ng-template">
+    @Html.Partial("Partial/_CalenderEventMarker")
+</script>
+
+<script id="eventdetailpopover" type="text/ng-template">
+    @Html.Partial("Partial/_EventDetailPopover")
+</script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+
+@section Scripts{
+    @if (!Model.IsPartial)
+    {
+        @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/referral/referralcalender")
+    }
+}
+<!--End Script Start Here-->

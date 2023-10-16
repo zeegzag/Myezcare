@@ -1,0 +1,1083 @@
+﻿@model NoteDetailModel
+
+<div class="modal-header">
+    @*<button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>*@
+    <button type="button" class="close" data-ng-click="CloseAddNoteModel()" aria-hidden="true"></button>
+     
+    <h4 class="modal-title text-center"><strong>@Resource.AddNote</strong></h4>
+</div>
+
+<div class="modal-body">
+    @*{{AddNotePageModel.Note.NoteID}} || {{AddNotePageModel.Note.PayorID}}*@
+    <div class="row">
+        <div class="col-sm-12">
+            <form id="frmAddNote">
+                <div>st
+                    <div class="row" data-ng-show="!NoteModel.IsPartial">
+                        <div class="col-lg-12 col-md-12 col-sm-12 ">
+                            @*<b>{{AddNotePageModel.Note.EmpSignatureDetails.SignatureName}}</b>*@
+                            <div class="row">
+                                @{
+                                    <div class="form-group col-lg-8 col-md-8 col-sm-8 col-sm-push-2">
+                                        <input type="text"
+                                               token-input
+                                               ng-val="EncryptedReferralID"
+                                               textfield='Name'
+                                               valuefield='EncryptedReferralID'
+                                               searchurl="{{GetReferralsURL}}"
+                                               placeholder="@Resource.SearchClientInformation"
+                                               tokenlimit='1'
+                                               onresultsformatter='ReferralDetailResultsFormatter'                                       
+                                               ontokenformatter="ReferralTokenFormatter"            
+                                               ondeletecallback='RemoveReferral'                           
+                                               autoSelectFirstResult="true"
+                                               minChars="1"
+                                               tokeninputobj="ReferralTokenObj"
+                                               id="AddNoteReferralIDTkn"
+                                               customclass="form-control input-sm"
+                                               name="EncryptedReferralID" />
+                                    </div>
+                                }
+                            </div>
+
+
+                        </div>
+                        <input type="text" id="expHdn" hidden="" />
+                    </div>
+
+
+                    <div data-ng-show="EncryptedReferralID!=null || AddNotePageModel.Note.NoteID > 0">
+                        <hr class="clear" data-ng-show="!NoteModel.IsPartial">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12 ">
+
+
+                                <div class="">
+                                    <span class="collapseSrc curser-pointer font-size-18 font-blue fa  fa-plus-circle uppercase" data-toggle="collapse" data-ng-click="ExpandCollapse()" href="#ClientInfo" aria-expanded="false"
+                                        aria-controls="ClientInfo">&nbsp;{{AddNotePageModel.ClientInfo.ClientName}} 
+                                        ({{ AddNotePageModel.ClientInfo.Age}})&nbsp;  {{AddNotePageModel.ClientInfo.Gender}}/&nbsp;
+                                        #<b>{{AddNotePageModel.ClientInfo.AHCCCSID}}</b>&nbsp;/&nbsp;<b>{{AddNotePageModel.ClientInfo.PayorShortName}}</b>
+                                    </span>
+
+                                    <span class="label label-danger" style="float: right;">
+                                        <b>@Resource.NotePayor = {{AddNotePageModel.Note.PayorShortName}}</b>
+                                    </span>
+
+
+                                    <div class="panel panel-primary collapse collapseDest" id="ClientInfo">
+                                        @*<div class="panel-heading">
+                                        <h3 class="panel-title">@Resource.ClientInformation</h3>
+                                    </div>*@
+                                        <div class="panel-body position-relative">
+
+                                            <div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.Payor:</b> {{AddNotePageModel.ClientInfo.PayorName?AddNotePageModel.ClientInfo.PayorName:'@Resource.NA'}}</label>
+                                                </div>
+
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.Client</b> {{AddNotePageModel.ClientInfo.ClientName ? AddNotePageModel.ClientInfo.ClientName:'@Resource.NA'}}</label>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.AHCCCS:</b> {{AddNotePageModel.ClientInfo.AHCCCSID}} </label>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.CIS #:</b> {{AddNotePageModel.ClientInfo.CISNumber? AddNotePageModel.ClientInfo.CISNumber :'@Resource.NA'}}</label>
+                                                </div>
+
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.Population:</b> {{AddNotePageModel.ClientInfo.Population?AddNotePageModel.ClientInfo.Population:'@Resource.NA'}}</label>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.Title:</b> {{AddNotePageModel.ClientInfo.Title?AddNotePageModel.ClientInfo.Title:'@Resource.NA'}}</label>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.Gender:</b> {{AddNotePageModel.ClientInfo.Gender ? AddNotePageModel.ClientInfo.Gender:'@Resource.NA'}}</label>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.DOBShort:</b> {{AddNotePageModel.ClientInfo.DOB | dateformat}}</label>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.Age:</b> {{AddNotePageModel.ClientInfo.Age}} <span>&nbsp;@Resource.YearShort</span></label>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label title="@Resource.UsedRespiteHours" class="control-label"><b>@Resource.URH:</b> {{AddNotePageModel.ClientInfo.UsedRespiteHours?AddNotePageModel.ClientInfo.UsedRespiteHours:'0'}} @Resource.hrs</label>
+                                                </div>
+                                                <div class="col-lg-3 col-md-3 col-sm-3">
+                                                    <label class="control-label"><b>@Resource.Phone:</b> {{AddNotePageModel.ClientInfo.Phone1?AddNotePageModel.ClientInfo.Phone1:'@Resource.NA'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.Address:</b> {{AddNotePageModel.ClientInfo.StrAddress}}</label>
+                                                </div>
+                                                <div class="pull-right permissions">
+                                                    <span class="badge badge-default curser-default" title="Permission for Phone" data-ng-show="AddNotePageModel.ClientInfo.PermissionForVoiceMail">@Resource.PhonePermissionShort</span>
+                                                    <span class="badge badge-default curser-default" title="Permission for Sms" data-ng-show="AddNotePageModel.ClientInfo.PermissionForSMS">@Resource.SMSPermissionShort</span>
+                                                    <span class="badge badge-default curser-default" title="Permission for Email" data-ng-show="AddNotePageModel.ClientInfo.PermissionForEmail">@Resource.EmailPermissionShort</span>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                                @*<div class="margin-top-5">
+                                    <span class="collapseSrc curser-pointer font-size-18 font-blue fa fa-plus-circle uppercase" data-ng-if="AddNotePageModel.DxCodes.length > 0" data-toggle="collapse" data-ng-click="ExpandCollapse()" href="#DxCodeInfo" aria-expanded="false" aria-controls="DxCodeInfo">&nbsp;@Resource.DxCodeDetails</span>
+
+                                </div>*@
+                            </div>
+                        </div>
+
+                        <hr class="clear">
+
+                        <div class="row">
+
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label required">@Resource.ServiceDate</label>
+                                <i class="fa fa-question-circle font-red" data-ng-tooltip="@Resource.ServiceDateMessage"
+                                   data-ng-custom-class="tooltip-extra-z-index"
+                                   data-ngbg-color-class="bg-red"
+                                    data-ngbg-arrow-color-class="tooltip-arrow-red"></i>
+                                @*{{AddNotePageModel.Note.CurrentDate}} {{AddNotePageModel.Note.ServiceDate}}*@
+                                <div class="input-group date" datepicker="AddNotePageModel.Note.ServiceDate" ng-dateval="AddNotePageModel.Note.ServiceDate" data-ng-maxdate="CurrentDate">
+                                    <input class="form-control input-sm dateInputMask"
+                                           id="ServiceDate" maxlength="10"
+                                           name="Note.ServiceDate"
+                                           data-val="true"
+                                           data-ng-disabled="AddNotePageModel.Note.GroupIDForMileServices"
+                                           data-val-required="@Resource.ServiceDateRequired"
+                                           type="text" placeholder="@Resource.ServiceDate">
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Note.ServiceDate)
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label required">@Resource.ServiceCodeType</label>
+                                <div>
+                                    <select class="form-control input-sm"
+                                            data-ng-init="AddNotePageModel.Note.ServiceCodeType=(AddNotePageModel.Note.ServiceCodeType==null || AddNotePageModel.Note.ServiceCodeType==0 || AddNotePageModel.Note.ServiceCodeID=='') ?'':AddNotePageModel.Note.ServiceCodeType.toString()"
+                                            data-ng-model="AddNotePageModel.Note.ServiceCodeType"
+                                            id="ServiceCodeType"
+                                            name="Note.ServiceCodeType"
+                                            data-ng-disabled="AddNotePageModel.Note.GroupIDForMileServices"
+                                            convert-to-number=""
+                                            data-val="true"
+                                            data-val-required="@Resource.ServiceCodeTypeRequired">
+                                        <option value="">@Resource.Select</option>
+                                        <option data-ng-repeat="option in AddNotePageModel.ServiceCodeTypes" value="{{option.ServiceCodeTypeID}}">{{option.ServiceCodeTypeName}}</option>
+                                    </select>
+
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Note.ServiceCodeType)
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label" data-ng-class="{'required':AddNotePageModel.Note.ServiceCodeType != OtherServiceCode && AddNotePageModel.Note.ServiceCodeType > 0}">@Resource.BillingProvider</label>
+                                <div>
+
+                                    @Html.DropDownListFor(p => p.Note.BillingProviderID, Model.Facilities.ToSelectList(Model.Note.BillingProviderID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_number = "",
+                                                                  data_ng_model = "AddNotePageModel.Note.BillingProviderID",
+                                                                  data_ng_init = "AddNotePageModel.Note.BillingProviderID=(AddNotePageModel.Note.BillingProviderID==null || AddNotePageModel.Note.BillingProviderID==0 || AddNotePageModel.Note.BillingProviderID=='') ?'':AddNotePageModel.Note.BillingProviderID.toString()",
+                                                                  data_ng_value = "AddNotePageModel.Note.BillingProviderID",
+                                                                  data_ng_options = "col.Value as col.Name for col in AddNotePageModel.Facilities track by col.Value",
+                                                                  @class = "form-control input-sm"
+                                                              })
+
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Note.BillingProviderID)
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label" data-ng-class="{'required':AddNotePageModel.Note.ServiceCodeType != OtherServiceCode && AddNotePageModel.Note.ServiceCodeType > 0}">@Resource.RenderingProvider</label>
+                                <div>
+                                    @Html.DropDownListFor(p => p.Note.RenderingProviderID, Model.Facilities.ToSelectList(Model.Note.RenderingProviderID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_number = "",
+                                                                  data_ng_model = "AddNotePageModel.Note.RenderingProviderID",
+                                                                  data_ng_init = "AddNotePageModel.Note.RenderingProviderID=(AddNotePageModel.Note.RenderingProviderID==null || AddNotePageModel.Note.RenderingProviderID==0 || AddNotePageModel.Note.RenderingProviderID=='') ?'':AddNotePageModel.Note.RenderingProviderID.toString()",
+                                                                  data_ng_value = "AddNotePageModel.Note.RenderingProviderID",
+                                                                  data_ng_options = "col.Value as col.Name for col in AddNotePageModel.Facilities track by col.Value",
+                                                                  @class = "form-control input-sm"
+                                                              })
+
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Note.RenderingProviderID)
+                            </div>
+
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                <label class="control-label required">@Resource.ZSPService</label>
+                                <div>
+                                    @Html.DropDownListFor(p => p.Note.ZarephathService, Model.Facilities.ToSelectList(Model.Note.ZarephathService ?? "", "Value", "Value", @Resource.Select, ""),
+                                                          new
+                                                              {
+                                                                  //convert_to_number = "",
+                                                                  data_ng_model = "AddNotePageModel.Note.ZarephathService",
+                                                                  data_ng_init = "AddNotePageModel.Note.ZarephathService=(AddNotePageModel.Note.ZarephathService==null || AddNotePageModel.Note.ZarephathService==0 || AddNotePageModel.Note.ZarephathService=='') ?'':AddNotePageModel.Note.ZarephathService.toString()",
+                                                                  data_ng_value = "AddNotePageModel.Note.ZarephathService",
+                                                                  data_ng_options = "option.Value as option.Value for option in AddNotePageModel.Services track by option.Value",
+                                                                  @class = "form-control input-sm"
+                                                              })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Note.ZarephathService)
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="AddNotePageModel.Note.ServiceCodeType > 0 && AddNotePageModel.Note.ServiceCodeType!= OtherServiceCode">
+                                <label class="control-label">@Resource.ServiceCode</label>
+
+                                @Html.TextBoxFor(x => x.Note.ServiceCodeID,
+                                                 new
+                                                     {
+                                                         ng_model = "AddNotePageModel.Note.ServiceCodeID",
+                                                         @class = "form-control hideErrorContent replaceErrorSource",
+                                                         tabindex = "-1"
+                                                     })
+                                <div class="replaceErrorDest " data-ng-class="{'cssDisabled':AddNotePageModel.Note.GroupIDForMileServices}">
+                                    <input type="text"
+                                           token-input
+                                           ng-val="AddNotePageModel.Note.ServiceCodeID"
+                                           textfield='ServiceCode'
+                                           valuefield='ServiceCodeID'
+                                           searchurl="{{GetServiceCodesURL}}"
+                                           placeholder="@Resource.EnterServiceCode"
+                                           tokenlimit='1'
+                                           onresultsformatter='ServiceCodeResultsFormatter'
+                                           onaddedcallback='AddedServiceCode'
+                                           ondeletecallback='RemoveServiceCode'
+                                           ontokenformatter="ServiceCodeTokenFormatter"
+                                           additional-filter-value="AdditionFilterForServiceCode"
+                                           additional-filter-text="searchParam"
+                                           autoSelectFirstResult="false"
+                                           minChars="0"
+                                           tokeninputobj="ServiceCodeTokenObj"
+                                           id="ServiceCodeIDToken"
+                                           customclass="form-control input-sm"
+                                           name="Note.ServiceCodeID"/>
+
+                                    
+
+
+
+                                </div>
+                                @Html.ValidationMessageFor(x => x.Note.ServiceCodeID)
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="AddNotePageModel.Note.ServiceCodeType!=OtherServiceCode">@*data-ng-show="AddNotePageModel.Note.ServiceCodeID > 0"*@
+                                <label class="control-label">@Resource.POS@*{{AddNotePageModel.Note.PosID}}*@</label>
+                                <div>
+                                    @Html.DropDownListFor(p => p.Note.PosID, Model.PosCodes.ToSelectList(Model.Note.PosID.ToString() ?? "", "PosName", "PosID", @Resource.Select, ""),
+                                                          new
+                                                              {
+                                                                  convert_to_string = "",
+                                                                  data_ng_model = "AddNotePageModel.Note.PosID",
+                                                                  data_ng_init = "AddNotePageModel.Note.PosID=(AddNotePageModel.Note.PosID==null || AddNotePageModel.Note.PosID==0 || AddNotePageModel.Note.PosID=='') ?'':AddNotePageModel.Note.PosID.toString()",
+                                                                  data_ng_value = "AddNotePageModel.Note.PosID",
+                                                                  data_ng_options = "option.PosID as option.PosName for option in AddNotePageModel.PosCodes track by option.PosID",
+                                                                  @class = "form-control input-sm",
+                                                                  data_ng_disabled = "AddNotePageModel.Note.GroupIDForMileServices"
+
+                                                              })
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Note.PosID)
+                            </div>
+                            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="AddNotePageModel.Note.ServiceCodeType!=OtherServiceCode">
+                                <label class="control-label">@Resource.POSDetails</label>
+                                <div>
+                                    @Html.TextBoxFor(x => x.Note.POSDetail,
+                                                     new
+                                                         {
+                                                             ng_model = "AddNotePageModel.Note.POSDetail",
+                                                             @class = "form-control input-sm",
+                                                             data_ng_disabled = "AddNotePageModel.Note.PosID!=OtherPOS",
+
+                                                         })
+                                    @*<input type="text" class="form-control input-sm" data-ng-disabled="AddNotePageModel.Note.PosID!=OtherPOS" name="AddNotePageModel.Note.POSDetail" data-ng-model="AddNotePageModel.Note.POSDetail">*@
+                                </div>
+                                @Html.ValidationMessageFor(m => m.Note.POSDetail)
+                            </div>
+                            <div class="clearfix">
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="SelectedServiceCodeForPayor.UnitType>0">
+                                    <label class="control-label">@Resource.StartTime</label>
+                                    @*<input class="form-control input-sm time" id="StartTime" name="AddNotePageModel.Note.StrStartTime"
+                                       type="text" data-ng-model="AddNotePageModel.Note.StrStartTime" placeholder="@Resource.StartTime">*@
+                                    @Html.TextBoxFor(x => x.Note.StrStartTime,
+                                    new
+                                    {
+                                        ng_model = "AddNotePageModel.Note.StrStartTime",
+                                        @class = "form-control input-sm time",
+                                        placeholder = @Resource.StartTime,
+                                    })
+                                    @Html.ValidationMessageFor(m => m.Note.StrStartTime)
+                                </div>
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="SelectedServiceCodeForPayor.UnitType>0">
+                                    <label class="control-label">@Resource.EndTime</label>
+                                    <div class="input-group">
+                                        @*<input class="form-control input-sm time" id="EndTime" maxlength="20" name="AddNotePageModel.Note.StrEndTime"
+                                           type="text" data-ng-model="AddNotePageModel.Note.StrEndTime" placeholder="@Resource.EndTime">*@
+                                        @Html.TextBoxFor(x => x.Note.StrEndTime,
+                                        new
+                                        {
+                                            ng_model = "AddNotePageModel.Note.StrEndTime",
+                                            @class = "form-control input-sm time",
+                                            placeholder = @Resource.EndTime,
+                                            compare_with = "#Note_StrStartTime",
+                                            validation_timecompare = ""
+                                        })
+                                    </div>
+                                </div>
+                                @*<div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="SelectedServiceCodeForPayor.UnitType==3">
+                            <label class="control-label">@Resource.NoOfStop</label>
+                            <div>
+                                <input class="form-control input-sm" dir-valid-number="" id="NoOfStop" maxlength="10" name="AddNotePageModel.Note.NoOfStops" data-ng-model="AddNotePageModel.Note.NoOfStop"
+                                    type="text">
+                            </div>
+                        </div>*@
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="SelectedServiceCodeForPayor.UnitType==DistanceInMilesUnit || SelectedServiceCodeForPayor.UnitType==StopUnit">
+                                    <label class="control-label">@Resource.StartMile</label>
+                                    <div>
+                                        @* <input
+                                        class="form-control input-sm" id="StartMile"
+                                        maxlength="10"
+                                        name="AddNotePageModel.Note.StartMile"
+                                        data-ng-model="AddNotePageModel.Note.StartMile"
+                                        dir-valid-decimal=""
+                                        type="text"
+                                        placeholder="@Resource.StartMile">*@
+                                        @Html.TextBoxFor(x => x.Note.StartMile,
+                                        new
+                                        {
+                                            ng_model = "AddNotePageModel.Note.StartMile",
+                                            @class = "form-control input-sm",
+                                            placeholder = @Resource.StartMile,
+                                            dir_valid_decimal = "",
+                                            maxlength = "10"
+                                        })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Note.StartMile)
+                                </div>
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="SelectedServiceCodeForPayor.UnitType==DistanceInMilesUnit || SelectedServiceCodeForPayor.UnitType==StopUnit">
+                                    <label class="control-label">@Resource.EndMile</label>
+                                    <div>
+                                        @*<input class="form-control input-sm"
+                                           dir-valid-decimal="" 
+                                           min="{{ AddNotePageModel.Note.StartMile }}" 
+                                           id="EndMile" 
+                                           maxlength="10" 
+                                           name="AddNotePageModel.Note.EndMile" 
+                                           data-ng-model="AddNotePageModel.Note.EndMile"
+                                           placeholder="@Resource.EndTime"
+                                           type="text" />*@
+                                        @Html.TextBoxFor(x => x.Note.EndMile,
+                                        new
+                                        {
+                                            ng_model = "AddNotePageModel.Note.EndMile",
+                                            min = "{{AddNotePageModel.Note.StartMile}}",
+                                            @class = "form-control input-sm",
+                                            placeholder = @Resource.EndMile,
+                                            dir_valid_decimal = "",
+                                            maxlength = "10"
+                                        })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Note.EndMile)
+                                </div>
+                            </div>
+
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 pulsateControls" data-ng-show="((SelectedServiceCodeForPayor.AvailableDailyUnit*1) < (SelectedServiceCodeForPayor.CalculatedUnit*1))">
+
+                                <div class="alert alert-danger margin-bottom-0">
+                                    <strong>@Resource.Note**:&nbsp;</strong> @Resource.DailyLimitExceedMsg
+                                </div>
+                                @*<i><span class="font-red font-weight-600">@Resource.Note**:&nbsp;</span><span class="">@Resource.DailyLimitExceedMsg</span></i>*@
+                            </div>
+
+                            @*<div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="AddNotePageModel.Note.ServiceCodeID>0">
+                            <label class="control-label">@Resource.CalculatedUnit</label>
+                            <div>
+                                <input type="text" class="form-control input-sm" disabled="disabled" name="AddNotePageModel.Note.CalculatedUnit" data-ng-model="AddNotePageModel.Note.CalculatedUnit">
+                            </div>
+                        </div>*@
+
+                            <div class="row clear-left" data-ng-show="SelectedServiceCodeForPayor.UnitType>0">
+                                <span class="collapseSrc curser-pointer font-size-18 font-blue uppercase fa  fa-plus-circle" data-toggle="collapse" data-ng-click="ExpandCollapse()" href="#UnitInfo" aria-expanded="false"
+                                    aria-controls="ClientInfo">&nbsp; @Resource.UnitInformation
+                                </span>
+                                <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12 no-padding block collapse collapseDest" id="UnitInfo">
+                                    <div class="mt-element-ribbon bg-grey-steel">
+                                        <div class="ribbon ribbon-color-info uppercase">@Resource.UnitDetails :</div>
+                                        <div class="row margin-left-60">
+                                            <div class="row margin-bottom-10 padding-left-right-10">
+
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.MaxUnitDetails</b></label><hr />
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.DailyUnitDetails</b>&nbsp; {{AddNotePageModel.Note.ServiceDate | dateformat}}</label><hr />
+                                                </div>
+
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><span class="UnitCalculation">@Resource.MaxUnitLimit:</span> {{SelectedServiceCodeForPayor.MaxUnit > 0 ? SelectedServiceCodeForPayor.MaxUnit +' @Resource.UN':'@Resource.Unlimited'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><span class="UnitCalculation">@Resource.DailyUnitLimit:</span> {{SelectedServiceCodeForPayor.DailyUnitLimit > 0 ? SelectedServiceCodeForPayor.DailyUnitLimit +' @Resource.UN':'@Resource.Unlimited'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><span class="UnitCalculation">@Resource.RemainingMaxUnit:</span> {{SelectedServiceCodeForPayor.MaxUnit == 0 ? '@Resource.Unlimited' : SelectedServiceCodeForPayor.AvailableMaxUnit +' @Resource.UN'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><span class="UnitCalculation">@Resource.RemainingDailyUnit:</span> {{SelectedServiceCodeForPayor.DailyUnitLimit == 0 && SelectedServiceCodeForPayor.MaxUnit == 0 ? '@Resource.Unlimited' : SelectedServiceCodeForPayor.AvailableDailyUnit +' @Resource.UN'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><span class="UnitCalculation">@Resource.TotalUsedUnit:</span> {{SelectedServiceCodeForPayor.TotalUsedUnit +' @Resource.UN'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><span class="UnitCalculation">@Resource.TodayUsedUnit:</span> {{SelectedServiceCodeForPayor.TodayUsedUnit +' @Resource.UN'}}</label>
+                                                </div>
+
+                                                @*<div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.MaxUnit:</b> {{SelectedServiceCodeForPayor.MaxUnit > 0 ? SelectedServiceCodeForPayor.MaxUnit  +' UN':'@Resource.Unlimited'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.DailyUnitLimit:</b> {{SelectedServiceCodeForPayor.DailyUnitLimit > 0 ? SelectedServiceCodeForPayor.DailyUnitLimit  +' UN':'@Resource.Unlimited'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.AvailableMaxUnit:</b> {{SelectedServiceCodeForPayor.MaxUnit == 0 ? '@Resource.Unlimited' : SelectedServiceCodeForPayor.AvailableMaxUnit  +' UN'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.AvailableDailyUnit:</b> {{SelectedServiceCodeForPayor.DailyUnitLimit == 0 && SelectedServiceCodeForPayor.MaxUnit == 0 ? '@Resource.Unlimited' : SelectedServiceCodeForPayor.AvailableDailyUnit +' UN'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.UsedMaxUnit:</b> {{SelectedServiceCodeForPayor.TotalUsedUnit +' UN'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.UsedDailyUnit:</b> {{SelectedServiceCodeForPayor.TodayUsedUnit +' UN'}}</label>
+                                                </div>*@
+                                            </div>
+                                            <hr class="clearfix" />
+                                            <div class="row margin-top-10 padding-left-right-10">
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    @*<label class="control-label"><b>@Resource.InputtedUnit:</b> {{referralNote.SelectedServiceCodeForPayor.UsedUnit +' UN'}}</label>*@
+                                                    <label class="control-label"></label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b class="color-red">@Resource.CalculatedUnit:</b> {{SelectedServiceCodeForPayor.CalculatedUnit +' @Resource.UN'}}</label>
+                                                </div>
+                                            </div>
+                                            @*<div class="row margin-top-10 padding-left-right-10">
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b>@Resource.InputtedUnit:</b> {{SelectedServiceCodeForPayor.UsedUnit +' UN'}}</label>
+                                                </div>
+                                                <div class="col-lg-6 col-md-6 col-sm-6">
+                                                    <label class="control-label"><b class="color-red">@Resource.CalculatedUnit:</b> {{AddNotePageModel.Note.CalculatedUnit +' UN'}}</label>
+                                                </div>
+                                            </div>*@
+                                        </div>
+
+                                        <div class="label-info-white row clearfix" data-ng-show="(SelectedServiceCodeForPayor.AvailableDailyUnit*1) < (SelectedServiceCodeForPayor.CalculatedUnit*1)">
+                                            <i><span class="font-red font-weight-600">@Resource.Note**:&nbsp;</span><span class="">@Resource.DailyLimitExceedMsg</span></i>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="clear">
+                        <div class="row">
+                            <div class="" data-ng-if="AddNotePageModel.Note.ServiceCodeType==OtherServiceCode">
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                    <label class="control-label">@Resource.SpokeTo</label>
+                                    <div>
+                                        <input type="text" class="form-control input-sm" name="AddNotePageModel.Note.SpokeTo" data-ng-model="AddNotePageModel.Note.SpokeTo">
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                    <label class="control-label">@Resource.Relation</label>
+                                    <div>
+                                        @*<input type="text" class="form-control input-sm" name="AddNotePageModel.Note.Relation" data-ng-model="AddNotePageModel.Note.Relation">*@
+                                        <select class="form-control input-sm"
+                                            data-ng-init="AddNotePageModel.Note.Relation=(AddNotePageModel.Note.Relation==null || AddNotePageModel.Note.Relation==0 || AddNotePageModel.Note.Relation=='') ?'':AddNotePageModel.Note.Relation.toString()"
+                                            data-ng-model="AddNotePageModel.Note.Relation"
+                                            id="Relation"
+                                            name="AddNotePageModel.Note.Relation">
+                                            <option value="">@Resource.Select</option>
+                                            <option data-ng-repeat="option in AddNotePageModel.Relations" value="{{option.Value}}">{{option.Value}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                    <label class="control-label">@Resource.KindOfNote</label>
+                                    <div>
+                                        <select class="form-control input-sm"
+                                            data-ng-init="AddNotePageModel.Note.OtherNoteType=(AddNotePageModel.Note.OtherNoteType==null || AddNotePageModel.Note.OtherNoteType==0 || AddNotePageModel.Note.OtherNoteType=='') ?'':AddNotePageModel.Note.OtherNoteType.toString()"
+                                            data-ng-model="AddNotePageModel.Note.OtherNoteType"
+                                            id="OtherNoteType"
+                                            name="AddNotePageModel.Note.OtherNoteType">
+                                            <option value="">@Resource.Select</option>
+                                            <option data-ng-repeat="option in AddNotePageModel.KindOfNotes" value="{{option.Value}}">{{option.Value}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="clearfix">
+
+                                    <div class="form-group col-md-6 col-sm-6 col-sm-3 margin-top-20">
+                                        <div>
+                                            <input data-ng-model="AddNotePageModel.Note.IsIssue" type="checkbox" id="IsIssue" name="Note.IsIssue" class="unicheckbox" val="AddNotePageModel.Note.IsIssue">
+                                            <label for="IsIssue">@Resource.OpenAsAnIssue</label>
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="AddNotePageModel.Note.IsIssue">
+                                        <label class="control-label" data-ng-class="{'required':AddNotePageModel.Note.IsIssue}">@Resource.Assignee</label>
+                                        <div>
+                                            @Html.DropDownListFor(p => p.Note.IssueAssignID, Model.Employees.ToSelectList(Model.Note.IssueAssignID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                            new
+                                            {
+                                                convert_to_number = "",
+                                                data_ng_model = "AddNotePageModel.Note.IssueAssignID",
+                                                data_ng_init = "AddNotePageModel.Note.IssueAssignID=(AddNotePageModel.Note.IssueAssignID==null || AddNotePageModel.Note.IssueAssignID==0 || AddNotePageModel.Note.IssueAssignID=='') ?'':AddNotePageModel.Note.IssueAssignID.toString()",
+                                                data_ng_value = "AddNotePageModel.Note.IssueAssignID",
+                                                data_ng_options = "col.Value as col.Name for col in AddNotePageModel.Employees track by col.Value",
+                                                @class = "form-control input-sm"
+                                            })
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.Note.IssueAssignID)
+                                    </div>
+                                </div>
+
+                                <hr class="clear">
+                            </div>
+                            <div class="inline-block">
+
+                                <div>
+                                    <a class="btn btn-xs btn-circle btn-default margin-left-10 margin-5"
+                                        data-ng-repeat="item in AddNotePageModel.NoteSentenceList"
+                                        data-ng-click="NoteSentenceSelectionClick(item.NoteSentenceDetails)"
+                                        data-ng-attr-title="{{item.NoteSentenceDetails}}">
+                                        <span>{{item.NoteSentenceTitle}}</span>
+                                    </a>
+                                </div>
+
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                    <label class="control-label required">@Resource.Intervention</label>
+                                    <div>
+                                        @Html.TextAreaFor(x => x.Note.NoteDetails,
+                                                          new
+                                                              {
+                                                                  ng_model = "AddNotePageModel.Note.NoteDetails",
+                                                                  @class = "form-control hideErrorContent replaceErrorSource",
+                                                                  tabindex = "-1"
+                                                              })
+                                        @Html.ValidationMessageFor(m => m.Note.NoteDetails)
+                                        <div class="replaceErrorDest summerNoteEditor">
+                                            <summernote data-ng-model="AddNotePageModel.Note.NoteDetails"
+                                                height="150"></summernote>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 compact" data-ng-if="AddNotePageModel.Note.ServiceCodeType!=OtherServiceCode">
+
+                                    <label class="control-label required"><strong>@Resource.DxCodeDetails</strong></label>
+
+                                    <div class="padding-10 alert-danger" data-ng-if="IsDifferentDxCode && (AddNotePageModel.DxCodes | filter:DxCodeFilter()).length">
+                                        <strong>Error!</strong> @Resource.DxCodeErrorMsg
+                                    </div>
+                                    <div class="padding-10 alert-info" data-ng-if="!IsDifferentDxCode && (AddNotePageModel.DxCodes | filter:DxCodeFilter()).length">
+                                        <strong>Info</strong> @Resource.DxCodeInfoMsg
+                                    </div>
+                                    @Html.TextBoxFor(q => q.NoteDxCodeCount,
+                                    new
+                                    {
+                                        data_ng_model = "AddNotePageModel.NoteDxCodeCount",
+                                        @class = "form-control hideErrorContent replaceErrorSource",
+                                        tabindex = "-1"
+                                    })
+
+                                    @Html.ValidationMessageFor(m => m.NoteDxCodeCount)
+
+                                    <hr class="clear">
+                                    <div class="replaceErrorDest">
+                                        <div class="table-responsive">
+                                            <table class="table table-advance table-bordered table-striped table-hover table-condensed" data-ng-cloak>
+                                                <thead>
+                                                    <tr>
+                                                        <th class="width-20px">
+                                                            <div data-ng-show="IsSameDxCodeType">
+                                                                <input id="SelectAllDxCode" type="checkbox" class="unicheckbox" data-ng-model="SelectAllDxCodeCheckbox" val="SelectAllDxCodeCheckbox" data-ng-change="SelectAllDxCode(SelectAllDxCodeCheckbox)">
+                                                            </div>
+                                                        </th>
+                                                        <th><strong>@Resource.DXCodeShortName</strong></th>
+                                                        <th><strong>@Resource.DXCode</strong></th>
+                                                        <th><strong>@Resource.DXCodeType</strong></th>
+                                                        <th><strong>@Resource.Precedence</strong></th>
+                                                        <th><strong>@Resource.StarDate</strong></th>
+                                                        <th><strong>@Resource.EndDate</strong></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr data-ng-repeat="dxCode in $parent.FilterDxCodes = (AddNotePageModel.DxCodes | filter:DxCodeFilter())" data-ng-if="(AddNotePageModel.DxCodes | filter:DxCodeFilter()).length">
+                                                        <td>
+                                                            <input type="checkbox" class="unicheckbox text-align-center" data-ng-attr-class="dxCode{{$index}}" data-ng-change="SelectDxCode(dxCode)" data-ng-model="dxCode.IsChecked" val="dxCode.IsChecked" />
+                                                        </td>
+                                                        <td>{{dxCode.DxCodeShortName}}</td>
+                                                        <td>{{(dxCode.DXCodeWithoutDot ? dxCode.DXCodeWithoutDot :'@Resource.NA') +' (' + dxCode.DXCodeName +')'}}</td>
+                                                        <td>{{dxCode.DxCodeType}}</td>
+                                                        <td>{{dxCode.Precedence ? dxCode.Precedence :'@Resource.NA'}}</td>
+                                                        <td data-ng-if="dxCode.StartDate">{{dxCode.StartDate | dateformat}}</td>
+                                                        <td data-ng-if="!dxCode.StartDate">@Resource.NA</td>
+                                                        <td data-ng-if="dxCode.EndDate">{{dxCode.EndDate | dateformat}}</td>
+                                                        <td data-ng-if="!dxCode.EndDate">@Resource.NA</td>
+                                                    </tr>
+                                                    <tr data-ng-if="!(AddNotePageModel.DxCodes | filter:DxCodeFilter()).length">
+                                                        <td colspan="7" class="pad-10">
+                                                            @Html.Raw(Resource.NoDxCodeFound)
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <br class="clear-both" />
+                                    <hr class="clear">
+                                    <div class="padding-bottom-10 col-lg-12 col-md-12 col-sm-12 ">
+                                        <label class="control-label"><strong>@Resource.DTRDetails</strong></label>
+                                        <label class="control-label alert-info" style="padding: 3px 5px">
+                                            @Resource.DTRReportRelatedNote
+                                        </label>
+                                        <div class="mt-checkbox-inline ">
+                                            <label class="mt-checkbox mt-checkbox-outline padding-top-10">
+                                                <input data-ng-model="AddNotePageModel.Note.DTRIsOnline"
+                                                    class="uniformControls" data-uniform-value="AddNotePageModel.Note.DTRIsOnline"
+                                                    data-ng-true-value="true" data-ng-false-value="false"
+                                                    type="checkbox">@Resource.Online<span></span>
+                                            </label>
+                                            <label class="mt-checkbox mt-checkbox-outline padding-top-10">
+                                                <input data-ng-model="AddNotePageModel.Note.DTRIsOnline"
+                                                    class="uniformControls" data-uniform-value="!AddNotePageModel.Note.DTRIsOnline"
+                                                    data-ng-true-value="false" data-ng-false-value="true"
+                                                    type="checkbox">Paper Work<span></span>
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group" data-ng-if="AddNotePageModel.Note.DTRIsOnline">
+                                        <div class="">
+                                            <div class="padding-bottom-10 padding-left-15">
+                                                <label class="control-label font-red">@Resource.DTRDetailsMsg</label>
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label">@Resource.DriverName</label>
+                                                <div>
+                                                    @Html.DropDownListFor(p => p.Note.DriverID, Model.Employees.ToSelectList(Model.Note.DriverID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                    new
+                                                    {
+                                                        convert_to_number = "",
+                                                        data_ng_model = "AddNotePageModel.Note.DriverID",
+                                                        data_ng_init = "AddNotePageModel.Note.DriverID=(AddNotePageModel.Note.DriverID==null || AddNotePageModel.Note.DriverID==0 || AddNotePageModel.Note.DriverID=='') ?'':AddNotePageModel.Note.DriverID.toString()",
+                                                        data_ng_value = "AddNotePageModel.Note.DriverID",
+                                                        data_ng_options = "col.Value as col.Name for col in AddNotePageModel.Employees track by col.Value",
+                                                        @class = "form-control input-sm"
+                                                    })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.DriverID)
+
+                                            </div>
+
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label">@Resource.VehicleNumber</label>
+                                                <div>
+                                                    @Html.TextBoxFor(x => x.Note.VehicleNumber,
+                                                    new
+                                                    {
+                                                        ng_model = "AddNotePageModel.Note.VehicleNumber",
+                                                        @class = "form-control input-sm auto-complete",
+                                                        searchurl = "{{GetDTRDetailsURL}}",
+                                                        dtrtype = (int)DTRDetail.DTRDetailTypes.Vehicle,
+                                                        
+                                                    })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.VehicleNumber)
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label">@Resource.VehicleType</label>
+                                                <div>
+                                                    @Html.TextBoxFor(x => x.Note.VehicleType,
+                                                    new
+                                                    {
+                                                        ng_model = "AddNotePageModel.Note.VehicleType",
+                                                        @class = "form-control input-sm auto-complete",
+                                                        searchurl = "{{GetDTRDetailsURL}}",
+                                                        dtrtype = (int)DTRDetail.DTRDetailTypes.VehicleType
+                                                    })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.VehicleType)
+                                            </div>
+                                            <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                                                <label class="control-label">@Resource.PickUpAddress</label>
+                                                <div>
+                                                    @Html.TextBoxFor(x => x.Note.PickUpAddress,
+                                                    new
+                                                    {
+                                                        ng_model = "AddNotePageModel.Note.PickUpAddress",
+                                                        @class = "form-control input-sm auto-complete",
+                                                        searchurl = "{{GetDTRDetailsURL}}",
+                                                        dtrtype = (int)DTRDetail.DTRDetailTypes.LocationAddress
+                                                    })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.PickUpAddress)
+                                            </div>
+                                            <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                                                <label class="control-label">@Resource.DropOffAddress</label>
+                                                <div>
+                                                    @Html.TextBoxFor(x => x.Note.DropOffAddress,
+                                                    new
+                                                    {
+                                                        ng_model = "AddNotePageModel.Note.DropOffAddress",
+                                                        @class = "form-control input-sm auto-complete",
+                                                        searchurl = "{{GetDTRDetailsURL}}",
+                                                        dtrtype = (int)DTRDetail.DTRDetailTypes.LocationAddress
+                                                    })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.DropOffAddress)
+                                            </div>
+
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label">@Resource.EscortName</label>
+                                                <div>
+                                                    @Html.TextBoxFor(x => x.Note.EscortName,
+                                                    new
+                                                    {
+                                                        ng_model = "AddNotePageModel.Note.EscortName",
+                                                        @class = "form-control input-sm",
+                                                    })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.EscortName)
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label">@Resource.Relationship</label>
+                                                <div>
+                                                    @Html.TextBoxFor(x => x.Note.Relationship,
+                                                    new
+                                                    {
+                                                        ng_model = "AddNotePageModel.Note.Relationship",
+                                                        @class = "form-control input-sm",
+                                                    })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.Relationship)
+                                            </div>
+
+                                            <div class="form-group col-md-2 col-sm-2 col-sm-2 margin-top-20">
+                                                <div>
+                                                    <input data-ng-model="AddNotePageModel.Note.RoundTrip" type="checkbox" id="RoundTrip" name="Note.RoundTrip" class="unicheckbox" val="AddNotePageModel.Note.RoundTrip">
+                                                    <label for="RoundTrip">@Resource.RoundTrip</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-md-2 col-sm-2 col-sm-2 margin-top-20">
+                                                <div>
+                                                    <input data-ng-model="AddNotePageModel.Note.OneWay" type="checkbox" id="OneWay" name="Note.OneWay" class="unicheckbox" val="AddNotePageModel.Note.OneWay">
+                                                    <label for="OneWay">@Resource.OneWay</label>
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group col-md-2 col-sm-2 col-sm-2 margin-top-20">
+                                                <div>
+                                                    <input data-ng-model="AddNotePageModel.Note.MultiStops" type="checkbox" id="MultiStops" name="Note.MultiStops" class="unicheckbox" val="AddNotePageModel.Note.MultiStops">
+                                                    <label for="MultiStops">@Resource.MultiStops</label>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                    <br class="clear-both" />
+                                    <hr class="clear">
+                                </div>
+
+                                <div class="form-group col-lg-12 col-md-12 col-sm-12 padding-top-20">
+                                    <button class="btn btn-sm green-seagreen yellow-casablanca-stripe" data-ng-click="AddTempNote(AddNotePageModel.Note)">@Resource.AddService</button>
+                                    <button class="btn btn-sm grey-silver red-stripe cancel" data-ng-click="ClearTempNote()">@Resource.ClearDetails</button>
+                                    <button class="cancel ClearDetails" data-ng-click="ClearTempNote(true)" style="display: none;"></button>
+                                </div>
+
+                                <div class="clearfix padding-top-40">
+                                    <h3 class=" form-group col-lg-12 col-md-12 col-sm-12">@Resource.NoteDetails</h3>
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                        <div class="clearfix tbl_reflog tbl_ReqServiceMsg" tabindex="-1">
+                                            <label class="control-label required"><strong>@Resource.ServiceDetails</strong></label>
+                                            <span class="font-red padding-left-5">@Resource.Atleast1ServiceRequried</span>
+                                            <hr />
+                                            <div class="portlet-body compact padding-30 text-align-center border-grey-steel bg-grey-steel bg-font-grey-steel tbl_ReqServiceMsg" data-ng-if="AddNotePageModel.TempNoteList.length<=0">
+                                                <b>@Resource.Atleast1ServiceRequried</b>
+                                            </div>
+
+                                            <div class="portlet-body compact" data-ng-if="AddNotePageModel.TempNoteList.length>0">
+                                                <div class="dataTables_wrapper">
+                                                    <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                                        <tbody data-ng-repeat="tempNote in AddNotePageModel.TempNoteList track by $index | orderBy:''">
+                                                            <tr data-ng-class="{'deleted':tempNote.IsDeleted,'edited':((tempNote.NoteID === 0 || tempNote.NoteID === undefined) && tempNote.DummyNoteID === AddNotePageModel.Note.DummyNoteID) || (tempNote.NoteID > 0 && tempNote.NoteID === AddNotePageModel.Note.NoteID)}">
+                                                                <td class="border-blue">
+                                                                    <div>@*tempNote.NoteID==AddNotePageModel.Note.NoteID || *@ @*{{tempNote.DummyNoteID}}*@
+
+                                                                        @*DummyNoteID: {{tempNote.DummyNoteID}}
+                                                                        GroupIDForMileServices: {{tempNote.GroupIDForMileServices}}*@
+                                                                        <div class="BatchSummaryDiv padding-top-4px">
+                                                                            <div class="td-batch-summary">@Resource.ServiceDate:</div>
+                                                                            <div class="BatchSummaryDesc">
+                                                                                <span class="text-decoration-underline">{{tempNote.ServiceDate | dateformat}}</span>
+                                                                            </div>
+                                                                            <div data-ng-if="tempNote.ServiceCodeType!=OtherServiceCode">
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.ServiceTime:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.StrStartTime}}</span><span class="padding-left-right-5 text-decoration-none">@Resource.To </span><span class="text-decoration-underline">{{tempNote.StrEndTime}}</span>
+                                                                                </div>
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Minutes:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.SelectedServiceCodeForPayor.MinutesDiff?tempNote.SelectedServiceCodeForPayor.MinutesDiff:'@Resource.NA'}} </span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Miles:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.SelectedServiceCodeForPayor.MileDiff?tempNote.SelectedServiceCodeForPayor.MileDiff:'@Resource.NA'}} </span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Units:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline font-purple-seance bold">{{tempNote.SelectedServiceCodeForPayor.CalculatedUnit}} </span>
+                                                                                </div>
+                                                                            </div>
+                                                                            <div data-ng-if="tempNote.ServiceCodeType==OtherServiceCode">
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.SpokeTo:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.SpokeTo?tempNote.SpokeTo:'@Resource.NA'}}</span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Relation:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.Relation?tempNote.Relation:'@Resource.NA'}} </span>
+                                                                                </div>
+
+                                                                                <div class="td-batch-summary padding-left-30">@Resource.Kind:</div>
+                                                                                <div class="BatchSummaryDesc">
+                                                                                    <span class="text-decoration-underline">{{tempNote.OtherNoteType?tempNote.OtherNoteType:'@Resource.NA'}} </span>
+                                                                                </div>
+
+                                                                                @*<div class="td-batch-summary padding-left-30">@Resource.IM:</div>
+                                                                            <div class="BatchSummaryDesc">
+                                                                                <span class="text-decoration-underline">{{tempNote.IsIssue}} </span>
+                                                                            </div>*@
+                                                                            </div>
+
+
+
+                                                                            <div class="td-batch-summary pull-right padding-right-5">
+                                                                                <div class="btn-group">
+                                                                                    <a class="btn-xs dropdown-toggle no-padding" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                                                        <i class="">@Resource.Actions</i>
+                                                                                    </a>
+                                                                                    <ul class="dropdown-menu pull-right">
+                                                                                        <li>
+                                                                                            <a data-ng-click="EditTempNote(tempNote)">@Resource.Edit</a>
+                                                                                        </li>
+                                                                                        <li>
+                                                                                            <a data-ng-if="tempNote.NoteID>0 && tempNote.IsDeleted" data-ng-click="DisableTempNote(tempNote,$index,'Enable')">@Resource.Enable</a>
+                                                                                            <a data-ng-if="tempNote.NoteID>0 && !tempNote.IsDeleted" data-ng-click="DisableTempNote(tempNote,$index,'Disable')">@Resource.Disable</a>
+                                                                                            <a data-ng-if="tempNote.NoteID<=0 || tempNote.NoteID == undefined" data-ng-click="DisableTempNote(tempNote,$index)">@Resource.Remove</a>
+                                                                                        </li>
+                                                                                    </ul>
+                                                                                </div>
+                                                                            </div>
+
+                                                                        </div>
+                                                                        <div class="BatchSummaryDiv padding-top-4px" data-ng-if="tempNote.ServiceCodeType!=OtherServiceCode">
+                                                                            <div class="td-batch-summary">@Resource.Code:</div>
+                                                                            <div class="BatchSummaryDesc font-purple-seance">
+                                                                                <span class="text-decoration-underline bold">{{tempNote.ServiceCode}}</span>-&nbsp;<span class="text-decoration-italic">{{tempNote.Description}}</span>
+                                                                            </div>
+                                                                            <div class="td-batch-summary padding-left-30">@Resource.POS: </div>
+                                                                            <div class="BatchSummaryDesc">
+                                                                                {{tempNote.PosID}}:&nbsp;{{tempNote.POSDetail}}
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="BatchSummaryDiv padding-top-4px padding-bottom-10">
+                                                                            <div class="td-batch-summary">@Resource.Intervention: </div>
+                                                                            <div class="BatchSummaryDesc">
+                                                                                <div class="htmlContainer" html-bind-dynamic="tempNote.NoteDetails">
+                                                                                </div>
+                                                                                @*<span data-ng-bind-html="tempNote.NoteDetails"></span>*@
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                </td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12 ">
+                                        <label class="control-label"><strong>@Resource.OtherDetails</strong></label>
+                                        <hr class="" />
+
+                                        <label class="control-label required">@Resource.Assessment</label>
+                                        <div>
+                                            @* @Html.TextAreaFor(x => x.Note.Assessment,
+                                                          new
+                                                              {
+                                                                  ng_model = "AddNotePageModel.Note.Assessment",
+                                                                  @class = "form-control hideErrorContent replaceErrorSource",
+                                                                  tabindex = "-1"
+                                                              })
+                                        @Html.ValidationMessageFor(m => m.Note.Assessment)
+                                        <div class="replaceErrorDest summerNoteEditor">
+                                            <summernote data-ng-model="AddNotePageModel.Note.Assessment"
+                                                height="150"></summernote>
+                                        </div>*@
+
+
+                                            @*<textarea class="form-control input-sm error_summer_note dirSummerNoteEditor" 
+                                            data-min-height="200" data-max-height="400" rows="5" data-ng-model="AddNotePageModel.Note.Assessment"
+                                        id="Assessment"
+                                        name="AddNotePageModel.Note.Assessment"
+                                        data-ng-val="AddNotePageModel.Note.Assessment"></textarea>*@
+                                            <summernote data-ng-model="AddNotePageModel.Note.Assessment" height="150"></summernote>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group font-black  col-lg-12 col-md-12 col-sm-12 ">
+                                        <div>
+                                            <label class="control-label"><strong>@Html.Raw(Resource.NoteAssigneeAndComment)</strong></label>
+
+                                            <span class="alert-warning font-black margin-left-20 pull-right" style="padding: 5px 10px;">
+                                                <input data-ng-model="AddNotePageModel.Note.AssigneeNeeded" type="checkbox" id="IsIssue" name="Note.AssigneeNeeded" class="unicheckbox" val="AddNotePageModel.Note.AssigneeNeeded">
+                                                <label for="AssigneeNeeded">@Resource.ShowNoteComment</label>
+                                            </span>
+
+                                            <span class="margin-right-20 pull-right">
+                                                <label class="control-label required">@Resource.NoteAssignee</label>
+                                                <span class="pull-right margin-left-10">
+
+                                                    @Html.DropDownListFor(p => p.Note.NoteAssignee, Model.Employees.ToSelectList(Model.Note.NoteAssignee.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                        new
+                                                        {
+                                                            convert_to_number = "",
+                                                            data_ng_model = "AddNotePageModel.Note.NoteAssignee",
+                                                            data_ng_init = "AddNotePageModel.Note.NoteAssignee=(AddNotePageModel.Note.NoteAssignee==null || AddNotePageModel.Note.NoteAssignee==0 || AddNotePageModel.Note.NoteAssignee=='') ?'':AddNotePageModel.Note.NoteAssignee.toString()",
+                                                            data_ng_value = "AddNotePageModel.Note.NoteAssignee",
+                                                            data_ng_options = "col.Value as col.Name for col in AddNotePageModel.Employees track by col.Value",
+                                                            @class = "form-control input-sm"
+                                                        })
+                                                </span>
+                                            </span>
+
+
+
+                                        </div>
+                                        <div data-ng-show="AddNotePageModel.Note.AssigneeNeeded">
+                                            <br class="clear-both" />
+                                            @*<div>
+                                                <div class="col-lg-2 no-padding">
+                                                    <label class="control-label required">@Resource.NoteAssignee</label>
+                                                </div>
+                                                <div class="col-lg-4 no-left-padding">
+
+                                                    @Html.DropDownListFor(p => p.Note.NoteAssignee, Model.Employees.ToSelectList(Model.Note.NoteAssignee.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                        new
+                                                        {
+                                                            convert_to_number = "",
+                                                            data_ng_model = "AddNotePageModel.Note.NoteAssignee",
+                                                            data_ng_init = "AddNotePageModel.Note.NoteAssignee=(AddNotePageModel.Note.NoteAssignee==null || AddNotePageModel.Note.NoteAssignee==0 || AddNotePageModel.Note.NoteAssignee=='') ?'':AddNotePageModel.Note.NoteAssignee.toString()",
+                                                            data_ng_value = "AddNotePageModel.Note.NoteAssignee",
+                                                            data_ng_options = "col.Value as col.Name for col in AddNotePageModel.Employees track by col.Value",
+                                                            @class = "form-control input-sm"
+                                                        })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.NoteAssignee)
+                                            </div>*@
+                                            <div>
+                                                @*<br class="clear-both" />
+                                                <br class="clear-both" />*@
+                                                <label class="control-label">@Resource.NoteComment</label>
+                                                <div>
+                                                    <textarea class="form-control input-sm" rows="8" data-ng-model="AddNotePageModel.Note.NoteComments"
+                                                        id="NoteAssignee"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group col-lg-12 col-md-12 col-sm-12" style="display: none;">
+                                        <label class="control-label">@Resource.ActionPlan</label>
+                                        <div>
+                                            @*                                    <textarea class="form-control input-sm error_summer_note dirSummerNoteEditor" data-min-height="200" data-max-height="400" rows="5" data-ng-model="AddNotePageModel.Note.ActionPlan"
+                                              id="ActionPlan"
+                                              name="AddNotePageModel.Note.ActionPlan"
+                                              data-ng-val="AddNotePageModel.Note.ActionPlan"></textarea>*@
+                                            <summernote data-ng-model="AddNotePageModel.Note.ActionPlan" height="150"></summernote>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div>
+                                <div class="col-lg-12 col-md-12 col-sm-12 table-responsive margin-bottom-15 compact" data-ng-cloak data-ng-if="AddNotePageModel.SignatureLog && AddNotePageModel.SignatureLog.SignatureLogID>0">
+                                    <b>Last Signature Detail:</b>
+                                    <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                        <thead>
+                                            <tr>
+                                                <th><strong>@Resource.Name</strong></th>
+                                                <th><strong>@Resource.Date</strong></th>
+                                                <th><strong>@Resource.MacAddress</strong></th>
+                                                <th><strong>@Resource.IPAddress</strong></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr>
+                                                <td>{{AddNotePageModel.SignatureLog.Name}}</td>
+                                                <td>{{AddNotePageModel.SignatureLog.Date | datetimeformat}}</td>
+                                                <td>{{AddNotePageModel.SignatureLog.MacAddress}}</td>
+                                                <td>{{AddNotePageModel.SignatureLog.SystemID}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <div>
+                                <hr class="clearfix" />
+                            </div>
+                            <div>
+                                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                    <div class="no-left-padding">
+                                        <input type="checkbox" id="MarkAsComplete" data-ng-model="AddNotePageModel.Note.MarkAsComplete" class="unicheckbox" val="AddNotePageModel.Note.MarkAsComplete">
+                                        <label for="MarkAsComplete"><strong class="SignAndComplete">@Resource.SignAndComplete</strong></label>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-6 col-md-6 col-sm-6 pull-left" data-ng-if="AddNotePageModel.Note.MarkAsComplete">
+                                    <div class="col-md-12">
+                                        @*<b>@SessionHelper.FirstName @SessionHelper.LastName</b>
+                                        <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{'@(ConfigSettings.AmazonS3Url + ConfigSettings.ZarephathBucket)/'+AddNotePageModel.Note.Signature}}" />*@
+
+                                        <b>{{AddNotePageModel.Note.EmpSignatureDetails.SignatureName}}</b>
+                                        <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{'@(ConfigSettings.AmazonS3Url + ConfigSettings.ZarephathBucket)/'+AddNotePageModel.Note.EmpSignatureDetails.Signature}}" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+<div class="modal-footer">
+    <button class="btn btn-sm red"  data-ng-click="CloseAddNoteModel()">@Resource.Cancel</button>
+    @*<button class="btn btn-sm blue" data-ng-click="SaveAndContinue(SelectedNoteSubDetailsItem)">@Resource.SaveAndContinue</button>*@
+    <button class="btn btn-sm green-jungle" data-ng-click="SaveNote(SelectedNoteSubDetailsItem)">@Resource.Save</button>
+</div>

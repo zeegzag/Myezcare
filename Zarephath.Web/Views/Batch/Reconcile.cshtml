@@ -1,0 +1,713 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Reconcile835);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_Reconcile835;
+}
+@model AddReconcile835Model
+@Html.Hidden("hdnAddReconcile835Model", Common.SerializeObject(Model))
+
+<div data-ng-controller="Reconcile835Controller">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.Reconcile835 &nbsp;<small>@Resource.Reconcile835Information</small>
+
+            <div class="btn-group pull-right btn-group-xs btn-group-devided">
+                <button type="button" class="btn collapsed grey border-grey-cascade btn-xs" data-toggle="collapse" data-target="#filter-panel">
+                    <i class="fa fa-sliders" aria-hidden="true"></i>&nbsp; @Resource.AllFilters
+                </button>
+            </div>
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="">
+            <div id="filter-panel" class="filter-panel collapse">
+                <div class="">
+                    @*panel panel-default*@
+                    <div class="">
+                        @*panel-body*@
+                        <form id="frmReconcile835">
+
+                            <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.Payor</label>
+                                    <div>
+                                        @Html.DropDownListFor(p => p.SearchReconcile835ListPage.PayorID, Model.PayorList.ToSelectList(Model.SearchReconcile835ListPage.PayorID.ToString() ?? "", "PayorName", "PayorID", @Resource.All, ""), new
+                        {
+                            data_val = "false",
+                            convert_to_number = "",
+                            data_ng_model = "TempReconcile835ListPage.PayorID",
+                            data_ng_init = "TempReconcile835ListPage.PayorID=TempReconcile835ListPage.PayorID==''?null:TempReconcile835ListPage.PayorID.toString()",
+                            @class = "form-control input-sm"
+                        })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.BatchNumberLabel</label>
+                                    <div>
+                                        @Html.TextBoxFor(m => m.SearchReconcile835ListPage.Batch, new { data_ng_model = "TempReconcile835ListPage.Batch", @class = "form-control input-sm", placeholder = Resource.BatchNumber, maxlength = 10 })
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.NoteNew</label>
+                                    <div>
+                                        @Html.TextBoxFor(m => m.SearchReconcile835ListPage.NoteID, new { data_ng_model = "TempReconcile835ListPage.NoteID", @class = "form-control input-sm", placeholder = Resource.NoteNew, maxlength = 10 })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.ClaimNumberLabel</label>
+                                    <div>
+                                        @Html.TextBoxFor(m => m.SearchReconcile835ListPage.ClaimNumber, new { data_ng_model = "TempReconcile835ListPage.ClaimNumber", @class = "form-control input-sm", placeholder = Resource.ClaimNumber, maxlength = 50 })
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.PayorClaimNumberLabel</label>
+                                    <div>
+                                        @Html.TextBoxFor(m => m.SearchReconcile835ListPage.PayorClaimNumber, new { data_ng_model = "TempReconcile835ListPage.PayorClaimNumber", @class = "form-control input-sm", placeholder = Resource.PayorClaimNumber, maxlength = 50 })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.ClientLabel</label>
+                                    <div>
+                                        @Html.TextBoxFor(m => m.SearchReconcile835ListPage.Client, new { data_ng_model = "TempReconcile835ListPage.Client", @class = "form-control input-sm", placeholder = Resource.ClientN, maxlength = 50 })
+                                    </div>
+                                </div>
+
+
+
+
+
+
+                                @*<div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.ServiceCode</label>
+                                    <div>
+                                        @Html.TextBoxFor(m => m.SearchReconcile835ListPage.ServiceCode,
+                                        new
+                                        {
+                                            data_ng_model = "TempReconcile835ListPage.ServiceCode",
+                                            @class = "form-control input-sm",
+                                            placeholder = Resource.ServiceCode,
+                                            maxlength = 50
+                                        })
+                                    </div>
+                                </div>*@
+
+
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3 clearfix">
+                                    <label class="control-label">@Resource.ServiceCode</label>
+                                    <div class="groupErrorParent  transportation-dropdown">
+                                        <select class="form-control input-sm groupError selectpicker"  data-buttonStyle="btn-sm btn-default"  multiple="multiple"
+                                    title="@Resource.SelectService" id="ServiceCodeID" @*convert_to_number=""*@
+                                    data-val="false" 
+                                    selectpicker="TempReconcile835ListPage.ServiceCodeID" name="Reconcile835Model.ServiceCodeIDs">
+                                            <option data-ng-repeat="option in Reconcile835Model.ServiceCodeList" value="{{option.ServiceCodeID}}">{{option.ServiceCode}}</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="form-group col-lg-1 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.Modifier</label>
+                                    <div>
+                                        @Html.DropDownListFor(p => p.SearchReconcile835ListPage.ModifierID, Model.ModifierList.ToSelectList(Model.SearchReconcile835ListPage.ModifierID.ToString() ?? "", "ModifierName", "ModifierID", @Resource.All, ""), new
+                        {
+                            convert_to_number = "",
+                            data_val = "false",
+                            data_ng_model = "TempReconcile835ListPage.ModifierID",
+                            data_ng_init = "TempReconcile835ListPage.ModifierID=TempReconcile835ListPage.ModifierID==''?null:TempReconcile835ListPage.ModifierID.toString()",
+                            @class = "form-control input-sm"
+                        })
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-1 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.POS</label>
+                                    <div>
+                                        @Html.DropDownListFor(p => p.SearchReconcile835ListPage.PosID, Model.PlaceOfServiceList.ToSelectList(Model.SearchReconcile835ListPage.PosID.ToString() ?? "", "PosName", "PosID", @Resource.All, ""), new
+                        {
+                            convert_to_number = "",
+                            data_val = "false",
+                            data_ng_model = "TempReconcile835ListPage.PosID",
+                            data_ng_init = "TempReconcile835ListPage.PosID=TempReconcile835ListPage.PosID==''?null:TempReconcile835ListPage.PosID.toString()",
+                            @class = "form-control input-sm"
+                        })
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.ClaimStatus</label>
+                                    <div>
+                                        @Html.DropDownListFor(p => p.SearchReconcile835ListPage.Status, Common.SetReconcileStatus().ToSelectList(Model.SearchReconcile835ListPage.Status ?? "", "Name", "Value", @Resource.All, ""), new
+                                                {
+                                                    data_val = "false",
+                                                    data_ng_model = "TempReconcile835ListPage.Status",
+                                                    data_ng_init = "TempReconcile835ListPage.Status=Reconcile835Model.Status==''?null:TempReconcile835ListPage.Status.toString()",
+                                                    @class = "form-control input-sm"
+                                                })
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.PayorClaimStatus</label>
+                                    <div>
+                                        @Html.DropDownListFor(p => p.SearchReconcile835ListPage.ClaimStatusCodeID, Model.ClaimStatusCodeList.ToSelectList(Model.SearchReconcile835ListPage.ClaimStatusCodeID.ToString() ?? "", "ClaimStatusName", "ClaimStatusCodeID", @Resource.All, ""), new
+                                        {
+                                            convert_to_number = "",
+                                            data_val = "false",
+                                            data_ng_model = "TempReconcile835ListPage.ClaimStatusCodeID",
+                                            data_ng_init = "TempReconcile835ListPage.ClaimStatusCodeID=Reconcile835Model.ClaimStatusCodeID==''?null:TempReconcile835ListPage.ClaimStatusCodeID.toString()",
+                                            @class = "form-control input-sm"
+                                        })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2 ">
+                                    <label class="control-label">@Resource.ServiceStartDate</label>
+                                    <div datepicker="TempReconcile835ListPage.ServiceStartDate" data-ng-dateval="TempReconcile835ListPage.ServiceStartDate" class="input-group date">
+                                        @Html.TextBoxFor(m => m.SearchReconcile835ListPage.ServiceStartDate,
+                            new
+                            {
+                                data_val = "false",
+                                @class = "form-control input-sm dateInputMask",
+                                placeholder = Resource.ServiceStartDate,
+                                maxlength = 10
+                            })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.ServiceEndDate</label>
+                                    <div datepicker="TempReconcile835ListPage.ServiceEndDate" data-ng-dateval="TempReconcile835ListPage.ServiceEndDate" class="input-group date">
+                                        @Html.TextBoxFor(m => m.SearchReconcile835ListPage.ServiceEndDate,
+                            new
+                            {
+                                data_val = "false",
+                                @class = "form-control input-sm dateInputMask",
+                                placeholder = Resource.ServiceEndDate,
+                                maxlength = 10
+                            })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+
+
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2 clearfix">
+                                    <label class="control-label">@Resource.DenialCode</label>
+                                    <div>
+                                        @Html.DropDownListFor(p => p.SearchReconcile835ListPage.ClaimAdjustmentReasonCodeID, Model.ClaimAdjustmentReasonCodeList.ToSelectList(Model.SearchReconcile835ListPage.ClaimAdjustmentReasonCodeID ?? "", "ClaimAdjustmentReasonDescription", "ClaimAdjustmentReasonCodeID", @Resource.All, ""), new
+                        {
+                            //convert_to_number = "",
+                            data_ng_model = "TempReconcile835ListPage.ClaimAdjustmentReasonCodeID",
+                            data_ng_init = "TempReconcile835ListPage.ClaimAdjustmentReasonCodeID=TempReconcile835ListPage.ClaimAdjustmentReasonCodeID==''?null:TempReconcile835ListPage.ClaimAdjustmentReasonCodeID.toString()",
+                            @class = "form-control input-sm fixedSelect"
+                        })
+                                    </div>
+                                </div>
+
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.GroupCode</label>
+                                    <div>
+                                        @Html.DropDownListFor(p => p.SearchReconcile835ListPage.ClaimAdjustmentGroupCodeID, Model.ClaimAdjustmentGroupCodeList.ToSelectList(Model.SearchReconcile835ListPage.ClaimAdjustmentGroupCodeID ?? "", "ClaimAdjustmentGroupCodeName", "ClaimAdjustmentGroupCodeID", @Resource.All, ""), new
+                        {
+                            //convert_to_number = "",
+                            data_ng_model = "TempReconcile835ListPage.ClaimAdjustmentGroupCodeID",
+                            data_ng_init = "TempReconcile835ListPage.ClaimAdjustmentGroupCodeID=TempReconcile835ListPage.ClaimAdjustmentGroupCodeID==''?null:TempReconcile835ListPage.ClaimAdjustmentGroupCodeID.toString()",
+                            @class = "form-control input-sm"
+                        })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2 ">
+                                    <label class="control-label">@Resource.Ch835RecordType</label>
+                                    <div>
+                                        @Html.DropDownListFor(p => p.SearchReconcile835ListPage.Str835ProcessedOnlyID, Model.Get835ProcessedOnlyList.ToSelectList(Model.SearchReconcile835ListPage.Str835ProcessedOnlyID.ToString(), "Name", "Value", "", ""), new
+                                        {
+                                            convert_to_number = "",
+                                            data_val = "false",
+                                            data_ng_model = "TempReconcile835ListPage.Str835ProcessedOnlyID",
+                                            data_ng_init = "TempReconcile835ListPage.Str835ProcessedOnlyID=TempReconcile835ListPage.Str835ProcessedOnlyID==null?'0':TempReconcile835ListPage.Str835ProcessedOnlyID.toString()",
+                                            @class = "form-control input-sm fixedSelect"
+                                        })
+                                    </div>
+                                </div>
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label">@Resource.Upload835File</label>
+                                    <input type="text"
+                                       token-input
+                                       ng-val="TempReconcile835ListPage.Upload835FileID"
+                                       textfield='FileName'
+                                       valuefield='Upload835FileID'
+                                       searchurl="{{GetUpload835URL}}"
+                                       placeholder="@Resource.SearchUplaoded835Files"
+                                       tokenlimit='1'
+                                       onresultsformatter='Upload835ResultsFormatter'
+                                       ontokenformatter="Upload835TokenFormatter"
+                                       ondeletecallback='RemoveUpload835'
+                                       onaddedcallback='AddedUpload835'
+                                       autoSelectFirstResult="true"
+                                       additional-filter-value="AdditionFilterForUpload835"                                           
+                                       additional-filter-text="searchParam"
+                                       autoSelectFirstResult="true"
+                                       minChars="1"
+                                       tokeninputobj="Upload835TokenObj"
+                                       id="Upload835Tkn"
+                                       customclass="form-control input-sm"
+                                       name="TempReconcile835ListPage.Upload835FileID"/>
+                                </div>
+
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                    <label class="control-label">@Resource.Service</label>
+                                    @Html.DropDownListFor(m => m.SearchReconcile835ListPage.ServiceID, Model.Services.ToSelectList(Convert.ToString(Model.SearchReconcile835ListPage.ServiceID), "Name", "Value", "All", "-1"),
+                                    new
+                                    {
+                                        id = "ServiceID",
+                                        data_ng_model = "TempReconcile835ListPage.ServiceID",
+                                        data_ng_init = "TempReconcile835ListPage.ServiceID = TempReconcile835ListPage.ServiceID==null?'-1':TempReconcile835ListPage.ServiceID.toString()",
+                                        @class = "form-control input-sm"
+                                    })
+                                </div>
+
+                                <div class="form-group col-lg-2 col-md-2 col-sm-2 clearfix">
+                                    <label class="control-label">@Resource.ClaimAdjustmentType</label>
+                                    @Html.DropDownListFor(m => m.SearchReconcile835ListPage.ClaimAdjustmentTypeID, Model.ClaimAdjustmentTypes.ToSelectList(Convert.ToString(Model.SearchReconcile835ListPage.ClaimAdjustmentTypeID), "Name", "Value", "All", "-1"),
+                                                                  new
+                                                                      {
+                                                                          id = "ServiceID",
+                                                                          data_ng_model = "TempReconcile835ListPage.ClaimAdjustmentTypeID",
+                                                                          data_ng_init = "TempReconcile835ListPage.ClaimAdjustmentTypeID = TempReconcile835ListPage.ClaimAdjustmentTypeID==null?'-1':TempReconcile835ListPage.ClaimAdjustmentTypeID.toString()",
+                                                                          @class = "form-control input-sm"
+                                                                      })
+                                </div>
+
+
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3 col-xs-12 no-right-padding">
+                                    <label class="control-label"></label>
+                                    <div>
+                                        <div class="btn-group">
+                                            <button type="submit" class="btn btn-sm blue" data-ng-click="SearchReconcile835Files()">@Resource.Search</button>
+                                        </div>
+                                        <div class="btn-group">
+                                            <button class="btn btn-sm grey border-grey-cascade " data-ng-click="ResetSearchFilter()">
+                                                @Resource.Reset
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space20">
+                                <hr />
+                            </div>
+
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+
+            <div class="btn-group" data-ng-show="Reconcile835List.length > 0">
+                <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                    <input id="SelectAllReconcile" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                    <label for="SelectAllReconcile"></label>
+                </span>
+            </div>
+
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+
+            <div class="btn-group padding-left-5" data-ng-if="SelectedReconcileIds.length > 0">
+                <div class="btn-group">
+                    <button type="button" class="btn btn-sm grey border-grey-cascade" data-toggle="dropdown" aria-expanded="false">
+                        <i class="fa fa-ellipsis-horizontal"></i>@Resource.AdjustmentAction
+                        <i class="fa fa-angle-down"></i>
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a href="javascript:void(0)" data-ng-click="BulkSetClaimAdjustmentFlag('@ClaimAdjustmentType.ClaimAdjustmentType_Void')" data-toggle="modal"><i class="fa fa-eraser"></i>@Resource.Void</a>
+                        </li>
+                        <li>
+                            <a href="javascript:void(0)" data-ng-click="BulkSetClaimAdjustmentFlag('@ClaimAdjustmentType.ClaimAdjustmentType_Replacement')"><i class="fa fa-exchange"></i>@Resource.Replacement</a>
+                        </li>
+                        <li class="divider"></li>
+                        <li>
+                            <a href="javascript:void(0)" data-ng-click="BulkSetClaimAdjustmentFlag('@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff')" data-toggle="modal"><i class="fa fa-file-text-o"></i>@Resource.WriteOff</a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+
+
+
+            <div class="btn-group margin-left-20PR">
+                <div class="top pagination-sm" data-ng-show="AjaxStart">
+                    <b>@Resource.Loading</b>
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+            </div>
+
+            <div class="inline-block pull-right" data-ng-show="Reconcile835List.length > 0">
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="Reconcile835ListPager.maxSize" on-page-change="Reconcile835ListPager.pageChanged(newPageNumber)" pagination-id="Reconcile835ListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+
+            <div class="pull-right excel-export">
+                <a data-ng-click="ExportReconcileList()" title="@Resource.ExportToExcel">
+                    <i class="font-green-soft fa fa-file-excel-o" style="font-size: 25px;"></i></a>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+
+
+    <div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive tblReconcile">
+                        <table class="table table-bordered table-striped table-condensed flip-content">
+                            <thead class="flip-content">
+                                <tr>
+                                    <th></th>
+                                    <th></th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('Status')">@Resource.ClaimStatus</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'Status'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('ClaimStatus')">@Resource.PayorClaimStatus</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'ClaimStatus'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('ClientName')">@Resource.ClientLabel</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'ClientName'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                     <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('Payor')">@Resource.Payor</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'Payor'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('AHCCCSID')" title="@Resource.AHCCCSID">@Resource.AHCCCSNumber</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'AHCCCSID'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('ClientDob')">@Resource.DOBShort</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'ClientDob'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('CISNumber')">@Resource.CISLabel</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'CISNumber'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('ServiceDate')">@Resource.ServiceDate</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'ServiceDate'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('ServiceCode')">@Resource.ServiceCode</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'ServiceCode'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('Modifier')" title="@Resource.Modifier">@Resource.ModifierShort</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'Modifier'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('PosID')">@Resource.POS</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'PosID'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('CalculatedUnit')">@Resource.Unit</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'CalculatedUnit'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('BilledAmount')">@Resource.BilledAmount</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'BilledAmount'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+
+                                    @* <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('AllowedAmount')">@Resource.AllowedAmount</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'AllowedAmount'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>*@
+
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('PaidAmount')">@Resource.PaidAmount</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'PaidAmount'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('BillingProviderNPI')">@Resource.NPI</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'BillingProviderNPI'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('BillingProvider')">@Resource.Provider</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'BillingProvider'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+
+                                    @*<th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('PayorClaimNumber')">@Resource.PayorClaimNumberLabel</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'PayorClaimNumber'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('ClaimNumber')">@Resource.ClaimNumberLabel</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'ClaimNumber'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('S277')">@Resource.S277</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'S277'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('S277CA')">@Resource.S277CA</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'S277CA'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>*@
+
+
+                                    @*<th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('Population')" title="@Resource.Population">@Resource.Pop</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'Population'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('Title')">@Resource.Title</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'Title'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                   <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('AdjustmentCode')" title="@Resource.AdjustmentCode">@Resource.AdjustCode</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'AdjustmentCode'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>
+                                    <th class="">
+                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="Reconcile835ListPager.sortColumn('LoadDate')">@Resource.LoadDate</a>
+                                        <span class="sortorder" data-ng-show="Reconcile835ListPager.sortIndex === 'LoadDate'" data-ng-class="{reverse:Reconcile835ListPager.reverse}"></span>
+                                    </th>*@
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in Reconcile835List | itemsPerPage: Reconcile835ListPager.pageSize" total-items="Reconcile835ListPager.totalRecords" current-page="Reconcile835ListPager.currentPage" pagination-id="Reconcile835ListPagerID">
+                                <tr id="openTrReconcile{{$index}}" >
+                                    <td class="td-reconcile">
+                                        <input type="checkbox" class="unicheckbox text-align-center margin-top-0" data-ng-model="item.IsChecked" data-ng-change="SelectReconcile(item)" val="item.IsChecked">
+                                    </td>
+                                    <td data-ng-class="{'badge-danger':item.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement',
+                                                        'badge-warning':item.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Void'  ,
+                                                        'badge-default':item.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff'}" 
+                                        data-ng-attr-title="{{item.ClaimAdjustmentTypeID}}">
+                                        <span class="collapseSource curser-pointer font-size-18 font-blue fa fa-plus-circle" 
+                                              data-ng-click="GetBatchNoteDetails(item,'#openTrReconcile'+$index)" 
+                                              data-ng-attr-id="{{'BNDetails-'+item.BatchNoteID }}"
+                                              data-toggle="collapse" 
+                                              data-ng-attr-data-target="{{'#BatchNoteDetails-'+item.BatchNoteID }}">
+                                        </span>
+                                    </td>
+                                    <td>{{item.Status ? item.Status:'@Resource.NA'}}</td>
+                                    <td>{{item.ClaimStatus ? item.ClaimStatus:'@Resource.NA'}}</td>
+
+                                    <td>{{item.ClientName ? item.ClientName:'@Resource.NA'}}</td>
+                                    <td>{{item.Payor ? item.Payor:'@Resource.NA'}}</td>
+
+                                    <td>{{item.AHCCCSID ? item.AHCCCSID:'@Resource.NA'}}</td>
+                                    <td>{{item.ClientDob |dateformat}}</td>
+                                    <td>{{item.CISNumber ? item.CISNumber:'@Resource.NA'}}</td>
+                                    <td>{{item.ServiceDate ? (item.ServiceDate|dateformat):'@Resource.NA'}}</td>
+                                    <td>{{item.ServiceCode ? item.ServiceCode :'@Resource.NA'}}</td>
+                                    <td>{{item.Modifier ? item.Modifier:'@Resource.NA'}}</td>
+                                    <td>{{item.PosID ? item.PosID:'@Resource.NA'}}</td>
+                                    <td>{{item.CalculatedUnit ? item.CalculatedUnit:'@Resource.NA'}}</td>
+                                    <td>{{item.BilledAmount ? (item.BilledAmount | currency):'@Resource.NA'}}</td>
+                                    @*<td>{{item.AllowedAmount ? (item.AllowedAmount | currency):'@Resource.NA'}}</td>*@
+                                    <td>{{item.PaidAmount ? (item.PaidAmount | currency) :'@Resource.NA'}}</td>
+                                    <td>{{item.BillingProviderNPI ? item.BillingProviderNPI:'@Resource.NA'}}</td>
+                                    <td>{{item.BillingProvider ? item.BillingProvider:'@Resource.NA'}}</td>
+
+                                    
+
+                                    @*<td>{{item.PayorClaimNumber ? item.PayorClaimNumber:'@Resource.NA'}}</td>
+                                    <td>{{item.ClaimNumber ? item.ClaimNumber:'@Resource.NA'}}</td>
+
+                                    <td>{{item.S277 ? item.S277:'@Resource.NA'}}</td>
+                                    <td>{{item.S277CA ? item.S277CA:'@Resource.NA'}}</td>*@
+
+
+
+                                    @*<td>{{item.Population ? item.Population:'@Resource.NA'}}</td>
+                                    <td>{{item.Title ? item.Title:'@Resource.NA'}}</td>*@
+                                    
+                                    @*<td>{{item.AdjustmentCode ? item.AdjustmentCode:'@Resource.NA'}}</td>
+                                    <td>{{item.LoadDate ? (item.LoadDate|dateformat) :'@Resource.NA'}}</td>*@
+
+
+
+                                    <td data-ng-class="{'badge-danger':item.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement',
+                                                        'badge-warning':item.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Void' , 
+                                                        'badge-default':item.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff'}" data-ng-attr-title="{{item.ClaimAdjustmentTypeID}}">
+                                        <div class="btn-group">
+                                            <a class="btn-xs dropdown-toggle no-padding" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                <i class="fa fa-adjust"></i>
+                                            </a>
+                                            <ul class="dropdown-menu pull-right">
+
+                                                <li data-ng-if="item.PayorClaimNumber">
+                                                    <a data-ng-click="SetClaimAdjustmentFlag(item,'@ClaimAdjustmentType.ClaimAdjustmentType_Void')"><i class="fa fa-eraser"></i>@Resource.Void</a>
+                                                </li>
+                                                <li data-ng-if="item.PayorClaimNumber">
+                                                    <a data-ng-click="SetClaimAdjustmentFlag(item,'@ClaimAdjustmentType.ClaimAdjustmentType_Replacement')"><i class="fa fa-exchange"></i>@Resource.Replacement</a>
+                                                </li>
+                                                <li>
+                                                    <a data-ng-click="SetClaimAdjustmentFlag(item,'@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff')"><i class="fa fa-file-text-o"></i>@Resource.WriteOff</a>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+
+                                    </td>
+                                </tr>
+                                <tr data-ng-attr-id="{{'BatchNoteDetails-'+item.BatchNoteID }}" class="collapse collapseDestination">
+                                    <td colspan="23">
+                                        <div class="space20"></div>
+                                        <div class="col-md-12">
+
+                                            <div class="tabbable tabbable-custom">
+                                                <ul class="nav nav-tabs" id="adjudicationRelatedTabs">
+                                                    <li class="active">
+                                                        <a data-ng-attr-id="adjudicationDetails{{item.BatchNoteID}}" data-ng-attr-data-target="#tab_Adjudication{{item.BatchNoteID}}" data-toggle="tab">@Resource.AdjudicationHistory</a>
+                                                    </li>
+                                                    <li class="">
+                                                        <a data-ng-attr-id="batchHistory{{item.BatchNoteID}}" data-ng-attr-data-target="#tab_BatchHistory{{item.BatchNoteID}}" data-toggle="tab">@Resource.BatchHistory</a>
+                                                    </li>
+                                                    <li class="">
+                                                        <a data-ng-attr-id="noteHistory{{item.BatchNoteID}}" data-ng-attr-data-target="#tab_NoteHistory{{item.BatchNoteID}}" data-toggle="tab">@Resource.NoteHistory</a>
+                                                    </li>
+                                                    <li class="pull-right" data-ng-if="item.ClaimAdjustmentTypeID">
+                                                        <span class="label" data-ng-class="{'label-danger':item.ClaimAdjustmentTypeID == '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement',
+                                                                                            'label-warning':item.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_Void' , 
+                                                                                            'label-default':item.ClaimAdjustmentTypeID=='@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff'}" >{{item.ClaimAdjustmentTypeID}}
+                                                        
+                                                        
+                                                        <a data-ng-click="SetClaimAdjustmentFlag(item,'@ClaimAdjustmentType.ClaimAdjustmentType_Remove')"><i class="fa fa-remove"></i></a>
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                                <div class="tab-content">
+                                                    <div class="tab-pane active" data-ng-attr-id="tab_Adjudication{{item.BatchNoteID}}">
+                                                        @Html.Partial("Partial/_AdjudicationHostory")
+                                                    </div>
+                                                    <div class="tab-pane" data-ng-attr-id="tab_BatchHistory{{item.BatchNoteID}}">
+                                                        @Html.Partial("Partial/_BatchHistory")
+                                                    </div>
+                                                     <div class="tab-pane" data-ng-attr-id="tab_NoteHistory{{item.BatchNoteID}}">
+                                                        @Html.Partial("Partial/_NoteHistory")
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="clearfix"></div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12" data-ng-if="Reconcile835List.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(Reconcile835ListPager.pageSize * Reconcile835ListPager.currentPage) - Reconcile835ListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(Reconcile835ListPager.pageSize == Reconcile835ListPager.currentPageSize) ? (Reconcile835ListPager.pageSize * Reconcile835ListPager.currentPage) :(Reconcile835ListPager.pageSize * Reconcile835ListPager.currentPage) - Reconcile835ListPager.pageSize  + Reconcile835ListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="Reconcile835ListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+
+
+                <div class="btn-group margin-left-20PR">
+                    <div class="top pagination-sm" data-ng-show="AjaxStart">
+                        <b>@Resource.Loading</b>
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+
+
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="Reconcile835ListPager.maxSize" on-page-change="Reconcile835ListPager.pageChanged(newPageNumber)" pagination-id="Reconcile835ListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+                <div data-ng-if="Reconcile835List.length == 0  ">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    @Html.Partial("Partial/_ClaimAdjustmentReason", Model)
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/batch/reconcile")
+    <script type="text/javascript">
+
+        var AdustmentType_Replacement = '@ClaimAdjustmentType.ClaimAdjustmentType_Replacement';
+        var AdustmentType_Void = '@ClaimAdjustmentType.ClaimAdjustmentType_Void';
+        var AdustmentType_WriteOff = '@ClaimAdjustmentType.ClaimAdjustmentType_WriteOff';
+        var AdustmentType_Remove = '@ClaimAdjustmentType.ClaimAdjustmentType_Remove';
+        var ReplacementConfirmationMessage = '@string.Format(@Resource.AdjTypeStatusConfirmationMessage, @ClaimAdjustmentType.ClaimAdjustmentType_Replacement)';
+        var VoidConfirmationMessage = '@string.Format(@Resource.AdjTypeStatusConfirmationMessage, @ClaimAdjustmentType.ClaimAdjustmentType_Void)';
+        var WriteOffConfirmationMessage = '@string.Format(@Resource.AdjTypeStatusConfirmationMessage, @ClaimAdjustmentType.ClaimAdjustmentType_WriteOff)';
+        var RemoveStatusMessage = '@Resource.RemoveStatusMessage';
+        var Comment = '@Resource.Comment';
+        var Uploaded = '@Resource.UploadedDate';
+
+        
+
+        @* var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Reconcile835File)';
+        var ProcessConfirmationMessage = '@string.Format(@Resource.ProcessConfirmationMessage, @Resource.Reconcile835File)';
+        var Invalid835UploadMessage = '@Resource.Invalid835UploadMessage';
+        var MaximumUploadImageSizeMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage2MB))';
+        var Select835File = '@Resource.Select835File';*@
+
+    </script>
+}

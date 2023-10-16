@@ -1,0 +1,243 @@
+﻿@model RefAuditLogPageModel
+
+@Html.Hidden("hdnSetAuditPageModel", Common.SerializeObject(Model))
+<div class="row-fluid">
+    <div class="">
+        <div class="row">
+            <div class="padding-bottom-10 col-lg-8 col-md-8 col-sm-12">
+                <div class=" no-left-padding col-lg-6 col-md-6 col-sm-12">
+                    <span class="label-italic">
+                        <b class="font-red-thunderbird">@Resource.NoteLabel</b>
+                        <span>@Html.Raw(Resource.AuditLogDetails)</span>
+                    </span>
+                </div>
+                <div class="no-right-padding col-lg-6 col-md-6 col-sm-12">
+
+                    <div class="top pagination-sm">
+                        <dir-pagination-controls boundary-links="true" max-size="AuditLogListPager.maxSize"
+                            on-page-change="AuditLogListPager.pageChanged(newPageNumber)" pagination-id="AuditLogListPagerID"></dir-pagination-controls>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+            @*  <div class="padding-bottom-10 col-lg-4 col-md-4 col-sm-12">
+                 <div class="form-group"><strong>@Resource.Search</strong></div>
+                 
+                </div>*@
+
+        </div>
+
+        <div class="row">
+            <div class="row-fluid  col-lg-8">
+                @*<form action="#" class="horizontal-form">*@
+                <div class="row-fluid" data-ng-show="AuditLogList.length > 0">
+                    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+
+                        <div class="portlet-body compact ">
+                            <div id="windowTable" class="dataTables_wrapper ">
+                                <table class="table table-bordered table-striped table-hover table-condensed">
+                                    <thead>
+                                        <tr>
+                                            <th class="width-20px">
+                                                @Resource.Hash
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="AuditLogListPager.sortColumn('CreatedByName')">@Resource.UpdatedBy
+                                                    <span class="sortorder" data-ng-show="AuditLogListPager.sortIndex === 'CreatedByName'" data-ng-class="{reverse:AuditLogListPager.reverse}"></span></a>
+
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="AuditLogListPager.sortColumn('CreatedDate')">@Resource.UpdatedDate</a>
+                                                <span class="sortorder" data-ng-show="AuditLogListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:AuditLogListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="AuditLogListPager.sortColumn('DataModel')">@Resource.Table</a>
+                                                <span class="sortorder" data-ng-show="AuditLogListPager.sortIndex === 'DataModel'" data-ng-class="{reverse:AuditLogListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="AuditLogListPager.sortColumn('AuditActionType')">@Resource.Action</a>
+                                                <span class="sortorder" data-ng-show="AuditLogListPager.sortIndex === 'AuditActionType'" data-ng-class="{reverse:AuditLogListPager.reverse}"></span>
+                                            </th>
+                                            <th>
+                                                <span class="pull-right" data-ng-show="AjaxStart">
+                                                    <img src="~/Assets/images/lazyload.gif" />
+                                                </span>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+
+                                        <tr dir-paginate="auditItem in AuditLogList | itemsPerPage: AuditLogListPager.pageSize" total-items="AuditLogListPager.totalRecords" current-page="AuditLogListPager.currentPage" pagination-id="AuditLogListPagerID">
+                                            <td>{{(AuditLogListPager.pageSize * AuditLogListPager.currentPage) - AuditLogListPager.pageSize + ($index + 1) }}</td>
+                                            <td>{{auditItem.CreatedByName}}</td>
+                                            <td>{{auditItem.CreatedDate | datetimeformat | orgdatetime}}</td>
+                                            <td>{{auditItem.DataModel}}</td>
+                                            <td>{{auditItem.AuditActionType}}</td>
+                                            <td>
+                                                <a href="#AuditView" data-ng-click="AuditView(auditItem)" data-toggle="modal">@Resource.AuditView</a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="clearfix"></div>
+                    <div class="row">
+                        <div class="space20">
+                            <hr />
+                        </div>
+                        <div class="col-md-12 col-sm-12">
+                            <span>
+                                @Resource.Showing <span data-ng-bind="(AuditLogListPager.pageSize * AuditLogListPager.currentPage) - AuditLogListPager.pageSize  + 1"></span>
+                                &nbsp;@Resource.To <span data-ng-bind="(AuditLogListPager.pageSize == AuditLogListPager.currentPageSize) ? (AuditLogListPager.pageSize * AuditLogListPager.currentPage) :(AuditLogListPager.pageSize * AuditLogListPager.currentPage) - AuditLogListPager.pageSize  + AuditLogListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="AuditLogListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                <span class="padding-left-25 top pagination-sm" data-ng-show="AjaxStart">
+                                    @Resource.Loading
+                                    <img src="~/Assets/images/lazyload.gif" />
+                                </span>
+                            </span>
+
+                            <div class="pull-right top pagination-sm">
+                                <dir-pagination-controls boundary-links="true" max-size="AuditLogListPager.maxSize"
+                                    on-page-change="AuditLogListPager.pageChanged(newPageNumber)" pagination-id="AuditLogListPagerID"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                @*</form>*@
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div data-ng-if="AuditLogList.length == 0">
+                            <span class="padding-left-25 top pagination-sm" data-ng-show="AjaxStart">
+                                @Resource.Loading
+                                <img src="~/Assets/images/lazyload.gif" />
+                            </span>
+                            <div class="row" data-ng-show="!AjaxStart">
+                                <div class="col-lg-12">
+                                    <div class="alert alert-danger">
+                                        @Html.Raw(Resource.NoRecordsFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row-fluid col-lg-4">
+
+
+                <form id="frmAuditLog">
+                    <div class="frmAuditLog">
+                        <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            @*<label class="control-label">@Resource.UpdatedBy</label>*@
+                            @Html.TextBoxFor(m => m.SearchRefAuditLogListModel.UpdatedBy, new { data_ng_model = "TempSearchRefAuditLogListModel.UpdatedBy", @class = "form-control input-sm", placeholder = Resource.UpdatedBy, maxlength = 50 })
+                        </div>
+                        <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            @*<label class="control-label">@Resource.Table</label>*@
+                            @Html.TextBoxFor(m => m.SearchRefAuditLogListModel.Table, new { data_ng_model = "TempSearchRefAuditLogListModel.Table", @class = "form-control input-sm", placeholder = Resource.Table, maxlength = 50 })
+                        </div>
+
+                        <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            @*<label class="control-label">@Resource.LastAttFromDate</label>*@
+                            <div class="input-group date no-focus" datepicker="TempSearchRefAuditLogListModel.UpdatedFromDate" ng-dateval="TempSearchRefAuditLogListModel.UpdatedFromDate">
+                                @Html.TextBoxFor(m => m.SearchRefAuditLogListModel.UpdatedFromDate, new { @class = "no-focus form-control input-sm", placeholder = @System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(Resource.From) })
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            @*<label class="control-label">@Resource.LastAttToDate</label>*@
+                            <div class="input-group date no-focus" datepicker="TempSearchRefAuditLogListModel.UpdatedToDate" ng-dateval="TempSearchRefAuditLogListModel.UpdatedToDate">
+                                @Html.TextBoxFor(m => m.SearchRefAuditLogListModel.UpdatedToDate, new { @class = "no-focus form-control input-sm", placeholder = @System.Threading.Thread.CurrentThread.CurrentCulture.TextInfo.ToTitleCase(Resource.To) })
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+
+                        <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            @*<label class="control-label">@Resource.LastAttToDate</label>*@
+                            @Html.DropDownListFor(p => p.SearchRefAuditLogListModel.ActionName, Common.SetCRUDActions().ToSelectList(Model.SearchRefAuditLogListModel.ActionName ?? "", "Name", "Value", Resource.SelectAction, ""),
+                                              new
+                                                  {
+                                                      data_ng_model = "TempSearchRefAuditLogListModel.ActionName",
+                                                      data_ng_init = "TempSearchRefAuditLogListModel.ActionName=TempSearchRefAuditLogListModel.ActionName==''?null:TempSearchRefAuditLogListModel.ActionName",
+                                                      @class = "form-control input-sm",
+                                                      data_val = false
+                                                  })
+                        </div>
+
+
+                        <div class="form-group col-lg-6 col-md-12 col-sm-12 col-xs-12">
+                            <div>
+                                <div class="col-md-6 no-padding">
+                                    <a class="btn btn-sm btn-primary form-control" data-ng-click="SearchRefAudit()">
+                                        @Resource.Search
+                                    </a>
+                                </div>
+                                <div class="col-md-6 no-right-padding">
+                                    <a class="btn btn-sm grey border-grey-cascade form-control" data-ng-click="ResetSearchFilter()">
+                                        @Resource.Reset
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+
+
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="modal fade" id="AuditView" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>@Resource.AuditView</span></h4>
+                </div>
+                <div class="modal-body">
+
+                    <table class="table table-condensed" cellpadding='5'>
+                        <thead>
+                            <tr class='active'>
+                                <td colspan='2'>@Resource.EventDate: <strong>{{AuditViewDetail.CreatedDate | orgdatetime}}</strong></td>
+                                <td>@Resource.ActionType: <strong>{{AuditViewDetail.AuditActionType}}</strong></td>
+                            </tr>
+                            <tr class='text-warning'>
+                                <td class="col-lg-4">@Resource.FieldName</td>
+                                <td class="col-lg-4">@Resource.BeforeChange</td>
+                                <td class="col-lg-4">@Resource.AfterChange</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="changeitem in AuditViewDetail.ChangesList">
+                                <td>{{changeitem.FieldName}}</td>
+                                <td>{{changeitem.ValueBefore}}<span data-ng-class="{'small-loader':changeitem.LoadInProgress && changeitem.TableName}"></span></td>
+                                <td>{{changeitem.ValueAfter}}<span data-ng-class="{'small-loader':changeitem.LoadInProgress && changeitem.TableName}"></span> &nbsp; <span class="CallGetTableDisplayValue" data-ng-if="changeitem.TableName" data-ng-click="GetTableDisplayValue(changeitem)"></span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal">@Resource.Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

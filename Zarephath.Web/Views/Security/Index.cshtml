@@ -1,0 +1,108 @@
+﻿@model LoginModel
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Login);
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+    CacheHelper chHelper = new CacheHelper();
+    //CacheHelper_MyezCare ch_MyezcareOrg = new CacheHelper_MyezCare();
+    //MyEzcareOrganization myezCareOrg = ch_MyezcareOrg.GetCachedData<MyEzcareOrganization>();
+}
+@Html.Hidden("hdnLoginModel", Common.SerializeObject(Model))
+<div data-ng-controller="LoginController">
+    
+    <section class="loginWrapper">
+        <div class="cstmContainer">
+            <div class="rightWrapper">
+                <div class="formWrapper">
+                    <div class="headingContent">
+                        <h4>Login into account</h4>
+                        <p>Use your credentials to access your account.</p>
+                    </div>
+                    <div class="alert alert-info alert-dismissable" data-ng-if="IsNotVerifiedEmail">
+                        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                        <span class="alert-link">Information:</span>
+                        <span>Don't received verification email yet, click <a href="javascript:;" data-ng-click="ResendVerificationLink()"><b>here</b> </a>to resend.</span>
+                    </div>
+                    <form class="login-form" role="form" method="POST" id="frmLogin">
+                        <div class="form-group">
+                            <label class="control-label visible-ie8 visible-ie9">@Resource.Username</label>
+                            @Html.TextBoxFor(m => m.UserName, new { data_ng_model = "LoginModel.UserName", placeholder = @Resource.Username, @class = "form-control form-control-solid placeholder-no-fix", maxlength = 30, name = "uname" })
+                            @Html.ValidationMessageFor(m => m.UserName)
+                        </div>
+                        <div class="form-group" ng-if="!showPassword">
+                            <label class="control-label visible-ie8 visible-ie9">@Resource.Password</label>
+                            @Html.PasswordFor(m => m.Password, new { data_ng_model = "LoginModel.Password", type = @Resource.Password, placeholder = "Password", @class = "form-control form-control-solid placeholder-no-fix", maxlength = 20, name = "password" })
+                            <span class="glyphicon glyphicon-eye-open form-control-eye" id="ViewPassword" data-ng-click="ViewPassword()"
+                                  style="cursor: pointer; pointer-events: all;">
+                            </span>
+                            @Html.ValidationMessageFor(m => m.Password)
+
+                        </div>
+                        <div class="form-group" ng-if="showPassword">
+                            <label class="control-label visible-ie8 visible-ie9">@Resource.Password</label>
+                            @* @Html.PasswordFor(m => m.Password, new { data_ng_model = "LoginModel.Password", type = "password", placeholder = "Password", @class = "form-control form-control-solid placeholder-no-fix", maxlength = 20, name = "password" })*@
+                            <input type="text" data-ng-model="LoginModel.Password" placeholder="Password" class="form-control form-control-solid placeholder-no-fix" maxlength=20 name="password" />
+                            <span class="glyphicon glyphicon-eye-close form-control-eye" id="ViewPassword" data-ng-click="ViewPassword()"
+                                  style="cursor: pointer; pointer-events: all;">
+                            </span>
+                            @Html.ValidationMessageFor(m => m.Password)
+
+                        </div>
+                        <div class="form-group" data-ng-show="ShowCaptcha">
+                            <div class="g-recaptcha" data-sitekey="@ConfigSettings.ReCapchaSiteKey"></div>
+                            <div id="alert-container" class="padding-top-10" data-s="flash-messages" data-ng-show="ShowCaptchaError">
+                                <div class="alert alert-danger alert-static" role="alert">
+                                    @Resource.MustSolveCaptcha
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group ftLinks">
+                            <label class="rememberme check no-margin mt-checkbox mt-checkbox-outline">
+                                <input type="checkbox" name="remember" class="uniformControls" data-uniform-value="LoginModel.IsRemember" value="1" data-ng-model="LoginModel.IsRemember" />@Resource.RememberMe
+                            </label>
+                            <div class="forgotPasscode">
+                                <a href="@Constants.ForgotPasswordURL" id="forget-password" class="forget-password no-margin" title="Forgot Password">@Resource.ForgotPasswordQ</a>
+                                <a href="@Constants.UnlockAccountURL" id="forget-password" class="forget-password no-margin clear-both padding-top-15" data-ng-show="AccountLocked">@Resource.UnlockAccountQ</a>
+                            </div>
+                        </div>
+                        <button class="btn uppercase btn-block btn-cstm" data-ng-click="Login()">@Resource.Login</button>
+                        <div class="loginSociallinks">
+                            <span>
+                                <a target="_blank" href="@Model.AndroidAppDownloadURL" role="button" class="pull-left" title="App Store"><img src="~/Assets/images/google-play-badge.png" alt="App Store icon" /></a>
+                            </span>
+                            <span>
+                                <a target="_blank" title="Google Play" href="@Model.iOSAppDownloadURL" role="button" class="pull-right"><img src="~/Assets/images/app-store-badge.png" alt="Play Store icon" /></a>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="leftWrapper">
+                <div class="logoContainer">
+                    <img src="../Assets/images/myezcaresimpleyetpowerful_Logo.png" alt="Logo">
+                </div>
+                <div class="announcementContent">
+                    <h2>Announcement <span class="icon"><img src="../Assets/images/promotion.svg" alt="icon"></span></h2>
+                    @Html.Partial("Partial/Announcement", Model)
+                    @*<p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+        <p>when an unknown printer took a galley of type and scrambled</p>
+        <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>
+        <p>when an unknown printer took a galley of type and scrambled printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s.</p>*@
+
+                </div>
+            </div>
+
+        </div>
+    </section> 
+</div>
+
+@section Scripts{
+    <script src='https://www.google.com/recaptcha/api.js'></script>
+    @Scripts.Render("~/assets/js/viewjs/security/login")
+    <script>
+        var ShowCaptch = '@Constants.ShowCaptch';
+        var AccountLocked = '@Constants.AccountLocked';
+    </script>
+
+}
+

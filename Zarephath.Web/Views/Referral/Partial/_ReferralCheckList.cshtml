@@ -1,0 +1,1029 @@
+﻿@model SetReferralCheckListModel
+@Html.Hidden("hdnSetReferralCheckListModel", Common.SerializeObject(Model))
+<form id="frmReferralCheckList">
+    <div class="row">
+        <div class="col-md-6 col-sm-6 padding-left-25">
+            <span class="badge  badge-success" data-ng-if="ReferralCheckList.IsCheckListOffline">
+                <strong>@Resource.FormIsOffline</strong>
+            </span>
+        </div>
+        <div class="col-md-6 col-sm-6 pull-right no-print text-align-right">
+            <a class="btn btn-sm yellow btn-primary margin-right-10" data-ng-click="PrintDiv('print-content')" title="Print"><i class="fa fa-print"></i>&nbsp;@Resource.Print</a>
+            @if (Common.HasPermission(Constants.Permission_ReferralChecklist_AddUpdate))
+            {
+                <button data-ng-click="ResetReferralCheckList()" class="btn btn-sm red">
+                    <i class="fa fa-remove">&nbsp;&nbsp;</i>@Resource.Reset
+                </button>
+                <button data-ng-click="SaveReferralCheckList()" class="btn btn-sm green-jungle">
+                    <i class="fa fa-save">&nbsp;&nbsp;</i>@Resource.Save
+                </button>
+            }
+
+        </div>
+
+        <div>
+            <div class="col-lg-12 col-md-12 col-xs-12 display-in-print display-none">
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6  pull-left">
+                    <img src="/Assets/images/logo-zrpath.png" />
+                </div>
+                <div class="col-lg-6 col-md-6 col-sm-6 col-xs-6 pull-right">
+                    <label class="font-size-30 pull-right margin-top-15">@Resource.NewReferralChecklist</label>
+                </div>
+            </div>
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding content-checklist">
+
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 form-md-line-input">
+                    <label class="col-lg-2 col-md-2 col-sm-3 col-xs-4 control-label">@Resource.ReferralReceived</label>
+                    <label class=" col-xs-8 display-none display-in-print control-label">{{ReferralDetail.ReferralName}}</label>
+                    <div class="col-lg-8 col-md-8 col-sm-8 col-xs-8 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralDetailModel.ReferralName, new { data_ng_model = "ReferralDetail.ReferralName", @class = "form-control input-sm prevent-enable", disabled = "disabled" })
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 col-xs-4 control-label">@Resource.ClientDob</label>
+                    <label class=" col-xs-8 display-none display-in-print control-label">{{ReferralDetail.DateOfBirth}}</label>
+                    <div class="col-md-8 col-sm-8 col-xs-8 hide-in-print" datepicker="ReferralDetail.DateOfBirth" ng-dateval="ReferralDetail.DateOfBirth">
+                        @Html.TextBoxFor(m => m.ReferralDetailModel.DateOfBirth, new { @class = "form-control input-sm prevent-enable", disabled = "disabled", date_mask = "" })
+                        <label class="display-none display-in-print form-control">{{ReferralDetail.DateOfBirth}}</label>
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 col-xs-4 control-label">@Resource.AHCCCSID</label>
+                    <label class=" col-xs-8 display-none display-in-print control-label">{{ReferralDetail.AHCCCSID}}</label>
+                    <div class="col-md-8 col-sm-8 col-xs-8 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralDetailModel.AHCCCSID, new { data_ng_model = "ReferralDetail.AHCCCSID", @class = "form-control input-sm prevent-enable", disabled = "disabled" })
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 col-xs-4 control-label">@Resource.CISNumber</label>
+                    <label class=" col-xs-8 display-none display-in-print control-label">{{ReferralDetail.CISNumber}}</label>
+                    <div class="col-md-8 col-sm-8 col-xs-8 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralDetailModel.CISNumber, new { data_ng_model = "ReferralDetail.CISNumber", @class = "form-control input-sm prevent-enable", disabled = "disabled" })
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 col-xs-4 control-label">@Resource.ReferringAgency</label>
+                    <label class=" col-xs-8 display-none display-in-print control-label">{{ReferralCheckList.ReferringAgency}}</label>
+                    <div class="col-md-8 col-sm-8 col-xs-8 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralDetailModel.ReferringAgency, new { data_ng_model = "ReferralCheckList.ReferringAgency", @class = "form-control input-sm hide-in-print prevent-enable", disabled = "disabled" })
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 col-xs-4 control-label">@Resource.Payor</label>
+                    <label class=" col-xs-8 display-none display-in-print control-label">{{ReferralCheckList.ReferringAgency}}</label>
+                    <div class="col-md-8 col-sm-8 col-xs-8 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralDetailModel.Payor, new { data_ng_model = "ReferralCheckList.Payor", @class = "form-control input-sm hide-in-print prevent-enable", disabled = "disabled" })
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 col-xs-4 control-label">@Resource.FacilatorInformation</label>
+                    <label class=" col-xs-8 display-none display-in-print control-label">{{ReferralCheckList.FacilatorInformation}}</label>
+                    <div class="col-md-8 col-sm-8 col-xs-8 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralDetailModel.FacilatorInformation, new { data_ng_model = "ReferralCheckList.FacilatorInformation", @class = "form-control input-sm prevent-enable", disabled = "disabled", maxlength = "100" })
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 form-md-line-input">
+                    <label class="col-md-2 col-sm-3 col-xs-4 control-label">@Resource.ReferralReceived</label>
+                    <label class=" col-xs-8 display-none display-in-print control-label">{{ReferralDetail.ReferralReceived | dateformat}}</label>
+                    <div class="col-md-8 col-sm-8 col-xs-8 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralDetailModel.ReferralReceived,
+                                         new
+                                             {
+                                                 data_ng_value = "ReferralDetail.ReferralReceived | dateformat",
+                                                 @class = "form-control input-sm date-picker prevent-enable",
+                                                 disabled = "disabled",
+                                                 maxlength = "100"
+                                             })
+                    </div>
+                </div>
+
+                <div class="space40"></div>
+
+                <div class="form-group col-md-12 col-sm-12 col-xs-12 ">
+                    <label class="col-md-2 col-sm-2 col-xs-2 control-label bold">@Resource.UpdateAgencyCM</label>
+                    @Html.TextBoxFor(x => x.ReferralCheckList.CaseManagerID,
+                                                 new
+                                                     {
+                                                         ng_model = "ReferralCheckList.CaseManagerID",
+                                                         @class = "form-control hideErrorContent replaceErrorSource",
+                                                     })
+                    @Html.ValidationMessageFor(x => x.ReferralCheckList.CaseManagerID)
+                    <div class="col-md-5 col-sm-5 col-xs-5 hide-in-print ">
+                        <div class="replaceErrorDest dis_autocompleter">
+                            <input type="text"
+                                   token-input
+                                   ng-val="ReferralCheckList.CaseManagerID"
+                                   textfield='Name'
+                                   valuefield='CaseManagerID'
+                                   searchurl="{{GetCaseManagersURL}}"
+                                   placeholder="@Resource.EnterCaseManagerAndAgencyInformation"
+                                   tokenlimit='1'
+                                   onresultsformatter='CL_CaseManagerResultsFormatter'
+                                   ondeletecallback='CL_RemoveCaseManager'
+                                   ontokenformatter="CL_CaseManagerTokenFormatter"
+                                   onaddedcallback="CL_CaseManagerAdded"
+                                   autoSelectFirstResult="false"
+                                   minChars="1"
+                                   tokeninputobj="CL_CaseManagerTokenObj"
+                                   id="CL_CaseManagerIDToken"
+                                   customclass="form-control input-sm"
+                                   name="ReferralCheckList.CaseManagerID"/>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group col-md-10 col-sm-10 col-xs-10 ">
+                    <div class="row portlet-body compact">
+                        @*@Html.TextBoxFor(q => q.DXCodeCount,
+                                 new
+                                     {
+                                         data_ng_model = "DXCodeCount",
+                                         @class = "form-control hideErrorContent replaceErrorSource",
+                                     })
+
+                        @Html.ValidationMessageFor(m => m.DXCodeCount)*@
+                        <div class=" col-md-12 ">
+                            <div class="replaceErrorDest pull-left">
+                                <div class="col-md-12">
+
+                                    <h5><strong>@Resource.AddDxCode</strong></h5>
+                                </div>
+                                <hr class="clear-both" />
+                                <div class="dis_autocompleter">
+                                    @*</form>*@
+                                    @*<form id="frmAddDxCode">*@
+                                    <div class="col-md-12 no-padding">
+
+                                        <div class="form-group col-lg-3 col-md-3 col-sm-6 ">
+                                            <label class="control-label required">@Resource.DXCode</label>
+                                            <div class="" id="dxCodeAuotComplete">
+                                                <input token-input type='text'
+                                           ng-val='ReferralDXCodeMapping.DXCodeID'
+                                           onresultsformatter='OnDxCodeResultsFormatter'
+                                           tokeninputobj='DxCodeTokenInputObj'
+                                           additional-filter-text='ignoreIds'
+                                           additional-filter-value='TempSelectedDXCodeIDs.toString()'
+                                           textfield='DXCodeName'
+                                           valuefield='DXCodeID'
+                                           tokenlimit='1'
+                                           onaddedcallback="OnDXCodeAdd"
+                                           autoSelectFirstResult="false"
+                                           minChars="1"
+                                           customClass="form-control input-sm"
+                                           searchurl='{{GetDXCodeListForAutoCompleteURL}}'
+                                           placeholder='@Resource.DXCodes' minChars="0" />
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-lg-2 col-md-2 col-sm-4">
+                                            <label class="control-label required">
+                                                @Resource.StartDate
+                                            </label>
+                                            <div class="input-group col-md-12" datepicker="ReferralDXCodeMapping.StartDate"
+                                                data-ng-dateval="ReferralDXCodeMapping.StartDate">
+                                                @Html.TextBoxFor(q => q.ReferralDXCodeMapping.StartDate,
+                                        new
+                                            {
+                                                @class = "form-control date input-sm dateInputMask",
+                                                placeholder = Resource.StartDate
+                                            })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-lg-2 col-md-2 col-sm-4">
+                                            <label class="control-label">
+                                                @Resource.EndDate
+                                            </label>
+                                            <div class="input-group col-md-12" datepicker="ReferralDXCodeMapping.EndDate"
+                                                data-ng-dateval="ReferralDXCodeMapping.EndDate">
+                                                @Html.TextBoxFor(q => q.ReferralDXCodeMapping.EndDate, new
+                                           {
+                                               @class = "form-control date input-sm dateInputMask",
+                                               placeholder = Resource.EndDate
+                                           })
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-lg-2 col-md-2 col-sm-4">
+                                            <label class="control-label required">@Resource.Precedence</label>
+                                            <div class="input-group col-md-12">
+                                                @Html.TextBoxFor(q => q.ReferralDXCodeMapping.Precedence, new
+                                    {
+                                        @class = "form-control input-sm",
+                                        data_ng_model = "ReferralDXCodeMapping.Precedence",
+                                        placeholder = Resource.Precedence,
+                                        maxlength = 3,
+                                        key_press_validation = "Digit"
+                                    })
+                                            </div>
+                                        </div>
+                                        @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                                        {
+                                            <div class="form-group col-lg-2 col-md-2 col-sm-4 margin-top-18">
+                                                <a class="btn btn-sm btn-info" data-ng-click="SaveReferralDXCodeMapping()">
+                                                    <i class="fa fa-save ">&nbsp;&nbsp;</i>@Resource.Add
+                                                </a>
+                                            </div>
+                                        }
+                                    </div>
+                                    @*</form>*@
+                                    <div class="form-group col-lg-9 col-md-9 col-sm-12 table-responsive" data-ng-if="DxCodeMappingList.length > 0" data-ng-cloak>
+                                        <label class="control-label"></label>
+
+                                        <div>
+                                            <table class="table table-advance table-bordered table-striped table-hover table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th><strong>@Resource.Type</strong></th>
+                                                        <th><strong>@Resource.DXCode</strong></th>
+                                                        <th><strong>@Resource.Description</strong></th>
+                                                        <th class="text-align-center"><strong>@Resource.Precedence</strong></th>
+                                                        <th class=""><strong>@Resource.StartDate</strong></th>
+                                                        <th class=""><strong>@Resource.EndDate</strong></th>
+                                                        <th class="width-10px"><strong>@Resource.Action</strong></th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr data-ng-class="{'deleted':dxCode.IsDeleted}" data-ng-repeat="dxCode in DxCodeMappingList">
+                                                        <td>{{dxCode.DxCodeShortName }}</td>
+                                                        @*<td>{{dxCode.DXCodeName}}</td>*@
+                                                        <td>{{(dxCode.DXCodeWithoutDot ? dxCode.DXCodeWithoutDot :'@Resource.NA') +' (' + dxCode.DXCodeName +')'}}</td>
+                                                        <td>{{dxCode.Description}}</td>
+                                                        <td class="text-align-center">{{(dxCode.Precedence)? dxCode.Precedence :'@Resource.NA'}}</td>
+                                                        <td data-ng-if="dxCode.StartDate">{{dxCode.StartDate | dateformat}}</td>
+                                                        <td data-ng-if="!dxCode.StartDate">@Resource.NA</td>
+                                                        <td data-ng-if="dxCode.EndDate">{{dxCode.EndDate | dateformat}}</td>
+                                                        <td data-ng-if="!dxCode.EndDate">@Resource.NA</td>
+                                                        <td class="text-center">
+                                                            @if (Common.HasPermission(Constants.Permission_ReferralDetails_AddUpdate))
+                                                            {
+                                                                <a data-ng-click="EditDxCodeFromMapping(dxCode)"><i class="fa fa-edit curser-pointer"></i></a>
+                                                                <a data-ng-click="DeleteDxCodeFromMapping(dxCode,'Delete Records')"><i class="fa fa-remove curser-pointer"></i></a>
+                                                            }
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+                <div class="form-group col-md-12 col-sm-12">
+                    <strong>@Resource.PreliminaryReviewText</strong>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12">
+                    <div class="col-md-1 col-sm-1 col-xs-1">
+                        <input data-ng-model="ReferralCheckList.ServiceRequested" type="checkbox" id="ReferralCheckList_ServiceRequested" class="unicheckbox" val="ReferralCheckList.ServiceRequested">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-5">
+                        @Html.LabelFor(m => m.ReferralCheckList.ServiceRequested, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-7">
+                        <div class="mt-checkbox-inline">
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralCheckList.RespiteService"
+                                    class="uniformControls" data-uniform-value="ReferralCheckList.RespiteService"
+                                    type="checkbox">@Resource.Respite<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralCheckList.LifeSkillsService"
+                                    class="uniformControls" data-uniform-value="ReferralCheckList.LifeSkillsService"
+                                    type="checkbox">
+                                @Resource.LifeSkillsService<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralCheckList.CounselingService"
+                                    class="uniformControls" data-uniform-value="ReferralCheckList.CounselingService"
+                                    type="checkbox">@Resource.Counseling<span></span>
+                            </label>
+                            <label class="mt-checkbox mt-checkbox-outline">
+                                <input data-ng-model="ReferralCheckList.ConnectingFamiliesService"
+                                    class="uniformControls" data-uniform-value="ReferralCheckList.ConnectingFamiliesService"
+                                    type="checkbox">@Resource.ConnectingFamiliesService<span></span>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.FacilitatorContacted" id="ReferralCheckList_FacilitatorContacted" class="unicheckbox" val="ReferralCheckList.FacilitatorContacted">
+                    </div>
+
+                    <div class="col-md-5 col-sm-5 col-xs-8">
+                        @Html.LabelFor(m => m.ReferralCheckList.FacilitatorContacted, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class=" col-xs-4 display-none display-in-print control-label">{{ReferralCheckList.FacilitatorContactedText}}</label>
+                    <div class="col-md-5 col-sm-5 col-xs-7 hide-in-print">
+                        @Html.DropDownListFor(p => p.ReferralCheckList.FacilitatorContacted, Model.YesNoList.ToSelectList(Model.ReferralCheckList.FacilitatorContacted.ToString() ?? "", "Name", "Value"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralCheckList.FacilitatorContacted",
+                                                  data_ng_init = "ReferralCheckList.FacilitatorContacted=(ReferralCheckList.FacilitatorContacted=null?'':ReferralCheckList.FacilitatorContacted.toString())",
+                                                  @class = "form-control",
+                                                  convert_to_boolean = "",
+                                                  data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                              })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1">
+                        <input data-ng-model="ReferralCheckList.AHCCCSVerification" type="checkbox" id="ReferralCheckList_AHCCCSVerification" class="unicheckbox" val="ReferralCheckList.AHCCCSVerification">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-10">
+                        @Html.LabelFor(m => m.ReferralCheckList.AHCCCSVerification, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-2 display-none display-in-print control-label">{{ReferralCheckList.AHCCCSVerificationText}}</label>
+
+                    <div class="col-md-5 col-sm-5 hide-in-print">
+                        <div class="input-group date" datepicker="ReferralCheckList.AHCCCSVerificationText" ng-dateval="ReferralCheckList.AHCCCSVerificationText">
+                            <input class="form-control input-sm"
+                                id="ServiceDate" maxlength="10"
+                                name="ReferralCheckList.AHCCCSVerificationText" placeholder='@Constants.GlobalDatePlaceholder'
+                                type="text">
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.AHCCCSVerificationText, new { data_ng_model = "ReferralCheckList.AHCCCSVerificationText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1 hide-in-print">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.TempASPRespiteIntervention" id="ReferralCheckList_ASPRespiteIntervention" class="unicheckbox" val="ReferralCheckList.TempASPRespiteIntervention" optval="ReferralCheckList.ASPRespiteIntervention">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-9">
+                        @Html.LabelFor(m => m.ReferralCheckList.ASPRespiteIntervention, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-3 display-none display-in-print control-label">{{ReferralCheckList.ASPRespiteInterventionText}}</label>
+                    <div class="col-md-5 col-sm-5 hide-in-print">
+                        @Html.DropDownListFor(p => p.ReferralCheckList.ASPRespiteIntervention, Common.SetNameValueDataForYesNoNAData().ToSelectList(Model.ReferralCheckList.ASPRespiteIntervention ?? "", "Name", "Value"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralCheckList.ASPRespiteIntervention",
+                                                  data_ng_init = "ReferralCheckList.ASPRespiteIntervention=(ReferralCheckList.ASPRespiteIntervention=null?'':ReferralCheckList.ASPRespiteIntervention.toString())",
+                                                  @class = "form-control",
+                                                  //convert_to_boolean = "",
+                                                  //data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                              })
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.ASPRespiteInterventionText, new { data_ng_model = "ReferralCheckList.ASPRespiteInterventionText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1 hide-in-print">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.SPExpireAndGuardianBHPSigned" id="ReferralCheckList_SPExpireAndGuardianBHPSigned" class="unicheckbox" val="ReferralCheckList.SPExpireAndGuardianBHPSigned">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-9">
+                        @Html.LabelFor(m => m.ReferralCheckList.SPExpireAndGuardianBHPSigned, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-3 display-none display-in-print control-label">{{ReferralCheckList.SPExpireAndGuardianBHPSignedText}}</label>
+                    <div class="col-md-5 col-sm-5 hide-in-print">
+                        <div class="col-md-6 padding-left-0">
+                            @Html.DropDownListFor(p => p.ReferralCheckList.SPExpireAndGuardianBHPSigned, Model.YesNoList.ToSelectList(Model.ReferralCheckList.SPExpireAndGuardianBHPSigned.ToString() ?? "", "Name", "Value"),
+                                                  new
+                                                      {
+                                                          data_ng_model = "ReferralCheckList.SPExpireAndGuardianBHPSigned",
+                                                          data_ng_init = "ReferralCheckList.SPExpireAndGuardianBHPSigned=(ReferralCheckList.SPExpireAndGuardianBHPSigned=null?'':ReferralCheckList.SPExpireAndGuardianBHPSigned.toString())",
+                                                          @class = "form-control",
+                                                          convert_to_boolean = "",
+                                                          data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                                      })
+                        </div>
+                        <div class="col-md-6 padding-right-0">
+                            <div class="input-group date" datepicker="ReferralCheckList.SPExpireAndGuardianBHPSignedText" ng-dateval="ReferralCheckList.SPExpireAndGuardianBHPSignedText">
+                                <input class="form-control input-sm" name="ReferralCheckList.SPExpireAndGuardianBHPSignedText" type="text" placeholder='@Constants.GlobalDatePlaceholder'>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.SPExpireAndGuardianBHPSignedText, new { data_ng_model = "ReferralCheckList.SPExpireAndGuardianBHPSignedText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1 hide-in-print">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.SPSignedByBHP" id="ReferralCheckList_SPSignedByBHP" class="unicheckbox" val="ReferralCheckList.SPSignedByBHP">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-9">
+                        @Html.LabelFor(m => m.ReferralCheckList.SPSignedByBHP, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-3 display-none display-in-print control-label">{{ReferralCheckList.SPSignedByBHPText}}</label>
+                    <div class="col-md-5 col-sm-5 hide-in-print">
+                        @Html.DropDownListFor(p => p.ReferralCheckList.SPSignedByBHP, Model.YesNoList.ToSelectList(Model.ReferralCheckList.SPSignedByBHP.ToString() ?? "", "Name", "Value"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralCheckList.SPSignedByBHP",
+                                                  data_ng_init = "ReferralCheckList.SPSignedByBHP=(ReferralCheckList.SPSignedByBHP=null?'':ReferralCheckList.SPSignedByBHP.toString())",
+                                                  @class = "form-control",
+                                                  convert_to_boolean = "",
+                                                  data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                              })
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.SPSignedByBHPText, new { data_ng_model = "ReferralCheckList.SPSignedByBHPText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1 hide-in-print">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.SPSignedByGuardian" id="ReferralCheckList_SPSignedByGuardian" class="unicheckbox" val="ReferralCheckList.SPSignedByGuardian">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-9">
+                        @Html.LabelFor(m => m.ReferralCheckList.SPSignedByGuardian, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-3 display-none display-in-print control-label">{{ReferralCheckList.SPExpireAndGuardianBHPSignedText}}</label>
+                    <div class="col-md-5 col-sm-5 hide-in-print">
+                        @Html.DropDownListFor(p => p.ReferralCheckList.SPSignedByGuardian, Model.YesNoList.ToSelectList(Model.ReferralCheckList.SPSignedByGuardian.ToString() ?? "", "Name", "Value"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralCheckList.SPSignedByGuardian",
+                                                  data_ng_init = "ReferralCheckList.SPSignedByGuardian=(ReferralCheckList.SPSignedByGuardian=null?'':ReferralCheckList.SPSignedByGuardian.toString())",
+                                                  @class = "form-control",
+                                                  convert_to_boolean = "",
+                                                  data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                              })
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.SPSignedByGuardianText, new { data_ng_model = "ReferralCheckList.SPSignedByGuardianText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1 hide-in-print">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.CoreAssessmentORAnnualUpdateCompleted" id="ReferralCheckList_CoreAssessmentORAnnualUpdateCompleted" class="unicheckbox" val="ReferralCheckList.CoreAssessmentORAnnualUpdateCompleted">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-10">
+                        @Html.LabelFor(m => m.ReferralCheckList.CoreAssessmentORAnnualUpdateCompleted, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-2 display-none display-in-print control-label">{{ReferralCheckList.CoreAssessmentORAnnualUpdateCompletedText}}</label>
+                    <div class="col-md-5 col-sm-5 form-md-line-input hide-in-print">
+                        <div class="input-group date" datepicker="ReferralCheckList.CoreAssessmentORAnnualUpdateCompletedText" ng-dateval="ReferralCheckList.CoreAssessmentORAnnualUpdateCompletedText">
+                            <input class="form-control input-sm" name="ReferralCheckList.CoreAssessmentORAnnualUpdateCompletedText" type="text" placeholder='@Constants.GlobalDatePlaceholder'>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.CoreAssessmentORAnnualUpdateCompletedText, new { data_ng_model = "ReferralCheckList.CoreAssessmentORAnnualUpdateCompletedText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1 hide-in-print">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.DiagnosisCodes" id="ReferralCheckList_DiagnosisCodes" class="unicheckbox" val="ReferralCheckList.DiagnosisCodes">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-6">
+                        @Html.LabelFor(m => m.ReferralCheckList.DiagnosisCodes, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-6 display-none display-in-print control-label">{{ReferralCheckList.DiagnosisCodesText}}</label>
+                    <div class="col-md-5 col-sm-5 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralCheckList.DiagnosisCodesText, new { data_ng_model = "ReferralCheckList.DiagnosisCodesText", @class = "form-control prevent-enable", maxlength = "100", disabled = "disabled" })
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1 hide-in-print">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.AssessmentBHPSigned" id="ReferralCheckList_AssessmentBHPSigned" class="unicheckbox" val="ReferralCheckList.AssessmentBHPSigned">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-6">
+                        @Html.LabelFor(m => m.ReferralCheckList.AssessmentBHPSigned, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-6 display-none display-in-print control-label">{{ReferralCheckList.AssessmentBHPSignedChecked}}</label>
+                    <div class="col-md-5 col-sm-5 hide-in-print">
+                        @Html.DropDownListFor(p => p.ReferralCheckList.AssessmentBHPSigned, Model.YesNoList.ToSelectList(Model.ReferralCheckList.AssessmentBHPSigned.ToString() ?? "", "Name", "Value"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralCheckList.AssessmentBHPSigned",
+                                                  data_ng_init = "ReferralCheckList.AssessmentBHPSigned=(ReferralCheckList.AssessmentBHPSigned=null?'':ReferralCheckList.AssessmentBHPSigned.toString())",
+                                                  @class = "form-control",
+                                                  convert_to_boolean = "",
+                                                  data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                              })
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.ASPRespiteInterventionText, new { data_ng_model = "ReferralCheckList.ASPRespiteInterventionText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                    @*<div class="col-md-5 col-sm-5 hide-in-print">
+                        <div class="radio-list">
+                            <label class="radio-inline">
+                                <input id="assessmentBHPSignedChecked" type="radio" name="optionsRadios"
+                                    class="uniformControls" data-uniform-value="ReferralCheckList.AssessmentBHPSignedChecked=='True'" data-ng-model="ReferralCheckList.AssessmentBHPSignedChecked" value="True">
+                                @Resource.Yes
+                            </label>
+                            <label class="radio-inline">
+                                <input id="assessmentBHPSignedUnChecked" type="radio" name="optionsRadios"
+                                    class="uniformControls" data-uniform-value="ReferralCheckList.AssessmentBHPSignedChecked=='False'" data-ng-model="ReferralCheckList.AssessmentBHPSignedChecked" value="False">
+                                @Resource.No
+                            </label>
+                        </div>
+                    </div>*@
+
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1">
+                        @*<input type="checkbox" data-ng-model="ReferralCheckList.TempASPRespiteIntervention" id="ReferralCheckList_ASPRespiteIntervention" class="unicheckbox" val="ReferralCheckList.TempASPRespiteIntervention" optval="ReferralCheckList.ASPRespiteIntervention">*@
+                        <input type="checkbox" data-ng-model="ReferralCheckList.TempSNCD" id="ReferralCheckList_SNCD" class="unicheckbox" val="ReferralCheckList.TempSNCD" optval="ReferralCheckList.SNCD">
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        @Html.LabelFor(m => m.ReferralCheckList.SNCD, new { @class = "control-label" })
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        <div class="col-md-6 padding-left-0">
+                            @Html.DropDownListFor(p => p.ReferralCheckList.SNCD, Common.SetNameValueDataForYesNoNAData().ToSelectList(Model.ReferralCheckList.SNCD ?? "", "Name", "Value"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralCheckList.SNCD",
+                                                  data_ng_init = "ReferralCheckList.SNCD=(ReferralCheckList.SNCD=null?'':ReferralCheckList.SNCD.toString())",
+                                                  @class = "form-control",
+                                                  //convert_to_boolean = "",
+                                                  //data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                              })
+                        </div>
+                        <div class="col-md-6 padding-right-0">
+                            <div class="input-group date" datepicker="ReferralCheckList.SNCDText" ng-dateval="ReferralCheckList.SNCDText">
+                                <input class="form-control input-sm" name="ReferralCheckList.SNCDText" type="text" placeholder='@Constants.GlobalDatePlaceholder'>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.SNCDText, new { data_ng_model = "ReferralCheckList.SNCDText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                </div>
+
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1 hide-in-print">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.CASIIScore" id="ReferralCheckList_CASIIScore" class="unicheckbox" val="ReferralCheckList.CASIIScore">
+                    </div>
+                    <div class="col-md-5 col-sm-5 col-xs-6">
+                        @Html.LabelFor(m => m.ReferralCheckList.CASIIScore, new { @class = "control-label bold-in-print" })
+                    </div>
+                    <label class="col-xs-6 display-none display-in-print control-label">{{ReferralCheckList.CASIIScoreText}}</label>
+                    <div class="col-md-5 col-sm-5 hide-in-print">
+                        @Html.TextBoxFor(m => m.ReferralCheckList.CASIIScoreText, new { data_ng_model = "ReferralCheckList.CASIIScoreText", @class = "form-control", maxlength = "100",dir_valid_number = ""  })
+                    </div>
+                </div>
+
+
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1">
+                        @*<input type="checkbox" data-ng-model="ReferralCheckList.Demographics" id="ReferralCheckList_Demographics" class="unicheckbox" val="ReferralCheckList.Demographics">*@
+                        <input type="checkbox" data-ng-model="ReferralCheckList.TempDemographics" id="ReferralCheckList_Demographics" class="unicheckbox" val="ReferralCheckList.TempDemographics" optval="ReferralCheckList.Demographics">
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        @Html.LabelFor(m => m.ReferralCheckList.Demographics, new { @class = "control-label" })
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        <div class="col-md-6 padding-left-0">
+                            @*@Html.DropDownListFor(p => p.ReferralCheckList.Demographics, Model.YesNoList.ToSelectList(Model.ReferralCheckList.Demographics.ToString() ?? "", "Name", "Value"),
+                                                  new
+                                                      {
+                                                          data_ng_model = "ReferralCheckList.Demographics",
+                                                          data_ng_init = "ReferralCheckList.Demographics=(ReferralCheckList.Demographics=null?'':ReferralCheckList.Demographics.toString())",
+                                                          @class = "form-control",
+                                                          convert_to_boolean = "",
+                                                          data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                                      })*@
+
+                            @Html.DropDownListFor(p => p.ReferralCheckList.Demographics, Common.SetNameValueDataForYesNoNAData().ToSelectList(Model.ReferralCheckList.Demographics ?? "", "Name", "Value"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralCheckList.Demographics",
+                                                  data_ng_init = "ReferralCheckList.Demographics=(ReferralCheckList.Demographics=null?'':ReferralCheckList.Demographics.toString())",
+                                                  @class = "form-control",
+                                                  //convert_to_boolean = "",
+                                                  //data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                              })
+                        </div>
+                        <div class="col-md-6 padding-right-0">
+                            <div class="input-group date" datepicker="ReferralCheckList.DemographicsText" ng-dateval="ReferralCheckList.DemographicsText">
+                                <input class="form-control input-sm" name="ReferralCheckList.DemographicsText" type="text" placeholder='@Constants.GlobalDatePlaceholder'>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        @*@Html.TextBoxFor(m => m.ReferralCheckList.DemographicsText, new { data_ng_model = "ReferralCheckList.DemographicsText", @class = "form-control", maxlength = "100" })*@
+                    </div>
+                </div>
+
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1">
+                        @*<input type="checkbox" data-ng-model="ReferralCheckList.ROI" id="ReferralCheckList_ROI" class="unicheckbox" val="ReferralCheckList.ROI">*@
+                        <input type="checkbox" data-ng-model="ReferralCheckList.TempROI" id="ReferralCheckList_ROI" class="unicheckbox" val="ReferralCheckList.TempROI" optval="ReferralCheckList.ROI">
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        @Html.LabelFor(m => m.ReferralCheckList.ROI, new { @class = "control-label" })
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        <div class="col-md-4 padding-left-0">
+                            @Html.DropDownListFor(p => p.ReferralCheckList.ROI, Common.SetNameValueDataForYesNoNAData().ToSelectList(Model.ReferralCheckList.ROI ?? "", "Name", "Value"),
+                                              new
+                                              {
+                                                  data_ng_model = "ReferralCheckList.ROI",
+                                                  data_ng_init = "ReferralCheckList.ROI=(ReferralCheckList.ROI=null?'':ReferralCheckList.ROI.toString())",
+                                                  @class = "form-control",
+                                                  //convert_to_boolean = "",
+                                                  //data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                              })
+
+                        </div>
+                        <div class="col-md-4 padding-left-0">
+                            @Html.DropDownListFor(p => p.ReferralCheckList.ROIFromAgencyID, Model.AgencyList.ToSelectList(Model.ReferralCheckList.ROIFromAgencyID.ToString() ?? "", "NickName", "AgencyID", Resource.SelectAgency),
+                                new
+                                {
+                                    convert_to_number = "",
+                                    data_ng_model = "ReferralCheckList.ROIFromAgencyID",
+                                    data_ng_init = "ReferralCheckList.ROIFromAgencyID=ReferralCheckList.ROIFromAgencyID==''?null:ReferralCheckList.ROIFromAgencyID.toString()",
+                                    @class = "form-control",
+                                    data_val = false
+                                })
+                        </div>
+                        <div class="col-md-4 no-padding">
+                            <div class="input-group date" datepicker="ReferralCheckList.ROIFromExpirationDate" ng-dateval="ReferralCheckList.ROIFromExpirationDate">
+                                <input class="form-control input-sm" name="ReferralCheckList.ROIFromExpirationDate" type="text" placeholder='@Constants.GlobalDatePlaceholder'>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                @*<div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    <div class="col-md-1 col-sm-1">
+                        <input type="checkbox" data-ng-model="ReferralCheckList.ReferralChecklist" id="referralChecklist" class="unicheckbox" val="ReferralCheckList.ReferralChecklist">
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        <label for="referralChecklist" class="control-label">&nbsp;@Html.Raw(Resource.ReferralChecklistText)</label>
+                    </div>
+                    <div class="col-md-5 col-sm-5">
+                        @Html.DropDownListFor(p => p.ReferralCheckList.ReferralChecklist, Model.YesNoList.ToSelectList(Model.ReferralCheckList.ReferralChecklist.ToString() ?? "", "Name", "Value"),
+                                                  new
+                                                      {
+                                                          data_ng_model = "ReferralCheckList.ReferralChecklist",
+                                                          data_ng_init = "ReferralCheckList.ReferralChecklist=(ReferralCheckList.ReferralChecklist=null?'':ReferralCheckList.ReferralChecklist.toString())",
+                                                          @class = "form-control",
+                                                          convert_to_boolean = "",
+                                                          data_ng_options = "col.Value as col.Name for col in YesNoList"
+                                                      })
+                    </div>
+                </div>*@
+
+
+                <div class="space10"></div>
+                <div class="display-none">
+                    <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                        <strong>@Resource.MissingOrIncompleteDocumentText</strong>
+                    </div>
+
+                    <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                        <div class="col-md-1 col-sm-1">
+                            <input type="checkbox" data-ng-model="ReferralCheckList.RequestPaperWork" id="ReferralCheckList_RequestPaperWork" class="unicheckbox" val="ReferralCheckList.RequestPaperWork">
+                        </div>
+                        <div class="col-md-5 col-sm-5">
+                            @Html.LabelFor(m => m.ReferralCheckList.RequestPaperWork, new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-5 col-sm-5">
+                            @Html.TextBoxFor(m => m.ReferralCheckList.RequestPaperWorkText, new { data_ng_model = "ReferralCheckList.RequestPaperWorkText", @class = "form-control", maxlength = "100" })
+                        </div>
+                    </div>
+
+                    <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                        <div class="col-md-1 col-sm-1">
+                            <input type="checkbox" data-ng-model="ReferralCheckList.PaperWorkReceived" id="ReferralCheckList_PaperWorkReceived" class="unicheckbox" val="ReferralCheckList.PaperWorkReceived">
+                        </div>
+                        <div class="col-md-5 col-sm-5">
+                            @Html.LabelFor(m => m.ReferralCheckList.PaperWorkReceived, new { @class = "control-label" })
+                        </div>
+                        <div class="col-md-5 col-sm-5">
+                            @Html.TextBoxFor(m => m.ReferralCheckList.PaperWorkReceivedText, new { data_ng_model = "ReferralCheckList.PaperWorkReceivedText", @class = "form-control", maxlength = "100" })
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group col-md-12 col-sm-12 form-md-line-input">
+                    @Html.LabelFor(m => m.ReferralCheckList.Notes, new { @class = "control-label bold" })
+                    @Html.TextAreaFor(m => m.ReferralCheckList.Notes, new { data_ng_model = "ReferralCheckList.Notes", @class = "form-control input-sm", rows = "3", maxlength = "500" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-6">
+        <div class="col-md-12 margin-bottom-5">
+            <div class="col-sm-1 no-left-padding">
+                <input type="checkbox" id="ismarkoffline" data-ng-model="ReferralCheckList.IsCheckListOffline" class="unicheckbox" val="ReferralCheckList.IsCheckListOffline">
+            </div>
+            <div class="col-sm-5 no-left-padding">
+                <label for="ismarkoffline"><strong class="markcomplete">@Resource.MarkAsOffline</strong></label>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="col-md-1 col-sm-1 no-left-padding">
+                <input type="checkbox" data-ng-model="ReferralCheckList.IsCheckListCompleted" id="isCheckListCompleted" class="unicheckbox" val="ReferralCheckList.IsCheckListCompleted">
+            </div>
+            <div class="col-md-5 col-sm-5 no-left-padding">
+                <label for="isCheckListCompleted"><strong class="markcomplete">@Resource.MarkAsComplete</strong></label>
+            </div>
+        </div>
+
+    </div>
+    <div class="col-md-6 col-sm-6 text-right no-print">
+        <a class="btn btn-sm btn-primary margin-right-10 yellow" data-ng-click="PrintDiv('print-content')" title="Print"><i class="fa fa-print"></i>&nbsp;@Resource.Print</a>
+        @if (Common.HasPermission(Constants.Permission_ReferralChecklist_AddUpdate))
+        {
+            <button data-ng-click="ResetReferralCheckList()" class="btn btn-sm red">
+                <i class="fa fa-remove">&nbsp;&nbsp;</i>@Resource.Reset
+            </button>
+            <button data-ng-click="SaveReferralCheckList()" class="btn btn-sm green-jungle">
+                <i class="fa fa-save">&nbsp;&nbsp;</i>@Resource.Save
+            </button>
+        }
+    </div>
+    <div class="space10"></div>
+
+    <div class="space20"></div>
+
+    <div class="row">
+        <div class="form-group col-md-12 col-sm-12">
+            <label class="col-md-4 col-sm-3 control-label">
+                @Resource.ZarephathConfidential
+            </label>
+
+            <label class="col-md-4 col-sm-6 control-label no-padding">
+                <span class="text-center">@Resource.AttachFormWithReferralText</span>
+            </label>
+
+            <label class="col-md-4 col-sm-3 control-label">
+                <span class="pull-right">@Resource.Updated: 05/25/2016@*<span data-ng-bind="ReferralCheckList.UpdatedDate| dateformat: 'L'"></span>*@</span>
+            </label>
+
+        </div>
+    </div>
+</form>
+
+
+
+
+
+
+
+
+
+
+
+<div id="print-content" data-ng-show="PrintContent">
+    @*<div>*@
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="col-xs-6  pull-left">
+                <img src="/Assets/images/logo-zrpath.png" alt="Logo" />
+            </div>
+            <div class="col-xs-6 pull-right">
+                <label class="font-size-25 pull-right margin-top-15">@Resource.NewReferralChecklist</label>
+            </div>
+        </div>
+        <form class="col-xs-12 form-inline print-font-custom no-padding">
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.ReferredName:</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.ReferralName}}</label>
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.ClientDob</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.DateOfBirth | dateformat}}</label>
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.AHCCCSID:</label>
+                </div>
+                <div class="col-xs-4 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.AHCCCSID}}</label>
+                </div>
+                <div class="col-xs-1">
+                    <label class="control-label pull-right">@Resource.CIS#:</label>
+                </div>
+                <div class="col-xs-5 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.CISNumber ? ReferralDetail.CISNumber : '@Resource.NA'}}</label>
+                </div>
+            </div>
+
+            @* <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.CIS#:</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.CISNumber ? ReferralDetail.CISNumber : '@Resource.NA'}}</label>
+                </div>
+            </div>*@
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.ReferringAgency</label>
+                </div>
+                <div class="col-xs-4 checklist-print-value">
+                    <label class="control-label" style="border-bottom: 1px dashed #000 !important;">{{ReferralDetail.ReferringAgency}}</label>
+                </div>
+                <div class="col-xs-1">
+                    <label class="control-label pull-right">@Resource.Payor</label>
+                </div>
+                <div class="col-xs-5 checklist-print-value">
+                    <label class="control-label" style="border-bottom: 1px dashed #000 !important;">{{ReferralDetail.Payor}}</label>
+                </div>
+            </div>
+
+            @*<div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.Payor</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label">{{ReferralDetail.Payor}}</label>
+                </div>
+            </div>*@
+
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.Facilator</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label" style="border-bottom: 1px dashed #000 !important;">{{ReferralDetail.FacilatorInformation}}</label>
+                </div>
+            </div>
+
+            <div class="form-group col-xs-12 form-md-line-input">
+                <div class="col-xs-2">
+                    <label class="control-label pull-right">@Resource.ReferralReceived</label>
+                </div>
+                <div class="col-xs-10 checklist-print-value">
+                    <label class="control-label" style="border-bottom: 1px dashed #000 !important;">{{ReferralDetail.ReferralReceived | dateformat}}</label>
+                </div>
+            </div>
+            <div class="form-group col-xs-12" style="margin-top: 10px;">
+                <strong>@Resource.PreliminaryReviewText</strong>
+            </div>
+            <div class="col-xs-12 margin-left-10">
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input type="checkbox" data-ng-value="ReferralCheckList.ServiceRequested" data-ng-checked="ReferralCheckList.ServiceRequested">
+                        @Resource.ServicRequestText</label>
+                    <div class="inline margin-left-10 chk">
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralCheckList.RespiteService" type="checkbox" value="{{ReferralCheckList.RespiteService}}">
+                            @Resource.Respite
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralCheckList.LifeSkillsService" type="checkbox" value="{{ReferralCheckList.LifeSkillsService}}">
+                            @Resource.LifeSkillsService
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralCheckList.CounselingService" type="checkbox">
+                            @Resource.Counseling
+                        </label>
+                        <label class="checkbox-inline">
+                            <input data-ng-checked="ReferralCheckList.ConnectingFamiliesService" type="checkbox">
+                            @Resource.ConnectingFamiliesService
+                        </label>
+
+                    </div>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.FacilitatorContacted" type="checkbox">
+                        @Resource.FacilitatorContactText</label>
+                    <span class="checklist-print-value inline margin-left-10" style="border-bottom: 1px dashed #000 !important; float: right; display: inline-block; width: 53%;">{{ReferralCheckList.FacilitatorContacted ? '@Resource.Yes' : '@Resource.No'}}
+                    </span>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.AHCCCSVerification" type="checkbox">
+                        @Resource.AHCCCSVerificationText</label>
+                    <span class="checklist-print-value inline margin-left-10" style="position: absolute; display: inline-block; width: 34%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.AHCCCSVerificationText ? (ReferralCheckList.AHCCCSVerificationText  | dateformat) : '@Resource.NA'}}</span>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.ASPRespiteIntervention=='Y'" type="checkbox">
+                        @Resource.AgencyServiceText</label>
+                    <label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 55%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.ASPRespiteIntervention=='Y' ?  '@Resource.Yes' : ReferralCheckList.ASPRespiteIntervention=='N' ? '@Resource.No':'@Resource.NA'}}</label>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.SPExpireAndGuardianBHPSigned" type="checkbox">
+                        @Resource.ServicePlanExpireText</label>
+
+                    <label class="checklist-print-value inline margin-left-10" style="position: absolute; display: inline-block; width: 70%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.SPExpireAndGuardianBHPSigned ? ( ReferralCheckList.SPExpireAndGuardianBHPSignedText ? '@Resource.Yes&nbsp;&nbsp;&nbsp;&nbsp;' + (ReferralCheckList.SPExpireAndGuardianBHPSignedText | dateformat) :'@Resource.Yes'):'@Resource.No'}}</label>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.SPSignedByBHP" type="checkbox">
+                        @Resource.SPSignedByBhpText</label>
+
+                    <label class="checklist-print-value inline margin-left-10" style="position: absolute; display: inline-block; width: 73%;">{{ReferralCheckList.SPSignedByBHP ?  '@Resource.Yes' : '@Resource.No'}}</label>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.SPSignedByGuardian" type="checkbox">
+                        @Resource.SPSignedByGuardianText</label>
+                    <label class="checklist-print-value  inline margin-left-10" style="display: inline-block; width: 68% !important; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.SPSignedByGuardian ? '@Resource.Yes' : '@Resource.No'}}</label>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.CoreAssessmentORAnnualUpdateCompleted" type="checkbox">
+                        @Resource.CoreAssessmentOrAnnualUpdateText</label>
+
+                    <label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 36%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.CoreAssessmentORAnnualUpdateCompletedText ? (ReferralCheckList.CoreAssessmentORAnnualUpdateCompletedText  | dateformat):'@Resource.NA'}}</label>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.DiagnosisCodes" type="checkbox">
+                        @Resource.DiagnosisCodeText</label>
+
+                    <label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 83%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.DiagnosisCodesText ? ReferralCheckList.DiagnosisCodesText :'@Resource.NA'}}</label>
+                </div>
+                <div class="form-group col-xs-12 form-md-line-input">
+                    <label class="checkbox inline">
+                        <input data-ng-checked="ReferralCheckList.AssessmentBHPSigned" type="checkbox">
+                        @Resource.AssessmentBHPSignedText</label>
+                    <label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 66%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.AssessmentBHPSigned ? '@Resource.Yes':'@Resource.No'}}</label>
+                </div>
+                <div class="clearfix">
+                    <div class="form-group col-xs-12 form-md-line-input">
+                        <label class="checkbox inline">
+                            <input data-ng-checked="ReferralCheckList.SNCD=='Y'" type="checkbox">
+                            @Resource.SNCDText</label>
+                        <label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 92%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.SNCD=='Y' ? (ReferralCheckList.SNCDText ? '@Resource.Yes&nbsp;&nbsp;&nbsp;&nbsp;' + (ReferralCheckList.SNCDText | dateformat) : '@Resource.Yes' ) : ReferralCheckList.SNCD=='N' ? '@Resource.No':'@Resource.NA'}}</label>
+                        @*<label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 92%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.SNCD ? ReferralCheckList.SNCDText ? '@Resource.Yes&nbsp;&nbsp;&nbsp;&nbsp;' + (ReferralCheckList.SNCDText  | dateformat) : '@Resource.No' :'@Resource.NA'}}</label>*@
+                    </div>
+                    <div class="form-group col-xs-12 form-md-line-input">
+                        <label class="checkbox inline">
+                            <input data-ng-checked="ReferralCheckList.CASIIScore" type="checkbox">
+                            @Resource.CASIIScore</label>
+                        <label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 90%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.CASIIScoreText}}</label>
+                        @*<label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 92%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.SNCD ? ReferralCheckList.SNCDText ? '@Resource.Yes&nbsp;&nbsp;&nbsp;&nbsp;' + (ReferralCheckList.SNCDText  | dateformat) : '@Resource.No' :'@Resource.NA'}}</label>*@
+                    </div>
+                    <div class="col-xs-12 form-md-line-input">
+                        <label class="checkbox inline">
+                            <input data-ng-checked="ReferralCheckList.Demographics=='Y'" type="checkbox">
+                            @Resource.DemographicsText</label>
+                        <label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 86%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.Demographics=='Y' ? (ReferralCheckList.DemographicsText ? '@Resource.Yes&nbsp;&nbsp;&nbsp;&nbsp;' + (ReferralCheckList.DemographicsText  | dateformat) : '@Resource.Yes' ) : ReferralCheckList.Demographics=='N' ? '@Resource.No':'@Resource.NA'}}</label>
+                        @*<label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 86%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.Demographics ? ReferralCheckList.DemographicsText ? '@Resource.Yes&nbsp;&nbsp;&nbsp;&nbsp;' + (ReferralCheckList.DemographicsText | dateformat): '@Resource.No' : '@Resource.NA'}}</label>*@
+                    </div>
+                    <div class="form-group col-xs-12 form-md-line-input">
+                        <label class="checkbox inline" style="display: inline-block;">
+                            <input data-ng-checked="ReferralCheckList.ROI=='Y'" type="checkbox">@Resource.ROIText</label>
+                        <label class="checklist-print-value inline margin-left-5" style="display: inline-block; width: 20%; border-bottom: 1px dashed #000 !important;">{{ReferralCheckList.ROI=='Y' ? ('@Resource.Yes' ) : ReferralCheckList.ROI=='N' ? '@Resource.No':'@Resource.NA'}}</label>
+                        <label class="checkbox inline margin-left-20" style="display: inline-block;">@Resource.ROIFromAgency
+
+                        </label>
+                        <label class="checklist-print-value inline margin-left-5" style="display: inline-block; width: 20%; border-bottom: 1px dashed #000 !important;">{{ReferralCheckList.ROIFromAgencyName? ReferralCheckList.ROIFromAgencyName:'@Resource.NA'}}</label>
+
+                        <label class="checkbox inline margin-left-20" style="display: inline-block;">@Resource.ExpirationDate</label>
+                        <label class="checklist-print-value inline margin-left-5" style="display: inline-block; width: 20%; border-bottom: 1px dashed #000 !important;">{{ReferralCheckList.ROIFromExpirationDate? (ReferralCheckList.ROIFromExpirationDate | dateformat): '@Resource.NA'}}</label>
+                    </div>
+                    @* <div class="form-group col-xs-12 form-md-line-input">
+                        <label class="checkbox inline">
+                            <input data-ng-checked="ReferralCheckList.ReferralChecklist" type="checkbox">
+                            @Html.Raw(Resource.ReferralChecklistText)</label>
+                        <label class="checklist-print-value inline margin-left-10" style="display: inline-block; width: 70%; border-bottom: 1px dashed #000 !important; float: right;">{{ReferralCheckList.ReferralChecklistText ? '@Resource.Yes':'@Resource.No'}}</label>
+                    </div>*@
+
+                </div>
+            </div>
+            <div class="display-none">
+                <div class="form-group col-xs-12" style="margin-top: 10px;">
+                    <strong>@Resource.MissingOrIncompleteDocumentText</strong>
+                </div>
+                <div class="col-xs-12 margin-left-10">
+                    <div class="form-group col-xs-12 form-md-line-input">
+                        <label class="checkbox inline">
+                            <input data-ng-checked="ReferralCheckList.RequestPaperWork" type="checkbox">
+                            @Resource.DateRequestUpdatedPaperworkText</label>
+                        <span class="checklist-print-value inline margin-left-10" style="border-bottom: 1px dashed #000 !important; float: right; display: inline-block; width: 53%;">{{ReferralCheckList.RequestPaperWorkText ? ReferralCheckList.RequestPaperWorkText : '@Resource.NA'}}
+                        </span>
+                    </div>
+                    <div class="form-group col-xs-12 form-md-line-input">
+                        <label class="checkbox inline">
+                            <input data-ng-checked="ReferralCheckList.PaperWorkReceived" type="checkbox">
+                            @Resource.DatePaperworkReceivedText</label>
+                        <span class="checklist-print-value inline margin-left-10" style="border-bottom: 1px dashed #000 !important; float: right; display: inline-block; width: 53%;">{{ReferralCheckList.PaperWorkReceivedText ? ReferralCheckList.PaperWorkReceivedText : '@Resource.NA'}}
+                        </span>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-xs-12 margin-left-10 margin-top-0">
+                <div class="col-xs-12 form-md-line-input">
+                    @*<span>@Resource.NotesLabel</span>*@
+                    <div class="col-xs-12 no-padding">
+                        <b>@Resource.NotesLabel</b>&nbsp;&nbsp;<span class="checklist-print-value line-height-16px" style="width: 95%; display: inline-block; border-bottom: 1px dashed #000 !important;">{{ReferralCheckList.Notes ? ReferralCheckList.Notes :'@Resource.NA'}}</span>
+                    </div>
+                </div>
+            </div>
+        </form>
+
+    </div>
+</div>

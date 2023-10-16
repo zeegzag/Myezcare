@@ -1,0 +1,266 @@
+﻿@model HC_AddReferralModel
+<div class="row-fluid">
+    <div class="">
+        <div class="tabbable tabbable-custom tabs-left">
+
+            <div class="col-md-1 col-sm-2 no-padding">
+                <ul class="nav nav-tabs tabs-left no-padding">
+                    <li class="active"><a id="referralDocument_clientdocuments" href="#tab_ClientDocuments" data-toggle="tab">@Resource.Documents</a></li>
+                    <li class=""><a id="referralDocument_missingdocument" href="#tab_MissingDocuemnt" data-toggle="tab">@Resource.MissingDocuemnts</a></li>
+                </ul>
+            </div>
+
+
+            <div class="tab-content col-md-11 col-sm-10">
+
+                <div class="tab-pane active" id="tab_ClientDocuments" style="min-height: 350px;">
+
+
+
+                    <div class="row">
+                        <div class="form-group col-lg-10 col-md-10 col-sm-10">
+                            <span class="label-italic">
+                                <b class="font-red-thunderbird">@Resource.NoteLabel</b>
+                                <span>@Html.Raw(Resource.DocuementNote)</span>
+                            </span>
+                        </div>
+                         @if (Common.HasPermission(Constants.Permission_ReferralDocuments_AddUpdate))
+                         {
+                             <div class="col-lg-2 col-md-2 col-sm-2 pull-right">
+                                 <div class="fileUpload btn btn-xs btn-primary pull-right margin-right-0">
+                                     <span><i class="icon-plus"></i>&nbsp; @Resource.UploadDocuments</span>
+                                     @*<input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                            amazonfileupload
+                                            file-uploadurl="{{UploadFile}}"
+                                            beforesend="BeforeSend"
+                                            aftersend="AfterSend"
+                                            progress="Progress"
+                                            data-primary-id="EncryptedReferralID"
+                                            multiple="multiple"
+                                            filelist="UploadingFileList"
+                                            data-ng-aws-settings-model="ReferralModel.AmazonSettingModel"/>*@
+                                     <input id="logoFileUpload" type="file" name="files[]" class="upload" value="Browse"
+                                            fileupload
+                                            file-uploadurl="{{UploadFile}}"
+                                            beforesend="BeforeSend"
+                                            aftersend="AfterSend"
+                                            progress="Progress"
+                                            data-primary-id="ReferralID"
+                                            filelist="UploadingFileList"
+                                            multiple="" />
+                                 </div>
+                             </div>
+                         }
+                    </div>
+
+
+
+
+
+                    <div class="row-fluid no-padding col-lg-12" data-ng-show="UploadingFileList.length > 0 || ReferralDocumentList.length > 0">
+                        @*<form action="#" class="horizontal-form">*@
+                        <div class="row-fluid">
+                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding">
+                                <div class="portlet box red">
+                                    <div class="portlet-title">
+                                        <div class="caption">
+                                            <i class="icon-briefcase"></i>&nbsp;@Resource.Documents
+                                        </div>
+                                    </div>
+                                    <div class="portlet-body compact table-responsive">
+                                        <div class="dataTables_wrapper">
+                                            <table class="table table-bordered table-striped table-hover table-condensed">
+                                                <thead>
+                                                    <tr>
+                                                        <th style="width: 10px;">
+                                                            @Resource.Hash
+                                                        </th>
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralDocumentPager.sortColumn('FileName')">@Resource.DocName</a>
+                                                            <span class="sortorder" data-ng-show="ReferralDocumentPager.sortIndex === 'FileName'" data-ng-class="{reverse:ReferralDocumentPager.reverse}"></span>
+                                                        </th>
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralDocumentPager.sortColumn('KindOfDocument')">@Resource.Kind</a>
+                                                            <span class="sortorder" data-ng-show="ReferralDocumentPager.sortIndex === 'KindOfDocument'" data-ng-class="{reverse:ReferralDocumentPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="col-lg-2">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralDocumentPager.sortColumn('DocumentTypeName')">@Resource.Type</a>
+                                                            <span class="sortorder" data-ng-show="ReferralDocumentPager.sortIndex === 'DocumentTypeName'" data-ng-class="{reverse:ReferralDocumentPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="col-lg-2">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralDocumentPager.sortColumn('Name')">@Resource.AddedBy</a>
+                                                            <span class="sortorder" data-ng-show="ReferralDocumentPager.sortIndex === 'Name'" data-ng-class="{reverse:ReferralDocumentPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="col-lg-1">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralDocumentPager.sortColumn('CreatedDate')">@Resource.DateReceived</a>
+                                                            <span class="sortorder" data-ng-show="ReferralDocumentPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:ReferralDocumentPager.reverse}"></span>
+                                                        </th>
+                                                        <th class="col-lg-1">@Resource.Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr data-ng-repeat="filedata in UploadingFileList" id="pbar">
+                                                        <td></td>
+                                                        <td>
+                                                            <div class="" data-ng-bind="filedata.name" title="{{filedata.name}}">
+                                                            </div>
+                                                        </td>
+
+                                                        <td colspan="4">
+                                                            <div>
+                                                                <div class="active" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                                                                    <div class="progress-bar" data-ng-class="{'progress-bar-success': !filedata.IsError,'progress-bar-danger': filedata.IsError}" data-ng-style="{ 'width': filedata.FileProgress+'%' }"><span data-ng-bind="filedata.IsError?filedata.ErrorMessage:filedata.FileProgress+'%'"></span></div>
+                                                                </div>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <a href="javascript:void(0);" data-ng-if="filedata.IsError" data-ng-click="DeleteUploadedFile(filedata)" tooltip title="Delete Document"><i class="fa fa-remove"></i></a>
+                                                        </td>
+                                                    </tr>
+                                                    <tr dir-paginate="referralDocument in ReferralDocumentList | itemsPerPage: ReferralDocumentPager.pageSize" total-items="ReferralDocumentPager.totalRecords" current-page="ReferralDocumentPager.currentPage" pagination-id="ReferralDocumentPagerID">
+                                                        <td data-ng-bind="$index + 1"></td>
+                                                        <td>
+                                                            <div class="">
+                                                                <a href="{{referralDocument.FilePath}}" target="_blank">{{referralDocument.FileName}}</a>
+                                                            </div>
+                                                        </td>
+                                                        <td><span data-ng-class="{'badge badge-info': referralDocument.KindOfDocument==Internal,'badge badge-danger': referralDocument.KindOfDocument==External}" title="{{referralDocument.KindOfDocument==External?'External Document':'Internal Document'}}">{{referralDocument.KindOfDocument==Internal?Internal:External}}</span></td>
+                                                        <td>{{referralDocument.DocumentTypeName==null?'@Resource.NA':referralDocument.DocumentTypeName}}</td>
+                                                        <td>{{referralDocument.Name}}</td>
+                                                        <td data-ng-bind="referralDocument.CreatedDate | orgdate"></td>
+                                                        <td>
+                                                             @if (Common.HasPermission(Constants.Permission_ReferralDocuments_AddUpdate))
+                                                             {
+                                                                 <a href="#EditDocument" data-ng-click="EditDocument(referralDocument)" tooltip title="Edit Document" data-toggle="modal"><i class="fa fa-edit"></i></a>
+                                                                 <a href="javascript:void(0);" data-ng-click="DeleteDocument(referralDocument)" tooltip title="Delete Document"><i class="fa fa-remove"></i></a>
+                                                             }
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                            <div class="row">
+                                                <div class="col-md-5 col-sm-5" data-ng-if="ReferralDocumentPager.totalRecords > ReferralDocumentPager.pageSize">
+                                                    @Resource.Showing <span data-ng-bind="(ReferralDocumentPager.pageSize * ReferralDocumentPager.currentPage) - ReferralDocumentPager.pageSize  + 1"></span>
+                                                    &nbsp;@Resource.To <span data-ng-bind="(ReferralDocumentPager.pageSize == ReferralDocumentPager.currentPageSize) ? (ReferralDocumentPager.pageSize * ReferralDocumentPager.currentPage) :(ReferralDocumentPager.pageSize * ReferralDocumentPager.currentPage) - ReferralDocumentPager.pageSize  + ReferralDocumentPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralDocumentPager.totalRecords"></span>&nbsp;@Resource.Records
+                                                </div>
+                                                <div class="col-md-7 col-sm-7">
+                                                    <div class="pull-right top pagination-sm">
+                                                        <dir-pagination-controls boundary-links="true" on-page-change="ReferralDocumentPager.pageChanged(newPageNumber,true)" pagination-id="ReferralDocumentPagerID"></dir-pagination-controls>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        @*</form>*@
+
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div data-ng-if="UploadingFileList.length == 0 && ReferralDocumentList.length == 0">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="alert alert-danger">
+                                            @Html.Raw(Resource.NoRecordsFound)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-pane" id="tab_MissingDocuemnt" style="min-height: 350px;">
+                    @Html.Partial("Partial/ReferralDocuments/_tabMissingDocuemnt", new MissingDocumentModel())
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="EditDocument" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" data-ng-click="CloseEditDocument()"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>@Resource.EditDocument</span></h4>
+                </div>
+                <div class="modal-body">
+                    <form id="frmDocumentEdit">
+                        <div class="row">
+                            <div class="form-group col-md-push-2 col-sm-10">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <label class="control-label required">@Resource.FileName</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="col-md-8">
+                                        @Html.TextBoxFor(m => m.ReferralDocument.FileName, new { data_ng_model = "DocumentDetail.FileName", @class = "form-control input-sm", maxlength = 100 })
+                                        @Html.ValidationMessageFor(m => m.ReferralDocument.FileName)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-push-2 col-sm-10">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <label class="control-label required">@Resource.DocumentKind</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="col-md-8">
+                                        @Html.DropDownListFor(m => m.ReferralDocument.KindOfDocument, Model.DocumentKind.ToSelectList(Model.ReferralDocument.KindOfDocument ?? "", "Name", "Name", "Select", ""),
+                                                    new
+                                                        {
+                                                            data_ng_model = "DocumentDetail.KindOfDocument",
+                                                            data_ng_init = "DocumentDetail.KindOfDocument=(DocumentDetail.KindOfDocument == null || DocumentDetail.KindOfDocument==0)?'':DocumentDetail.KindOfDocument",
+                                                            @class = "form-control input-sm",
+                                                            data_ng_change="SetFilter()"
+                                                        })
+                                        @Html.ValidationMessageFor(m => m.ReferralDocument.KindOfDocument)
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-push-2 col-sm-10">
+                                <div class="col-lg-4 col-md-4 col-sm-4 col-xs-4">
+                                    <label class="control-label required">@Resource.DocumentType</label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="col-md-8">
+                                        <select class="form-control input-sm" data-ng-options="item.DocumentTypeID as item.DocumentTypeName for item in ReferralModel.DocumentTypeList | filter : {DocumentKind:SelectedDocType}"
+                                                data-ng-init="DocumentDetail.DocumentTypeID=(DocumentDetail.DocumentTypeID==null || DocumentDetail.DocumentTypeID==0 || DocumentDetail.DocumentTypeID=='') ?'':DocumentDetail.DocumentTypeID"
+                                                data-ng-model="DocumentDetail.DocumentTypeID" data-val="true" data-val-required="@Resource.DocumentTypeRequired"
+                                                id="DocumentTypeID" name="DocumentDetail.DocumentTypeID">
+                                            <option value="">@Resource.Select</option>
+                                        </select>
+                                        @Html.ValidationMessageFor(m => m.ReferralDocument.DocumentTypeID)
+                                        
+                                        @*<select class="form-control input-sm"
+                                                data-ng-init="DocumentDetail.DocumentTypeID=(DocumentDetail.DocumentTypeID==null || DocumentDetail.DocumentTypeID==0 || DocumentDetail.DocumentTypeID=='') ?'':DocumentDetail.DocumentTypeID.toString()"
+                                                data-ng-model="DocumentDetail.DocumentTypeID"
+                                                data-val="true" data-val-required="@Resource.DocumentTypeRequired"
+                                                id="DocumentTypeID"
+                                                name="DocumentDetail.DocumentTypeID"
+                                                convert-to-number="">
+                                            <option value="">@Resource.SelectDocument</option>
+                                            <option data-ng-repeat="option in ReferralModel.DocumentTypeList | filter : {DocumentKind:SelectedDocType}" value="{{option.DocumentTypeID}}">{{option.DocumentTypeName}}</option>
+                                        </select>
+                                        @Html.ValidationMessageFor(m => m.ReferralDocument.DocumentTypeID)*@
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                            <div class="form-group col-lg-12 col-md-12 col-sm-12 col-xs-12">
+                                <button type="button" class="btn btn-danger" data-dismiss="modal" data-ng-click="CloseEditDocument()">@Resource.Cancel</button>@*data-ng-click="ResetReferralInternamMessage()"*@
+                                <button type="submit" data-ng-click="SaveDocument(DocumentDetail)" class="btn green-jungle">@Resource.Save</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

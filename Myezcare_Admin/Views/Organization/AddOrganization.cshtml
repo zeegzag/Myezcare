@@ -1,0 +1,162 @@
+﻿@model SetAddOrganizationModel
+
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.MyEzcareOrganization.OrganizationID > 0 ? Resource.EditOrganization : Resource.AddOrganization));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_OrganizationAdd;
+    bool isEditMode = Model.MyEzcareOrganization.OrganizationID > 0;
+}
+
+@Html.Hidden("hdnOrganizationModel", Common.SerializeObject(Model))
+<div data-ng-controller="AddOrganizationController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditOrganization : @Resource.AddOrganization)
+            <small>@Resource.EnterOrganizationInformation</small>
+            <input type="submit" data-ng-click="SaveOrganizationDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && isEditMode ? Resource.Update : Resource.Save)" />
+            <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <form id="frmOrganization" class="form-horizontal">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.OrganizationDetails
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.OrganizationType
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.DropDownListFor(m => m.MyEzcareOrganization.OrganizationType, Model.OrganizationTypeList.ToSelectList(Convert.ToString(Model.MyEzcareOrganization.OrganizationType), "Name", "Value", Resource.Select, ""), new
+                                            {
+                                                id = "OrganizationType",
+                                                data_ng_model = "MyEzcareOrganization.OrganizationType",
+                                                data_ng_init = "MyEzcareOrganization.OrganizationType=MyEzcareOrganization.OrganizationType==''?null:MyEzcareOrganization.OrganizationType",
+                                                @class = "form-control input-sm"
+                                            })
+                                            @Html.ValidationMessageFor(q => q.MyEzcareOrganization.OrganizationType)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.DisplayName
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.TextBoxFor(m => m.MyEzcareOrganization.DisplayName, new { data_ng_model = "MyEzcareOrganization.DisplayName", @class = "form-control input-sm",  placeholder = Resource.DisplayName, maxlength = 100 })
+                                            @Html.ValidationMessageFor(m => m.MyEzcareOrganization.DisplayName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.DomainName
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.TextBoxFor(m => m.MyEzcareOrganization.DomainName, new { data_ng_model = "MyEzcareOrganization.DomainName", disabled = "", @class = "form-control input-sm", placeholder = Resource.DomainName, maxlength = 100 })
+                                            @Html.ValidationMessageFor(m => m.MyEzcareOrganization.DomainName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.CompanyName
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.TextBoxFor(m => m.MyEzcareOrganization.CompanyName, new { data_ng_model = "MyEzcareOrganization.CompanyName", @class = "form-control input-sm", placeholder = Resource.CompanyName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(m => m.MyEzcareOrganization.CompanyName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.StartDate
+                                        </label>
+                                        <div class="col-md-8 input-group date" datepicker="MyEzcareOrganization.StartDate"
+                                             ng-dateval="MyEzcareOrganization.StartDate">
+                                            @Html.TextBoxFor(q => q.MyEzcareOrganization.StartDate, new { @class = "form-control input-sm dateInputMask", maxlength = 10, placeholder = Resource.StartDate })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.MyEzcareOrganization.StartDate)
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label ">
+                                            @Resource.EndDate
+                                        </label>
+                                        <div class="col-md-8 input-group date" datepicker="MyEzcareOrganization.EndDate"
+                                             ng-dateval="MyEzcareOrganization.EndDate">
+                                            @Html.TextBoxFor(q => q.MyEzcareOrganization.EndDate, new { @class = "form-control input-sm dateInputMask", maxlength = 10, placeholder = Resource.EndDate })
+                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        </div>
+                                        @Html.ValidationMessageFor(m => m.MyEzcareOrganization.EndDate)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.DBServer
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.TextBoxFor(q => q.MyEzcareOrganization.DBServer, new { @class = "form-control input-sm", data_ng_model = "MyEzcareOrganization.DBServer", maxlength = 100, placeholder = Resource.DBServer })
+                                            @Html.ValidationMessageFor(m => m.MyEzcareOrganization.DBServer)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.DBName
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.TextBoxFor(q => q.MyEzcareOrganization.DBName, new { @class = "form-control input-sm", data_ng_model = "MyEzcareOrganization.DBName", maxlength = 100, placeholder = Resource.DBName })
+                                            @Html.ValidationMessageFor(m => m.MyEzcareOrganization.DBName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.DBProviderName
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.TextBoxFor(q => q.MyEzcareOrganization.DBProviderName, new { @class = "form-control input-sm", data_ng_model = "MyEzcareOrganization.DBProviderName", maxlength = 100, placeholder = Resource.DBProviderName })
+                                            @Html.ValidationMessageFor(m => m.MyEzcareOrganization.DBProviderName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.DBUserName
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.TextBoxFor(q => q.MyEzcareOrganization.DBUserName, new { @class = "form-control input-sm", data_ng_model = "MyEzcareOrganization.DBUserName", maxlength = 100, placeholder = Resource.DBUserName })
+                                            @Html.ValidationMessageFor(m => m.MyEzcareOrganization.DBUserName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label">
+                                            @Resource.DBPassword
+                                        </label>
+                                        <div class="col-md-8 input-group">
+                                            @Html.PasswordFor(q => q.MyEzcareOrganization.DBPassword, new { @class = "form-control input-sm", data_ng_model = "MyEzcareOrganization.DBPassword", maxlength = 100, placeholder = Resource.DBPassword })
+                                            @Html.ValidationMessageFor(m => m.MyEzcareOrganization.DBPassword)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space15"></div>
+                        <div class="col-md-12 form-group no-margin no-padding">
+                            <input type="submit" data-ng-click="SaveOrganizationDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && isEditMode ? Resource.Update : Resource.Save)" />
+                            <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/organization/addorganization")
+}

@@ -1,0 +1,322 @@
+﻿@model HC_ETSModel
+<div class="modal fade" id="etsMasterModel" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content"style="width: 100%;">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                <h4 class="modal-title" id="H1" data-ng-hide="ETSMaster.EmployeeTimeSlotMasterID>0">@Resource.AddEmployeeSchedule</h4>
+                <h4 class="modal-title" id="H1" data-ng-show="ETSMaster.EmployeeTimeSlotMasterID>0">@Resource.UpdateEmployeeSchedule</h4>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12 col-sm-12">
+                        <form id="frmETSMaster">
+                            <div class="col-md-12 col-md-12 no-padding">
+                                @{ Html.EnableClientValidation(false); }
+                                <div class="col-lg-3 col-md-3 col-sm-6">
+                                    <label class="control-label required margin-bottom-5">@Resource.Employee</label>
+
+                                    @Html.DropDownListFor(p => p.ETSMaster.EmployeeID, Model.EmployeeList.ToSelectList(Model.ETSMaster.EmployeeID.ToString() ?? "", "Name", "Value", Resource.SelectEmployee, ""),
+                                      new
+                                          {
+                                              id = "ETSMasterEmployeeID",
+                                              data_ng_model = "ETSMaster.EmployeeID",
+                                              data_ng_init = "ETSMaster.EmployeeID=ETSMaster.EmployeeID==''?null:ETSMaster.EmployeeID.toString()",
+                                              @class = "form-control input-sm requiredStrip",
+                                              disabled = "",
+                                              convert_to_number = ""
+
+                                          })
+                                    @Html.ValidationMessageFor(m => m.ETSMaster.EmployeeID)
+                                </div>
+
+                                <div class="col-lg-3 col-md-3 col-sm-6 mb-10">
+                                    <label class="control-label required margin-bottom-5">@Resource.StarDate</label>
+
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="ETSMaster.StartDate" ng-dateval="ETSMaster.StartDate" data-ng-maxdate="
+                                         ETSMaster.EndDate">
+                                        @Html.TextBoxFor(m => m.ETSMaster.StartDate, new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask",
+                                                    maxlength = "50",
+                                                    placeholder = Resource.DateFormat
+                                                })
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                        @Html.ValidationMessageFor(m => m.ETSMaster.StartDate)
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3 col-md-3 col-sm-6 margin-top-10 endDatecheckbox">
+                                    <input type="checkbox" class="checkbox" data-ng-model="ETSMaster.IsEndDateAvailable" data-ng-value="false" data-ng-change="resetEndDate()" /><span>@Resource.EndDate</span>
+                                </div>
+
+                                <div class="col-lg-3 col-md-3 col-sm-6" data-ng-if="ETSMaster.IsEndDateAvailable">
+                                    <label class="control-label required margin-bottom-5">@Resource.EndDate</label>
+
+                                    <div class="input-group date date-picker pull-right"
+                                         datepicker="ETSMaster.EndDate" ng-dateval="ETSMaster.EndDate" data-ng-mindate="ETSMaster.StartDate">
+                                        @Html.TextBoxFor(m => m.ETSMaster.EndDate, new
+                                           {
+                                               @class = "form-control input-sm dateInputMask",
+                                               maxlength = "50",
+                                               placeholder = Resource.DateFormat
+                                           })
+                                        @Html.ValidationMessageFor(m => m.ETSMaster.EndDate)
+                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-12 col-md-12 col-sm-12 margin-top-17">
+                                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveETSMaster()" data-ng-show="ETSMaster.EmployeeTimeSlotMasterID > 0">@Resource.UpdateSchedule</button>
+                                    <button type="button" class="btn btn-sm green-jungle" data-ng-click="SaveETSMaster()" data-ng-hide="ETSMaster.EmployeeTimeSlotMasterID > 0">@Resource.SaveAddTimeSlot</button>
+                                    @*<button type="button" class="btn btn-default" data-dismiss="modal" data-ng-click="OnCloseModel()">@Resource.Cancel</button>*@
+                                </div>
+                            </div>
+                        </form>
+                        <hr style="display: inline-block; width: 100%;" />
+
+                        <form id="frmETSDetail" data-ng-show="ETSMaster.EmployeeTimeSlotMasterID > 0">
+
+                            <div>
+                                <div class="">
+                                    <div class="col-md-12">
+                                        <h4 class="modal-title" id="H1" data-ng-hide="ETSDetail.EmployeeTimeSlotDetailID>0">@Resource.AddTimeSlot</h4>
+                                        <h4 class="modal-title" id="H1" data-ng-show="ETSDetail.EmployeeTimeSlotDetailID>0">@Resource.UpdateTimeSlot</h4>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-sm-12">
+
+                                            <div class="col-md-12 no-padding">
+
+
+
+                                                <div class="col-lg-2 col-md-2 col-sm-2" data-ng-if="ETSDetail.EmployeeTimeSlotDetailID > 0">
+                                                    <label class="control-label required">@Resource.Day</label>
+                                                    @Html.DropDownListFor(p => p.ETSDetail.Day, Model.WeekDaysList.ToSelectList(Model.ETSDetail.Day.ToString() ?? "", "Name", "Value", Resource.SelectDay, ""),
+                                                    new
+                                                    {
+                                                        id = "ETSDetailDayID",
+                                                        data_ng_model = "ETSDetail.Day",
+                                                        data_ng_init = "ETSDetail.Day=ETSDetail.Day==''?null:ETSDetail.Day.toString()",
+                                                        @class = "form-control input-sm",
+                                                        convert_to_number = "",
+                                                        @required = true
+                                                    })
+                                                    @Html.ValidationMessageFor(m => m.ETSDetail.Day)
+
+                                                </div>
+
+
+                                                <div class="col-lg-3 col-md-3 col-sm-3" data-ng-if="ETSDetail.EmployeeTimeSlotDetailID == 0">
+                                                    <label class="control-label required">@Resource.Day</label>
+
+                                                    @Html.TextBoxFor(p => p.ETSDetail.SelectedDays,
+                                                     new
+                                                     {
+                                                         data_ng_model = "ETSDetail.SelectedDays",
+                                                         @class = "form-control hideErrorContent replaceErrorSource",
+                                                         id = "SelectedDay",
+                                                         @required = true
+                                                     })
+                                                    @Html.ValidationMessageFor(p => p.ETSDetail.SelectedDays)
+                                                    <div class="replaceErrorDest requiredStrip">
+                                                        @*<select class="form-control input-sm selectpicker" multiple="multiple" data-buttonstyle="btn-sm btn-default"
+                                                                    selectpicker="ETSDetail.SelectedDays" name="ETSDetail.SelectedDays" data-val="false" id="SelectedDays"
+                                                                    data-val-required="@Resource.DayRequired" title="@Resource.SelectDay"
+                                                                    data-ng-model="ETSDetail.SelectedDays">
+                                                                <option ng-repeat="day in ETSModel.WeekDaysList" value="{{day.Value}}">{{day.Name}}</option>
+                                                            </select>*@
+
+                                                        <div ng-dropdown-multiselect-all="" options="ETSModel.WeekDaysList" selected-model="SelectedDays" checkboxes="true" title="@Resource.SelectDay" extra-settings="SelectDaySettings"></div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="col-lg-2 col-md-2 col-sm-2">
+                                                    <label class="control-label" data-ng-class="{'required': !ETSDetail.Is24Hrs}">@Resource.StartTime</label>
+                                                    @Html.TextBoxFor(x => x.ETSDetail.StrStartTime,
+                                                        new
+                                                        {
+                                                            ng_model = "ETSDetail.StrStartTime",
+                                                            @class = "form-control input-sm time",
+                                                            placeholder = @Resource.StartTime,
+                                                            data_ng_required = "!ETSDetail.Is24Hrs"
+                                                        })
+                                                    @Html.ValidationMessageFor(m => m.ETSDetail.StrStartTime)
+                                                </div>
+
+                                                <div class="col-lg-2 col-md-2 col-sm-2">
+                                                    <label class="control-label" data-ng-class="{'required': !ETSDetail.Is24Hrs}">@Resource.EndTime</label>
+                                                    @*<input class="form-control input-sm time" id="EndTime" maxlength="20" name="AddNotePageModel.Note.StrEndTime"
+                                                        type="text" data-ng-model="AddNotePageModel.Note.StrEndTime" placeholder="@Resource.EndTime">*@
+                                                    @Html.TextBoxFor(x => x.ETSDetail.StrEndTime,
+                                                        new
+                                                        {
+                                                            ng_model = "ETSDetail.StrEndTime",
+                                                            @class = "form-control input-sm time",
+                                                            placeholder = @Resource.EndTime,
+                                                            compare_with = "#ETSDetail_StrStartTime",
+                                                            validation_timecompare = "",
+                                                            data_ng_required = "!ETSDetail.Is24Hrs"
+                                                        })
+                                                </div>
+
+                                                <div class="col-lg-1 col-md-1 col-sm-1">
+                                                    <label class="control-label">All Day</label>
+                                                    <input type="checkbox" ng-model="ETSDetail.AllDay" ng-change="SetTime(ETSDetail);" />
+                                                </div>
+
+                                                <div class="col-lg-1 col-md-1 col-sm-1">
+                                                    <label class="control-label" style="white-space: nowrap;">Is 24 Hrs?</label>
+                                                    <input type="checkbox" ng-model="ETSDetail.Is24Hrs" ng-change="Set24Hrs(ETSDetail);" />
+                                                </div>
+
+                                                <div class="col-lg-2 col-md-2 col-sm-2">
+                                                    <label class="control-label">@Resource.Notes</label>
+                                                    @Html.TextBoxFor(x => x.ETSDetail.Notes,
+                                                        new
+                                                        {
+                                                            ng_model = "ETSDetail.Notes",
+                                                            @class = "form-control input-sm",
+                                                            placeholder = @Resource.Notes,
+                                                        })
+                                                    @Html.ValidationMessageFor(m => m.ETSDetail.Notes)
+                                                </div>
+
+                                                <div class="margin-top-17"
+                                                     ng-class="{ 'col-lg-3 col-md-3 col-sm-3' : ETSDetail.EmployeeTimeSlotDetailID > 0 , 'col-lg-1 col-md-1 col-sm-2' :  ETSDetail.EmployeeTimeSlotDetailID == 0 }">
+                                                    <button type="submit" class="btn btn-sm green-jungle" data-ng-click="UpdateETSDetail()" data-ng-show="ETSDetail.EmployeeTimeSlotDetailID > 0">@Resource.Update</button>
+                                                    <button id="btnSaveETS" type="submit" class="btn btn-sm green-jungle" data-ng-click="SaveETSDetail()" data-ng-hide="ETSDetail.EmployeeTimeSlotDetailID > 0">@Resource.Add</button>
+                                                    <button type="button" class="btn btn-sm btn-default" data-ng-click="ResetETSDetailModel()" data-ng-show="ETSDetail.EmployeeTimeSlotDetailID > 0">@Resource.Cancel</button>
+                                                    @*<button type="button" class="btn btn-default" data-dismiss="modal" data-ng-click="OnCloseModel()">@Resource.Cancel</button>*@
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div data-ng-show="ETSDetailList.length > 0 && ETSMaster.EmployeeTimeSlotMasterID>0">
+                            <div class="row">
+                                <div class="col-md-12 col-sm-12 col-xs-12">
+
+                                    <div class="inline-block pull-right" data-ng-show="ETSDetailList.length > 0">
+                                        <div class="pull-right margin-left-5">
+                                            <dir-pagination-controls boundary-links="true" max-size="ETSDetailListPager.maxSize" on-page-change="ETSDetailListPager.pageChanged(newPageNumber)" pagination-id="ETSDetailListPager"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="space20"></div>
+                            </div>
+                            <div>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="portlet-body compact" style="display: block;">
+                                            <div class="table-responsive emp_timeslotstbl">
+
+                                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                                    <thead class="flip-content">
+                                                        <tr>
+                                                            <th class="">
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ETSDetailListPager.sortColumn('Day')">@Resource.Day</a>
+                                                                <span class="sortorder" data-ng-show="ETSDetailListPager.sortIndex === 'Day'" data-ng-class="{reverse:ETSDetailListPager.reverse}"></span>
+                                                            </th>
+
+                                                            <th>
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ETSDetailListPager.sortColumn('StartTime')">@Resource.StartTime</a>
+                                                                <span class="sortorder" data-ng-show="ETSDetailListPager.sortIndex === 'StartTime'" data-ng-class="{reverse:ETSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th>
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ETSDetailListPager.sortColumn('EndTime')">@Resource.EndTime</a>
+                                                                <span class="sortorder" data-ng-show="ETSDetailListPager.sortIndex === 'EndTime'" data-ng-class="{reverse:ETSDetailListPager.reverse}"></span>
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                All Day
+                                                            </th>
+                                                            <th class="col-md-1">
+                                                                Is 24 Hrs?
+                                                            </th>
+                                                            <th>
+                                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ETSDetailListPager.sortColumn('Notes')">@Resource.Notes</a>
+                                                                <span class="sortorder" data-ng-show="ETSDetailListPager.sortIndex === 'Notes'" data-ng-class="{reverse:ETSDetailListPager.reverse}"></span>
+                                                            </th>
+
+                                                            <th class="width-130px col-sm-2">@Resource.Action</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+
+                                                        <tr data-ng-class="{'deleted':item.IsDeleted}" dir-paginate="item in ETSDetailList | itemsPerPage: ETSDetailListPager.pageSize" total-items="ETSDetailListPager.totalRecords" current-page="ETSDetailListPager.currentPage" pagination-id="ETSDetailListPager"
+                                                            data-ng-click="ETSDetailClick(item)">
+                                                            <td>{{item.DayName != null ? item.DayName : '@Resource.NA'}}</td>
+                                                            <td>{{item.StrStartTime}}</td>
+                                                            <td>{{item.StrEndTime}}</td>
+                                                            <td class="text-center">
+                                                                <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.AllDay"></i>
+                                                                <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.AllDay"></i>
+                                                            </td>
+                                                            <td class="text-center">
+                                                                <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.Is24Hrs"></i>
+                                                                <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.Is24Hrs"></i>
+                                                            </td>
+                                                            <td>{{item.Notes}}</td>
+                                                            <td>
+                                                                @if (Common.HasPermission(Constants.HC_Permission_Employee_AddUpdate))
+                                                                {
+
+                                                                    <a href="javascript:void(0);" data-ng-click="OpenEtsDetailModal($event,item)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                    @*<a href="javascript:void(0);" data-ng-show="item.IsDeleted" data-ng-click="DeleteETSDetail($event,item.EmployeeTimeSlotDetailID,'@Resource.Enable')" class="btn btn-xs green">@Resource.Enable</a>*@
+                                                                    <a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteETSDetail($event,item.EmployeeTimeSlotDetailID,'@Resource.Delete')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                                    @*<a href="javascript:void(0);" data-ng-show="!item.IsDeleted" data-ng-click="DeleteETSDetail()" class="btn btn-xs red">@Resource.Delete</a>*@
+                                                                }
+                                                            </td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-12" data-ng-if="ETSDetailList.length > 0">
+                                        <div class="col-sm-6 pull-left no-padding">
+                                            @Resource.Showing <span data-ng-bind="(ETSDetailListPager.pageSize * ETSDetailListPager.currentPage) - ETSDetailListPager.pageSize  + 1"></span>
+                                            &nbsp;@Resource.To <span data-ng-bind="(ETSDetailListPager.pageSize == ETSDetailListPager.currentPageSize) ? (ETSDetailListPager.pageSize * ETSDetailListPager.currentPage) :(ETSDetailListPager.pageSize * ETSDetailListPager.currentPage) - ETSDetailListPager.pageSize  + ETSDetailListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ETSDetailListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                                        </div>
+                                        <div class="pull-right top pagination-sm">
+                                            <dir-pagination-controls boundary-links="true" max-size="ETSDetailListPager.maxSize" on-page-change="ETSDetailListPager.pageChanged(newPageNumber)" pagination-id="ETSDetailListPager"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div data-ng-if="ETSDetailList.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                @*<button type="button" class="btn btn-default" data-dismiss="modal" data-ng-click="OnCloseModel()">@Resource.Cancel</button>
+                    <button type="button" class="btn green-jungle" data-ng-click="SaveETSMaster()">@Resource.Save</button>*@
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,184 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.ARAgingReport);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ARAgingReport;
+}
+
+
+@model SetARAgingReportPage
+@Html.Hidden("hdnARAgingReportPageModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="ARAgingReportController">
+
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.ARAgingReport</h3>
+    </div>
+
+
+    <div>
+
+        <div>
+            <div class="row">
+                <div class="col-md-9 col-sm-12 col-xs-12">
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12 row">
+                        <label>@Resource.Payor</label>
+                        <div>
+                            @Html.DropDownListFor(p => p.SearchARAgingReportPage.PayorIDs, Model.PayorList.ToSelectList(Model.SearchARAgingReportPage.StrReconcileStatus ?? "", "Name", "Value", "", ""), new
+                            {
+                                data_val = "false",
+                                @class = "form-control input-sm selectpicker",
+                                data_buttonStyle = "btn-sm btn-default",
+                                selectpicker = "SearchARAgingReportPage.PayorIDs",
+                                multiple = "multiple",
+                                title = Resource.SelectPayor,
+                                //data_ng_change="SearchARAgingReport()"
+                            })
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12">
+                        <label>@Resource.ClaimStatus</label>
+                        <div>
+                            @Html.DropDownListFor(p => p.SearchARAgingReportPage.ReconcileStatus, Common.SetReconcileStatus().ToSelectList(Model.SearchARAgingReportPage.StrReconcileStatus ?? "", "Name", "Value", "", ""), new
+                            {
+                                data_val = "false",
+                                @class = "form-control input-sm selectpicker",
+                                data_buttonStyle = "btn-sm btn-default",
+                                selectpicker = "SearchARAgingReportPage.ReconcileStatus",
+                                multiple = "multiple",
+                                title = Resource.SelectClaimStatus,
+                                //data_ng_change="SearchARAgingReport()"
+                            })
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-3 col-md-3 col-sm-12">
+                        <label>@Resource.ClientNameLabel</label>
+                        <div>
+                            @Html.TextBoxFor(q => q.SearchARAgingReportPage.ClientName,
+                                new
+                                {
+                                    @class = "form-control input-sm",
+                                    placeholder = Resource.ClientNameLabel,
+                                    data_ng_model = "SearchARAgingReportPage.ClientName",
+                                })
+                            @Html.ValidationMessageFor(q => q.SearchARAgingReportPage.ClientName)
+
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-2 col-sm-12">
+                        <label>&nbsp;</label>
+                        <div>
+                            <button type="button" class="btn btn-sm btn-primary" data-ng-click="SearchARAgingReport()">@Resource.Search</button>
+                            <button type="button" class="btn btn-sm btn-default" data-ng-click="Reset()">@Resource.Reset</button>
+                        </div>
+                    </div>
+
+                    <div class="form-group col-lg-1 col-md-1 col-sm-12">
+                        <label>&nbsp;</label>
+                        <a class="btn collapsed green border-grey-cascade btn-sm" data-ng-click="ExportARAgingReportList()">
+                            <i class="fa fa-file-excel-o" aria-hidden="true"></i>&nbsp; @Resource.Export
+                        </a>
+                    </div>
+                    <div class="space20"></div>
+                    <div class="portlet-body clearfix" style="display: block;">
+                        <div class="table-responsive">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr class="trThemeColor">
+                                        @*style="background: #1e87e3; color: white;"*@
+                                        <th>@Resource.Payor</th>
+                                        @*<th class="width-100px">@Resource.PayorType</th>*@
+                                        <th class="width-100px">@Html.Raw(Resource.Days0_60)</th>
+                                        <th class="width-100px">@Html.Raw(Resource.Days61_90)</th>
+                                        <th class="width-100px">@Html.Raw(Resource.Days91_120)</th>
+                                        <th class="width-100px">@Html.Raw(Resource.Days121_180)</th>
+                                        <th class="width-100px">@Html.Raw(Resource.Days181_270)</th>
+                                        <th class="width-100px">@Html.Raw(Resource.Days271_365)</th>
+                                        @*<th class="">@Html.Raw(Resource.Days365Onwards)</th>*@
+                                        <th class="width-100px">@Resource.Total</th>
+
+                                    </tr>
+                                </thead>
+                                <tbody>
+
+                                    <tr data-ng-repeat="item in ARAgingList" data-ng-class="{'bg-gray-color font-weight-700': $last}" >
+
+                                        <td class="bold" data-ng-class="{'font-red':!item.IsFooterRow, 'agingFooterRow':item.IsFooterRow}">{{item.PayorShortName }}</td>
+                                        @*<td class="bold" data-ng-class="{'agingFooterRow':item.IsFooterRow}">{{item.PayorTypeName }}</td>*@
+
+                                        <td data-ng-class="{'agingFooterRow':item.IsFooterRow}">
+                                            <a href="javascript:void(0);" class="curser-pointer" data-ng-click="GotoReconcilePage(item,@((int)Enum_IndexForSelectedRange.Range_0_60))">
+                                                {{(item.PendingAmount0_60| orgcurrency)}}
+                                            </a>
+                                        </td>
+                                        <td data-ng-class="{'agingFooterRow':item.IsFooterRow}">
+                                            <a href="javascript:void(0);" class="curser-pointer" data-ng-click="GotoReconcilePage(item,@((int)Enum_IndexForSelectedRange.Range_61_90))">
+                                                {{(item.PendingAmount61_90| orgcurrency)}}
+                                            </a>
+                                        </td>
+                                        <td data-ng-class="{'agingFooterRow':item.IsFooterRow}">
+                                            <a href="javascript:void(0);" class="curser-pointer" data-ng-click="GotoReconcilePage(item,@((int)Enum_IndexForSelectedRange.Range_91_120))">
+                                                {{(item.PendingAmount91_120| orgcurrency)}}
+                                            </a>
+                                        </td>
+                                        <td data-ng-class="{'agingFooterRow':item.IsFooterRow}">
+                                            <a href="javascript:void(0);" class="curser-pointer" data-ng-click="GotoReconcilePage(item,@((int)Enum_IndexForSelectedRange.Range_121_180))">
+                                                {{(item.PendingAmount121_180| orgcurrency)}}
+                                            </a>
+                                        </td>
+                                        <td data-ng-class="{'agingFooterRow':item.IsFooterRow}">
+                                            <a href="javascript:void(0);" class="curser-pointer" data-ng-click="GotoReconcilePage(item,@((int)Enum_IndexForSelectedRange.Range_181_270))">
+                                                {{(item.PendingAmount181_270| orgcurrency)}}
+                                            </a>
+                                        </td>
+                                        <td data-ng-class="{'agingFooterRow':item.IsFooterRow}">
+                                            <a href="javascript:void(0);" class="curser-pointer" data-ng-click="GotoReconcilePage(item,@((int)Enum_IndexForSelectedRange.Range_271_365))">
+                                                {{(item.PendingAmount271_365| orgcurrency)}}
+                                            </a>
+                                        </td>
+                                        @*<td>{{item.PendingAmount365_Plus| orgcurrency}}</td>*@
+
+                                        <td class="bold"
+                                            data-ng-class="{'agingFooterRow':item.IsFooterRow,'agingLastColumn':!item.IsFooterRow}">
+                                            <a href="javascript:void(0);" class="curser-pointer" data-ng-click="GotoReconcilePage(item,@((int)Enum_IndexForSelectedRange.Range_0_365))">
+                                                {{item.TotalPendingAmount| orgcurrency}}
+                                            </a>
+                                        </td>
+
+
+                                    </tr>
+                                </tbody>
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-9 col-sm-12 col-xs-12">
+                    <div data-ng-if="ARAgingList.length == 0  ">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/areas/homeCare/batch/aragingreport")
+    <script type="text/javascript">
+        var Cookie_AgingReportFilters = '@Constants.Cookie_AgingReportFilters';
+    </script>
+}

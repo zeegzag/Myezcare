@@ -1,0 +1,313 @@
+﻿@model HC_AddReferralModel
+
+<div class="row-fluid no-padding col-lg-12">
+    <div class="row-fluid">
+
+        <div class="row">
+            <form id="frmChecklistSearch">
+                <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                    <label class="control-label required">@Resource.ChecklistItemType</label>
+                    <select class="form-control exclude-reload-alert input-sm"
+                            data-ng-model="SelectedChecklistItemTypeID"
+                            data-ng-change="ChecklistItemTypeChange()"
+                            data-val="true" data-val-required="@Resource.SelectChecklistItemType"
+                            id="ChecklistItemTypeID"
+                            name="ChecklistItemTypeID"
+                            data-ng-class="{'valid': !(SelectedChecklistItemTypeID == null  || SelectedChecklistItemTypeID == '' )}"
+                            convert-to-number="">
+                        <option data-ng-repeat='item in ChecklistItemTypes' value="{{item.ChecklistItemTypeID}}">{{item.ChecklistItemTypeName}}</option>
+                    </select>
+                </div>
+
+                <div data-ng-hide="SelectedChecklistItemTypeID == ChecklistItemTypeMonthlyVisitID || SelectedChecklistItemTypeID == ChecklistItemTypeAnnualVisitID">
+                    <div class="form-group col-lg-10 col-md-10 col-sm-10">
+                        <p class="label-italic">
+                            <b class="font-red-thunderbird">@Resource.Notes:</b>
+                            <span>@Resource.PatientChecklistNotes</span>
+                        </p>
+                    </div>
+                </div>
+                
+
+                <div data-ng-show="SelectedChecklistItemTypeID == ChecklistItemTypeMonthlyVisitID || SelectedChecklistItemTypeID == ChecklistItemTypeAnnualVisitID">
+                    <div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                        <label class="required">@Resource.StartDate</label>
+                        <div>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="ChecklistItemModel.StartDate" ng-dateval="ChecklistItemModel.StartDate" data-ng-maxdate="ChecklistItemModel.EndDate">
+                                <input class="form-control input-sm dateInputMask exclude-reload-alert" data-val="true"
+                                       id="ChecklistItemModel_StartDate" name="ChecklistItemModel.StartDate"
+                                       data-val-required="@Resource.StartDateRequired" placeholder='@Resource.StarDate' maxlength="10" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        <span class="field-validation-valid" data-valmsg-for="ChecklistItemModel.StartDate" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-2 col-sm-2 col-xs-12">
+                        <label class="required">@Resource.EndDate</label>
+                        <div>
+                            <div class="input-group date date-picker pull-right"
+                                 datepicker="ChecklistItemModel.EndDate" ng-dateval="ChecklistItemModel.EndDate" data-ng-mindate="ChecklistItemModel.StartDate">
+                                <input class="form-control input-sm dateInputMask exclude-reload-alert" data-val="true"
+                                       id="ChecklistItemModel_EndDate" name="ChecklistItemModel.EndDate"
+                                       data-val-required="@Resource.EndDateRequired" placeholder='@Resource.EndDate' maxlength="10" />
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                        <span class="field-validation-valid" data-valmsg-for="ChecklistItemModel.EndDate" data-valmsg-replace="true"></span>
+                    </div>
+                    <div class="col-lg-2 col-md-3 col-sm-12 col-xs-5">
+                        <label></label>
+                        <div>
+                            <input type='button' class="btn btn-sm btn-default bg-gray-color" value="@Resource.GetChecklist" data-ng-click="GetVisitChecklistItems()" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div data-ng-show="SelectedChecklistItemTypeID != ChecklistItemTypeMonthlyVisitID && SelectedChecklistItemTypeID != ChecklistItemTypeAnnualVisitID">
+            <div class="col-lg-12 no-padding">
+                <div class="alert alert-success" data-ng-show="ChecklistSaved">
+                    <p class="text-align-center">
+                        @Resource.ChecklistItemsSaved
+                    </p>
+                </div>
+            </div>
+
+            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding" data-ng-show="ChecklistItems.length > 0">
+                <form id="frmPatientIntakeChecklist">
+
+                    <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+                        <thead>
+                            <tr>
+                                <th class="width-20px"></th>
+                                <th><strong>@Resource.ItemRequired</strong></th>
+                                <th><strong>@Resource.ItemName</strong></th>
+                                <th><strong>@Resource.DocumentRequired</strong></th>
+                                <th><strong>@Resource.DocumentUploaded</strong></th>
+                                <th><strong>@Resource.DocumentName</strong></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in ChecklistItems">
+                                <td>
+                                    <label class="mt-checkbox mt-checkbox-outline">
+                                        <input id="PatientIntakeChecklist_{{item.ChecklistItemID}}" class="uniformControls" type="checkbox"
+                                               data-uniform-value="item.IsChecked"
+                                               data-ng-model="item.IsChecked"
+                                               data-ng-change="ChecklistItemChange(item)"
+                                               data-ng-checked="item.IsChecked"
+                                               data-ng-disabled="item.IsAutomatic || ChecklistSaved"
+                                               data-ng-ismandatory="item.IsMandatory"
+                                               data-ng-true-value="1" />
+                                    </label>
+                                </td>
+                                <td data-ng-bind="item.IsMandatory ? '@Resource.Yes' : '@Resource.No'"></td>
+                                <td data-ng-bind="item.StepName"></td>
+                                <td data-ng-bind="item.IsDocumentRequired ? '@Resource.Yes' : '@Resource.No'"></td>
+                                <td data-ng-bind="item.IsDocumentUploaded ? '@Resource.Yes' : '@Resource.No'"></td>
+                                <td data-ng-bind="item.IsDocumentUploaded ? item.DocumentName : ''"></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="col-lg-12 no-padding margin-top-15 clearfix text-center">
+                        <input type="button" data-ng-click="SavePatientIntakeChecklist()" data-ng-disabled="ChecklistSaved" class="btn btn-sm green-jungle" value="@Resource.MarkAsComplete" />
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-sm-12">
+                <div data-ng-if="ChecklistItems.length == 0">
+                    <div class="row">
+                        <div class="col-lg-12">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoChecklistItemFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div data-ng-show="SelectedChecklistItemTypeID == ChecklistItemTypeMonthlyVisitID || SelectedChecklistItemTypeID == ChecklistItemTypeAnnualVisitID">
+            <div class="row">
+                <div class="col-sm-10" data-ng-if="VisitChecklistItems.length > 0">
+                    <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog">
+                        <thead>
+                            <tr>
+                                <th data-ng-show="SelectedChecklistItemTypeID == ChecklistItemTypeMonthlyVisitID"><strong>@Resource.Month</strong></th>
+                                <th data-ng-show="SelectedChecklistItemTypeID == ChecklistItemTypeAnnualVisitID"><strong>@Resource.Year</strong></th>
+                                <th><strong>@Resource.Date</strong></th>
+                                <th><strong>@Resource.IsCareTypeAssigned</strong></th>
+                                <th><strong>@Resource.IsClockInCompleted</strong></th>
+                                <th><strong>@Resource.IsClockOutCompleted</strong></th>
+                                <th><strong>@Resource.IsSignedByPatient</strong></th>
+                                <th><strong>@Resource.VisitCompleted</strong></th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in VisitChecklistItems">
+                                <td data-ng-show="SelectedChecklistItemTypeID == ChecklistItemTypeMonthlyVisitID">{{item.StartDate | monthformat}}</td>
+                                <td data-ng-show="SelectedChecklistItemTypeID == ChecklistItemTypeAnnualVisitID">{{item.StartDate | yearformat}}</td>
+                                <td data-ng-bind="item.StartDate | orgdate"></td>
+                                <td data-ng-bind="item.IsCareTypeAssigned ? '@Resource.Yes' : '@Resource.No'"></td>
+                                <td data-ng-bind="item.ClockInTime != null ? '@Resource.Yes' : '@Resource.No'"></td>
+                                <td data-ng-bind="item.ClockOutTime != null ? '@Resource.Yes' : '@Resource.No'"></td>                                
+                                <td data-ng-bind="item.IsSigned ? '@Resource.Yes' : '@Resource.No'"></td>
+                                <td>
+                                    <span class="badge Confirmed" data-ng-show="item.IsCompleted">@Resource.Completed</span>
+                                    <span class="badge InCompleteItem" data-ng-show="!item.IsCompleted">@Resource.InComplete</span>
+                                    @*<i class="glyphicon glyphicon-ok text-success" title="@Resource.Completed" data-ng-if="item.IsCompleted"></i>
+                                    <i class="glyphicon glyphicon-remove text-danger" title="@Resource.InComplete" data-ng-if="!item.IsCompleted"></i>*@
+                                </td>
+                                <td>
+                                    <a href="javascript:void(0);" class="btn btn-xs btn-success ng-scope" data-ng-click="OpenVisitChecklistModal(item)" title="@Resource.ViewDetails">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" class="btn btn-xs btn-success ng-scope" data-ng-show="!item.IsCompleted" data-ng-click="OpenEmpSMSPopup(item, item.EmployeeMobileNumber)" title="@Resource.SendSMS">
+                                        <i class="fa fa-comment"></i>
+                                    </a>
+                                    <a href="javascript:void(0);" class="btn btn-xs btn-success ng-scope" data-ng-show="!item.IsCompleted" data-ng-click="OpenEmpNotificationPopup(item)" title="@Resource.SendNotification">
+                                        <i class="fa fa-bell"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>       
+
+
+                <div class="col-lg-2 col-md-2 col-sm-6 col-xs-12" data-ng-repeat="item in VisitChecklistItems">
+
+                    @*<div class="dashboard-stat2 visit-checklist">
+            <div class="display">
+                <div class="number">
+                    <h4 data-ng-class="{'font-green-jungle': item.IsCompleted, 'font-red-haze': !item.IsCompleted}">
+                        <span data-ng-bind="item.IsCompleted ? '@Resource.Completed' : '@Resource.InComplete'"></span>
+                    </h4>
+                    <span>{{item.StartDate | orgdate }}</span>
+                </div>
+                <div class="icon">
+                    <i class="fa fa-check font-green-jungle" data-ng-show="item.IsCompleted"></i>
+                    <i class="fa fa-circle-o font-red-haze" data-ng-show="!item.IsCompleted"></i>
+                </div>
+            </div>
+            <div class="action-area">
+                <input type="button" class="btn btn-primary btn-sm" data-ng-click="OpenVisitChecklistModal(item)" value="@Resource.ViewDetails" />
+            </div>
+        </div>*@
+                </div>
+                <div class="col-lg-10" data-ng-if="IsVisitChecklistItemsLoaded && VisitChecklistItems.length == 0">
+                    <div class="alert alert-danger">
+                        @Html.Raw(Resource.NoRecordFound)
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @Html.Partial("Partial/ReferralDetails/_EmployeeSms", new HC_ScheduleMasterModel())
+        @Html.Partial("Partial/ReferralDetails/_EmployeeNotification")
+
+        <div class="modal fade" id="VisitModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title text-center bold" id="monthlyVisitModalTitle">
+                            <span data-ng-show="SelectedChecklistItemTypeID == ChecklistItemTypeMonthlyVisitID">@Resource.MonthlyVisit</span>
+                            <span data-ng-show="SelectedChecklistItemTypeID == ChecklistItemTypeAnnualVisitID">@Resource.AnnualVisit</span>
+                            <span>({{CurrentVisitChecklist.StartDate | datetimeformat}} - {{CurrentVisitChecklist.EndDate | datetimeformat}})</span>
+                        </h4>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="table-scrollable" data-ng-if="CurrentVisitChecklist.IsCareTypeAssigned != undefined">
+                                        <table class="table table-bordered">
+                                            @*<thead>
+                                                    <tr>
+                                                        <th class="width-20px"></th>
+                                                        <th><strong>@Resource.ItemName</strong></th>
+                                                    </tr>
+                                                </thead>*@
+                                            <tbody>
+                                                <tr>
+                                                    <td>@Resource.IsCareTypeAssigned</td>
+                                                    <td>
+                                                        <i class="glyphicon glyphicon-ok text-success" data-ng-if="CurrentVisitChecklist.IsCareTypeAssigned"></i>
+                                                        <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!CurrentVisitChecklist.IsCareTypeAssigned"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@Resource.IsClockInCompleted</td>
+                                                    <td>
+                                                        <i class="glyphicon glyphicon-ok text-success" data-ng-if="CurrentVisitChecklist.IsClockInCompleted"></i>
+                                                        <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!CurrentVisitChecklist.IsClockInCompleted"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <table class="table table-bordered table-striped table-condensed flip-content">
+                                                            <thead class="flip-content">
+                                                                <tr>
+                                                                    <th>Document</th>
+                                                                    <th></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>D1 - TBD</td>
+                                                                    <td>Yes</td>
+                                                                </tr>
+                                                                <tr>
+                                                                    <td>D2 - TBD</td>
+                                                                    <td>No</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@Resource.IsClockOutCompleted</td>
+                                                    <td>
+                                                        <i class="glyphicon glyphicon-ok text-success" data-ng-if="CurrentVisitChecklist.IsClockOutCompleted"></i>
+                                                        <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!CurrentVisitChecklist.IsClockOutCompleted"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@Resource.IsSignedByPatient</td>
+                                                    <td>
+                                                        <i class="glyphicon glyphicon-ok text-success" data-ng-if="CurrentVisitChecklist.IsSigned"></i>
+                                                        <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!CurrentVisitChecklist.IsSigned"></i>
+                                                    </td>
+                                                </tr>
+                                                <tr>
+                                                    <td>@Resource.VisitCompleted</td>
+                                                    <td>
+                                                        <i class="glyphicon glyphicon-ok text-success" data-ng-if="CurrentVisitChecklist.IsCompleted"></i>
+                                                        <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!CurrentVisitChecklist.IsCompleted"></i>
+                                                    </td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <div class="alert alert-danger" data-ng-if="CurrentVisitChecklist.IsCareTypeAssigned == undefined">
+                                        @Html.Raw(Resource.NoRecordFound)
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-sm red" data-dismiss="modal">@Resource.Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,58 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Process270_271MenuTitle);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_Process270_271;
+}
+@model AddProcess270271Model
+
+
+
+<div>
+    @*@Html.Hidden("hdnAddReferralModel", Common.SerializeObject(Model))*@
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.Process270_271Title</h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="tabbable tabbable-custom boxless">
+                <ul class="nav nav-tabs" id="loanDetailTopTabs">
+                    @if (Common.HasPermission(Constants.Permission_Billing_Upload835))
+                    {
+                        <li class="@(Common.HasPermission(Constants.Permission_Billing_Upload835) ? "active" : "disabled")">
+                            <a id="@Constants.HashUrl_Process270" data-target="#tab_Process270" data-toggle="@(Common.HasPermission(Constants.Permission_Billing_Upload835) ? "tab" : "")">@Resource.Process270<span class="badge badge-important" data-ng-hide="TotalReferralErrorCount <= 0">{{TotalReferralErrorCount}}</span></a>
+                        </li>
+                    }
+                    @if (Common.HasPermission(Constants.Permission_Billing_Upload835))
+                    {
+                        <li class="@(Common.HasPermission(Constants.Permission_Billing_Upload835) ? "" : "disabled")">
+                            <a id="@Constants.HashUrl_Process271"  data-target="#tab_Process271" data-toggle="@(Common.HasPermission(Constants.Permission_Billing_Upload835) ? "tab" : "")">@Resource.Process271</a>
+                        </li>
+                    }
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_Process270" data-ng-controller="Process270Controller">
+                        @Html.Partial("Partial/Process270_271/_Process270",Model)
+                    </div>
+
+                    <div class="tab-pane" id="tab_Process271" data-ng-controller="Process271Controller">
+                        @Html.Partial("Partial/Process270_271/_Process271",Model)
+                    </div>
+
+                </div>
+            </div>
+            <div class="clearfix"></div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/batch/process270_271")
+    <script type="text/javascript">
+        var DeleteConfirmation270Message = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.EDI270File)';
+        var DeleteConfirmation271Message = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.EDI271File)';
+        var Invalid271UploadMessage = '@Resource.Invalid271UploadMessage';
+        var MaximumUploadImageSizeMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage2MB))';
+        var Select271File = '@Resource.Select271File';
+        
+    </script>
+}

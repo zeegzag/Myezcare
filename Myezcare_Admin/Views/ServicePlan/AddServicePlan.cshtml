@@ -1,0 +1,204 @@
+﻿@model SetAddServicePlanModel
+
+@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.ServicePlan.ServicePlanID > 0 ? Resource.EditServicePlan : Resource.AddServicePlan));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_ServicePlanAdd;
+    bool isEditMode = Model.ServicePlan.ServicePlanID > 0;
+}
+
+@Html.Hidden("hdnServicePlanModel", Common.SerializeObject(Model))
+<div data-ng-controller="AddServicePlanController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditServicePlan : @Resource.AddServicePlan)
+            <small>@Resource.EnterServicePlanInformation</small>
+            <input type="submit" data-ng-click="SaveServicePlanDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && isEditMode ? Resource.Update : Resource.Save)" />
+            <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-lg-12 col-sm-12 col-md-12">
+            <form id="frmServicePlan">
+                <div class="form-group row">
+                    <div class="col-lg-12 col-sm-12 col-md-12">
+                        <div class="row clearfix">
+                            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                <label class="control-label required">
+                                    @Resource.ServicePlanName
+                                </label>
+                                @Html.TextBoxFor(m => m.ServicePlan.ServicePlanName, new { data_ng_model = "ServicePlan.ServicePlanName", @class = "form-control input-sm", placeholder = Resource.ServicePlanName, maxlength = 100 })
+                                @Html.ValidationMessageFor(m => m.ServicePlan.ServicePlanName)
+                            </div>
+                            <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                                <label class="control-label">
+                                    @Resource.SetupFees
+                                </label>
+                                @Html.TextBoxFor(m => m.ServicePlan.SetupFees, new { data_ng_model = "ServicePlan.SetupFees", data_ng_init = "ServicePlan.SetupFees=ServicePlan.SetupFees==''?null:ServicePlan.SetupFees", @class = "form-control input-sm", placeholder = Resource.SetupFees, maxlength = 10 })
+                                @Html.ValidationMessageFor(m => m.ServicePlan.SetupFees)
+                            </div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="portlet-body compact">
+                                    <div class="dataTables_wrapper external-events-group table-responsive">
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <div>
+                                                <i class="glyphicon glyphicon-tree-conifer"></i>&nbsp;@Resource.WebPermissions
+                                                <label class="required"></label>
+                                                <span class="color-red" data-ng-show="ShowWebPermissionError">@Resource.PleaseSelectWebPermission</span>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id="jstreeid" data-ng-click="SetPermission()" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="PermissionList" tree="treeInstance" tree-events="ready:ExpandTreeView;hover_node:ShowDescription;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                <div class="portlet-body compact">
+                                    <div class="dataTables_wrapper external-events-group table-responsive">
+                                    </div>
+                                </div>
+                                <div class="">
+                                    <div class="panel panel-default">
+                                        <div class="panel-heading">
+                                            <div>
+                                                <i class="glyphicon glyphicon-tree-conifer"></i>&nbsp;@Resource.MobilePermissions
+                                                <label class="required"></label>
+                                                <span class="color-red" data-ng-show="ShowMobilePermissionError">@Resource.PleaseSelectMobilePermission</span>
+                                            </div>
+                                        </div>
+                                        <div class="panel-body">
+                                            <div id="jstreeidMobile" data-ng-click="SetPermission()" should-apply="config.applyModelChanges()" js-tree="treeConfig" data-ng-model="MobilePermissionList" tree="treeInstanceMobile" tree-events="ready:ExpandTreeView;hover_node:ShowDescription;"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row clearfix">
+                            <div class="col-lg-12 col-sm-12 col-md-12">
+                                <h4><strong>@Resource.Pricing</strong></h4>
+                                <hr class="clear-both" />
+                            </div>
+                            <div class="col-lg-12 col-sm-12 col-md-12 no-padding">
+
+                                <div data-ng-repeat="module in ServicePlanModules">
+                                    
+                                    <div class="form-group col-lg-2 col-md-2 col-sm-2"  data-ng-if="module.ModuleID!='@((int)Common.ServicePlanModuleEnum.Billing)'">
+                                        <label class="control-label required">
+                                            {{module.ModuleDisplayName}}
+                                          <i class="fa fa-question-circle" data-ng-tooltip="{{module.ModuleHelpText}}" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <input type="text" name="ServicePlan_{{module.ModuleID}}" class="form-control input-sm"  
+                                               id="ServicePlan_{{module.ModuleID}}"
+                                               data-ng-model="module.MaximumAllowedNumber" 
+                                               data-ng-init="module.MaximumAllowedNumber==module.MaximumAllowedNumber==''?null:module.MaximumAllowedNumber.toString()" 
+                                               data-val="true" data-val-required="{{module.ModuleRequiredText}}" data-val-number="@Resource.EnterValidNumber"
+                                               data-val-range="@Resource.EnterValidNumber" data-val-range-max="1E+6" data-val-range-min="0" 
+                                               data-val-regex="@Resource.EnterValidNumber" data-val-regex-pattern="^\d+$"
+                                               maxlength="6"
+                                        />
+                                        
+                                    </div>
+                                    
+                                    
+                                    <div class="form-group col-lg-2 col-md-2 col-sm-2" data-ng-if="module.ModuleID=='@((int)Common.ServicePlanModuleEnum.Billing)'">
+                                        <label class="control-label">
+                                            {{module.ModuleDisplayName}}
+                                          <i class="fa fa-question-circle" data-ng-tooltip="{{module.ModuleHelpText}}" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                       
+                                        <input type="text" name="ServicePlan.{{module.ModuleID}}" class="form-control input-sm"
+                                               id="ServicePlanBilling_{{module.ModuleID}}"
+                                               data-ng-model="module.MaximumAllowedNumber"
+                                               data-ng-init="module.MaximumAllowedNumber==module.MaximumAllowedNumber==''?null:module.MaximumAllowedNumber.toString()"  
+                                               data-val="true" data-val-number="@Resource.EnterBetween0To100"
+                                               data-val-range="@Resource.EnterBetween0To100" data-val-range-max="1E+3" data-val-range-min="1"
+                                               data-val-regex="@Resource.EnterBetween0To100" data-val-regex-pattern="(100)|[1-9]\d?"
+                                               maxlength="3"
+                                        />
+                                        
+
+                                    </div>
+
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label class="control-label">@Resource.ServicePlanComponents</label>
+                                    <div class="">
+                                        <input type="text"
+                                               token-input
+                                               ng-val="Title"
+                                               textfield='Title'
+                                               valuefield='Title'
+                                               searchurl="{{SearhServicePlanComponentURL}}"
+                                               placeholder="@Resource.EnterComponent"
+                                               tokenlimit='1'
+                                               onresultsformatter='ServicePlanComponentResultsFormatter'
+                                               ontokenformatter="ServicePlanComponentTokenFormatter"
+                                               onaddedcallback='AddedServicePlanComponent'
+                                               autoSelectFirstResult="false"
+                                               minChars="0"
+                                               tokeninputobj="ServicePlanComponentTokenObj"
+                                               id="ProductTagTkn"
+                                               customclass="form-control input-sm" />
+                                    </div>
+                                </div>
+                                <div class="form-group" data-ng-show="ListServicePlanComponent.length>0">
+                                    <div class="control-label"></div>
+                                    <div class="">
+                                        <div class="badge_main">
+                                            <span data-ng-repeat="item in ListServicePlanComponent">
+                                                <span class="badge-default badge-success ">
+                                                    {{item.Title}}
+                                                    <a href="javascript:void(0)" data-ng-click="DeleteServicePlanComponent(item,$index)" class="fa fa-times" aria-hidden="true"></a>
+                                                </span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div data-ng-init="ServicePlan.PerPatientPrice = ServicePlan.PerPatientPrice == 0 ? '' : ServicePlan.PerPatientPrice;ServicePlan.NumberOfDaysForBilling = ServicePlan.NumberOfDaysForBilling == 0 ? '' : ServicePlan.NumberOfDaysForBilling">
+                                <div class="col-lg-12 col-sm-12 col-md-12 no-padding">
+                                    <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                        <label class="control-label required">
+                                            @Resource.PerPatientPrice
+                                        </label>
+                                        @Html.TextBoxFor(m => m.ServicePlan.PerPatientPrice, new { data_ng_model = "ServicePlan.PerPatientPrice", @class = "form-control input-sm", placeholder = Resource.PerPatientPrice, maxlength = 10 })
+                                        @Html.ValidationMessageFor(m => m.ServicePlan.PerPatientPrice)
+                                    </div>
+                                    <div class="form-group col-lg-2 col-md-2 col-sm-2">
+                                        <label class="control-label required">
+                                            @Resource.NumberOfDaysForBilling
+                                        </label>
+                                        @Html.TextBoxFor(m => m.ServicePlan.NumberOfDaysForBilling, new { data_ng_model = "ServicePlan.NumberOfDaysForBilling", @class = "form-control input-sm", placeholder = Resource.NumberOfDaysForBilling, maxlength = 3 })
+                                        @Html.ValidationMessageFor(m => m.ServicePlan.NumberOfDaysForBilling)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space15"></div>
+                        <div class="col-md-12 form-group no-margin no-padding">
+                            <input type="submit" data-ng-click="SaveServicePlanDetails()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && isEditMode ? Resource.Update : Resource.Save)" />
+                            <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        var pleaseSelectPermission = '@Resource.PleaseSelectPermission';
+        var servicePlanBillingModule = '@((int)Common.ServicePlanModuleEnum.Billing)';
+    </script>
+    @Scripts.Render("~/assets/js/viewjs/siteapp/serviceplan/addserviceplan")
+}

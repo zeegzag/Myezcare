@@ -1,0 +1,176 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.ScheduleBatchServiceList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    //   ViewBag.SelectedMenuItem = Resource.SMI_ScheduleBatchServiceList;
+}
+@model ScheduleBatchServiceModel
+@Html.Hidden("hdnSetScheduleBatchServiceListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="ScheduleBatchServiceListController">
+    <div class="page-bar">
+        <h3 class="page-title">@Resource.ScheduleBatchServiceList &nbsp;<small>@Resource.ScheduleBatchServiceListInformation</small>
+            <div class="btn-group pull-right btn-group-xs btn-group-devided">
+                <a type="button" class="btn collapsed grey border-grey-cascade btn-xs" href="/cronjob/performschedulebatchservices" target="_blank">
+                    <i class="fa fa-sliders" aria-hidden="true"></i>&nbsp; @Resource.RunBatchService
+                </a>
+            </div>
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group" data-ng-show="ScheduleBatchServiceList.length > 0">
+                <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                    <input id="SelectAllScheduleBatchService" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                    <label for="SelectAllScheduleBatchService"></label>
+                </span>
+            </div>
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group" data-ng-if="SelectedScheduleBatchServiceIds.length > 0">
+                <button type="button" data-ng-click="DeleteScheduleBatchService(0,'Delete')" class="btn blue btn-sm grey border-grey-cascade">
+                    <i class="fa fa-trash-o"></i>&nbsp;&nbsp;@Resource.Delete
+                </button>
+            </div>
+            <div class="inline-block pull-right" data-ng-show="ScheduleBatchServiceList.length > 0">
+                <div class="inline-block pull-right" data-ng-show="ScheduleBatchServiceList.length > 0">
+                    <div class="pull-right margin-left-5">
+                        <dir-pagination-controls boundary-links="true" max-size="ScheduleBatchServiceListPager.maxSize" on-page-change="ScheduleBatchServiceListPager.pageChanged(newPageNumber)" pagination-id="ScheduleBatchServiceListPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div class="space20"></div>
+        </div>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body" style="display: block;">
+                    <div class="table-responsive">
+                        <form id="frmScheduleBatchServiceList">
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="width-20px"></th>
+                                        <th class="col-sm-4">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleBatchServiceListPager.sortColumn('ScheduleBatchServiceName')">@Resource.ScheduleBatchServiceNameLable</a>
+                                            <span class="sortorder" data-ng-show="ScheduleBatchServiceListPager.sortIndex === 'ScheduleBatchServiceName'" data-ng-class="{reverse:ScheduleBatchServiceListPager.reverse}"></span>
+                                        </th>
+                                        <th class="col-sm-2">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleBatchServiceListPager.sortColumn('ScheduleBatchServiceType')">@Resource.ScheduleBatchServiceTypeLable</a>
+                                            <span class="sortorder" data-ng-show="ScheduleBatchServiceListPager.sortIndex === 'ScheduleBatchServiceType'" data-ng-class="{reverse:ScheduleBatchServiceListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="col-sm-2">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleBatchServiceListPager.sortColumn('ScheduleBatchServiceStatus')">@Resource.ScheduleBatchServiceStatus</a>
+                                            <span class="sortorder" data-ng-show="ScheduleBatchServiceListPager.sortIndex === 'ScheduleBatchServiceStatus'" data-ng-class="{reverse:ScheduleBatchServiceListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="col-sm-2">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="ScheduleBatchServiceListPager.sortColumn('AddedBy')">@Resource.AddedBy</a>
+                                            <span class="sortorder" data-ng-show="ScheduleBatchServiceListPager.sortIndex === 'AddedBy'" data-ng-class="{reverse:ScheduleBatchServiceListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="width120">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td></td>
+                                        <td>@Html.TextBoxFor(m => m.SearchScheduleBatchServiceModel.ScheduleBatchServiceName, new
+                                                {
+                                                    data_ng_model = "TempScheduleBatchServiceListPage.ScheduleBatchServiceName",
+                                                    @class = "form-control input-sm",
+                                                    placeholder = Resource.ScheduleBatchServiceNameLable,
+                                                    maxlength = 100
+                                                })</td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchScheduleBatchServiceModel.ScheduleBatchServiceType, Model.ScheduleBatchServiceTypeList.ToSelectList(Model.SearchScheduleBatchServiceModel.ScheduleBatchServiceType, "Name", "Value", Resource.SelectServiceType, ""),
+                                                                  new
+                                                                      {
+                                                                          data_ng_model = "TempScheduleBatchServiceListPage.ScheduleBatchServiceType",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false,
+                                                                      })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchScheduleBatchServiceModel.ScheduleBatchServiceStatus, Model.ScheduleBatchServiceStatusList.ToSelectList(Model.SearchScheduleBatchServiceModel.ScheduleBatchServiceStatus, "Name", "Value", Resource.SelectServiceStatus, ""),
+                                                                  new
+                                                                      {
+                                                                          data_ng_model = "TempScheduleBatchServiceListPage.ScheduleBatchServiceStatus",
+                                                                          @class = "form-control input-sm",
+                                                                          data_val = false,
+                                                                      })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchScheduleBatchServiceModel.AddedBy, new
+                                                {
+                                                    data_ng_model = "TempScheduleBatchServiceListPage.AddedBy",
+                                                    @class = "form-control input-sm",
+                                                    placeholder = Resource.AddedBy,
+                                                    maxlength = 100
+                                                })
+                                        </td>
+                                        <td>
+                                            <input type="submit" value="@Resource.Search"class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchScheduleBatchService()"/>
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr dir-paginate="item in ScheduleBatchServiceList | itemsPerPage: ScheduleBatchServiceListPager.pageSize" total-items="ScheduleBatchServiceListPager.totalRecords" current-page="ScheduleBatchServiceListPager.currentPage" pagination-id="ScheduleBatchServiceListPagerID">
+                                        <td>
+                                            <input type="checkbox" class="unicheckbox" data-ng-model="item.IsChecked" data-ng-change="SelectScheduleBatchService(item)" val="item.IsChecked"></td>
+                                        <td>{{item.ScheduleBatchServiceName ? item.ScheduleBatchServiceName :'@Resource.NA'}}</td>
+                                        <td>{{item.StrScheduleBatchServiceType ? item.StrScheduleBatchServiceType :'@Resource.NA'}}</td>
+                                        <td>{{item.ScheduleBatchServiceStatus ? item.ScheduleBatchServiceStatus :'@Resource.NA'}}</td>
+
+                                        <td>{{item.AddedBy ? item.AddedBy :'@Resource.NA'}} {{(item.CreatedDate) ?(item.CreatedDate|dateformat) :'@Resource.NA'}}</td>
+                                        <td>
+                                            <a href="javascript:void(0);" data-ng-click="DeleteScheduleBatchService(item.ScheduleBatchServiceID,'@Resource.Delete')" class="btn btn-xs red">@Resource.Delete</a>
+                                            <a target="_blank" data-ng-attr-href="{{item.AWSSignedFilePath}}" class="btn btn-xs green" data-ng-if="item.AWSSignedFilePath">@Resource.Download</a>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="ScheduleBatchServiceList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(ScheduleBatchServiceListPager.pageSize * ScheduleBatchServiceListPager.currentPage) - ScheduleBatchServiceListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(ScheduleBatchServiceListPager.pageSize == ScheduleBatchServiceListPager.currentPageSize) ? (ScheduleBatchServiceListPager.pageSize * ScheduleBatchServiceListPager.currentPage) :(ScheduleBatchServiceListPager.pageSize * ScheduleBatchServiceListPager.currentPage) - ScheduleBatchServiceListPager.pageSize  + ScheduleBatchServiceListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ScheduleBatchServiceListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="ScheduleBatchServiceListPager.maxSize" on-page-change="ScheduleBatchServiceListPager.pageChanged(newPageNumber)" pagination-id="ScheduleBatchServiceListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ScheduleBatchServiceList.length == 0  ">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/schedule/schedulebatchservicelist")
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.ScheduleBatchService)';
+    </script>
+}

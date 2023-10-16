@@ -1,0 +1,491 @@
+﻿@model HC_DayCare_ScheduleAssignmentModel 
+<div class="emprefSchScreen">
+    <div class="emprefpopup_left col-sm-7">
+        <div class="emprefsch_search">
+
+            <form class="form-horizontal" id="createSchForm">
+                <div class="row">
+
+                    @*  <div class="form-group col-lg-10 col-md-12 col-sm-12 col-xs-12">
+                    
+                        <label>@Resource.StartDate</label>
+                        <div data-ng-if="CreateSchModel.TimePickerRequire">
+                            <div class="input-group date date-picker pull-right"
+                                datetimepicker="CreateSchModel.StartDate" ng-dateval="CreateSchModel.StartDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" disabled=""/>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+
+                        <div data-ng-if="!CreateSchModel.TimePickerRequire">
+                            <div class="input-group date date-picker pull-right"
+                                datepicker="CreateSchModel.StartDate" ng-dateval="CreateSchModel.StartDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50"/>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="form-group col-lg-10 col-md-12 col-sm-12 col-xs-12">
+                        <label>@Resource.EndDate</label>
+                        <div data-ng-if="CreateSchModel.TimePickerRequire">
+                            <div class="input-group date date-picker pull-right"
+                                datetimepicker="CreateSchModel.EndDate" ng-dateval="CreateSchModel.EndDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" disabled=""/>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+
+                        <div data-ng-if="!CreateSchModel.TimePickerRequire">
+                            <div class="input-group date date-picker pull-right"
+                                datepicker="CreateSchModel.EndDate" ng-dateval="CreateSchModel.EndDate" ng-maxdate="CreateSchModel.MaxEndDate" data-val="true">
+                                <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50"/>
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                        </div>
+                    </div>*@
+
+                    <div class="form-group col-lg-10 col-md-12 col-sm-12 col-xs-12">
+                        <label>@Resource.Facility</label>
+                        <div>
+                            <div>
+                                @*<select id="FacilityID" class="form-control input-sm" data-ng-model="CreateSchModel.FacilityID"
+                                        data-val="true" data-val-required="@Resource.FacilityRequired" data-original-title="@Resource.FacilityRequired"
+                                        data-ng-options="item.FacilityID as item.FacilityName for item in FacilityList">
+                                    <option value="">@Resource.SelectFacility</option>
+                                </select>*@
+
+                                <select class="form-control input-sm"
+                                        data-ng-init="CreateSchModel.FacilityID=CreateSchModel.FacilityID==''?null:CreateSchModel.FacilityID.toString()"
+                                        data-ng-model="CreateSchModel.FacilityID"
+                                        data-val="true" data-val-required="@Resource.FacilityRequired"
+                                        id="FacilityID"
+                                        name="CreateSchModel.FacilityID"
+                                        data-ng-options="item.FacilityID as item.FacilityName for item in FacilityList">
+                                    <option value="">@Resource.SelectFacility</option>
+                                </select>
+                                @Html.ValidationMessageFor(q => q.CreateSchModel.FacilityID)
+
+
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group col-lg-10 col-md-12 col-sm-12 col-xs-12">
+                        <label>@Resource.PatientPayor</label>
+                        <div>
+                            <div>
+                               @* <select id="PayorID" class="form-control input-sm" data-ng-model="CreateSchModel.PayorID"
+                                        data-val="false"
+                                        data-ng-options="item.PayorID as item.PayorName for item in PatientPayorList">
+                                    <option value="">@Resource.SelectPayor</option>
+                                </select>*@
+
+                                <select class="form-control input-sm"
+                                        data-ng-init="CreateSchModel.PayorID=CreateSchModel.PayorID==''?null:CreateSchModel.PayorID.toString()"
+                                        data-ng-model="CreateSchModel.PayorID"
+                                        data-val="false" data-val-required="@Resource.FacilityRequired"
+                                        id="PayorID"
+                                        name="CreateSchModel.PayorID"
+                                        data-ng-options="item.PayorID as item.PayorName for item in PatientPayorList">
+                                    <option value="">@Resource.SelectPayor</option>
+                                </select>
+                            </div>
+                        </div>
+
+                    </div>
+
+
+                    <div class="form-group col-lg-4 col-md-3 col-sm-12 col-xs-5">
+                        <label></label>
+                        <div>
+                            <input type='submit' class="btn btn-sm btn-primary" value="@Resource.CreateSchedule" data-ng-click="CreateBulkSchedule()"/>
+
+                            @*<a href="javascript:void(0)" class="btn btn-sm btn-primary" data-ng-if="CreateSchModel.ScheduleID==0" data-ng-click="CreateBulkSchedule()">
+                                <i class="fa fa-plus"></i> &nbsp;@Resource.Schedule
+                            </a>
+                            <a href="javascript:void(0)" class="btn btn-sm btn-primary" data-ng-if="CreateSchModel.ScheduleID>0" data-ng-click="CreateBulkSchedule(true)">
+                                <i class="fa fa-plus"></i> &nbsp; @Resource.Reschedule
+                            </a>*@
+
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+    </div>
+
+    <div class="emprefpopup_right col-sm-5 no-right-padding">
+        <div class="emprefsch_constraints">
+            <h5 class="badge badge-warning badge-roundless margin-top-0 margin-bottom-10 font-black font-size-13 font-weight-500">Patient's Visit Frequency</h5>
+            <div>
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 no-left-padding">
+                    @*{{SearchModel.StartDate}}*@
+                    <label>@Resource.StartDate</label>
+                    <div data-ng-if="SearchModel.TimePickerRequire">
+                        <div class="input-group date date-picker pull-right"
+                            datetimepicker="SearchModel.StartDate" ng-dateval="SearchModel.StartDate" data-val="true">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" disabled=""/>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+
+                    <div data-ng-if="!SearchModel.TimePickerRequire">
+                        <div class="input-group date date-picker pull-right"
+                            datepicker="SearchModel.StartDate" ng-dateval="SearchModel.StartDate" data-val="true">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50"/>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="form-group col-lg-6 col-md-6 col-sm-12 col-xs-12 no-padding">
+                    <label>@Resource.EndDate</label>
+                    <div data-ng-if="SearchModel.TimePickerRequire">
+                        <div class="input-group date date-picker pull-right"
+                            datetimepicker="SearchModel.EndDate" ng-dateval="SearchModel.EndDate" data-val="true">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50" disabled=""/>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+
+                    <div data-ng-if="!SearchModel.TimePickerRequire">
+                        <div class="input-group date date-picker pull-right"
+                            datepicker="SearchModel.EndDate" ng-dateval="SearchModel.EndDate" ng-maxdate="SearchModel.MaxEndDate" data-val="true">
+                            <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50"/>
+                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <br />
+
+
+            <div class="pull-left clearfix" data-ng-show="PatientRefSchAjaxStart">
+                <img src="~/Assets/images/lazyload.gif" />
+            </div>
+
+
+            <div data-ng-show="RTSMaster.StartDate" class="clearfix">
+                @*<div class="font-size-12">@Resource.From {{RTSMaster.StartDate | dateformat}} @Resource.To {{ RTSMaster.EndDate ? (RTSMaster.EndDate | dateformat): '@Resource.NA'}}</div>*@
+
+                @*<ul class="client_time">
+                    <li data-ng-repeat="item in DetailModel.ListETSDetail"><b>{{item.StrDayName}}</b> {{item.StrStartTime}} - {{item.StrEndTime}}</li>
+                </ul>*@
+                <div class="compact" style="max-height: 340px; overflow: auto;">
+                    <table class="table table-bordered table-striped table-condensed flip-content">
+                        <thead class="flip-content">
+                            <tr>
+                                <th></th>
+                                <th>@Resource.Day</th>
+                                <th>@Resource.StartTime</th>
+                                <th>@Resource.EndTime</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr data-ng-repeat="item in ListRTSDetail"
+                                data-ng-class="{'bg-green':item.RemainingSlotCount==0}">
+                                <td>
+                                    <input type="checkbox" id="{{'#FrequencyRadio-'+item.EmployeeID }}" name="group1"
+                                        class="margin-left-right-3 uniformControls input-xs"
+                                        data-uniform-value="item.IsChecked"
+                                        data-ng-model="item.IsChecked"
+                                        data-ng-change="OnPatientDaySelection(item)" />
+                                </td>
+                                <td>{{item.StrDayName}}</td>
+                                <td>{{item.StrStartTime}}</td>
+                                <td>{{item.StrEndTime}}</td>
+                                <td>
+
+
+                                    <a href="javascript:void(0)" class="text-decoration-none" title="@Resource.ViewAssignedEmployees"
+                                   data-ng-mouseover="SetReferralTimeSlotModel(item)"
+                                   item-detail-popup data-ng-url="GetAssignedFacilitiesURL"
+                                   data-ng-search-model="ReferralTimeSlotModel" data-ng-width="400"
+                                   data-ng-template-selector="#popover-assigned-facility" data-popover-cloasble="true">
+                                        <i class="fa fa-eye"></i>
+                                    </a>
+
+                                    <a href="javascript:void(0)" title="@Resource.UnassignSchedule" data-ng-click="DeleteSchedules(item)" class="text-decoration-none">
+                                        <i class="fa fa-trash font-red"></i>
+                                    </a>
+                                    @*<a href="javascript:void(0)" title="@Resource.PatientDeniedService" class="text-decoration-none" data-ng-if="SearchModel.ScheduleID > 0" data-ng-click="OpenRemoveScheduleModal(item)">
+                                        <i class="fa fa-sticky-note"></i>
+                                    </a>*@
+
+                                    <a href="javascript:void(0)" title="@Resource.PatientDeniedService" class="text-decoration-none"  data-ng-if="ShowPatientDeniedService"
+                                        data-ng-click="OpenRemoveScheduleModal(item)">
+                                        <i class="fa fa-sticky-note"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div data-ng-hide="RTSMaster.StartDate">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger padding-5">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+
+        <div class="padding-top-10 clearfix">
+            <div class="padding-bottom-30">
+                <h5 class="font-weight-600 text-decoration-underline margin-top-0 margin-bottom-10 font-black font-size-13 font-weight-500 pull-left">@Resource.PatientOnHold</h5>
+                <a href="javascript:vpid(0)" class="btn btn-xs btn-success pull-right" data-ng-click="OpenPatientHoldModal(true)">+&nbsp;@Resource.PatientHold</a>
+            </div>
+
+            <div class="col-md-12 no-padding">
+                <div>
+                </div>
+            </div>
+
+            <div class="compact" style="max-height: 200px; overflow: auto; clear: both;">
+
+                <div class="pull-left clearfix" data-ng-show="PatientUnHoldActionAjaxStart">
+                    <img src="~/Assets/images/lazyload.gif" />
+                </div>
+
+
+
+                <table class="table table-bordered table-striped table-condensed flip-content clearfix" data-ng-show="PatientHoldDetailList.length>0">
+                    <thead class="flip-content">
+                        <tr>
+                            <th>#</th>
+                            <th>@Resource.StartDate</th>
+                            <th>@Resource.EndDate</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr data-ng-repeat="item in PatientHoldDetailList" data-ng-class="{'bg-purple-soft':item.CurrentActiveGroup}"
+                        @*data-ng-attr-title="{{item.CurrentActiveGroup?'@Resource.CurrentActivePatientHoldGroup':''}}"*@
+                        data-ng-attr-title="{{'@Resource.HoldReason : '+item.PatientOnHoldReason}}"
+                        >
+                            <td>{{$index+1}}
+                            </td>
+                            <td>{{item.StartDate | dateformat}}</td>
+                            <td>{{ item.EndDate ? (item.EndDate | dateformat): '@Resource.NA'}}</td>
+                            <td>
+                                <a href="javascript:void(0)" title="@Resource.PatientUnHold" data-ng-click="OpenPatientHoldModal(false,item)" class="text-decoration-none" data-ng-show="!item.OldActiveGroup">
+                                    <i class="fa fa-remove font-black"></i>
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+
+
+<script id="schemprefskill-popover" type="text/ng-template">
+    <div class="col-sm-12 no-padding">
+        <table class="table table-bordered table-striped table-condensed flip-content" data-ng-if="DetailModel.ListEmpRefPreferenceModel.length>0">
+            <tbody>
+                <tr data-ng-repeat="item in DetailModel.ListEmpRefPreferenceModel">
+                    <td>{{item.PreferenceName}}</td>
+                    <td>
+                        <i class="glyphicon glyphicon-ok text-success" data-ng-if="item.IsMatched"></i>
+                        <i class="glyphicon glyphicon-remove text-danger" data-ng-if="!item.IsMatched"></i>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div data-ng-if="DetailModel.ListEmpRefPreferenceModel.length==0" class="padding-bottom-15px">
+            <span data-ng-if="DetailModel.SearchEmpRefMatchModel.MatchType =='@Preference.PreferenceKeyType.Skill.ToString()'">
+                       No patient skills are set. Please set skills from patient menu.
+            </span>
+            <span data-ng-if="DetailModel.SearchEmpRefMatchModel.MatchType =='@Preference.PreferenceKeyType.Preference.ToString()'">
+                    No patient preferences are set. Please set preferences from patient menu.
+            </span>
+        </div>
+    </div>
+</script>
+
+
+<script id="popover-assigned-facility" type="text/ng-template">
+    <div class="col-sm-12 no-padding assigned-employee">
+        <div class="pull-left clearfix" data-ng-show="IsLoadingDetails">
+                <img src="/Assets/images/lazyload.gif" />
+            </div>
+
+        <table class="table table-bordered table-striped table-condensed flip-content" data-ng-if="DetailModel.length>0">
+            <tbody>
+                <thead>
+                    <th><strong>@Resource.Name</strong></td>
+                    <th><strong>@Resource.NPI#</strong></td>
+                </thead>
+                <tr data-ng-repeat="item in DetailModel">
+                    <td>
+                        <a href="@Constants.AddFacilityHouseURL{{item.EncryptedFacilityID}}" target="_blank">{{item.FacilityName}}</a>
+                    </td>
+                    <td>{{item.FacilityMPI}}</td>
+                    
+                </tr>
+            </tbody>
+        </table>
+    
+    <div data-ng-if="DetailModel.length==0" class="padding-bottom-15px">
+        <span>
+                @Resource.NoEmployeesAssigned
+        </span>
+      
+    </div>
+
+    </div>
+
+</script>
+
+
+
+
+
+
+<div id="pationOnHoldModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="ClosePatientHoldModal()">&times;</button>
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span data-ng-show="PatientHoldDetail.PatientOnHoldAction">@Resource.PatientHold</span>
+                    <span data-ng-show="!PatientHoldDetail.PatientOnHoldAction">@Resource.PatientUnHold</span>
+                </h4>
+            </div>
+            <div class="modal-body">
+
+                <span data-ng-show="PatientHoldDetail.PatientOnHoldAction">@Resource.PatientHoldConfirmation</span>
+                <span data-ng-show="!PatientHoldDetail.PatientOnHoldAction">@Resource.PatientUnHoldConfirmation</span>
+                <form id="modalHoldFrom">
+
+                    <div data-ng-show="PatientHoldDetail.PatientOnHoldAction" class="clearfix margin-top-15">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group col-md-6 no-left-padding">
+                                <label class="control-label required">@Resource.StartDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                    datepicker="PatientHoldDetail.StartDate" ng-dateval="PatientHoldDetail.StartDate" data-val="true">
+                                    <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50"
+                                           name="PatientHoldDetail.StartDate" id="PatientHoldDetail_EndDateStartDate"
+                                           data-val-required="@Resource.StartDateRequired" data-val="true"/>
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.StartDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group col-md-6 no-right-padding">
+                                <label class="control-label">@Resource.EndDate</label>
+                                <div class="input-group date date-picker pull-right"
+                                    datepicker="PatientHoldDetail.EndDate" ng-dateval="PatientHoldDetail.EndDate" data-val="true">
+                                    <input class="form-control input-sm dateInputMask " placeholder='@Resource.EndDate' maxlength="50"
+                                           name="PatientHoldDetail.EndDate" id="PatientHoldDetail_EndDate"
+                                           @*data-val-required="@Resource.EndDateRequired"*@ data-val="false"/>
+                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                    <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.EndDate" data-valmsg-replace="true"></span>
+                                </div>
+
+                            </div>
+
+                            <div class="form-group clearfix">
+                                <label class="control-label required">@Resource.HoldReason</label>
+                                <textarea rows="5" class="form-control input-sm" data-ng-model="PatientHoldDetail.PatientOnHoldReason" maxlength="1000"
+                                          placeholder="@Resource.HoldReason" data-val="true"
+                                          data-val-required="@Resource.HoldReasonRequired"
+                                          name="PatientHoldDetail.PatientOnHoldReason" id="PatientHoldDetail_PatientOnHoldReason"></textarea>
+                                <span class="field-validation-valid" data-valmsg-for="PatientHoldDetail.PatientOnHoldReason" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="ClosePatientHoldModal()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="OnHoldUnHoldAction()">@Resource.Save</button>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+<div id="removeScheduleModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-sm">
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-ng-click="CloseRemoveScheduleModal()">&times;</button>
+
+                <h4 class="caption margin-bottom-0 margin-top-5">
+                    <span>@Resource.PatientDeniedService</span>
+                </h4>
+
+            </div>
+            <div class="modal-body">
+
+
+                <form id="modalRemoveScheduleForm">
+
+                    <div class="clearfix margin-top-15">
+                        <div class="col-md-12 no-padding">
+                            <div class="form-group clearfix">
+                                <label class="control-label required">@Resource.Reason</label>
+                                <textarea rows="5" class="form-control input-sm" data-ng-model="RemoveScheduleDetail.RemoveScheduleReason" maxlength="1000"
+                                          placeholder="@Resource.Note" data-val="true"
+                                          data-val-required="@Resource.ReasonRequired"
+                                          name="RemoveScheduleDetail.Notes" id="RemoveScheduleDetail_Notes"></textarea>
+                                <span class="field-validation-valid" data-valmsg-for="RemoveScheduleDetail_Notes" data-valmsg-replace="true"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+
+
+            <div class="modal-footer">
+                <div>
+                    <button type="button" class="btn btn-sm btn-danger red" data-ng-click="CloseRemoveScheduleModal()">@Resource.Cancel</button>
+                    <button type="button" class="btn btn-sm  btn-primary blue" data-ng-click="OnRemoveScheduleAction()">@Resource.Save</button>
+                </div>
+
+
+            </div>
+
+
+        </div>
+
+    </div>
+</div>

@@ -1,0 +1,254 @@
+﻿
+@{
+    ViewBag.Title = "AddEBForms";
+    bool isEditMode = Model != null && Convert.ToInt32(Model.EBForms.FormId) > 0;
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (isEditMode ? Resource.EditForms : @Resource.AddForms));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_FormsAdd;
+}
+@model  EBFormsModel
+
+@Html.Hidden("hdnFormModel", Common.SerializeObject(Model))
+
+<div data-ng-controller="AddFormsController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @(isEditMode ? Resource.EditForms : @Resource.AddForms)
+            <small>@Resource.EnterFormsInformation</small>
+            <input type="submit" data-ng-click="SaveForms()" class="btn btn-sm green-jungle pull-right" value="@(isEditMode ? Resource.Update : Resource.Save)" />
+            <a href="@Constants.HC_EBFormsListURL"></a>
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <form class="form-horizontal" id="frmAddForms">
+
+                <div class="form-group row">
+
+                  
+                    <div class="col-sm-12">
+
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.FormsInformation
+                            </div>
+
+
+
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Name</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBForms.Name, new { @class = "form-control input-sm", data_ng_model = "EBFormsModel.EBForms.Name", placeholder = @Resource.Name, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.EBForms.Name)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+
+                                        <label class="col-md-5 control-label required">@Resource.Category</label>
+                                        <div class="col-md-7">
+                                            @Html.DropDownListFor(q => q.EBForms.EBCategoryID, Model.FormCategoryList.ToSelectList(Model.EBForms.EBCategoryID ?? "", "Name", "Id", @Resource.Select, ""),
+                                                        new
+                                                        {
+                                                            data_ng_model = "EBFormsModel.EBForms.EBCategoryID",
+                                                            data_ng_init = "EBFormsModel.EBForms.EBCategoryID=EBFormsModel.EBForms.EBCategoryID==''?null:EBFormsModel.EBForms.EBCategoryID",
+                                                            @class = "form-control input-sm",
+
+                                                        })
+                                            @Html.ValidationMessageFor(q => q.EBForms.EBCategoryID)
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.NameForUrl</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBForms.NameForUrl, new { @class = "form-control input-sm", data_ng_model = "EBFormsModel.EBForms.NameForUrl", placeholder = @Resource.NameForUrl, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.EBForms.NameForUrl)
+                                        </div>
+                                    </div>
+
+
+
+
+
+                                    <div class="form-group" style="display:none">
+                                        <label class="col-md-5 control-label required">@Resource.HasHtml</label>
+                                        <div class="col-md-7">
+                                            <label class="mt-checkbox mt-checkbox-outline">
+                                                @Html.CheckBoxFor(q => q.EBForms.HasHtml,
+                                            new
+                                            {
+                                                data_ng_model = "EBFormsModel.EBForms.HasHtml",
+                                                @class = "uniformControls",
+                                                data_uniform_value = "EBFormsModel.EBForms.HasHtml"
+
+                                            })
+                                                @Resource.HasHtml
+                                            </label>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="form-group" style="display:none">
+                                        <label class="col-md-5 control-label required">@Resource.NewHtmlURI</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBForms.NewHtmlURI, new
+                                       {
+                                           @class = "form-control input-sm",
+                                           data_ng_model = "EBFormsModel.EBForms.NewHtmlURI",
+                                           maxlength = 5,
+                                           placeholder = "XXXXX",
+                                           dir_valid_number = ""
+                                       })
+                                            @Html.ValidationMessageFor(q => q.EBForms.NewHtmlURI)
+                                        </div>
+                                    </div>
+
+
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.Version</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBForms.Version,
+                                                        new
+                                                        {
+                                                            @class = "form-control input-sm",
+                                                            data_ng_model = "EBFormsModel.EBForms.Version",
+                                                            placeholder = @Resource.Version,
+                                                            maxlength = 100,
+                                                        })
+                                            @Html.ValidationMessageFor(q => q.EBForms.Version)
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 no-padding">
+                                <div class="col-sm-12">
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.FormLongName</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBForms.FormLongName, new { @class = "form-control input-sm", data_ng_model = "EBFormsModel.EBForms.FormLongName", placeholder = @Resource.FormLongName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.EBForms.FormLongName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.Markets </label>
+                                        <div class="col-md-7">
+                                            @Html.DropDownListFor(q => q.EBForms.EbMarketIDs, Model.MarketList.ToSelectList(Model.EBForms.EbMarketIDs ?? "", "Name", "Id", @Resource.Select, ""),
+                                                        new
+                                                        {
+                                                            data_ng_model = "EBFormsModel.EBForms.EbMarketIDs",
+                                                            data_ng_init = "EBFormsModel.EBForms.EbMarketIDs=EBFormsModel.EBForms.EbMarketIDs==''?null:EBFormsModel.EBForms.EbMarketIDs",
+                                                            @class = "form-control input-sm",
+
+                                                        })
+                                            @Html.ValidationMessageFor(q => q.EBForms.EbMarketIDs)
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.Price</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBForms.FormPrice, new { @class = "form-control input-sm", data_ng_model = "EBFormsModel.EBForms.FormPrice", placeholder = @Resource.Price, maxlength = 10 })
+                                            @Html.ValidationMessageFor(q => q.EBForms.FormPrice)
+                                        </div>
+                                    </div>
+
+                                    @*<div class="form-group">
+                                        <label class="col-md-5 control-label">@Resource.NewPdfURI</label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.EBForms.File, new { type = "file", id = "NewPdfURI", @class = "form-control-file" })
+                                            <br />
+                                            <label class="error" style="display:none;color: red;" id="lblFileMessage" name="lblFileMessage">Please Select File</label>
+                                            @if (Model != null && Convert.ToInt32(Model.EBForms.FormId) > 0)
+                                            {
+                                                @Html.ValidationMessageFor(q => q.EBForms.File, "", new { @class = "error" })
+                                            }
+                                        </div>
+                                    </div>*@
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">Is Internal Form</label>
+                                        <div class="col-md-7">
+                                            <label class="mt-checkbox mt-checkbox-outline control-label">
+                                                @Html.CheckBoxFor(q => q.EBForms.IsInternalForm,
+                                                new
+                                                {
+                                                    data_ng_model = "EBFormsModel.EBForms.IsInternalForm",
+                                                    @class = "uniformControls",
+                                                    data_uniform_value = "EBFormsModel.EBForms.IsInternalForm"
+
+                                                })
+
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">Is Orbeon Form</label>
+                                        <div class="col-md-7">
+                                            <label class="mt-checkbox mt-checkbox-outline control-label">
+                                                @Html.CheckBoxFor(q => q.EBForms.IsOrbeonForm,
+                                                new
+                                                {
+                                                    data_ng_model = "EBFormsModel.EBForms.IsOrbeonForm",
+                                                    @class = "uniformControls",
+                                                    data_uniform_value = "EBFormsModel.EBForms.IsOrbeonForm"
+
+                                                })
+
+                                            </label>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label class="col-md-5 control-label required">@Resource.IsActive</label>
+                                        <div class="col-md-7">
+                                            <label class="mt-checkbox mt-checkbox-outline control-label">
+                                                @Html.CheckBoxFor(q => q.EBForms.IsActive,
+                                            new
+                                            {
+                                                data_ng_model = "EBFormsModel.EBForms.IsActive",
+                                                @class = "uniformControls",
+                                                data_uniform_value = "EBFormsModel.EBForms.IsActive"
+
+                                            })
+
+                                            </label>
+                                        </div>
+                                    </div>
+
+
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+
+                    </div>
+                </div>
+                <div class="col-md-12 form-group no-margin no-padding">
+
+                    <input type="submit" data-ng-click="SaveForms()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Convert.ToInt32 (Model.EBForms.FormId) > 0 ? Resource.Update : Resource.Save)" />
+
+                    <a href="@Constants.HC_EBFormsListURL">
+                        <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteapp/areas/homecare/ebforms/addforms")
+}

@@ -1,0 +1,84 @@
+﻿@model HC_ETSModel
+<div class="modal fade" id="etsDetailModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="display: none; margin-top: 0px;">
+    <form id="frmETSDetail">
+        <div class="modal-dialog modal-md" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="OnCloseModel()"><span aria-hidden="true">×</span></button>
+                    <h4 class="modal-title" id="H1" data-ng-hide="ETSMaster.EmployeeTimeSlotDetailID>0">@Resource.AddTimeSlot</h4>
+                    <h4 class="modal-title" id="H1" data-ng-show="ETSMaster.EmployeeTimeSlotDetailID>0">@Resource.UpdateTimeSlot</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+
+                            <div class="col-md-12 no-padding">
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.Day</label>
+
+                                    @Html.DropDownListFor(p => p.ETSDetail.Day, Common.SetWeekDays().ToSelectList(Model.ETSDetail.Day.ToString() ?? "", "Name", "Value", Resource.SelectDay, ""),
+                                      new
+                                      {
+                                          id = "ETSDetailDayID",
+                                          data_ng_model = "ETSDetail.Day",
+                                          data_ng_init = "ETSDetail.Day=ETSDetail.Day==''?null:ETSDetail.Day.toString()",
+                                          @class = "form-control input-sm",
+                                          convert_to_number = ""
+                                      })
+                                    @Html.ValidationMessageFor(m => m.ETSDetail.Day)
+                                </div>
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.StartTime</label>
+
+                                    <div class="input-group">
+
+                                        @Html.TextBoxFor(x => x.ETSDetail.StrStartTime,
+                                            new
+                                            {
+                                                ng_model = "ETSDetail.StrStartTime",
+                                                @class = "form-control input-sm time",
+                                                placeholder = @Resource.StartTime,
+                                            })
+                                        @Html.ValidationMessageFor(m => m.ETSDetail.StrStartTime)
+                                    </div>
+                                </div>
+
+
+
+                                <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                    <label class="control-label required">@Resource.EndTime</label>
+
+                                    <div class="input-group">
+                                        @*<input class="form-control input-sm time" id="EndTime" maxlength="20" name="AddNotePageModel.Note.StrEndTime"
+                                            type="text" data-ng-model="AddNotePageModel.Note.StrEndTime" placeholder="@Resource.EndTime">*@
+                                        @Html.TextBoxFor(x => x.ETSDetail.StrEndTime,
+                                        new
+                                        {
+                                            ng_model = "ETSDetail.StrEndTime",
+                                            @class = "form-control input-sm time",
+                                            placeholder = @Resource.EndTime,
+                                            compare_with = "#ETSDetail_StrStartTime",
+                                            validation_timecompare = ""
+                                        })
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" data-ng-click="OnCloseModel()">@Resource.Cancel</button>
+                    <button type="submit" class="btn green-jungle" data-ng-click="SaveETSDetail()">@Resource.Save</button>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+   
+
+</div>

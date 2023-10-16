@@ -1,0 +1,462 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.LatestERA);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_LatestERA;
+}
+@section styles{
+    <link href="~/Assets/css/sitecss/bootstrap-editable.css" rel="stylesheet" />
+}
+@model HC_ERAModel
+@Html.Hidden("hdnERAModel", Common.SerializeObject(Model))
+<style>
+    .envTypeAccess {
+        pointer-events: none;
+    }
+</style>
+<div data-ng-controller="LatestERAController">
+
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.LatestERA &nbsp;<small>@Resource.LatestERAInformation</small>
+
+        </h3>
+    </div>
+    <div class="row">
+        @{ Html.EnableClientValidation(false); }
+        <form id="">
+            <div class="col-md-12 col-sm-12 col-xs-12 no-padding">
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">@Resource.Payor</label>
+                    <div>
+                        @Html.DropDownListFor(p => p.SearchERAList.PayorID, Model.PayorList.ToSelectList(Model.SearchERAList.PayorID.ToString() ?? "", "DisplayPayorName", "PayorID", @Resource.SelectPayor, ""),
+                                              new
+                                                  {
+                                                      convert_to_number = "",
+                                                      data_ng_model = "ERAModel.SearchERAList.PayorID",
+                                                      data_ng_init = "ERAModel.SearchERAList.PayorID=BatchModel.SearchBatchList.PayorID==''?null:ERAModel.SearchERAList.PayorID.toString()",
+                                                      @class = "form-control input-sm",
+                                                  })
+                        @Html.ValidationMessageFor(q => q.SearchERAList.PayorID)
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">Check / ETF Number</label>
+                    <div>
+                        @Html.TextBoxFor(q => q.SearchERAList.CheckNumber,
+                                  new
+                                  {
+                                      @class = "form-control input-sm",
+                                      placeholder = Resource.PR_CheckNumber,
+                                      data_ng_model = "ERAModel.SearchERAList.CheckNumber",
+                                  })
+                        @Html.ValidationMessageFor(q => q.SearchERAList.CheckNumber)
+
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">ERA ID</label>
+                    <div>
+                        @Html.TextBoxFor(q => q.SearchERAList.EraId,
+                                  new
+                                  {
+                                      @class = "form-control input-sm",
+                                      placeholder = "ERA",
+                                      data_ng_model = "ERAModel.SearchERAList.EraId",
+                                  })
+
+                        @Html.ValidationMessageFor(q => q.SearchERAList.EraId)
+
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">Paid @Resource.StartDate</label>
+                    <div class="input-group date" datepicker="ERAModel.SearchERAList.PaidStartDate"
+                         data-ng-dateval="ERAModel.SearchERAList.PaidStartDate">
+                        @Html.TextBoxFor(q => q.SearchERAList.PaidStartDate,
+                                         new
+                                             {
+                                                 @class = "form-control input-sm dateInputMask",
+                                                 placeholder = Resource.StartDate,
+                                             })
+                        @Html.ValidationMessageFor(q => q.SearchERAList.PaidStartDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">Paid @Resource.EndDate</label>
+                    <div class="input-group date" datepicker="ERAModel.SearchERAList.PaidEndDate"
+                         data-ng-dateval="ERAModel.SearchERAList.PaidEndDate">
+                        @Html.TextBoxFor(q => q.SearchERAList.PaidEndDate,
+                            new
+                            {
+                                @class = "form-control input-sm dateInputMask",
+                                placeholder = Resource.EndDate,
+                            })
+                        @Html.ValidationMessageFor(q => q.SearchERAList.PaidEndDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3 clear-both">
+                    <label class="control-label">Received @Resource.StartDate</label>
+                    <div class="input-group date" datepicker="ERAModel.SearchERAList.ReceivedStartDate"
+                         data-ng-dateval="ERAModel.SearchERAList.ReceivedStartDate">
+                        @Html.TextBoxFor(q => q.SearchERAList.ReceivedStartDate,
+                                         new
+                                             {
+                                                 @class = "form-control input-sm dateInputMask",
+                                                 placeholder = Resource.StartDate,
+                                             })
+                        @Html.ValidationMessageFor(q => q.SearchERAList.ReceivedStartDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+
+                <div class="form-group col-lg-2 col-md-3 col-sm-3">
+                    <label class="control-label">Received @Resource.EndDate</label>
+                    <div class="input-group date" datepicker="ERAModel.SearchERAList.ReceivedEndDate"
+                         data-ng-dateval="ERAModel.SearchERAList.ReceivedEndDate">
+                        @Html.TextBoxFor(q => q.SearchERAList.ReceivedEndDate,
+                            new
+                            {
+                                @class = "form-control input-sm dateInputMask",
+                                placeholder = Resource.EndDate,
+                            })
+                        @Html.ValidationMessageFor(q => q.SearchERAList.ReceivedEndDate)
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+
+
+                <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                    <div class="btn-group data-botton">
+                        <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="HCGetERAsList()">
+                            <i class="fa fa-search"></i>&nbsp;&nbsp;@Resource.Search
+                        </button>
+                    </div>
+                    <div class="btn-group data-botton">
+                        <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Reset()">
+                            <i class="fa fa-close"></i>&nbsp;&nbsp;@Resource.Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="space20">
+                <hr />
+            </div>
+        </form>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-md-12 col-sm-12 col-xs-12">
+
+
+                <button class="btn blue btn-sm green border-green-cascade" data-ng-click="GetERAsList()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.GetLatestERA
+                </button>
+
+
+                <a type="button" class="btn blue btn-sm blue border-green-cascade  margin-left-10"
+                   @*href="@Constants.HC_Get_Download_Process_AllERA_URL" target="_blank"*@
+                   data-ng-click="ProcessAllERA835('@Constants.HC_Get_Download_Process_AllERA_URL')">
+                    <i class="fa fa-gears" aria-hidden="true"></i>&nbsp; Get Latest & Process ALL ERA
+                </a>
+
+
+
+                <div class="btn-group margin-left-20PR">
+                    <div class="top pagination-sm" data-ng-show="AjaxStart">
+                        @Resource.Loading
+                        <img src="~/Assets/images/lazyload.gif" />
+                    </div>
+                </div>
+
+                <div class="inline-block pull-right" data-ng-show="ERAsList.length > 0">
+                    <div class="inline-block pull-right" data-ng-show="ERAsList.length > 0">
+                        <div class="pull-right margin-left-5">
+                            <dir-pagination-controls boundary-links="true" max-size="ERAsListPager.maxSize" on-page-change="ERAsListPager.pageChanged(newPageNumber)" pagination-id="ERAsListPagerID"></dir-pagination-controls>
+                        </div>
+                    </div>
+                </div>
+                <div class="space20"></div>
+
+            </div>
+        </div>
+
+
+        <div>
+            @{
+                string titleAttributeValue = Model.OrganizationSetting.EnvironmentType ? "" : Resource.DemoEnvMsg;
+            }
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div class="portlet-body compact" style="display: block;">
+                        <div class="table-responsive">
+                            <form id="frmCaseManagerList">
+                                <table class="table table-bordered table-striped table-condensed flip-content">
+                                    <thead class="flip-content">
+                                        <tr>
+
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ERAsListPager.sortColumn('PayerName')">Payor Name</a>
+                                                <span class="sortorder" data-ng-show="ERAsListPager.sortIndex === 'PayerName'" data-ng-class="{reverse:ERAsListPager.reverse}"></span>
+                                            </th>
+
+
+                                            @*<th class="">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ERAsListPager.sortColumn('CheckType')">Check Type</a>
+                                                    <span class="sortorder" data-ng-show="ERAsListPager.sortIndex === 'CheckType'" data-ng-class="{reverse:ERAsListPager.reverse}"></span>
+                                                </th>*@
+                                            @*<th class="">
+                                                    <a class="anchor_color" href="javascript:void(0);" data-ng-click="ERAsListPager.sortColumn('ProviderNPI')">NPI (Submitter ID)</a>
+                                                    <span class="sortorder" data-ng-show="ERAsListPager.sortIndex === 'ProviderNPI'" data-ng-class="{reverse:ERAsListPager.reverse}"></span>
+                                                </th>*@
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ERAsListPager.sortColumn('EraID')">ERA ID</a>
+                                                <span class="sortorder" data-ng-show="ERAsListPager.sortIndex === 'EraID'" data-ng-class="{reverse:ERAsListPager.reverse}"></span>
+                                            </th>
+
+
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ERAsListPager.sortColumn('PaidAmount')">Paid Amount</a>
+                                                <span class="sortorder" data-ng-show="ERAsListPager.sortIndex === 'PaidAmount'" data-ng-class="{reverse:ERAsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ERAsListPager.sortColumn('PaidDate')">Paid Date</a>
+                                                <span class="sortorder" data-ng-show="ERAsListPager.sortIndex === 'PaidDate'" data-ng-class="{reverse:ERAsListPager.reverse}"></span>
+                                            </th>
+
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ERAsListPager.sortColumn('CheckNumber')">Check Number</a>
+                                                <span class="sortorder" data-ng-show="ERAsListPager.sortIndex === 'CheckNumber'" data-ng-class="{reverse:ERAsListPager.reverse}"></span>
+                                            </th>
+                                            <th class="">
+                                                <a class="anchor_color" href="javascript:void(0);" data-ng-click="ERAsListPager.sortColumn('ReceivedTime')">Received Time</a>
+                                                <span class="sortorder" data-ng-show="ERAsListPager.sortIndex === 'ReceivedTime'" data-ng-class="{reverse:ERAsListPager.reverse}"></span>
+
+
+                                            </th>
+                                            @*<th>ProviderNPI</th>
+                                                <th>ProviderTaxID</th>*@
+
+                                            <th>@Resource.Status</th>
+                                            <th class="width-300px">Batch #s Mapped</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody dir-paginate="item in ERAsList | itemsPerPage: ERAsListPager.pageSize" total-items="ERAsListPager.totalRecords" current-page="ERAsListPager.currentPage" pagination-id="ERAsListPagerID">
+                                        <tr title="{{item.ValidationMessage}}">
+                                            <td>{{item.PayerName}}</td>
+
+                                            <td>{{item.EraID}}</td>
+
+
+                                            <td>{{item.PaidAmount | orgcurrency}}</td>
+                                            <td>{{item.PaidDate | orgdate}}</td>
+                                            <td>{{item.CheckNumber}}</td>
+                                            <td>{{item.RecievedTime | dateformat|orgdate}}</td>
+
+
+                                            <td>
+                                                @*<span data-ng-attr-class="badge badge-{{item.StrUpload835FileProcessStatus}}">{{item.StrUpload835FileProcessStatus}}</span>*@
+
+
+                                                <div data-ng-if="item.Upload835FileProcessStatus==0 && item.ValidationMessage != null">
+                                                    <span class="badge badge-danger ValidationMessage" data-ng-if="item.ValidationMessage" data-ng-tooltip="{{item.ValidationMessage}}">
+                                                        Message <i class="fa fa-question-circle font-size-12"
+                                                                   data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                    </span>
+                                                </div>
+
+                                                <div data-ng-if="item.Upload835FileProcessStatus==@((int) EnumUpload835FileProcessStatus.InProcess)">
+                                                    <span class="badge badge-InProcess">@Resource.InProcess</span>
+                                                </div>
+
+                                                <div data-ng-if="item.Upload835FileProcessStatus==@((int)EnumUpload835FileProcessStatus.Running)">
+                                                    <span class="badge badge-Running">@Resource.Running</span>
+                                                </div>
+
+                                                <div data-ng-if="item.Upload835FileProcessStatus==@((int)EnumUpload835FileProcessStatus.Processed)">
+                                                    <span class="badge badge-Processed">@Resource.Processed</span>
+                                                    @*<a target="_blank" class="fa fa-download" title="@Resource.DownloadCsv" data-ng-attr-href="{{item.AWSReadableFilePath}}"></a>*@
+
+                                                    <a target="_blank" class="fa fa-file cursor-pointer" download="" title="@Resource.DownloadCsv" data-ng-if="item.AWSReadableFilePath.length" data-ng-attr-href="{{item.AWSReadableFilePath}}"></a>
+                                                    <a target="_blank" class="fa fa-download cursor-pointer" download="" title="@Resource.DownloadErrorLog" data-ng-if="item.AWSLogFilePath" data-ng-attr-href="{{item.AWSLogFilePath}}"></a>
+
+
+                                                </div>
+                                                <div data-ng-if="item.Upload835FileProcessStatus==@((int)EnumUpload835FileProcessStatus.ErrorInProcess)">
+                                                    <span class="badge badge-ErrorInProcess">@Resource.ErrorInProcess</span>
+                                                    @*<a target="_blank" class="fa fa-download" title="@Resource.DownloadErrorLog" data-ng-attr-href="{{item.AWSLogFilePath}}"></a>*@
+
+                                                    <a target="_blank" class="fa fa-file cursor-pointer" title="@Resource.DownloadCsv" data-ng-if="item.AWSReadableFilePath" data-ng-attr-href="{{item.AWSReadableFilePath}}"></a>
+                                                    <a target="_blank" class="fa fa-download cursor-pointer" download="" title="@Resource.DownloadErrorLog" data-ng-if="item.AWSLogFilePath" data-ng-attr-href="{{item.AWSLogFilePath}}"></a>
+                                                </div>
+
+                                            </td>
+                                            <td class="word-wrap">
+                                                @*<span data-ng-if="item.EraMappedBatches"> {{item.EraMappedBatches}}</span>*@
+                                                <span data-ng-repeat="batchID in item.EraMappedBatches.split(',') " data-ng-click="ViewBatchDetails_LatestERA(batchID,item)" class="cursor-pointer font-blue">
+                                                    {{batchID}}
+                                                </span>
+                                            </td>
+
+
+
+
+
+
+
+                                            <td>
+                                                <div class="btn-group">
+                                                    <button class="btn btn-default btn-xs dropdown-toggle green-haze-stripe" type="button" data-toggle="dropdown" aria-expanded="false">
+                                                        <b>@Resource.Action  </b>
+                                                        <i class="fa fa-angle-down"></i>
+                                                    </button>
+                                                    <ul class="dropdown-menu pull-right">
+                                                        <li title="@Html.Raw(titleAttributeValue)" class="@(Model.OrganizationSetting.EnvironmentType ? " " : " disabled")">
+                                                                <a href="javascript:void(0);" data-ng-click="@(Model.OrganizationSetting.EnvironmentType ? "GetERAPDF(item.EraID)" : " ")">
+                                                                    <i class="fa fa-eye"></i>@Resource.PrintPDF
+                                                                </a>
+                                                        </li>
+                                                        <li title="@Html.Raw(titleAttributeValue)" class="@(Model.OrganizationSetting.EnvironmentType ? " " : " disabled")">
+                                                                <a data-ng-click="@(Model.OrganizationSetting.EnvironmentType ? "GetERA835(item.EraID)" : " ")">
+                                                                    <i class="fa fa-refresh"></i>Download ERA 835
+                                                                </a>
+                                                        </li>
+                                                        <li title="@Html.Raw(titleAttributeValue)" class="@(Model.OrganizationSetting.EnvironmentType ? " " : " disabled")" data-ng-if="!(item.Upload835FileProcessStatus==@((int)EnumUpload835FileProcessStatus.Processed)  || item.Upload835FileProcessStatus==@((int)EnumUpload835FileProcessStatus.ErrorInProcess))">
+                                                                <a data-ng-click="@(Model.OrganizationSetting.EnvironmentType ? "ProcessERA835(item.EraID,false)" : " ")">
+                                                                    <i class="fa fa-refresh"></i>@Resource.Process
+                                                                </a>
+
+                                                        </li>
+
+                                                        <li title="@Html.Raw(titleAttributeValue)" class="@(Model.OrganizationSetting.EnvironmentType ? " " : " disabled")" data-ng-if="item.Upload835FileProcessStatus==@((int)EnumUpload835FileProcessStatus.Processed)  || item.Upload835FileProcessStatus==@((int)EnumUpload835FileProcessStatus.ErrorInProcess)">
+
+                                                                <a data-ng-click="@(Model.OrganizationSetting.EnvironmentType ? "ProcessERA835(item.EraID,true)" : " ")">
+                                                                    <i class="fa fa-refresh"></i>Process Again
+                                                                </a>
+                                                        </li>
+
+
+
+                                                        @*<li>
+                                                                <a href="javascript:alert('This functionality is currently under development.');">
+                                                                    <i class="fa fa-file-archive-o"></i>@Resource.Archive
+                                                                </a>
+                                                            </li>*@
+                                                    </ul>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12" data-ng-if="ERAsList.length > 0">
+                    <div class="col-sm-3 pull-left no-padding">
+                        @Resource.Showing <span data-ng-bind="(ERAsListPager.pageSize * ERAsListPager.currentPage) - ERAsListPager.pageSize  + 1"></span>
+                        &nbsp;@Resource.To <span data-ng-bind="(ERAsListPager.pageSize == ERAsListPager.currentPageSize) ? (ERAsListPager.pageSize * ERAsListPager.currentPage) :(ERAsListPager.pageSize * ERAsListPager.currentPage) - ERAsListPager.pageSize  + ERAsListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ERAsListPager.totalRecords"></span>&nbsp;@Resource.Records
+                    </div>
+                    <div class="pull-right top pagination-sm">
+                        <dir-pagination-controls boundary-links="true" max-size="ERAsListPager.maxSize" on-page-change="ERAsListPager.pageChanged(newPageNumber)" pagination-id="ERAsListPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="row">
+                <div class="col-md-12 col-sm-12 col-xs-12">
+                    <div data-ng-if="ERAsList.length == 0  ">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <div class="alert alert-danger">
+                                    @Html.Raw(Resource.NoRecordsFound)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+
+
+
+
+
+
+    <div class="modal fade" id="modal__ProcessAllERA" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog " style="width:75%">
+            <div class="modal-content">
+
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>ERA Process</span></h4>
+                </div>
+
+                <div class="modal-body">
+                    <iframe id="iframeProcessERA" width="100%" height="600px"></iframe>
+                </div>
+
+                @*<iframe id="iframeProcessERA" width="100%" height="750px"></iframe>*@
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+    <div class="modal fade" id="model__ViewBatch" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                @*@if (SessionHelper.IsCaseManagement)
+                    {
+                        @Html.Partial("Partial/_ViewBatch_CM", Model)
+                    }
+                    else
+                    {
+                        @Html.Partial("Partial/_ViewBatch", Model)
+                    }
+                *@
+
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="H1"><span>Batch Claims Details</span></h4>
+                </div>
+
+                <div class="modal-body">
+                    <iframe id="iframe_viewbatch" width="100%" frameborder="0"></iframe>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+
+
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/batch/latesERA")
+    <script type="text/javascript">
+        var MaximumUploadImageSizeMessage = '@Html.Raw(HttpUtility.JavaScriptStringEncode(@Resource.MaximumUploadFileSizeMessage2MB))';
+        var UnProcessedStatus = '@((int)EnumUpload835FileProcessStatus.UnProcessed)';
+        var A835TemplateType_Edi = '@Enum835TemplateType.Edi_File.ToString()';
+        var A835TemplateType_Paper = '@Enum835TemplateType.Paper_Remits_EOB.ToString()';
+    </script>
+}

@@ -1,0 +1,177 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.NoteSentenceList);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_NoteSentenceList;
+}
+
+@model SetNoteSentenceListPage
+@Html.Hidden("hdnSetNoteSentenceListPage", Common.SerializeObject(Model))
+
+
+<div data-ng-controller="NoteSentenceListController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.NoteSentenceList &nbsp;<small>@Resource.NoteSentenceInfomrmation</small>
+            
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            @if (Common.HasPermission(Constants.Permission_NoteSentence_AddUpdate))
+            {
+                <div class="btn-group" data-ng-show="NoteSentenceList.length > 0">
+                    <span class="btn blue btn-sm grey border-grey-cascade" style="padding: 5px;">
+                        <input id="SelectAllNoteSentence" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                        <label for="SelectAllNoteSentence"></label>
+                    </span>
+                </div>
+            }
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchNoteSentenceListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchNoteSentenceListPage.IsDeleted), "Name", "Value", "", ""),
+                                                                      new
+                                                                      {
+                                                                          id = "IsDeleted",
+                                                                          data_ng_model = "TempSearchNoteSentenceListPage.IsDeleted",
+                                                                          data_ng_init = "TempSearchNoteSentenceListPage.IsDeleted = TempSearchNoteSentenceListPage.IsDeleted==null?'-1':TempSearchNoteSentenceListPage.IsDeleted.toString()",
+                                                                          @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                          data_ng_change = "SearchNoteSentence()"
+                                                                      })
+            </div>
+            @if (Common.HasPermission(Constants.Permission_NoteSentence_AddUpdate))
+            {
+                <div class="btn-group" data-ng-if="SelectedNoteSentenceIds.length > 0">
+                    <button type="button" data-ng-click="DeleteNoteSentence()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>{{TempSearchNoteSentenceListPage.IsDeleted==0 ?'@Constants.DisableSelected' :(TempSearchNoteSentenceListPage.IsDeleted==1?'@Constants.EnableSelected':'@Constants.InverseSelected')}}
+                    </button>
+                </div>
+            }
+            <a data-ng-click="EmployeeEditModel(NoteSentence.EncryptedNoteSentenceID)" class="btn btn-sm letter-space green-jungle"><i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.NoteSentence</a>
+            <div class="inline-block pull-right" data-ng-show="NoteSentenceList.length > 0">
+                <div class="pull-right margin-left-5">
+                    <dir-pagination-controls boundary-links="true" max-size="NoteSentenceListPager.maxSize" on-page-change="NoteSentenceListPager.pageChanged(newPageNumber)" pagination-id="NoteSentenceListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+        <div class="space20"></div>
+    </div>
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <form id="frmNoteSentenceList ">
+                        <div class="table-responsive tabbable-custom">
+
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.Permission_NoteSentence_AddUpdate))
+                                        {
+                                            <th class="width-20px"></th>
+                                        }
+                                        <th>
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteSentenceListPager.sortColumn('NoteSentenceTitle')">@Resource.NoteSentenceTitle</a>
+                                            <span class="sortorder" data-ng-show="NoteSentenceListPager.sortIndex === 'NoteSentenceTitle'" data-ng-class="{reverse:NoteSentenceListPager.reverse}"></span>
+                                        </th>
+
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="NoteSentenceListPager.sortColumn('NoteSentenceDetails')">@Resource.NoteSentenceDetails</a>
+                                            <span class="sortorder" data-ng-show="NoteSentenceListPager.sortIndex === 'NoteSentenceDetails'" data-ng-class="{reverse:NoteSentenceListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-130px" style="text-align:center">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.Permission_NoteSentence_AddUpdate))
+                                        {
+                                            <td></td>
+                                        }
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchNoteSentenceListPage.NoteSentenceTitle, new { data_ng_model = "TempSearchNoteSentenceListPage.NoteSentenceTitle", @class = "form-control input-sm", placeholder = Resource.NoteSentenceTitle, maxlength = 100 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchNoteSentenceListPage.NoteSentenceDetails, new { data_ng_model = "TempSearchNoteSentenceListPage.NoteSentenceDetails", @class = "form-control input-sm", placeholder = Resource.NoteSentenceDetails, maxlength = 100 })
+                                        </td>
+                                        <td>
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchNoteSentence()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':NoteSentence.IsDeleted}" dir-paginate="NoteSentence in NoteSentenceList | itemsPerPage: NoteSentenceListPager.pageSize" total-items="NoteSentenceListPager.totalRecords" current-page="NoteSentenceListPager.currentPage" pagination-id="NoteSentenceListPager_ID">
+                                        @if (Common.HasPermission(Constants.Permission_NoteSentence_AddUpdate))
+                                        {
+                                            <td>
+                                                <input type="checkbox" class="unicheckbox text-align-center" data-ng-model="NoteSentence.IsChecked" data-ng-change="SelectNoteSentence(NoteSentence)" val="NoteSentence.IsChecked">
+                                            </td>
+                                        }
+                                        <td data-ng-bind="NoteSentence.NoteSentenceTitle"></td>
+                                        @*<td data-ng-bind="NoteSentence.NoteSentenceDetails"></td>*@
+                                        <td title="Click on Notes">
+                                            <span href="javascript:void(0);" class="display-block pull-left cursor-pointer" common-detail-popover="ABC" popover-trigger="click" data-content="{{NoteSentence.NoteSentenceDetails}}"
+                                                  ng-header="@Resource.Notes">{{NoteSentence.NoteSentenceDetails.length>200 ? NoteSentence.NoteSentenceDetails.substr(0,50)+'...' :  NoteSentence.NoteSentenceDetails}}</span>
+                                        </td>
+                                        <td style="text-align:center">
+                                            @if (Common.HasPermission(Constants.Permission_NoteSentence_AddUpdate))
+                                            {
+                                                <a data-ng-click="EmployeeEditModel(NoteSentence.EncryptedNoteSentenceID)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                <a href="javascript:void(0);" data-ng-show="NoteSentence.IsDeleted" data-ng-click="DeleteNoteSentence(NoteSentence.NoteSentenceID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!NoteSentence.IsDeleted" data-ng-click="DeleteNoteSentence(NoteSentence.NoteSentenceID,'Disable')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                            }
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="NoteSentenceList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(NoteSentenceListPager.pageSize * NoteSentenceListPager.currentPage) - NoteSentenceListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(NoteSentenceListPager.pageSize == NoteSentenceListPager.currentPageSize) ? (NoteSentenceListPager.pageSize * NoteSentenceListPager.currentPage) :(NoteSentenceListPager.pageSize * NoteSentenceListPager.currentPage) - NoteSentenceListPager.pageSize  + NoteSentenceListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="NoteSentenceListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="NoteSentenceListPager.maxSize" on-page-change="NoteSentenceListPager.pageChanged(newPageNumber)" pagination-id="NoteSentenceListPager_ID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="NoteSentenceList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="NoteSentence_fixedAside" class="asideBar-right fixed">
+        <div class="listContentinner">
+            <div class="closeasidebar" data-ng-click="EmployeeEditModelClosed()"><i class="fa fa-close"></i></div>
+            <iframe id="NoteSentence_fixedAsidelDDLBindIFrame" style="position:absolute; top:2%;  bottom:0px; right:0px; width:100%; min-height:100%; border:none; margin:0; padding:0; overflow:hidden; z-index:999999;"></iframe>
+        </div>
+    </div>
+</div>
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/notesentence/notesentencelist")
+
+    <script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(Resource.DeleteConfirmationMessage, Resource.NoteSentence)';
+        var EnableDisableConfirmationMessage = '@string.Format(Resource.EnableDisableConfirmationMessage, Resource.NoteSentence)';
+    </script>
+}

@@ -1,0 +1,308 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, @Resource.BroadcastNotifications);
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_BroadcastNotifications;
+}
+@model HC_SendBulkSmsModel
+@Html.Hidden("hdnSendBulkSmsModel", Common.SerializeObject(Model))
+<div data-ng-controller="SendBulkSmsController">
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.BroadcastNotifications
+        </h3>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="tabbable tabbable-custom boxless">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#sendbulksms">@Resource.BroadcastNotifications</a></li>
+                    <li>
+                        <a href="#empBroadcastNotificationSms" id="tabBroadcastNotificationSms" data-toggle="tab">@Resource.SentNotification</a>
+                    </li>
+                </ul>
+                <div class="tab-content">
+                    <div id="sendbulksms" class="tab-pane fade  in active">
+                        <div class="compact col-lg-5">
+                            <div class="font-size-18 padding-bottom-15px required">
+                                <strong>@Resource.Step1 :</strong> @Resource.SelectEmployeeToBroadcastNotification
+                            </div>
+                            <div class="table-responsive" style="display: block; height: 500px; overflow-y: auto;">
+                                <form id="frmemployeelist">
+                                    <table class="table table-bordered table-striped table-condensed flip-content">
+                                        <thead class="flip-content">
+                                            <tr>
+                                                <th class="width-20px"></th>
+                                                <th class="">
+                                                    <strong>@Resource.Employee</strong>
+                                                </th>
+                                                <th class="">
+                                                    <strong>@Resource.MobileNumber</strong>
+                                                </th>
+                                                <th class="">
+                                                    <strong>@Resource.AllowdForNotification</strong>
+                                                </th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr class="compact-search-tr">
+                                                <td class="text-align-center">
+                                                    <div class="btn-group" data-ng-show="EmployeeList.length > 0">
+                                                        <input id="SelectAllEmployee" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                        <label for="SelectAllEmployee"></label>
+                                                    </div>
+                                                </td>
+                                                <td class="col-sm-8">
+                                                    @Html.TextBoxFor(m => m.SearchSBSEmployeeModel.EmployeeName, new { data_ng_model = "SearchSBSEmployeeModel.EmployeeName", @class = "form-control input-sm", placeholder = Resource.Employee, maxlength = 50 })
+                                                </td>
+                                                <td class="col-sm-4">
+                                                    <div class="no-padding">
+                                                        @Html.TextBoxFor(m => m.SearchSBSEmployeeModel.MobileNumber, new { data_ng_model = "SearchSBSEmployeeModel.MobileNumber", @class = "form-control input-sm", placeholder = Resource.MobileNumber, maxlength = 10 })
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="">
+                                                        @*col-sm-1*@
+                                                        <button type="submit" data-ng-click="GetEmployeeList()" class="pull-left btn btn-sm">
+                                                            @*<i class="fa fa-search"></i>*@
+                                                            @Resource.Search
+                                                        </button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                            <tr data-ng-repeat="item in EmployeeList">
+                                                <td class="text-align-center">
+                                                    <input type="checkbox"
+                                                           class="unicheckbox text-align-center" data-ng-model="item.IsChecked" data-ng-change="SelectEmployee(item)" val="item.IsChecked">
+                                                </td>
+                                                <td>
+                                                    @*<a href="@Constants.HC_AddEmployee{{item.EncryptedEmployeeID}}" target="_blank">
+                                                            {{item.EmployeeName}}
+                                                        </a>*@
+                                                    {{item.EmployeeName}}
+                                                </td>
+                                                <td data-ng-bind="item.MobileNumber"></td>
+                                                <td>
+                                                    <div class="text-center">
+                                                        <i class="fa fa-check color-green font-size-14" ng-if="item.IsAbleToReceiveNotification"></i>
+                                                        <i class="fa fa-times color-red font-size-14" ng-if="!(item.IsAbleToReceiveNotification)"></i>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </form>
+                                <div data-ng-if="EmployeeList.length==0">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger">
+                                                @Html.Raw(Resource.NoRecordsFound)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="compact col-lg-7">
+                            <div class="col-lg-12 margin-bottom-10" data-ng-if="IsModelDetailBind">
+                                <b>Patient: </b><span class="font-size-18 font-weight-400 font-style-oblique">{{PatientModel.PatientName}}</span>&nbsp;&nbsp;<span class="badge badge-default label-sm font-size-11 font-style-oblique">{{calculateAge(PatientModel.Dob)}}</span>&nbsp;&nbsp;/  #<b>{{PatientModel.AHCCCSID}}</b>
+                            </div>
+                            <div class="col-lg-12 margin-bottom-40" data-ng-if="IsModelDetailBind">
+                                <span><b>Schedule Timing : </b>{{PatientModel.ReferralTSStartTime | dateformat:'dddd, Do MMMM'}}&nbsp;&nbsp;&nbsp;<b>From </b>{{PatientModel.ReferralTSStartTime | timeformat}}&nbsp;<b>To </b>{{PatientModel.ReferralTSEndTime | timeformat}}</span>
+                            </div>
+                            <div class="col-lg-12 font-size-18 padding-bottom-15px required">
+                                <strong>@Resource.Step2:</strong> @Resource.EnterBroadcastNotificationText
+                            </div>
+                            <div class="col-lg-11">
+                                <textarea class="form-control input-sm" rows="13" placeholder="@Resource.EnterBroadcastNotificationTextHere"
+                                          data-ng-model="SendSMSModel.Message" maxlength="1000"></textarea>
+                            </div>
+                            <div class="col-lg-12 font-size-18 padding-top-40 padding-bottom-15px">
+                                <strong>@Resource.Step3:</strong> @Resource.ClickOnSendNotificationButton
+                            </div>
+                            <div class="col-lg-12">
+                                <button class="btn btn-lg blue" data-ng-click="SendBroadcastNotification()">@Resource.SendNotification</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="empBroadcastNotificationSms" class="tab-pane fade">
+                        <div class="inline-block pull-right" data-ng-show="SentBroadcastNotificationList.length > 0">
+                            <div class="pull-right margin-left-5">
+                                <dir-pagination-controls boundary-links="true" max-size="SentBroadcastNotificationListPager.maxSize" on-page-change="SentBroadcastNotificationListPager.pageChanged(newPageNumber)" pagination-id="SentBroadcastNotificationListPager"></dir-pagination-controls>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-10">
+                                <div class="compact" style="display: block;">
+                                    <div class="table-responsive">
+
+                                        <div class="font-size-18 padding-bottom-15px">
+                                            <strong>@Resource.MessageHistory</strong>
+                                        </div>
+                                        <form id="frmViewSendSms">
+                                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                                <thead class="flip-content">
+                                                    <tr>
+                                                        <th class="">
+                                                            @Resource.Employees
+                                                        </th>
+                                                        <th class="col-lg-5">
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentBroadcastNotificationListPager.sortColumn('Title')">@Resource.Title</a>
+                                                            <span class="sortorder" data-ng-show="SentBroadcastNotificationListPager.sortIndex === 'Title'" data-ng-class="{reverse:SentBroadcastNotificationListPager.reverse}"></span>
+                                                        </th>
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentBroadcastNotificationListPager.sortColumn('NotificationType')">@Resource.NotificationType</a>
+                                                            <span class="sortorder" data-ng-show="SentBroadcastNotificationListPager.sortIndex === 'NotificationType'" data-ng-class="{reverse:SentBroadcastNotificationListPager.reverse}"></span>
+                                                        </th>
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentBroadcastNotificationListPager.sortColumn('Inrogress')">@Resource.NotificationStatus</a>
+                                                            <span class="sortorder" data-ng-show="SentBroadcastNotificationListPager.sortIndex === 'InProgress'" data-ng-class="{reverse:SentBroadcastNotificationListPager.reverse}"></span>
+                                                        </th>
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentBroadcastNotificationListPager.sortColumn('Employee')">@Resource.SentBy</a>
+                                                            <span class="sortorder" data-ng-show="SentBroadcastNotificationListPager.sortIndex === 'Employee'" data-ng-class="{reverse:SentBroadcastNotificationListPager.reverse}"></span>
+                                                        </th>
+
+                                                        <th>
+                                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="SentBroadcastNotificationListPager.sortColumn('CreatedDate')">@Resource.SentDate</a>
+                                                            <span class="sortorder" data-ng-show="SentBroadcastNotificationListPager.sortIndex === 'CreatedDate'" data-ng-class="{reverse:SentBroadcastNotificationListPager.reverse}"></span>
+                                                        </th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr data-ng-class="{'deleted':employee.IsDeleted}" dir-paginate="item in SentBroadcastNotificationList | itemsPerPage: SentBroadcastNotificationListPager.pageSize" total-items="SentBroadcastNotificationListPager.totalRecords" current-page="SentBroadcastNotificationListPager.currentPage" pagination-id="SentBroadcastNotificationListPager">
+                                                        <td>
+                                                            <a class="" data-ng-click="GetEmployeesForBroadcastNotification(item.NotificationId,item.NotificationType)">
+                                                                    <strong>@Resource.ViewEmployees</strong>
+                                                                </a>
+                                                            
+                                                        </td>
+                                                        <td>{{item.Title}}</td>
+                                                        <td>{{item.StrNotificationType}}</td>
+                                                        <td>{{item.StrInProgress}}</td>
+                                                        <td>{{item.SentBy}}</td>
+                                                        <td>{{item.SentDate | dateformat | orgdate}}</td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </form>
+                                    </div>
+                                </div>
+
+
+                                <div data-ng-if="SentBroadcastNotificationList.length==0">
+                                    <div class="row">
+                                        <div class="col-lg-12">
+                                            <div class="alert alert-danger">
+                                                @Html.Raw(Resource.NoRecordsFound)
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12" data-ng-if="SentBroadcastNotificationList.length > 0">
+                                <div class="col-sm-3 pull-left no-padding">
+                                    @Resource.Showing <span data-ng-bind="(SentBroadcastNotificationListPager.pageSize * SentBroadcastNotificationListPager.currentPage) - SentBroadcastNotificationListPager.pageSize  + 1"></span>
+                                    &nbsp;@Resource.To <span data-ng-bind="(SentBroadcastNotificationListPager.pageSize == SentBroadcastNotificationListPager.currentPageSize) ? (SentBroadcastNotificationListPager.pageSize * SentBroadcastNotificationListPager.currentPage) :(SentBroadcastNotificationListPager.pageSize * SentBroadcastNotificationListPager.currentPage) - SentBroadcastNotificationListPager.pageSize  + SentBroadcastNotificationListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="SentBroadcastNotificationListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                                </div>
+                                <div class="pull-right top pagination-sm">
+                                    <dir-pagination-controls boundary-links="true" max-size="SentBroadcastNotificationListPager.maxSize" on-page-change="SentBroadcastNotificationListPager.pageChanged(newPageNumber)" pagination-id="SentBroadcastNotificationListPager"></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div>
+        <div class="modal fade" id="empSentSmsModal" tabindex="-1" role="dialog" aria-labelledby="" aria-hidden="true" style="display: none; margin-top: 0px;">
+            <div class="modal-dialog modal-md" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title" id="H1">@Resource.Employees</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="col-md-12 no-padding" data-ng-if="DisplaySearchFilter">
+
+                            <div class="col-md-4 pull-right no-padding compact-search-tr">
+                                @Html.DropDownListFor(m => m.SearchSBSEmployeeModel.ScheduleNotificationAction, Common.SetScheduleNotificationAction().ToSelectList(Convert.ToString(Model.SearchSBSEmployeeModel.ScheduleNotificationAction), "Name", "Value"), new
+                                {
+                                data_ng_model = "SearchSBSEmployeeModel.ScheduleNotificationAction",
+                                data_ng_init = "SearchSBSEmployeeModel.ScheduleNotificationAction=SearchSBSEmployeeModel.ScheduleNotificationAction==null?'-1':SearchSBSEmployeeModel.ScheduleNotificationAction",
+                                @class = "form-control input-sm",
+                                data_ng_change = "SearchEmployee()",
+                                convert_to_number = ""
+                                })
+                            </div>
+                            <div class="col-md-3 pull-right no-right-padding">
+                                @Resource.SearchByAction
+                            </div>
+                        </div>
+                        <div class="">
+                            <div class="btn-group margin-left-20PR">
+                                <div class="top pagination-sm" data-ng-show="ModalAjaxStart">
+                                    @Resource.Loading
+                                    <img src="~/Assets/images/lazyload.gif" />
+                                </div>
+                            </div>
+                            <table class="table table-bordered table-striped table-condensed flip-content">
+                                <thead class="flip-content">
+                                    <tr>
+                                        <th class="">
+                                            <strong>@Resource.Employee</strong>
+                                        </th>
+                                        <th class="">
+                                            <strong>@Resource.MobileNumber</strong>
+                                        </th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr data-ng-repeat="item in EmployeesListForBroadcastNotification">
+                                        <td>
+                                            <a href="">
+                                                {{item.EmployeeName}}
+                                            </a>
+                                        </td>
+                                        <td data-ng-bind="item.MobileNumber  | phoneformat"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                    <div data-ng-if="EmployeesListForBroadcastNotification.length == 0">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="alert alert-danger">
+                                                    @Html.Raw(Resource.NoRecordsFound)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default" data-dismiss="modal">@Resource.Okay</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/employee/broadcastnotification")
+    <script type="text/javascript">
+    var ConfirmSendSMS = '@Resource.ConfirmSendSMS';
+    var ConfirmBroadcastNotification = '@Resource.ConfirmBroadcastNotification';
+    </script>
+}

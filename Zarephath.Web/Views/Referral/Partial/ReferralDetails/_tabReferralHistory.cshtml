@@ -1,0 +1,238 @@
+﻿@model AddReferralModel
+
+@Html.Hidden("hdnAddReferralModel", Common.SerializeObject(Model))
+
+<div class="row">
+    <div class="col-sm-12">
+        <div class="fscontainer">
+            <div class="legend">
+                @Resource.PayorDetails
+            </div>
+
+            <div class="row">
+                <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.Payor</label>
+
+                    @Html.DropDownListFor(p => p.ReferralPayorMapping.PayorID, Model.PayorList.ToSelectList(Model.ReferralPayorMapping.PayorID.ToString() ?? "", "PayorName", "PayorID", @Resource.SelectPayor, ""),
+                                              new
+                                              {
+                                                  convert_to_number = "",
+                                                  data_ng_model = "ReferralModel.ReferralPayorMapping.PayorID",
+                                                  data_ng_init = "ReferralModel.ReferralPayorMapping.PayorID=(ReferralModel.ReferralPayorMapping.PayorID==null || ReferralModel.ReferralPayorMapping.PayorID==0)?'':ReferralModel.ReferralPayorMapping.PayorID",
+                                                  @class = "form-control input-sm validateElement",
+                                                  data_error_Count = "ReferralErrorCount.ReferralHistoryTab",
+                                                  data_ng_change = "ReferralModel.Referral.SelectedPayor=ReferralModel.ReferralPayorMapping.PayorID"
+                                                  //data_ng_setname = "ReferralModel.ReferralPayorMapping.PayorName"
+
+                                              })
+                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.PayorID)
+                </div>
+
+                <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                    <label class="control-label required">@Resource.EffectiveStartDate</label>
+                    <div class="input-group date" datepicker="ReferralModel.ReferralPayorMapping.PayorEffectiveDate" ng-dateval="ReferralModel.ReferralPayorMapping.PayorEffectiveDate">
+                        <input 
+                            class="form-control input-sm validateElement dateInputMask" placeholder="@Resource.EffectiveDate"
+                            data-error-Count = "ReferralErrorCount.ReferralHistoryTab"                                
+                            data-val="true"
+                            data-val-required="@Resource.EffectiveDateRequired" id="ReferralPayorMapping_PayorEffectiveDate" maxlength="50" name="ReferralPayorMapping.PayorEffectiveDate"
+                            type="text" />
+
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+
+                    </div>
+                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.PayorEffectiveDate)
+
+                </div>
+                <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                    <label class="control-label">@Resource.EffectiveEndDate</label>
+                    <div class="input-group date" datepicker="ReferralModel.ReferralPayorMapping.PayorEffectiveEndDate" ng-dateval="ReferralModel.ReferralPayorMapping.PayorEffectiveEndDate">
+                        <input
+                            class="form-control input-sm dateInputMask" placeholder="@Resource.EffectiveEndDate"
+                            id="ReferralPayorMapping_PayorEffectiveEndDate" maxlength="50" name="ReferralPayorMapping.PayorEffectiveEndDate"
+                            type="text"/>
+                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                    </div>
+                </div>
+
+            </div>
+
+            <div data-ng-if="ReferralModel.ReferralPayorMappingList.length > 0" data-ng-cloak>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <strong>@Resource.PayorHistory</strong>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-10 col-md-10 col-sm-12">
+                        <div class="portlet-body compact">
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-condensed flip-content">
+                                    <thead>
+                                        <tr>
+                                            <th><strong>@Resource.Payor</strong></th>
+                                            <th><strong>@Resource.EffectiveStartDate</strong></th>
+                                            <th><strong>@Resource.EffectiveEndDate</strong></th>
+                                            <th><strong>@Resource.AddedBy</strong></th>
+                                            <th><strong>@Resource.ChangedBY</strong></th>
+                                            <th><strong>@Resource.Action</strong></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody data-ng-repeat="referralPayorMapping in ReferralModel.ReferralPayorMappingList |orderBy:'-ReferralPayorMappingID'">
+                                        <tr data-ng-class="{'selectedPayor':referralPayorMapping.ReferralPayorMappingID==ReferralModel.ReferralPayorMapping.ReferralPayorMappingID}">
+                                            <td>{{referralPayorMapping.PayorName}}&nbsp;&nbsp;
+                                                <span class="pull-right margin-top-4" data-ng-show="{{referralPayorMapping.IsActive}}" data-ng-class="{'badge badge-success':referralPayorMapping.IsActive}" title="Active Payer">Active</span>
+                                                <a class="pull-right fa fa-check-circle-o text-decoration-none margin-top-2 markActivePayor" title="@Resource.MarkAsActive" data-ng-show="{{!referralPayorMapping.IsActive}}"
+                                                    data-ng-click="MarkPayorAsActive(referralPayorMapping.ReferralPayorMappingID)"></a>
+                                            </td>
+
+
+                                            <td>{{referralPayorMapping.PayorEffectiveDate | dateformat}}</td>
+                                            <td data-ng-if="referralPayorMapping.PayorEffectiveEndDate == null">@Resource.NA</td>
+                                            <td data-ng-if="referralPayorMapping.PayorEffectiveEndDate != null">{{referralPayorMapping.PayorEffectiveEndDate | dateformat}}</td>
+                                            <td data-ng-attr-title="{{@Resource.At+' '+ (referralPayorMapping.CreatedDate | datetimeformat)}}">{{referralPayorMapping.AddedByName}}</td>
+                                            <td data-ng-attr-title="{{@Resource.At+' '+(referralPayorMapping.UpdatedDate | datetimeformat)}}">{{referralPayorMapping.UpdatedByName}}</td>
+                                            <td class="text-align-center">
+                                                <button class="btn btn-xs" title="@Resource.Edit" data-ng-click="EditReferralPayor(referralPayorMapping.ReferralPayorMappingID)"><i class="fa fa-edit "></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 col-md-12 col-sm-12">
+                        <div data-ng-if="ReferralModel.ReferralPayorMappingList.length == 0">
+                            <div class="alert alert-danger">
+                                @Html.Raw(Resource.NoRecordsFound)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<div class="space15"></div>
+<div class="row">
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <div class="fscontainer">
+            <div class="legend">
+                @Resource.ReferralHistory
+            </div>
+
+            <div>
+                <div class="row">
+                    <div class="clearfix">
+                        <div class="form-group col-lg-2 col-md-4 col-sm-4">
+
+                            <label class="control-label required">@Resource.ReferralDate
+                                <i class="fa fa-question-circle" data-ng-tooltip="@Resource.FutureDateNotAllowed"  data-ng-custom-class="tooltip-extra-z-index"></i>
+                            </label>
+                            <div class="input-group date" datepicker="ReferralModel.Referral.ReferralDate" ng-dateval="ReferralModel.Referral.ReferralDate" data-ng-maxdate="CurrentDate">
+                                <input class="form-control input-sm validateElement dateInputMask" 
+                                       data-error-Count = "ReferralErrorCount.ReferralHistoryTab" placeholder="@Resource.ReferralDate"                                   
+                                       data-val="true"
+                                       data-val-required="@Resource.ReferralDateRequired" id="Referral_ReferralDate" maxlength="50" name="Referral.ReferralDate"
+                                       type="text">
+
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                            @Html.ValidationMessageFor(m => m.Referral.ReferralDate)
+
+                        </div>
+
+                        <div class="form-group col-lg-2 col-md-4 col-sm-4">
+
+                            <label class="control-label required">@Resource.ReferralSource</label>
+                            @Html.DropDownListFor(p => p.Referral.ReferralSourceID, Model.ReferralSources.ToSelectList(Model.Referral.ReferralSourceID.ToString() ?? "", "ReferralSourceName", "ReferralSourceID", @Resource.Select, ""),
+                                                  new
+                                                      {
+                                                          convert_to_number = "",
+                                                          data_ng_model = "ReferralModel.Referral.ReferralSourceID",
+                                                          data_ng_init = "ReferralModel.Referral.ReferralSourceID=(ReferralModel.Referral.ReferralSourceID==null || ReferralModel.Referral.ReferralSourceID==0)?'':ReferralModel.Referral.ReferralSourceID",
+                                                          @class = "form-control input-sm validateElement",
+                                                          data_error_Count = "ReferralErrorCount.ReferralHistoryTab",
+                                                          //data_ng_setname = "ReferralModel.ReferralPayorMapping.PayorName"
+
+                                                      })
+                            @Html.ValidationMessageFor(q => q.Referral.ReferralSourceID)
+
+                        </div>
+
+                        <div class="form-group col-lg-2 col-md-4 col-sm-4">
+
+                            <label class="control-label">@Resource.FirstDOS</label>
+                            <div class="input-group date" datepicker="ReferralModel.Referral.FirstDOS" ng-dateval="ReferralModel.Referral.FirstDOS">
+                                <input class="form-control input-sm" data-val="true"
+                                       id="Referral_FirstDOS" maxlength="50" name="Referral.FirstDOS" placeholder="@Resource.FirstDOS"
+                                       type="text" >
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                            @*                        <input class="form-control input-sm" data-val="true"
+                                   id="Referral_FirstDOS" maxlength="50" name="Referral.FirstDOS" placeholder="@Resource.FirstDOS"
+                                   type="text" disabled="disabled" data-ng-value="ReferralModel.ServiceDate | dateformat">*@
+                        </div>
+
+                        <div class="form-group col-lg-2 col-md-3 col-sm-3" id="data_2">
+                            <label class="control-label" data-ng-class="{'required':ReferralModel.Referral.ReferralStatusID == Inactive}">@Resource.ClosureDate</label>
+                            <div class="input-group date" datepicker="ReferralModel.Referral.ClosureDate" ng-dateval="ReferralModel.Referral.ClosureDate" data-ng-class="{'required':ReferralModel.Referral.ReferralStatusID == Inactive}">
+
+                                <input class="form-control input-sm validateElement dateInputMask" id="Referral_ClosureDate" 
+                                       maxlength="50" name="Referral.ClosureDate" placeholder="@Resource.ClosureDate"  data-val-required="@Resource.ClosureDateRequired"
+                                       type="text" data-val="{{ReferralModel.Referral.ReferralStatusID == @Convert.ToInt64(@ReferralStatus.ReferralStatuses.Inactive) ? 'true':'false'}}" data-error-Count = "ReferralErrorCount.ReferralHistoryTab">
+                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                            </div>
+                            @Html.ValidationMessageFor(q => q.Referral.ClosureDate)
+                        </div>
+
+                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                            <label class="control-label" data-ng-class="{'required':ReferralModel.Referral.ReferralStatusID == Inactive}">@Resource.ClosureReason</label>
+                            @Html.TextBoxFor(q => q.Referral.ClosureReason, new
+                                {
+                                    @class = "form-control input-sm validateElement",
+                                    data_error_Count = "ReferralErrorCount.ReferralHistoryTab",
+                                    data_ng_model = "ReferralModel.Referral.ClosureReason",
+                                    placeholder = @Resource.ClosureReason,
+                                    maxlength = 500
+                                })
+                            @Html.ValidationMessageFor(q => q.Referral.ClosureReason)
+                        </div>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.RespiteHoursLimit</label>
+                        <input class="form-control input-sm" data-val="false" maxlength="50" type="text" disabled="disabled" data-ng-value='@ConfigSettings.RespiteUsageLimit'>
+                    </div>
+                    <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.UsedRespiteHours</label>
+                        <input class="form-control input-sm" data-ng-model="ReferralModel.Referral.UsedRespiteHours" data-val="false" maxlength="50" type="text" disabled="disabled" value="0">
+                    </div>
+                    <div class="form-group col-lg-2 col-md-4 col-sm-4">
+                        <label class="control-label">@Resource.AvailableRespiteHours</label>
+                        <input class="form-control input-sm" data-val="false" maxlength="50" type="text" disabled="disabled" data-ng-value="'@ConfigSettings.RespiteUsageLimit'-ReferralModel.Referral.UsedRespiteHours">
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

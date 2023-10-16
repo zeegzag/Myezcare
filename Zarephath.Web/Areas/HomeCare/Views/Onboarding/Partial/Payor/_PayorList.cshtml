@@ -1,0 +1,204 @@
+﻿@model HC_SetPayorListPage
+@Html.Hidden("hdnSetPayorListPage", Common.SerializeObject(Model))
+
+<div data-ng-controller="PayorListController">
+
+    <div class="page-bar">
+        <h3 class="page-title">
+            @Resource.PayorList &nbsp;
+        </h3>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12 col-sm-12 col-xs-12">
+            <div class="btn-group">
+                <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                    <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                </button>
+            </div>
+
+            <div class="btn-group">
+                @Html.DropDownListFor(m => m.SearchPayorListPage.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchPayorListPage.IsDeleted), "Name", "Value", "", ""),
+                                      new
+                                          {
+                                              id = "IsDeleted",
+                                              data_ng_model = "TempPayorListPage.IsDeleted",
+                                              data_ng_init = "TempPayorListPage.IsDeleted = TempPayorListPage.IsDeleted==null?'-1':TempPayorListPage.IsDeleted.toString()",
+                                              @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                              data_ng_change = "SearchPayor()"
+                                          })
+            </div>
+            @if (Common.HasPermission(Constants.HC_Permission_Payor_Delete))
+            {
+                <div class="btn-group" data-ng-if="SelectedPayorIds.length > 0">
+                    <button type="button" data-ng-click="DeletePayor()" class="btn blue btn-sm grey border-grey-cascade">
+                        <i class="fa fa-random margin-right-10"></i>
+                        {{SearchPayorListPage.IsDeleted==0?'Disable Selected' :(SearchPayorListPage.IsDeleted==1?'Enable Selected':'Inverse - Enable/Disable')}}
+                    </button>
+                </div>
+            }
+            @if (Common.HasPermission(Constants.HC_Permission_Payor_AddUpdate))
+            {
+                <div class="btn-group padding-left-15">
+                    <a data-ng-click="OpenAddPayorModal()" class="btn btn-sm green-jungle letter-space pull-right">
+                        <i class="fa fa-plus">&nbsp;&nbsp;</i>@Resource.Payor
+                    </a>
+                </div>
+            }
+            <div class="inline-block pull-right" data-ng-show="PayorList.length > 0">
+                <div class="inline-block pull-right" data-ng-show="PayorList.length > 0">
+                    <div class="pull-right margin-left-5">
+                        <dir-pagination-controls boundary-links="true" max-size="PayorListPager.maxSize" on-page-change="PayorListPager.pageChanged(newPageNumber)" pagination-id="PayorListPagerID"></dir-pagination-controls>
+                    </div>
+                </div>
+            </div>
+            <div class="space20"></div>
+
+        </div>
+    </div>
+
+    <div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="portlet-body compact" style="display: block;">
+                    <div class="table-responsive">
+                        <form id="frmPayorList">
+                            <table class="table table-bordered table-striped table-condensed flip-content table-checkable">
+                                <thead class="flip-content">
+                                    <tr>
+                                        @if (Common.HasPermission(Constants.HC_Permission_Payor_Delete))
+                                        {
+                                            <th class="width-20px"></th>
+                                        }
+                                        <th class="" style="text-align:left">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorListPager.sortColumn('PayorName')">@Resource.PayorName</a>
+                                            <span class="sortorder" data-ng-show="PayorListPager.sortIndex === 'PayorName'" data-ng-class="{reverse:PayorListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorListPager.sortColumn('ShortName')">@Resource.ShortName  </a>
+                                            <span class="sortorder" data-ng-show="PayorListPager.sortIndex === 'ShortName'" data-ng-class="{reverse:PayorListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorListPager.sortColumn('AgencyNPID')">@Resource.AgencyNPID</a>
+                                            <span class="sortorder" data-ng-show="PayorListPager.sortIndex === 'AgencyNPID'" data-ng-class="{reverse:PayorListPager.reverse}"></span>
+                                        </th>
+                                        <th class="">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorListPager.sortColumn('PayerGroup')">
+                                                @Resource.PayerGroup
+                                            </a>
+                                            <span class="sortorder" data-ng-show="PayorListPager.sortIndex === 'PayerGroup'" data-ng-class="{reverse:PayorListPager.reverse}"></span>
+                                        </th>
+                                        <th class=">
+                                            <a class="anchor_color" href="javascript:void(0);" data-ng-click="PayorListPager.sortColumn('PayorBillingType')">
+                                                @Resource.PayorBillingType
+                                            </a>
+                                            <span class="sortorder" data-ng-show="PayorListPager.sortIndex === 'PayorBillingType'" data-ng-class="{reverse:PayorListPager.reverse}"></span>
+                                        </th>
+                                        <th class="width-120px">@Resource.Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr class="compact-search-tr">
+                                        @if (Common.HasPermission(Constants.HC_Permission_Payor_Delete))
+                                        {
+                                            <td class="text-align-center">
+                                                <input id="SelectAllPayor" class="unicheckbox text-align-center" type="checkbox" data-ng-show="PayorList.length > 0" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                            </td>
+                                        }
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchPayorListPage.PayorName, new { data_ng_model = "TempPayorListPage.PayorName", @class = "form-control input-sm", placeholder = Resource.PayorName, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchPayorListPage.ShortName, new { data_ng_model = "TempPayorListPage.ShortName", @class = "form-control input-sm", placeholder = Resource.ShortName, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.TextBoxFor(m => m.SearchPayorListPage.AgencyNPID, new { data_ng_model = "TempPayorListPage.AgencyNPID", @class = "form-control input-sm", placeholder = Resource.AgencyNPID, maxlength = 50 })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchPayorListPage.PayerGroup, Model.PayerGroupList.ToSelectList(Model.SearchPayorListPage.PayerGroup.ToString() ?? "", "Name", "Value", @Resource.Select, "-1"),
+                                                    new
+                                                    {
+                                                        data_ng_model = "TempPayorListPage.PayerGroup",
+                                                        data_ng_init = "TempPayorListPage.PayerGroup=TempPayorListPage.PayerGroup==''?null:TempPayorListPage.PayerGroup.toString()",
+                                                        @class = "form-control input-small input-sm"
+                                                    })
+                                        </td>
+                                        <td>
+                                            @Html.DropDownListFor(p => p.SearchPayorListPage.PayorBillingType, Model.PayorBillingTypeList.ToSelectList(Model.SearchPayorListPage.PayorBillingType.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                    new
+                                                    {
+                                                        data_ng_model = "TempPayorListPage.PayorBillingType",
+                                                        data_ng_init = "TempPayorListPage.PayorBillingType=TempPayorListPage.PayorBillingType==''?null:TempPayorListPage.PayorBillingType.toString()",
+                                                        @class = "form-control input-small input-sm"
+                                                    })
+                                        </td>
+                                        <td class="text-align-center">
+                                            <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchPayor()" />
+                                            <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                        </td>
+                                    </tr>
+                                    <tr data-ng-class="{'deleted':PayorList.IsDeleted}" dir-paginate="PayorList in PayorList | itemsPerPage: PayorListPager.pageSize" total-items="PayorListPager.totalRecords" current-page="PayorListPager.currentPage" pagination-id="PayorListPagerID">
+                                        @if (Common.HasPermission(Constants.HC_Permission_Payor_Delete))
+                                        {
+                                            <td>
+                                                <input type="checkbox" class="unicheckbox" data-ng-model="PayorList.IsChecked" data-ng-change="SelectPayor(PayorList)" val="PayorList.IsChecked">
+                                            </td>
+                                        }
+                                        <td style="text-align:left" data-ng-bind="PayorList.PayorName ? PayorList.PayorName:'@Resource.NA'"></td>
+                                        <td data-ng-bind="PayorList.ShortName ? PayorList.ShortName:'@Resource.NA'"></td>
+                                        <td data-ng-bind="PayorList.AgencyNPID? PayorList.AgencyNPID:'@Resource.NA'"></td>
+                                        <td data-ng-bind="PayorList.PayerGroup?PayorList.PayerGroup: '@Resource.NA'"></td>
+                                        <td data-ng-bind="PayorList.PayorBillingType?PayorList.PayorBillingType: '@Resource.NA'"></td>
+                                        <td class="text-align-center">
+                                            @if (Common.HasPermission(Constants.HC_Permission_Payor_AddUpdate))
+                                            {
+                                                <a data-ng-click="OpenAddPayorModal(PayorList.EncryptedPayorID)" class="btn btn-xs blue">@Resource.Edit </a>
+                                            }
+                                            @if (Common.HasPermission(Constants.HC_Permission_Payor_Delete))
+                                            {
+                                                <a href="javascript:void(0);" data-ng-show="PayorList.IsDeleted" data-ng-click="DeletePayor(PayorList.PayorID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                <a href="javascript:void(0);" data-ng-show="!PayorList.IsDeleted" data-ng-click="DeletePayor(PayorList.PayorID,'Disable')" class="btn btn-xs red">@Resource.Disable</a>
+                                            }
+
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12" data-ng-if="PayorList.length > 0">
+                <div class="col-sm-3 pull-left no-padding">
+                    @Resource.Showing <span data-ng-bind="(PayorListPager.pageSize * PayorListPager.currentPage) - PayorListPager.pageSize  + 1"></span>
+                    &nbsp;@Resource.To <span data-ng-bind="(PayorListPager.pageSize == PayorListPager.currentPageSize) ? (PayorListPager.pageSize * PayorListPager.currentPage) :(PayorListPager.pageSize * PayorListPager.currentPage) - PayorListPager.pageSize  + PayorListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="PayorListPager.totalRecords"></span>&nbsp;@Resource.Records
+                </div>
+                <div class="pull-right top pagination-sm">
+                    <dir-pagination-controls boundary-links="true" max-size="PayorListPager.maxSize" on-page-change="PayorListPager.pageChanged(newPageNumber)" pagination-id="PayorListPagerID"></dir-pagination-controls>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="PayorList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger">
+                            @Html.Raw(Resource.NoRecordsFound)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.Action("AddPayor")
+</div>
+@Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/payor/payorlist")
+<script type="text/javascript">
+        var DeleteConfirmationMessage = '@string.Format(@Resource.DeleteConfirmationMessage, @Resource.Payor)';
+        var EnableDisableConfirmationMessage = '@string.Format(@Resource.EnableDisableConfirmationMessage, @Resource.Payor)';
+</script>

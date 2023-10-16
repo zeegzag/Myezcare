@@ -1,0 +1,277 @@
+﻿@{
+    bool IsAttandancePage = ViewBag.IsAttandancePage ?? false;
+
+    if (!IsAttandancePage)
+    {
+        ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.Assignment);
+        ViewBag.SelectedMenuItem = Resource.SMI_ScheduleAssignment;
+    }
+    else
+    {
+        ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, Resource.AttendanceMaster);
+        ViewBag.SelectedMenuItem = Resource.SMI_AttendanceMaster;
+    }
+
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+@model HC_DayCare_ScheduleAssignmentModel
+
+
+
+
+@section Styles{
+    @Styles.Render("~/assets/css/viewjs/siteApp/schedule/scheduleassignmentinhome")
+    <style>
+        /*.page-content-wrapper .page-content
+        {
+            padding: 13px 15px 10px 15px;
+        }*/
+        .progressbar {
+            margin-bottom: 0 !important;
+            margin-top: 0 !important;
+        }
+
+        .proggress {
+            height: 2px !important;
+        }
+
+        .percentCount {
+            position: absolute !important;
+            right: 0 !important;
+            top: -26px !important;
+            font-size: 11px !important;
+            margin-top: 7px;
+        }
+
+        .lineProgressbar {
+            display: inline-block;
+            width: 100%;
+            float: left;
+        }
+
+        .webui-popover.in {
+            z-index: 10050 !important;
+        }
+    </style>
+
+}
+@Html.Hidden("hdnScheduleAssignment", Common.SerializeObject(Model))
+<div data-ng-controller="ScheduleAssignmentController" id="ScheduleAssignment" style="margin-top: -10px">
+
+    <div class="row">
+
+        <div class="col-sm-12">
+            <!--<div class="portlet light portlet-fit  calendar">-->
+            @*<div class="portlet light portlet-fit" style="min-height: 700px; overflow-y: visible; overflow-x: hidden">*@
+            <div class="portlet light portlet-fit">
+                <div class="col-sm-12 no-padding">
+                    <div class="col-lg-12">
+                        <div>
+                            <form id="frmScheduleSearch">
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3 no-left-padding">
+                                    <div class="btn-group">
+                                        <span class="btn blue btn-sm grey border-grey-cascade padding-left-4">
+                                            <input class="uniformControls" type="checkbox"
+                                                data-ng-model="IsALLPatientChecked"
+                                                data-uniform-value="IsAllPatientChecked"
+                                                data-ng-change="OnAllScheduleSearch(IsALLPatientChecked,true)">
+                                            <label>All Patients</label>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="form-group col-lg-2 col-md-3 col-sm-3 no-left-padding">
+                                    <div class="input-group date date-picker pull-right"
+                                        datepicker="ScheduleSearchModel.StartDate" ng-dateval="ScheduleSearchModel.StartDate" data-val="true">
+                                        <input class="form-control input-sm dateInputMask " placeholder='@Resource.StarDate' maxlength="50" />
+                                        @*<span class="input-group-addon"><i class="fa fa-calendar"></i></span>*@
+                                    </div>
+                                </div>
+
+
+                                @*<div class="form-group col-lg-2 col-md-3 col-sm-3">
+            <div class="input-group date date-picker pull-right"
+                datepicker="ScheduleSearchModel.EndDate" ng-dateval="ScheduleSearchModel.EndDate" data-ng-mindate="ScheduleSearchModel.StartDate">
+                <input class="form-control input-sm dateInputMask" maxlength="50" />
+                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+            </div>
+        </div>*@
+
+                                <div class="form-group col-lg-2 col-md-4col-sm-4 no-left-padding">
+                                    <input class="form-control input-sm filterEmp" placeholder='@Resource.SearchPatient' data-ng-model="ScheduleSearchModel.ReferralName" data-ng-change="setFilter()" maxlength="50" />
+                                </div>
+
+
+                                @*<div class="form-group col-lg-2 col-md-3 col-sm-3 no-left-padding">
+                                    <select class="form-control input-sm groupError selectpicker" data-buttonStyle="btn-sm btn-default" multiple="multiple"
+                                            title="@Resource.SelectFacility" id="FacilityID" 
+                                            data-val="false"
+                                            selectpicker="ScheduleSearchModel.FacilityIDs" name="Reconcile835Model.FacilityIDs">
+                                        <option data-ng-repeat="option in FacilityList" value="{{option.FacilityID}}">{{option.FacilityName}}</option>
+                                    </select>
+                                </div>*@
+
+
+                                @*<div class="form-group col-lg-2 col-md-3 col-sm-3 no-left-padding">
+                                    <select class="form-control input-sm "
+                                        data-ng-init="ScheduleSearchModel.SchStatus=(ScheduleSearchModel.SchStatus==null || ScheduleSearchModel.SchStatus=='')?'':ScheduleSearchModel.SchStatus"
+                                        data-ng-model="ScheduleSearchModel.SchStatus"
+                                        id="ScheduleSearchModelSchStatus"
+                                        name="ScheduleSearchModelSchStatus"
+                                        convert-to-number="">
+                                        <option value="">All</option>
+                                        <option value="1">Scheduled</option>
+                                        <option value="2">Not Scheduled</option>
+                                    </select>
+                                </div>*@
+
+                                <div class="form-group col-lg-1 col-md-2 col-sm-3">
+                                    <button class="btn btn-sm blue CreateCalender" data-ng-click="SeachAndGenerateCalenders(true)">@Resource.Search</button>
+                                </div>
+
+                            </form>
+
+                           @* <button type="button" class="btn btn-default border-grey-cascade margin-right-05 btn-sm pull-right btn-success"
+                                 data-ng-click="UploadPatientCSV()" title="@Resource.UploadExcelForAttendance">
+                                <i class="fa fa-file-excel-o font-size-14" aria-hidden="true"></i>
+                            </button>*@
+                        </div>
+
+                        <hr class="clear-both" />
+                    </div>
+
+
+
+                </div>
+
+                <div id="print-content-assignment">
+                    @*<div class="col-sm-12 schedule-calendar-assignment-list" >*@
+                    <div class="col-sm-12">
+                        @*<div id='calendar'></div>*@
+                        <div class="margin-bottom-15 sclenders" data-ng-repeat="calenderItem in CalendarList">
+
+                            <div data-ng-casemanagementcalender="calenderItem" class="has-toolbar customCalender" data-ng-show="ShowCalenders"
+                                 data-ng-startdate="ScheduleSearchModel.StartDate"
+
+                                 data-ng-get-event-list="GetScheduleList"
+                                 data-ng-resourcelist="GetResourcesList"
+                                 data-ng-resourcename="ResourceColumns"
+                                 data-ng-on-drop="OnEventDrop"
+                                 data-ng-on-event-change="OnEventChange"
+                                 data-ng-on-event-render="EventRender"
+
+                                 data-ng-on-resource-render="ResourceRender"
+
+                                 data-ng-refresh="CalenderRefresh"
+                                data-ng-showloader="ShowCalenderLoader"
+                                 @*
+                                 data-ng-on-event-order="EventOrder"
+                                 data-ng-on-day-render="DayRender"
+                                 ng-after-all-event-render="AllEventRender"
+                                 data-ng-startdate="SelectedWeekObj.StartDate"
+                                 data-ng-hiddendays="SelectedWeekObj.WeekDaysToHide"*@>
+                            </div>
+                        </div>
+
+                        <div class="calender_loader" data-ng-show="ShowCalenderLoaderFlag">
+                            <div class="calender_loadertitle">Loading...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    @Html.Partial("Partial/CaseManagement/_EmpRefSchDetailPopover", Model)
+    @*@Html.Partial("Partial/CaseManagement/_NoteModalAction")*@
+    @*@Html.Partial("Partial/CaseManagement/_SchAttendanceModalAction")*@
+</div>
+
+
+@*<script id="clientcountAtLocations-popover" type="text/ng-template">
+    @Html.Partial("Partial/_ClientCountAtLocationsPopover")
+</script>
+
+
+<script id="facilitydetailpopover" type="text/ng-template">
+    @Html.Partial("Partial/_FacilityDetailPopover")
+</script>*@
+
+
+
+<script id="empReource" type="text/ng-template">
+    <span>
+        <a href="@Constants.HC_AddReferral{{DataModel.resourceObj.EncryptedReferralID}}" target="_blank"
+           class="text-decoration-none font-size-12" data-ng-bind="DataModel.resourceObj.ReferralName"></a>
+
+
+        @*<span style="padding: 8px;float: left;" data-ng-style="{'background-color':DataModel.resourceObj.eventColor}"></span>*@
+        <span style="float: left;">
+            <input type="checkbox" class="uniformControls" id="IsScheduleSearch{{DataModel.resourceObj.ReferralID}}"
+                   data-ng-model="DataModel.resourceObj.IsPatientChecked"
+                   data-uniform-value="DataModel.resourceObj.IsPatientChecked"
+                   data-ng-change="DataModel.resourceObj.OnScheduleSearch(DataModel.resourceObj)" />
+        </span>
+
+        @*<span data-ng-click="DataModel.resourceObj.EmpRefSchModal()"><i class="fa fa-calendar cursor-pointer"></i></span>*@
+        
+    @*<span style="cursor: pointer;float: right;padding-right: 35px;" data-ng-click="DataModel.resourceObj.OpenEmpRefSchModal(DataModel.resourceObj.ReferralID)"><i class="fa fa-calendar"></i></span>*@
+
+
+        @*<span class='prg lineProgressbar' data-reamininghours="{{DataModel.resourceObj.NewRemainingHours}}"
+              data-totalhours="{{DataModel.resourceObj.NewAllocatedHrs}}">
+            <sapn>
+        </span>*@
+
+</script>
+
+<script id="calendereventmarker" type="text/ng-template">
+        @Html.Partial("Partial/CaseManagement/_CalenderEventMarker")
+</script>
+<script id="eventdetailpopover" type="text/ng-template">
+    @Html.Partial("Partial/CaseManagement/_EventDetailPopover")
+</script>
+
+
+
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/casemanagement/scheduleassignment")
+    @Scripts.Render("~/assets/js/viewjs/siteApp/Areas/HomeCare/schedule/casemanagement/emprefschoptions")
+    
+    <script src="/Assets/js/sitejs/freewall.js"></script>
+    <script type="text/javascript">
+        var DeleteConfirmationMessageForSchedule = '@string.Format(@Resource.DeleteConfirmationMessage, "Schedule Master")';
+        var DeleteConfirmationMessageFromFacility = '@string.Format(@Resource.DeleteConfirmationMessageFromFacility)';
+        var ScheduleStartEndDateBetweenWeekStartEndDate = '@string.Format(@Resource.ScheduleStartEndDateBetweenWeekStartEndDate)';
+        var ScheduleStartEndDateMustSevenDay = '@string.Format(@Resource.ScheduleStartEndDateMustSevenDay)';
+
+        var CancelStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Cancelled)';
+        var UnconfirmedStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Unconfirmed)';
+        var ConfirmedStatus = '@Convert.ToInt32(ScheduleStatus.ScheduleStatuses.Confirmed)';
+
+        var AlreadyRescheduleConfirm = '@Resource.AlreadyRescheduleConfirm';
+        var ScheduleBatchServiceConfirmation = '@Resource.ScheduleBatchServiceConfirmation';
+        var RescheduleConfirm = '@Resource.RescheduleConfirm';
+
+        var TransportationAssignmentRemoveAction = @Constants.TransportationAssignmentRemoveAction;
+        var TransportationAssignmentKeepAction = @Constants.TransportationAssignmentKeepAction;
+
+        var TransportationAssignmentConfirmationTitle = '@Resource.TransportationAssignmentConfirmationTitle';
+        var TransportationAssignmentConfirmationMessage = '@Resource.TransportationAssignmentConfirmationMessage';
+        var RemoveAssignedTransportion = '@Resource.RemoveAssignedTransportion';
+        var KeepTransportion = '@Resource.KeepTransportion';
+        var IsAttandancePage = @(IsAttandancePage ? "true" : "false");
+        var UnassignSchedule = '@Resource.UnassignSchedule';
+
+        var PatientHoldConfirmation = '@Resource.PatientHoldConfirmation';
+        var PatientUnHoldConfirmation = '@Resource.PatientUnHoldConfirmation';
+
+        var PatientHold = '@Resource.PatientHold';
+        var PatientUnHold = '@Resource.PatientUnHold';
+
+        var InvalidCSVUploadMessage = '@Resource.InvalidCSVUploadMessage';
+        var SelectCSVFile = '@Resource.SelectCSVFile';
+
+    </script>
+}

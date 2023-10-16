@@ -1,0 +1,601 @@
+﻿@using Zarephath.Core.Models
+@model HC_AddReferralModel
+
+@Html.Hidden("hdnSetReferralPatientsPayorModel", Common.SerializeObject(Model))
+<div class="col-sm-12">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group row">
+                <div class="fscontainer">
+                    <div class="legend">
+                        @Resource.PatientPayors
+                    </div>
+                    <div class="Patientpayorsbottom">
+                        <div class="row">
+                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                <div class="btn-group">
+                                    <button class="btn blue btn-sm grey border-grey-cascade" data-ng-click="Refresh()">
+                                        <i class="fa fa-refresh"></i>&nbsp;&nbsp;@Resource.Refresh
+                                    </button>
+                                </div>
+
+                                <div class="btn-group">
+                                    @if (Common.HasPermission(Constants.HC_Permission_Payor_ServiceCode_Mapping))
+                                    {
+                                        @Html.DropDownListFor(m => m.SearchReferralPayorMapping.IsDeleted, Model.DeleteFilter.ToSelectList(Convert.ToString(Model.SearchReferralPayorMapping.IsDeleted), "Name", "Value", "", ""),
+                                                                new
+                                                                {
+                                                                    id = "IsDeleted",
+                                                                    data_ng_model = "TempReferralPayorMappingList.IsDeleted",
+                                                                    data_ng_init = "TempReferralPayorMappingList.IsDeleted = TempReferralPayorMappingList.IsDeleted==null?'-1':TempReferralPayorMappingList.IsDeleted.toString()",
+                                                                    @class = "form-control input-sm btn blue btn-sm grey border-grey-cascade",
+                                                                    data_ng_change = "SearchReferralPayorMapping()"
+                                                                })
+                                    }
+                                </div>
+                                <div class="inline-block pull-right" data-ng-show="ReferralPayorMappingList.length > 0">
+                                    <div class="inline-block pull-right" data-ng-show="ReferralPayorMappingList.length > 0">
+                                        <div class="pull-right margin-left-5">
+                                            <dir-pagination-controls boundary-links="true" max-size="ReferralPayorMappingListPager.maxSize" on-page-change="ReferralPayorMappingListPager.pageChanged(newPageNumber)" pagination-id="ReferralPayorMappingListPagerID"></dir-pagination-controls>
+                                        </div>
+                                    </div>
+
+                                </div>
+
+                                <div class="space20"></div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="portlet-body" style="display: block;">
+                                    @{ Html.EnableClientValidation(false); }
+                                    <form>
+                                        <div class="row">
+                                            <div class="col-lg-12 col-md-12 col-sm-12">
+                                                <div class="portlet-body compact">
+                                                    <div class="dataTables_wrapper">
+                                                        <table class="table table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                            <thead class="flip-content">
+                                                                <tr>
+                                                                    @*@if (Common.HasPermission(Constants.HC_Permission_Patient_AddUpdate))
+        {
+            <th class="width-20px"></th>
+        }*@
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralPayorMappingListPager.sortColumn('PayorName')">@Resource.PayorName</a>
+                                                                        <span class="sortorder" data-ng-show="ReferralPayorMappingListPager.sortIndex === 'PayorName'" data-ng-class="{reverse:ReferralPayorMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralPayorMappingListPager.sortColumn('StarDate')">@Resource.StarDate</a>
+                                                                        <span class="sortorder" data-ng-show="ReferralPayorMappingListPager.sortIndex === 'StarDate'" data-ng-class="{reverse:ReferralPayorMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralPayorMappingListPager.sortColumn('EndDate')">@Resource.EndDate</a>
+                                                                        <span class="sortorder" data-ng-show="ReferralPayorMappingListPager.sortIndex === 'EndDate'" data-ng-class="{reverse:ReferralPayorMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralPayorMappingListPager.sortColumn('Precedence')">@Resource.Precedence</a>
+                                                                        <span class="sortorder" data-ng-show="ReferralPayorMappingListPager.sortIndex === 'Precedence'" data-ng-class="{reverse:ReferralPayorMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th class="width-120px">
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralPayorMappingListPager.sortColumn('BeneficiaryType')">@Resource.BeneficiaryType</a>
+                                                                        <span class="sortorder" data-ng-show="ReferralPayorMappingListPager.sortIndex === 'BeneficiaryType'" data-ng-class="{reverse:ReferralPayorMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>
+                                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="ReferralPayorMappingListPager.sortColumn('BeneficiaryNumber')">@Resource.BeneficiaryNumber</a>
+                                                                        <span class="sortorder" data-ng-show="ReferralPayorMappingListPager.sortIndex === 'BeneficiaryNumber'" data-ng-class="{reverse:ReferralPayorMappingListPager.reverse}"></span>
+                                                                    </th>
+                                                                    <th>@Resource.IsPayorPrimaryInsured</th>
+                                                                    <th class="width-120px">@Resource.Action</th>
+                                                                </tr>
+                                                            </thead>
+
+                                                            <tbody>
+                                                                <tr class="compact-search-tr">
+                                                                    @*<td class="text-align-center">
+            <div class="btn-group" data-ng-show="ReferralPayorMappingList.length > 0">
+                <input id="SelectAllReferralPayorMapping" class="unicheckbox text-align-center" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                <label for="SelectAllReferralPayorMapping"></label>
+            </div>
+        </td>*@
+                                                                    <td>
+                                                                        @Html.TextBoxFor(m => m.SearchReferralPayorMapping.PayorName, new { data_ng_model = "TempReferralPayorMappingList.PayorName", @class = "form-control input-sm", placeholder = Resource.PayorName, maxlength = 50 })
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="input-group date"
+                                                                             datepicker="TempReferralPayorMappingList.PayorEffectiveDate"
+                                                                             data-ng-dateval="TempReferralPayorMappingList.PayorEffectiveDate">
+                                                                            @Html.TextBoxFor(q => q.SearchReferralPayorMapping.PayorEffectiveDate,
+                                                                                                    new
+                                                                                                    {
+                                                                                                        @class = "form-control input-sm dateInputMask",
+                                                                                                        placeholder = Resource.StartDate
+                                                                                                    })
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+
+                                                                    </td>
+                                                                    <td>
+                                                                        <div class="input-group date"
+                                                                             datepicker="TempReferralPayorMappingList.PayorEffectiveEndDate"
+                                                                             data-ng-dateval="TempReferralPayorMappingList.PayorEffectiveEndDate">
+                                                                            @Html.TextBoxFor(q => q.SearchReferralPayorMapping.PayorEffectiveEndDate,
+                                                                                            new
+                                                                                            {
+                                                                                                @class = "form-control input-sm dateInputMask",
+                                                                                                placeholder = Resource.EndDate
+                                                                                            })
+                                                                            <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td>
+                                                                        @*@Html.TextBoxFor(m => m.SearchReferralPayorMapping.Precedence, new { data_ng_model = "TempReferralPayorMappingList.Precedence", @class = "form-control input-sm", placeholder = Resource.Precedence, maxlength = 3, dir_valid_number = "" })*@
+                                                                        @Html.DropDownListFor(p => p.SearchReferralPayorMapping.Precedence, Model.PrecedenceList.ToSelectList(Model.SearchReferralPayorMapping.Precedence.ToString() ?? "", "Name", "Value", @Resource.All, "0"),
+                                                                    new
+                                                                    {
+                                                                        convert_to_number = "",
+                                                                        data_ng_model = "TempReferralPayorMappingList.Precedence",
+                                                                        data_ng_init = "TempReferralPayorMappingList.Precedence=(TempReferralPayorMappingList.Precedence==null || TempReferralPayorMappingList.Precedence==0)?'0':TempReferralPayorMappingList.Precedence",
+                                                                        @class = "form-control input-sm",
+                                                                    })
+                                                                    </td>
+                                                                    <td>
+                                                                        @*@Html.TextBoxFor(m => m.SearchReferralPayorMapping.BeneficiaryType, new { data_ng_model = "TempReferralPayorMappingList.BeneficiaryType", @class = "form-control input-sm", placeholder = Resource.BeneficiaryType, maxlength = 50 })*@
+                                                                        <select class="form-control input-sm"
+                                                                                data-ng-init="TempReferralPayorMappingList.BeneficiaryTypeID=TempReferralPayorMappingList.BeneficiaryTypeID==''?null:TempReferralPayorMappingList.BeneficiaryTypeID.toString()"
+                                                                                data-ng-model="TempReferralPayorMappingList.BeneficiaryTypeID"
+                                                                                id="BeneficiaryTypeID"
+                                                                                name="TempReferralPayorMappingList.BeneficiaryTypeID"
+                                                                                convert-to-number="">
+                                                                            <option value="">@Resource.Select</option>
+                                                                            <option data-ng-repeat="option in ReferralModel.BeneficiaryTypes" value="{{option.Value}}">{{option.Name}}</option>
+                                                                        </select>
+                                                                    </td>
+                                                                    <td>
+                                                                        @Html.TextBoxFor(m => m.SearchReferralPayorMapping.BeneficiaryNumber, new { data_ng_model = "TempReferralPayorMappingList.BeneficiaryNumber", @class = "form-control input-sm", placeholder = Resource.BeneficiaryNumber, maxlength = 50 })
+                                                                    </td>
+                                                                    <td></td>
+                                                                    <td class="text-align-center" width="130">
+                                                                        <input type="submit" value="@Resource.Search" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="SearchReferralPayorMapping()" />
+                                                                        <a href="javascript:void(0);" class="btn btn-default grey border-grey-cascade btn-xs" data-ng-click="ResetSearchFilter()">@Resource.Reset</a>
+                                                                    </td>
+                                                                </tr>
+                                                                <tr data-ng-class="{'deleted':ReferralPayorMappingList.IsDeleted}" dir-paginate="ReferralPayorMappingList in ReferralPayorMappingList | itemsPerPage: ReferralPayorMappingListPager.pageSize" total-items="ReferralPayorMappingListPager.totalRecords" current-page="ReferralPayorMappingListPager.currentPage" pagination-id="ReferralPayorMappingListPagerID">
+                                                                    @*@if (Common.HasPermission(Constants.HC_Permission_Patient_AddUpdate))
+        {
+            <td class="text-align-center">
+                <input type="checkbox" class="unicheckbox" data-ng-model="ReferralPayorMappingList.IsChecked" data-ng-change="SelectReferralPayorMapping(ReferralPayorMappingList)" val="ReferralPayorMappingList.IsChecked">
+            </td>
+        }*@
+                                                                    <td>
+                                                                        {{ReferralPayorMappingList.PayorName  ? ReferralPayorMappingList.PayorName:'@Resource.NA'}}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ReferralPayorMappingList.PayorEffectiveDate ? (ReferralPayorMappingList.PayorEffectiveDate | date:'@Resource._DateFormat') : '@Resource.NA'}}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ReferralPayorMappingList.PayorEffectiveEndDate ? (ReferralPayorMappingList.PayorEffectiveEndDate | date:'@Resource._DateFormat') : '@Resource.NA' }}
+                                                                    </td>
+                                                                    <td data-ng-if="ReferralPayorMappingList.Precedence == 1">
+                                                                        @Constants.Primary
+                                                                    </td>
+                                                                    <td data-ng-if="ReferralPayorMappingList.Precedence == 2">
+                                                                        @Constants.Secondary
+                                                                    </td>
+                                                                    <td data-ng-if="ReferralPayorMappingList.Precedence == 3">
+                                                                        @Constants.Tertiary
+                                                                    </td>
+                                                                    <td data-ng-if="ReferralPayorMappingList.Precedence == null || ReferralPayorMappingList.Precedence == ''">
+                                                                        @Resource.NA
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ReferralPayorMappingList.BeneficiaryType  ? ReferralPayorMappingList.BeneficiaryType:'@Resource.NA'}}
+                                                                    </td>
+                                                                    <td>
+                                                                        {{ReferralPayorMappingList.BeneficiaryNumber  ? ReferralPayorMappingList.BeneficiaryNumber:'@Resource.NA'}}
+                                                                    </td>
+                                                                    <td>
+                                                                        <span data-ng-tooltip="{{ReferralPayorMappingList.InsuredShowToolTip}}" data-ng-custom-class="tooltip-extra-z-index" data-ngbg-color-class="max-width-321" data-ng-if="ReferralPayorMappingList.IsPayorNotPrimaryInsured == true">@Resource.Yes</span>
+                                                                        <span data-ng-if="ReferralPayorMappingList.IsPayorNotPrimaryInsured == false">@Resource.No</span>
+                                                                    </td>
+                                                                    <td class="text-align-center">
+                                                                        @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PatientPayor_Add))
+                                                                        {
+                                                                            <a href="#" data-ng-click="EditPayorCodeMapping(ReferralPayorMappingList)" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                        }
+                                                                        @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PatientPayor_Delete))
+                                                                        {
+                                                                            <a href="javascript:void(0);" data-ng-show="ReferralPayorMappingList.IsDeleted" data-ng-click="DeleteReferralPayorMapping(ReferralPayorMappingList.ReferralPayorMappingID,'Enable')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                            <a href="javascript:void(0);" data-ng-show="!ReferralPayorMappingList.IsDeleted" data-ng-click="DeleteReferralPayorMapping(ReferralPayorMappingList.ReferralPayorMappingID,'Disable')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                                        }
+
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+
+                                                        </table>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div data-ng-if="ReferralPayorMappingList.length == 0">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div class="alert alert-danger">
+                                                                        @Html.Raw(Resource.NoRecordsFound)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12" data-ng-if="ReferralPayorMappingList.length > 0">
+                                <div class="pull-left col-sm-3 no-padding">
+                                    @Resource.Showing <span data-ng-bind="(ReferralPayorMappingListPager.pageSize * ReferralPayorMappingListPager.currentPage) - ReferralPayorMappingListPager.pageSize  + 1"></span>
+                                    &nbsp;@Resource.To <span data-ng-bind="(ReferralPayorMappingListPager.pageSize == ReferralPayorMappingListPager.currentPageSize) ? (ReferralPayorMappingListPager.pageSize * ReferralPayorMappingListPager.currentPage) :(ReferralPayorMappingListPager.pageSize * ReferralPayorMappingListPager.currentPage) - ReferralPayorMappingListPager.pageSize  + ReferralPayorMappingListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="ReferralPayorMappingListPager.totalRecords"></span>&nbsp;@Resource.Records
+                                </div>
+                                <div class="pull-right top pagination-sm">
+                                    <dir-pagination-controls boundary-links="true" max-size="ReferralPayorMappingListPager.maxSize" on-page-change="ReferralPayorMappingListPager.pageChanged(newPageNumber)" pagination-id="ReferralPayorMappingListPagerID"></dir-pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space20"> </div>
+                    <hr class="boldLine" />
+                    @if (Common.HasPermission(Constants.HC_Permission_PatientIntake_Billing_PatientPayor_Add))
+                    {
+                        <div class="patients-payor-section">
+                            <form id="FrmPatientsPayor">
+                                <div class="col-sm-12">
+                                    <div class="row">
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label required">@Resource.Payor</label>
+                                            @Html.DropDownListFor(p => p.ReferralPayorMapping.PayorID, Model.PayorList.ToSelectList(Model.ReferralPayorMapping.PayorID.ToString() ?? "", "PayorName", "PayorID", @Resource.Select, ""),
+                                            new
+                                            {
+                                                convert_to_number = "",
+                                                data_ng_model = "ReferralModel.ReferralPayorMapping.PayorID",
+                                                data_ng_init = "ReferralModel.ReferralPayorMapping.PayorID=(ReferralModel.ReferralPayorMapping.PayorID==null || ReferralModel.ReferralPayorMapping.PayorID==0)?'':ReferralModel.ReferralPayorMapping.PayorID",
+                                                @class = "form-control input-sm",
+                                                data_ng_change = "ReferralModel.Referral.SelectedPayor=ReferralModel.ReferralPayorMapping.PayorID"
+                                            })
+                                            @Html.ValidationMessageFor(q => q.ReferralPayorMapping.PayorID)
+                                        </div>
+
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label required">@Resource.StartDate</label>
+                                            <div class="input-group date"
+                                                 datepicker="ReferralModel.ReferralPayorMapping.PayorEffectiveDate"
+                                                 data-ng-dateval="ReferralModel.ReferralPayorMapping.PayorEffectiveDate"
+                                                 data-ng-maxdate="ReferralModel.ReferralPayorMapping.PayorEffectiveEndDate">
+                                                @Html.TextBoxFor(q => q.ReferralPayorMapping.PayorEffectiveDate,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask",
+                                                    placeholder = Resource.StartDate
+                                                })
+                                                @Html.ValidationMessageFor(q => q.ReferralPayorMapping.PayorEffectiveDate)
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label required">@Resource.EndDate</label>
+                                            <div class="input-group date"
+                                                 datepicker="ReferralModel.ReferralPayorMapping.PayorEffectiveEndDate"
+                                                 data-ng-dateval="ReferralModel.ReferralPayorMapping.PayorEffectiveEndDate"
+                                                 data-ng-mindate="ReferralModel.ReferralPayorMapping.PayorEffectiveDate">
+                                                @Html.TextBoxFor(q => q.ReferralPayorMapping.PayorEffectiveEndDate,
+                                                new
+                                                {
+                                                    @class = "form-control input-sm dateInputMask",
+                                                    placeholder = Resource.EndDate
+                                                })
+                                                @Html.ValidationMessageFor(q => q.ReferralPayorMapping.PayorEffectiveEndDate)
+                                                <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label required">@Resource.Precedence</label>
+                                            @Html.DropDownListFor(p => p.ReferralPayorMapping.Precedence, Model.PrecedenceList.ToSelectList(Model.ReferralPayorMapping.Precedence.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                            new
+                                            {
+                                                convert_to_number = "",
+                                                data_ng_model = "ReferralModel.ReferralPayorMapping.Precedence",
+                                                data_ng_init = "ReferralModel.ReferralPayorMapping.Precedence=(ReferralModel.ReferralPayorMapping.Precedence==null || ReferralModel.ReferralPayorMapping.Precedence==0)?'':ReferralModel.ReferralPayorMapping.Precedence",
+                                                @class = "form-control input-sm requiredStrip",
+                                                @*data_ng_change= "PrimaryInsured(ReferralModel.ReferralPayorMapping.Precedence)",*@
+                                            })
+                                            @Html.ValidationMessageFor(q => q.ReferralPayorMapping.Precedence)
+                                        </div>
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label required">
+                                                @Resource.BeneficiaryType
+                                            </label>
+                                            <select class="form-control input-sm requiredStrip"
+                                                    data-ng-init="ReferralModel.ReferralPayorMapping.BeneficiaryTypeID=ReferralModel.ReferralPayorMapping.BeneficiaryTypeID==''?null:ReferralModel.ReferralPayorMapping.BeneficiaryTypeID.toString()"
+                                                    data-ng-model="ReferralModel.ReferralPayorMapping.BeneficiaryTypeID"
+                                                    id="BeneficiaryTypeID"
+                                                    name="ReferralModel.ReferralPayorMapping.BeneficiaryTypeID"
+                                                    convert-to-number=""
+                                                    data-val="true" 
+                                                    data-val-required="@Resource.BeneficiaryTypeIDRequired">
+                                                <option value="">@Resource.Select</option>
+                                                <option data-ng-repeat="option in ReferralModel.BeneficiaryTypes" value="{{option.Value}}">{{option.Name}}</option>
+                                            </select>
+                                            @Html.ValidationMessageFor(q => q.ReferralPayorMapping.BeneficiaryTypeID)
+                                        </div>
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label required">
+                                                <span data-ng-if="ReferralModel.ReferralPayorMapping.BeneficiaryTypeID!=''">@Resource.BeneficiaryNumber</span>
+                                            </label>
+                                            <input id="ReferralBeneficiaryTypeDetail_BeneficiaryNumber" name="ReferralPayorMapping.BeneficiaryNumber"
+                                                   data-ng-model="ReferralModel.ReferralPayorMapping.BeneficiaryNumber"
+                                                   data-error-count="ReferralErrorCount.ClientTab"
+                                                   class="form-control input-sm validateElement requiredStrip"
+                                                   data-ng-disabled="ReferralModel.ReferralPayorMapping.BeneficiaryTypeID==null || ReferralModel.ReferralPayorMapping.BeneficiaryTypeID==''"
+                                                   maxlength="20" 
+                                                   data-val="true" 
+                                                    data-val-required="@Resource.BeneficiaryNumberRequired"/>
+                                            @Html.ValidationMessageFor(q => q.ReferralPayorMapping.BeneficiaryNumber)
+                                        </div>
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label">@Resource.EmployersNameSchoolName</label>
+                                            @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredEmployersNameOrSchoolName,
+                            new
+                            {
+                                data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredEmployersNameOrSchoolName",
+                                @class = "form-control input-sm",
+                                maxlength = "100"
+                            })
+                                            @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredEmployersNameOrSchoolName)
+                                        </div>
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label">@Resource.InsuredSPolicyGroupFECANumber</label>
+                                            @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredPolicyGroupOrFecaNumber,
+                                            new
+                                            {
+                                                data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredPolicyGroupOrFecaNumber",
+                                                @class = "form-control input-sm",
+                                                maxlength = "100"
+                                            })
+                                            @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredPolicyGroupOrFecaNumber)
+                                        </div>
+                                        <div class="form-group col-lg-4 col-md-4 col-sm-4">
+                                            <label class="control-label">@Resource.MemberID</label>
+                                            @Html.TextBoxFor(q => q.ReferralPayorMapping.MemberID,
+                                            new
+                                            {
+                                                data_ng_model = "ReferralModel.ReferralPayorMapping.MemberID",
+                                                @class = "form-control input-sm",
+                                                maxlength = "100"
+                                            })
+                                            @Html.ValidationMessageFor(q => q.ReferralPayorMapping.MemberID)
+                                        </div>
+                                        <div class="form-group col-lg-6 col-md-6 col-sm-6 margin-top-15">
+                                            <label class="mt-checkbox mt-checkbox-outline mt-10">
+                                                @Html.CheckBoxFor(m => m.ReferralPayorMapping.IsPayorNotPrimaryInsured,
+                                                new
+                                                {
+                                                    data_ng_model = "ReferralModel.ReferralPayorMapping.IsPayorNotPrimaryInsured",
+                                                    @class = "uniformControls",
+                                                    data_uniform_value = "ReferralModel.ReferralPayorMapping.IsPayorNotPrimaryInsured",
+                                                    data_ng_change = "CheckPrimaryInsured()"
+                                                })
+                                                @Resource.PayorPrimaryInsured
+                                            </label>
+                                        </div>
+                                    </div>
+                                    @*Insured's Detail Show and hide on click on check box start*@
+                                    <div class="row" id="Insured_Detail" ng-if="Insured_Detail">
+                                   @* <div class="row" id="Insured_Detail" ng-if="$scope.ReferralPayorMapping.IsPayorNotPrimaryInsured==true">*@
+                                        <div class="titleHead">
+                                            <div class="form-group margin-left-14 mt-10 font-weight-600 font-size-16">
+                                                @Resource.InsuredDetail
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.FirstName</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredFirstName,
+                                                    new
+                                                    {
+                                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredFirstName",
+                                                        @class = "form-control input-sm",
+                                                        maxlength = "50"
+                                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredFirstName)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label">@Resource.MiddleName</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredMiddleName,
+                                                    new
+                                                    {
+                                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredMiddleName",
+                                                        @class = "form-control input-sm",
+                                                        maxlength = "50"
+                                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredMiddleName)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.LastName</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredLastName,
+                                                    new
+                                                    {
+                                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredLastName",
+                                                        @class = "form-control input-sm",
+                                                        maxlength = "50"
+                                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredLastName)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.Gender</label>
+                                                    @Html.DropDownListFor(p => p.ReferralPayorMapping.InsuredGender, Model.GenderList.ToSelectList(Model.Referral.Gender ?? "", "Name", "Value", @Resource.SelectGender, ""),
+                                    new
+                                    {
+                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredGender",
+                                        data_ng_init = "ReferralModel.ReferralPayorMapping.InsuredGender=ReferralModel.ReferralPayorMapping.InsuredGender==null?'':ReferralModel.ReferralPayorMapping.InsuredGender.toString()",
+                                        @class = "form-control input-sm requiredStrip",
+                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredGender)
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div class="row">
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.Address</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredAddress,
+                                    new
+                                    {
+                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredAddress",
+                                        @class = "form-control input-sm",
+                                        maxlength = "500"
+                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredAddress)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.City</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredCity,
+                                    new
+                                    {
+                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredCity",
+                                        @class = "form-control input-sm",
+                                        maxlength = "100"
+                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredCity)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.State</label>
+                                                    @Html.DropDownListFor(p => p.ReferralPayorMapping.InsuredState, Model.StateList.ToSelectList(Model.ReferralPayorMapping.InsuredState ?? "", "StateName", "StateCode", @Resource.SelectState, ""),
+                                    new
+                                    {
+                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredState",
+                                        data_ng_init = "ReferralModel.ReferralPayorMapping.InsuredState=ReferralModel.ReferralPayorMapping.InsuredState==''?null:ReferralModel.ReferralPayorMapping.InsuredState",
+                                        @class = "form-control input-sm requiredStrip",
+                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredState)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.ZipCode</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredZipCode,
+                                    new
+                                    {
+                                        @class = "form-control input-sm",
+                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredZipCode",
+                                        maxlength = 5,
+                                        placeholder = "XXXXX",
+                                        dir_valid_number = ""
+                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredZipCode)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.Phone</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredPhone,
+                                    new
+                                    {
+                                        @class = "form-control input-sm",
+                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredPhone",
+                                        maxlength = 15,
+                                        placeholder = "(XXX) XXX-XXXX",
+                                        phone_input = ""
+                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredPhone)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">
+                                                        @Resource.DateOfBirth
+                                                        <i class="fa fa-question-circle" data-ng-tooltip="@Resource.FutureDateNotAllowed" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                                    </label>
+                                                    <div id="dateDOB" class="input-group date" datepicker="ReferralModel.ReferralPayorMapping.InsuredDateOfBirth"
+                                                         data-ng-dateval="ReferralModel.ReferralPayorMapping.InsuredDateOfBirth" data-ng-maxdate="CurrentDate">
+
+                                                        <input class="form-control input-sm dateInputMask" data-val="true" data-val-required="@Resource.DateOfBirthRequired"
+                                                               placeholder="@Resource.DateFormat" id="ReferralModel_ReferralPayorMapping_InsuredDateOfBirth" maxlength="10"
+                                                               name="ReferralModel.ReferralPayorMapping.InsuredDateOfBirth" type="text">
+                                                        @*@Html.ValidationMessageFor(m => m.Referral.Dob)*@
+                                                        <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                    </div>
+                                                </div>
+                                                @*<div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label required">@Resource.Gender</label>
+                                                    @Html.DropDownListFor(p => p.ReferralPayorMapping.InsuredGender, Model.GenderList.ToSelectList(Model.Referral.Gender ?? "", "Name", "Value", @Resource.SelectGender, ""),
+                                    new
+                                    {
+                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredGender",
+                                        data_ng_init = "ReferralModel.ReferralPayorMapping.InsuredGender=ReferralModel.ReferralPayorMapping.InsuredGender==null?'':ReferralModel.ReferralPayorMapping.InsuredGender.toString()",
+                                        @class = "form-control input-sm requiredStrip",
+                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredGender)
+                                                </div>*@
+
+
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label">@Resource.EmployersNameSchoolName</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredEmployersNameOrSchoolName,
+                                    new
+                                    {
+                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredEmployersNameOrSchoolName",
+                                        @class = "form-control input-sm",
+                                        maxlength = "100"
+                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredEmployersNameOrSchoolName)
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-4">
+                                                    <label class="control-label">@Resource.InsuredSPolicyGroupFECANumber</label>
+                                                    @Html.TextBoxFor(q => q.ReferralPayorMapping.InsuredPolicyGroupOrFecaNumber,
+                                                    new
+                                                    {
+                                                        data_ng_model = "ReferralModel.ReferralPayorMapping.InsuredPolicyGroupOrFecaNumber",
+                                                        @class = "form-control input-sm",
+                                                        maxlength = "100"
+                                                    })
+                                                    @Html.ValidationMessageFor(q => q.ReferralPayorMapping.InsuredPolicyGroupOrFecaNumber)
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    @*Insured's Detail Show and hide on click on check box end*@
+                                    <div class="row">
+                                        <div class="form-group text-right col-lg-12 col-md-12 col-sm-12">
+                                            <div class="btn-group">
+                                                <a href="#" data-ng-click="SaveReferralPayorMappingDetails()" class="btn btn-sm green-jungle"><i class="fa fa-save">&nbsp;&nbsp;</i>@Resource.Save</a>
+
+                                            </div>
+                                            <div class="btn-group">
+                                                <a href="#" data-ng-click="ClearReferralPayorMappingDetails()" class="btn btn-sm grey border-grey-cascade"><i class="fa fa-remove">&nbsp;&nbsp;</i>@Resource.Cancel</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="space1"></div>
+
+                                    <div class="space1"></div>
+                                </div>
+                            </form>
+                        </div>
+                        <hr class="padding-bottom-25" />
+
+
+                    }
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

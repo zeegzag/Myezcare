@@ -1,0 +1,139 @@
+﻿<div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h4 class="modal-title">{{ValidateAndGenerateEdi837Model.PageTitle}}</h4>
+</div>
+
+
+<div class="modal-body">
+    <div class="row">
+        <div class="col-sm-12" data-ng-if="ValidateAndGenerateEdi837Model.FilteredBatchList.length > 0">
+            <div class="portlet-body batchCompact" style="display: block;">
+                <div class="table-responsive tabbable-custom">
+                    <form id="frmBatchList">
+                        <table class="table table-hover table-bordered table-striped table-condensed table-checkable ">
+                            <thead class="flip-content">
+                                <tr>
+                                    <th class="col-sm-1">
+                                        <span>@Resource.Batch</span>
+                                    </th>
+                                    <th class="col-sm-6">
+                                        <span>@Resource.BatchSummary</span>
+                                    </th>
+
+                                    <th class="col-sm-2">
+                                        <span>@Resource.Validation</span>
+                                    </th>
+                                    <th class="col-sm-3" data-ng-if="!ValidateAndGenerateEdi837Model.ValidateOnly">
+                                        <span>@Resource.Edi837</span>
+                                    </th>
+
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                <tr data-ng-repeat="item in ValidateAndGenerateEdi837Model.FilteredBatchList">
+                                    <td>
+                                        <span data-ng-bind="item.BatchID ? item.BatchID:'@Resource.NA'"></span>
+                                        <br />
+                                        <span class="badge badge-danger" data-ng-if="item.IsSent">Sent</span>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <div class="BatchSummaryDiv">
+                                                <div class="td-batch-summary">@Resource.Payor:</div>
+                                                <div class="BatchSummaryDesc">
+                                                    {{item.PayorName ? item.PayorName:'@Resource.NA'}}
+                                                </div>
+                                            </div>
+                                            <div class="BatchSummaryDiv">
+                                                <div class="td-batch-summary">@Resource.Description: </div>
+                                                <div class="BatchSummaryDesc">
+                                                    {{ item.BatchTypeName}} {{item.StartDate | orgdate}}-{{item.EndDate |orgdate}}
+                                                </div>
+                                            </div>
+                                            <div class="BatchSummaryDiv">
+                                                <div class="td-batch-summary">@Resource.Site:</div>
+                                                <div class="BatchSummaryDesc">{{item.FacilityName ? item.FacilityName:'@Resource.NA'}}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+
+
+                                    <td>
+
+                                        <div data-ng-show="ValidateAndGenerateEdi837Model.ShowLoader">
+
+                                            <div class="progress progress-striped active">
+                                                <div class="progress-bar progress-bar-warning" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+                                        <div data-ng-show="item.ShowResult">
+                                            <span data-ng-attr-class="{{item.ValidationPassed?'badge badge-success':'badge badge-danger'}}">{{item.ValidationPassed?'@Resource.Passed':'@Resource.Failed'}}</span>
+                                            <a target="_blank" data-ng-if="!item.ValidationPassed" data-ng-attr-href="{{item.ValidationErrorFilePath}}" download>@Resource.Download</a>
+                                        </div>
+
+                                    </td>
+                                    <td data-ng-show="!ValidateAndGenerateEdi837Model.ValidateOnly">
+                                        <div data-ng-show="ValidateAndGenerateEdi837Model.ShowLoader">
+                                            <div class="progress progress-striped active">
+                                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div data-ng-show="item.ShowResult" style="display:inline-flex;">
+                                            <span data-ng-attr-class="{{item.Edi837GenerationPassed?'badge badge-success':'badge badge-danger'}}">{{item.Edi837GenerationPassed?'@Resource.Passed':'@Resource.Failed'}}</span>
+                                            <a class="btn btn-info green-jungle gbtnposition" target="_blank" data-ng-if="item.ValidationPassed" data-ng-attr-href="{{item.Edi837FilePath}}" download>@Resource.Download</a>
+                                        </div>
+
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12" data-ng-if="ValidateAndGenerateEdi837Model.FilteredBatchList.length > 0">
+            <span class="label-italic">
+                <b class="font-red-thunderbird">@Resource.NoteLabel</b>
+                <span data-ng-if="ValidateAndGenerateEdi837Model.ValidateOnly">@Html.Raw(string.Format(@Resource.BatchValidationText, Resource.ValidateThisBatches))</span>
+                <span data-ng-if="!ValidateAndGenerateEdi837Model.ValidateOnly">@Html.Raw(string.Format(@Resource.BatchValidationText, Resource.ValidateBatchesAndGenerateEDI837))</span>
+            </span>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div data-ng-if="ValidateAndGenerateEdi837Model.FilteredBatchList.length == 0">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="alert alert-danger" data-ng-if="ValidateAndGenerateEdi837Model.EdiFileType == 1">
+                            @Html.Raw(string.Format(Resource.PayorEDIFileTypeNotMatchMessage, "Professional","P"))
+                        </div>
+                        <div class="alert alert-danger" data-ng-if="ValidateAndGenerateEdi837Model.EdiFileType == 2">
+                            @Html.Raw(string.Format(Resource.PayorEDIFileTypeNotMatchMessage, "Institutional","I"))
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@*@if (Common.HasPermission(Constants.Permission_Billing_Batch837))
+{*@
+<div class="modal-footer text-align-center" data-ng-if="ValidateAndGenerateEdi837Model.FilteredBatchList.length > 0" style="height:62px">
+    <button id="btnConfirm" class="btn btn-info" data-loading-text="{{ValidateAndGenerateEdi837Model.ValidateWaitText}}" data-ng-click="DoEdi837Action('#btnConfirm')">@Resource.YesContinue</button>
+    @if (Common.HasPermission(Constants.myEZcareClearingHouse))
+    {
+        <button id="btnSubmitClaim" style="display:none;" class="btn btn-info submit-claim" data-loading-text="{{ValidateAndGenerateEdi837Model.ValidateWaitText}}" data-ng-click="SubmitClaim('#btnSubmitClaim')">Submit Claim</button>
+    }
+    </div>
+@*}*@

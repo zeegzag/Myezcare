@@ -1,0 +1,436 @@
+﻿@model HC_AddPayorModel
+@section Styles {
+    <link href="@Url.Content("~/Assets/css/sitecss/site.css")" rel="stylesheet" type="text/css" />
+}
+
+<form class="form-horizontal" id="frmPayor">
+    <div class="col-lg-12 col-md-12 col-sm-12 no-padding">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="form-group row">
+                    <div class="col-sm-12">
+                        <div class="fscontainer">
+                            <div class="legend">
+                                @Resource.PayorDetails
+                            </div>
+
+                            <div class="row-cards">
+                                <div class="card" data-ng-click="ShowSearchPayorModalClick()">Payor/Plan</div>
+
+                                <div data-ng-if="ShowEnrollmentAction && PayorModel.Payor.EraPayorID && PayorModel.Payor.PayorID >0">
+                                    <div class="card" data-ng-if="PayorModel.Payor.ERAEnroll_Status == null || PayorModel.Payor.ERAEnroll_Status == ''"
+                                         data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_ERA')">
+                                        ERA Enrollment
+                                    </div>
+     
+                                    <div class="card" data-ng-if="PayorModel.Payor.ERAEnroll_Status == '1'"
+                                         data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_ERA')"
+                                         disabled="disabled">
+                                        ERA Enrollment
+                                    </div>
+                                    <div class="card" data-ng-if="PayorModel.Payor.ERAEnroll_Status == '0'"
+                                         data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_ERA')">
+                                        ERA Enrollment
+                                    </div>
+
+                                </div>
+                                <div data-ng-if="ShowEnrollmentAction && PayorModel.Payor.EraPayorID && PayorModel.Payor.PayorID >0">
+                                    <div class="card" data-ng-if="PayorModel.Payor.CMS1500Enroll_Status == null || PayorModel.Payor.CMS1500Enroll_Status == ''"
+                                         data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_CMS1500')">
+                                        CMS1500
+                                    </div>
+                                    <div class="card" data-ng-if="PayorModel.Payor.CMS1500Enroll_Status == '1'"
+                                         data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_CMS1500')"
+                                         disabled="disabled">
+                                        CMS1500
+                                    </div>
+                                    <div class="card" data-ng-if="PayorModel.Payor.CMS1500Enroll_Status == '0'"
+                                         data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_CMS1500')">
+                                        CMS1500
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-sm-6 no-padding">
+
+                                <div class="col-sm-12">
+
+                                    @*<div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">
+                                                Payor Action
+                                            </label>
+                                            <div class="col-md-8">
+
+                                                <input type="button" class="btn btn-sm blue-madison margin-right-10" data-ng-click="ShowSearchPayorModalClick()" value="Search for a new Payor, click here?" />
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group col-sm-12" data-ng-if="ShowEnrollmentAction && PayorModel.Payor.EraPayorID && PayorModel.Payor.PayorID >0">
+                                            <label class="col-md-4 control-label">
+                                                Enrollment Status
+                                            </label>
+                                            <div class="col-md-8">
+                                                <div data-ng-if="PayorModel.Payor.ERAEnroll_Status == null || PayorModel.Payor.ERAEnroll_Status == ''">
+                                                    <input type="button" class="btn btn-sm red-stripe grey-cascade  margin-right-10" data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_ERA')" value="ERA Enrollment - Pending - Click to Enroll" />
+                                                </div>
+
+                                                <div data-ng-if="PayorModel.Payor.ERAEnroll_Status == '1'">
+                                                    <input type="button" class="btn btn-sm green-stripe dark-green  margin-right-10" disabled="disabled" value="ERA Enrollment - Completed" />
+                                                </div>
+
+                                                <div data-ng-if="PayorModel.Payor.ERAEnroll_Status == '0'">
+                                                    <input type="button" class="btn btn-sm red-stripe red-flamingo  margin-right-10" data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_ERA')" value="ERA Enrollment - Failed - Click to Enroll" />
+                                                </div>
+
+                                            </div>
+                                        </div>
+
+
+                                        <div class="form-group col-sm-12" data-ng-if="ShowEnrollmentAction && PayorModel.Payor.EraPayorID && PayorModel.Payor.PayorID >0">
+                                            <label class="col-md-4 control-label">
+                                            </label>
+                                            <div class="col-md-8">
+                                                <div data-ng-if="PayorModel.Payor.CMS1500Enroll_Status == null || PayorModel.Payor.CMS1500Enroll_Status == ''">
+                                                    <input type="button" class="btn btn-sm  red-stripe grey-cascade margin-right-10" data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_CMS1500')" value="CMS 1500 Enrollment - Pending - Click to Enroll" />
+                                                </div>
+                                                <div data-ng-if="PayorModel.Payor.CMS1500Enroll_Status == '1'">
+                                                    <input type="button" class="btn btn-sm green-stripe dark-green  margin-right-10" disabled="disabled" value="CMS1500 Enrollment - Completed" />
+                                                </div>
+                                                <div data-ng-if="PayorModel.Payor.CMS1500Enroll_Status == '0'">
+                                                    <input type="button" class="btn btn-sm red-stripe red-flamingo  margin-right-10" data-ng-click="EnrollmentClick(PayorModel.Payor,'@Constants.Enroll_CMS1500')" value="CMS1500 Enrollment - Failed - Click to Enroll" />
+                                                </div>
+                                            </div>
+                                        </div>*@
+
+
+
+
+
+                                    @* This filed is connected with  AgencyNPID column in database.*@
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            CMS 1500 Payor ID
+                                            @*@Resource.PayorId*@
+                                            @*<i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.NPINumberHelptext"
+                                                data-ng-custom-class="tooltip-extra-z-index"></i>*@
+                                        </label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.Payor.PayorIdentificationNumber, new
+                                            {
+                                           @class = "form-control input-sm",
+                                                data_ng_model = "PayorModel.Payor.PayorIdentificationNumber"
+                                       })
+                                            @Html.ValidationMessageFor(q => q.Payor.PayorIdentificationNumber)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            ERA Payor ID
+                                        </label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.Payor.EraPayorID, new
+                                            {
+                                           @class = "form-control input-sm",
+                                                data_ng_model = "PayorModel.Payor.EraPayorID"
+                                       })
+                                            @Html.ValidationMessageFor(q => q.Payor.EraPayorID)
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.PayorName</label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.Payor.PayorName, new { @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.PayorName", placeholder = @Resource.PayorName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Payor.PayorName)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.ShortName</label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.Payor.ShortName, new { @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.ShortName", placeholder = @Resource.ShortName, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Payor.ShortName)
+                                        </div>
+                                    </div>
+                                    @*<div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label">@Resource.PayorSubmissionName</label>
+                                            <div class="col-md-8">
+                                                @Html.TextBoxFor(q => q.Payor.PayorSubmissionName, new { @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.PayorSubmissionName", placeholder = @Resource.PayorSubmissionName, maxlength = 50 })
+                                                @Html.ValidationMessageFor(q => q.Payor.PayorSubmissionName)
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">
+                                                @Resource.PayorNumber
+                                            </label>
+                                            <div class="col-md-8 col-sm-12 ">
+                                                @Html.TextBoxFor(q => q.Payor.PayorIdentificationNumber, new { @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.PayorIdentificationNumber", placeholder = @Resource.PayorNumber, maxlength = 30 })
+                                                @Html.ValidationMessageFor(q => q.Payor.PayorIdentificationNumber)
+                                            </div>
+                                        </div>*@
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.Address</label>
+                                        <div class="col-md-8">
+                                            @Html.TextAreaFor(q => q.Payor.Address, new { @class = "form-control input-sm requiredStrip", data_ng_model = "PayorModel.Payor.Address", placeholder = @Resource.Address, maxlength = 100, rows = "2" })
+                                            @Html.ValidationMessageFor(q => q.Payor.Address)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.City</label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.Payor.City, new { @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.City", placeholder = @Resource.City, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Payor.City)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.State</label>
+                                        <div class="col-md-8">
+                                            @Html.DropDownListFor(p => p.Payor.StateCode, Model.StateCodeList.ToSelectList("", "StateName", "StateCode", @Resource.Select, ""),
+                                            new
+                                            {
+                                                data_ng_model = "PayorModel.Payor.StateCode",
+                                                data_ng_init = "PayorModel.Payor.StateCode=PayorModel.Payor.StateCode==null?'AZ':PayorModel.Payor.StateCode.toString()",
+                                                @class = "form-control input-sm requiredStrip"
+                                            })
+                                            @Html.ValidationMessageFor(q => q.Payor.StateCode)
+                                        </div>
+                                    </div>
+                                    <div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">@Resource.ZipCode</label>
+                                        <div class="col-md-8">
+                                            @Html.TextBoxFor(q => q.Payor.ZipCode, new
+                                       {
+                                           @class = "form-control input-sm",
+                                           data_ng_model = "PayorModel.Payor.ZipCode",
+                                           maxlength = Resource.ZipCodemaxlength,
+                                           placeholder = Resource.ZipCodePlaceholder,
+
+                                           dir_valid_number = ""
+                                       })
+                                            @Html.ValidationMessageFor(q => q.Payor.ZipCode)
+                                            @*<zipcode type="text" ng-model="PayorModel.Payor.ZipCode" required="ZipCode is required" modelid="Zip" />*@
+                                        </div>
+                                    </div>
+
+                                    @*<div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.PayorType</label>
+                                            <div class="col-md-8">
+                                                <div class=" input-group-sm">
+                                                    @Html.DropDownListFor(p => p.Payor.PayorTypeID, Model.PayorTypeList.ToSelectList(Model.Payor.PayorTypeID.ToString() ?? "", "PayorTypeName", "PayorTypeID", @Resource.SelectPayor, ""), new
+                                                        {
+                                                            convert_to_number = "",
+
+                                                            data_ng_model = "PayorModel.Payor.PayorTypeID",
+                                                            data_ng_init = "PayorModel.Payor.PayorTypeID=PayorModel.Payor.PayorTypeID==''?null:PayorModel.Payor.PayorTypeID.toString()",
+                                                            @class = "form-control",
+                                                            //data_ng_class = "{'valid': !(PayorModel.Payor.PayorTypeID == null  || PayorModel.Payor.PayorTypeID == '' )}"
+                                                        })
+                                                    @Html.ValidationMessageFor(q => q.Payor.PayorTypeID)
+                                                </div>
+                                            </div>
+                                        </div>*@
+                                </div>
+                            </div>
+                            <div class="col-sm-6 no-padding">
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-5 control-label required">
+                                        @Resource.PayorInvoiceType
+                                    </label>
+                                    <div class="col-md-7">
+                                        @Html.DropDownListFor(m => m.Payor.PayorInvoiceType, Model.PayorInvoiceTypeList.ToSelectList(Convert.ToString(Model.Payor.PayorInvoiceType), "Name", "Value", Resource.Select, ""),
+                                       new
+                                       {
+                                           id = "PayorBillingType",
+                                           data_ng_model = "PayorModel.Payor.PayorInvoiceType",
+                                           data_ng_init = "PayorModel.Payor.PayorInvoiceType=PayorModel.Payor.PayorInvoiceType==''?null:PayorModel.Payor.PayorInvoiceType",
+                                           @class = "form-control input-sm requiredStrip"
+                                       })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Payor.PayorInvoiceType)
+                                </div>
+                                @*<div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label required">
+                                            @Resource.AgencyNPIID
+                                            <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.NPINumberHelptext"
+                                               data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Payor.AgencyNPID, new {
+                                           id = "NPI",
+                                           @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.AgencyNPID",
+                                           dir_valid_number = "",placeholder = "XXXXXXXXXX", maxlength = 10 })
+                                            @Html.ValidationMessageFor(q => q.Payor.AgencyNPID)
+                                        </div>
+                                    </div>*@
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-5 control-label">
+                                        @Resource.AgencyTaxNumber
+                                        <i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.AgencyTaxNumberHelptext"
+                                           data-ng-custom-class="tooltip-extra-z-index"></i>
+                                    </label>
+                                    <div class="col-md-7">
+                                        @Html.TextBoxFor(q => q.Payor.AgencyTaxNumber, new { @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.AgencyTaxNumber", placeholder = @Resource.AgencyTaxNumber, maxlength = 50 })
+                                        @Html.ValidationMessageFor(q => q.Payor.AgencyTaxNumber)
+                                    </div>
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-5 control-label">
+                                        @Resource.NPIOption
+                                        <a target="_blank" class="padding-top-5" href="@(Constants.HC_GeneralMasterURL+(int)Common.DDType.NPIOptions)">
+                                            <i class="fa fa-plus padding-left-10 font-size-15" data-ng-tooltip="@Resource.AddNPIOption" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </a>
+                                    </label>
+                                    <div class="col-md-7">
+                                        @Html.DropDownListFor(p => p.Payor.NPIOption, Model.NPIOptionsList.ToSelectList(Model.Payor.NPIOption.ToString() ?? "", "Name", "Value", @Resource.Select, "0"),
+                                          new
+                                          {
+                                              convert_to_number = "",
+                                              data_ng_model = "PayorModel.Payor.NPIOption",
+                                              data_ng_init = "PayorModel.Payor.NPIOption=(PayorModel.Payor.NPIOption==null || PayorModel.Payor.NPIOption==0 || PayorModel.Payor.NPIOption=='') ?'0':PayorModel.Payor.NPIOption.toString()",
+                                              data_ng_value = "PayorModel.Payor.NPIOption",
+                                              @class = "form-control input-sm"
+                                          })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Payor.NPIOption)
+                                </div>
+                                @*<div class="form-group col-sm-12">
+                                        <label class="col-md-4 control-label">@Resource.Taxenomy
+                                        </label>
+                                        <div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Payor.Taxenomy, new { @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.Taxenomy", placeholder = @Resource.Taxenomy, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Payor.Taxenomy)
+                                        </div>
+                                    </div>*@
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-5 control-label">
+                                        @Resource.PayerGroup
+                                        <a target="_blank" class="padding-top-5" href="@(Constants.HC_GeneralMasterURL+(int)Common.DDType.PayerGroup)">
+                                            <i class="fa fa-plus padding-left-10 font-size-15" data-ng-tooltip="@Resource.AddPayerGroup" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </a>
+                                    </label>
+                                    <div class="col-md-7">
+                                        @Html.DropDownListFor(p => p.Payor.PayerGroup, Model.PayerGroupList.ToSelectList(Model.Payor.PayerGroup.ToString() ?? "", "Name", "Value", @Resource.Select, "0"),
+                                          new
+                                          {
+                                              convert_to_number = "",
+                                              data_ng_model = "PayorModel.Payor.PayerGroup",
+                                              data_ng_init = "PayorModel.Payor.PayerGroup=(PayorModel.Payor.PayerGroup==null || PayorModel.Payor.PayerGroup==0 || PayorModel.Payor.PayerGroup=='') ?'0':PayorModel.Payor.PayerGroup.toString()",
+                                              data_ng_value = "PayorModel.Payor.PayerGroup",
+                                              @class = "form-control input-sm"
+                                          })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Payor.PayerGroup)
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-5 control-label">
+                                        @Resource.BussinessLine
+                                        <a target="_blank" class="padding-top-5" href="@(Constants.HC_GeneralMasterURL+(int)Common.DDType.BussinessLine)">
+                                            <i class="fa fa-plus padding-left-10 font-size-15" data-ng-tooltip="@Resource.AddBussinessLine" data-ng-custom-class="tooltip-extra-z-index"></i>
+                                        </a>
+                                    </label>
+                                    <div class="col-md-7">
+                                        @Html.DropDownListFor(p => p.Payor.BussinessLine, Model.BussinessLineList.ToSelectList(Model.Payor.BussinessLine.ToString() ?? "", "Name", "Value", @Resource.Select, "0"),
+                                          new
+                                          {
+                                              convert_to_number = "",
+                                              data_ng_model = "PayorModel.Payor.BussinessLine",
+                                              data_ng_init = "PayorModel.Payor.BussinessLine=(PayorModel.Payor.BussinessLine==null || PayorModel.Payor.BussinessLine==0 || PayorModel.Payor.BussinessLine=='') ?'0':PayorModel.Payor.BussinessLine.toString()",
+                                              data_ng_value = "PayorModel.Payor.BussinessLine",
+                                              @class = "form-control input-sm"
+                                          })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Payor.BussinessLine)
+                                </div>
+                                <div class="form-group col-sm-12" data-ng-if="PayorModel.Payor.PayorInvoiceType == @((int)Common.PayorInvoiceType.Insurance)">
+                                    <label class="col-md-5 control-label required">
+                                        @Resource.PayorBillingType
+                                    </label>
+                                    <div class="col-md-7">
+                                        @Html.DropDownListFor(m => m.Payor.PayorBillingType, Model.PayorBillingTypeList.ToSelectList(Convert.ToString(Model.Payor.PayorBillingType), "Name", "Value", Resource.Select, ""),
+                                       new
+                                       {
+                                           id = "PayorBillingType",
+                                           data_ng_model = "PayorModel.Payor.PayorBillingType",
+                                           data_ng_init = "PayorModel.Payor.PayorBillingType=PayorModel.Payor.PayorBillingType==''?null:PayorModel.Payor.PayorBillingType",
+                                           @class = "form-control input-sm"
+                                       })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Payor.PayorBillingType)
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-5 control-label">
+                                        @Resource.NPINumber
+                                        @*<i class="fa fa-question-circle font-size-15" data-ng-tooltip="@Resource.NPINumber"
+                                            data-ng-custom-class="tooltip-extra-z-index"></i>*@
+                                    </label>
+                                    @*<div class="col-md-7">
+                                            @Html.TextBoxFor(q => q.Payor.NPINumber, new { @class = "form-control input-sm", data_ng_model = "PayorModel.Payor.NPINumber", placeholder = @Resource.NPINumber, maxlength = 50 })
+                                            @Html.ValidationMessageFor(q => q.Payor.NPINumber)
+                                        </div>*@
+                                    <div class="col-md-7">
+                                        @Html.DropDownListFor(p => p.Payor.NPINumber, Model.NPINumberList.ToSelectList(Model.Payor.NPINumber.ToString() ?? "", "Name", "Value", @Resource.Select, "0"),
+                                          new
+                                          {
+                                              convert_to_number = "",
+                                              data_ng_model = "PayorModel.Payor.NPINumber",
+                                              data_ng_init = "PayorModel.Payor.BussinessLine=(PayorModel.Payor.NPINumber==null || PayorModel.Payor.NPINumber==0 || PayorModel.Payor.BussinessLine=='') ?'0':PayorModel.Payor.BussinessLine.toString()",
+                                              data_ng_value = "PayorModel.Payor.NPINumber",
+                                              @class = "form-control input-sm"
+                                          })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Payor.NPINumber)
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-5 control-label">
+                                        @Resource.ClaimProcessor
+                                    </label>
+                                    <div class="col-md-7">
+                                        @Html.DropDownListFor(p => p.Payor.ClaimProcessor, Model.PayorClaimProcessorList.ToSelectList(Model.Payor.ClaimProcessor ?? "", "Name", "Value", @Resource.Select, ""),
+                                          new
+                                          {
+                                              data_ng_model = "PayorModel.Payor.ClaimProcessor",
+                                              data_ng_init = "PayorModel.Payor.ClaimProcessor=(!PayorModel.Payor.ClaimProcessor) ?'':PayorModel.Payor.ClaimProcessor",
+                                              data_ng_value = "PayorModel.Payor.ClaimProcessor",
+                                              @class = "form-control input-sm"
+                                          })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Payor.ClaimProcessor)
+                                </div>
+                                <div class="form-group col-sm-12">
+                                    <label class="col-md-5 control-label">
+                                        @Resource.VisitBilledBy
+                                    </label>
+                                    <div class="col-md-7">
+                                        @Html.DropDownListFor(p => p.Payor.VisitBilledBy, Model.PayorVisitBilledByList.ToSelectList(Model.Payor.VisitBilledBy ?? "", "Name", "Value", @Resource.Select, ""),
+                                          new
+                                          {
+                                              data_ng_model = "PayorModel.Payor.VisitBilledBy",
+                                              data_ng_init = "PayorModel.Payor.VisitBilledBy=(!PayorModel.Payor.VisitBilledBy) ?'':PayorModel.Payor.VisitBilledBy",
+                                              data_ng_value = "PayorModel.Payor.VisitBilledBy",
+                                              @class = "form-control input-sm"
+                                          })
+                                    </div>
+                                    @Html.ValidationMessageFor(m => m.Payor.VisitBilledBy)
+                                </div>
+                                @*<div class="form-group col-sm-push-2 col-sm-10" data-ng-if="PayorSetting">
+                                        <div class="note note-warning">
+                                            <h4 class="block">@Resource.PayorSettingMissingTitle </h4>
+                                            <p>@Resource.PayorSettingMissingDetail </p>
+                                        </div>
+                                    </div>*@
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12 form-group no-margin no-padding text-center">
+                    <input type="submit" data-ng-click="SavePayorDetails()" class="btn btn-sm green-jungle" value="@(Model.Payor != null && Model.Payor.PayorID > 0 ? Resource.Update : @Resource.Save)" />
+                    <a class="wzd-cancel">
+                        <input type="button" class="btn btn-sm red-mint margin-right-10" data-ng-click="Cancel()" value="@Resource.Cancel" />
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

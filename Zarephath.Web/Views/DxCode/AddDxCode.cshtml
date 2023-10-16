@@ -1,0 +1,146 @@
+﻿@{
+    ViewBag.Title = string.Format("{0} {1}", Resource.ZarePhath, (Model != null && Model.DxCode != null && Model.DxCode.DXCodeID > 0 ? Resource.EditDxCode : Resource.AddDxCode));
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewBag.SelectedMenuItem = Resource.SMI_DxCodeAdd;
+}
+
+@model AddDxCodeModel
+
+@if (Model != null)
+{
+    @Html.Hidden("hdnDxCodeModel", Common.SerializeObject(Model))
+    <div data-ng-controller="AddDxCodeController">
+        <form class="form-horizontal" id="frmDxCode">
+            <div class="page-bar">
+                <h3 class="page-title">
+                    @(Model != null && Model.DxCode != null && Model.DxCode.DXCodeID > 0 ? Resource.EditDxCode : Resource.AddDxCode)
+                    <small>@Resource.EnterDxCodeInformation</small>
+                    <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.DxCode != null && (Model.DxCode.DXCodeID > 0) ? Resource.Update : Resource.Save)" />
+                    <input type="button" data-ng-click="Cancel()" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                </h3>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="form-group row">
+                        <div class="col-sm-12">
+                            <div class="fscontainer">
+                                <div class="legend">
+                                    @Resource.DxCodeDetails
+                                </div>
+
+                                <div class="col-sm-push-2 col-sm-7 no-padding">
+                                    <div class="col-sm-12">
+                                        
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.DXCodeType</label>
+                                            <div class="col-md-8 col-sm-12">
+                                                @Html.DropDownListFor(p => p.DxCode.DxCodeType, Model.DxCodeTypes.ToSelectList(Model.DxCode.DxCodeType ?? "", "DxCodeTypeName", "DxCodeTypeID", @Resource.SelectDxCodeType, ""),
+                                                                      new
+                                                                          {                                                                            
+                                                                              data_ng_model = "DxCodeModel.DxCode.DxCodeType",
+                                                                              data_ng_init = "DxCodeModel.DxCode.DxCodeType=DxCodeModel.DxCode.DxCodeType==''?null:DxCodeModel.DxCode.DxCodeType",
+                                                                              @class = "form-control input-sm",                                                                            
+
+                                                                          })
+                                                @Html.ValidationMessageFor(q => q.DxCode.DxCodeType)
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.DXCodeWithoutDot</label>
+                                            <div class="col-md-8 col-sm-12">
+                                                @Html.TextBoxFor(q => q.DxCode.DXCodeWithoutDot, new
+                                                    {
+                                                        @class = "form-control input-sm",
+                                                        data_ng_model = "DxCodeModel.DxCode.DXCodeWithoutDot",
+                                                        placeholder = Resource.DXCodeWithoutDot,
+                                                        maxlength = 20
+                                                    })
+                                                @Html.ValidationMessageFor(q => q.DxCode.DXCodeWithoutDot)
+
+                                            </div>                                            
+                                        </div>
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.DXCode</label>
+                                            <div class="col-md-8 col-sm-12">
+                                                @Html.TextBoxFor(q => q.DxCode.DXCodeName, new
+                                                    {
+                                                        @class = "form-control input-sm",
+                                                        data_ng_model = "DxCodeModel.DxCode.DXCodeName",
+                                                        placeholder = Resource.DXCodeName,
+                                                        maxlength = 100
+                                                    })
+                                                @Html.ValidationMessageFor(q => q.DxCode.DXCodeName)
+                                            </div>
+                                            <span class="margin-top-10 col-md-push-4 col-md-8 col-sm-12"><b>E.g:</b>
+                                                <br />
+                                                DxCode without dot - 'T7402'<br />
+                                                DXCode - 'T74.02'
+                                            </span>
+                                        </div>
+                                        <div class="form-group col-sm-12">
+
+                                            <label class="col-md-4 control-label">@Resource.Description</label>
+                                            <div class="col-md-8 col-sm-12 textarea-field">
+                                                @Html.TextAreaFor(q => q.DxCode.Description, new { @class = "form-control input-sm", data_ng_model = "DxCodeModel.DxCode.Description", placeholder = Resource.Description, rows = 6, maxlength = 500 })
+                                                @Html.ValidationMessageFor(q => q.DxCode.Description)
+                                            </div>
+
+                                        </div>
+                                        @*TODO: As per client requirement we are removing start date and end date from dx code*@
+                                        @*<div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">
+                                                @Resource.StartDate
+                                            </label>
+                                            <div class="col-md-8 col-sm-12">
+                                                <div class="input-group col-md-12" datepicker="DxCodeModel.DxCode.EffectiveFrom"
+                                                    data-ng-dateval="DxCodeModel.DxCode.EffectiveFrom"
+                                                    data-ng-maxdate="DxCodeModel.DxCode.EffectiveTo">
+                                                    @Html.TextBoxFor(q => q.DxCode.EffectiveFrom, new { @class = "form-control date input-sm dateInputMask", placeholder = Resource.StartDate })
+                                                    @Html.ValidationMessageFor(q => q.DxCode.EffectiveFrom)
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-sm-12">
+                                            <label class="col-md-4 control-label required">@Resource.EndDate</label>
+                                            <div class="col-md-8 col-sm-12">
+                                                <div class="input-group  col-md-12" datepicker="DxCodeModel.DxCode.EffectiveTo" data-ng-dateval="DxCodeModel.DxCode.EffectiveTo"
+                                                    data-ng-mindate="DxCodeModel.DxCode.EffectiveFrom">
+                                                    @Html.TextBoxFor(q => q.DxCode.EffectiveTo, new { @class = "form-control date input-sm dateInputMask", placeholder = Resource.EndDate })
+                                                    @Html.ValidationMessageFor(q => q.DxCode.EffectiveTo)
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                            </div>
+                                        </div>*@
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12 form-group no-margin no-padding">
+                        <input type="submit" data-ng-click="Save()" class="btn btn-sm green-jungle pull-right" value="@(Model != null && Model.DxCode != null && (Model.DxCode.DXCodeID > 0) ? Resource.Update : Resource.Save)" />
+                        <a href="@Constants.DXCodeListURL">
+                            <input type="button" class="btn btn-sm red-mint pull-right margin-right-10" value="@Resource.Cancel" />
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+
+
+
+
+
+        </form>
+    </div>
+}
+
+@section Scripts{
+    @Scripts.Render("~/assets/js/viewjs/siteApp/dxcode/adddxcode")
+}

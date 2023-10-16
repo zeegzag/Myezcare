@@ -1,0 +1,801 @@
+﻿@model GroupNoteModel
+<div class="col-lg-7 col-md-7 col-sm-7 col-xs-12 no-padding margin-top-minus-10">
+    <h3 class="inline col-md-6 padding-left-0">@Resource.CompleteGroupNote</h3>
+</div>
+<hr class="clearfix" />
+
+<div class="col-lg-12 col-md-12 col-sm-12 no-padding">
+    <a href="#" class="btn btn-default" data-ng-click="ExpandAll()">@Resource.OpenAll</a> <a href="#" class="btn btn-default" data-ng-click="CollapseAll()">@Resource.CloseAll</a>
+    <a href="#" class="btn btn-default" data-ng-click="SwitchView()">@Resource.SwitchView</a>
+    <br />
+    <div class="col-md-12 no-padding margin-top-15">
+        <div class="panel-group" id="accordion" data-ng-if="SelectedClients">
+            <div class="padding-left-right-10 padding-bottom-10" data-ng-class="{'clear-right':$index % 2 !=0,'clear-left':$index % 2 ==0,'col-lg-12 col-md-12 col-sm-12':ColSizeOne,'col-lg-6 col-md-6 col-sm-12':!ColSizeOne}" data-ng-repeat="referralNote in SelectedClients">
+                <div class="form-group" id="group-note-panel">
+                    <div class="panel panel-default">
+                        <div class="panel-heading accordion-toggle curser-pointer">
+                            <div class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="{{'#collapse'+referralNote.ReferralID}}">{{referralNote.Name}}
+                                    <span>
+                                        <small><b>({{referralNote.AHCCCSID}}, @Resource.CISLabel: {{referralNote.CISNumber}})</b></small>
+                                        <small><b>&nbsp;&nbsp;@Resource.Payor</b>: <u>{{referralNote.PayorName}}</u></small>
+                                    </span>
+                                </a>
+
+                                <a class="pull-right margin-left-05 btn btn-xs red" data-ng-click="referralNote.RemoveClient(referralNote)">@Resource.Delete</a>
+                                <a class="pull-right margin-left-05 btn btn-xs blue" data-ng-click="referralNote.ValidateForm('frmNote-'+referralNote.ReferralID)">
+                                    <span class="error badge badge-danger font-white" data-ng-if="referralNote.ErrorCount.length>0">{{referralNote.ErrorCount.length}}</span>
+                                    <span class="error badge badge-success font-white" style="display: none;">@Resource.P</span>
+                                    &nbsp;@Resource.Validate
+                                </a>
+                            </div>
+                        </div>
+                        <div id="{{'collapse'+referralNote.ReferralID}}" class="panel-collapse collapse">
+                            <div class="panel-body">
+                                <form id="{{'frmNote-'+referralNote.ReferralID}}">
+                                    <div class="row">
+                                        <div class="clearfix">
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label required">@Resource.ServiceDate</label>
+                                                <i class="fa fa-question-circle font-red" data-ng-tooltip="@Resource.ServiceDateMessage"
+                                                   data-ng-custom-class="tooltip-extra-z-index"
+                                                   data-ngbg-color-class="bg-red"
+                                                    data-ngbg-arrow-color-class="tooltip-arrow-red"></i>
+                                                <div class="input-group date" datepicker="referralNote.Note.ServiceDate" ng-dateval="referralNote.Note.ServiceDate" data-ng-maxdate="CurrentDate">
+                                                    <input class="form-control input-sm dateInputMask validateElement"
+                                                               maxlength="10"                                                
+                                                               data-val="true" 
+                                                               data-error-Count = "referralNote.ErrorCount"
+                                                               data-val-required="@Resource.ServiceDateRequired"
+                                                               type="text" placeholder="@Resource.ServiceDate" 
+                                                               data-ng-attr-id = "{{ 'Note_ServiceDate' + referralNote.ReferralID }}"
+                                                               data-ng-attr-name = "{{ 'Note.ServiceDate' + referralNote.ReferralID }}" />
+                                                    <span class="input-group-addon"><i class="fa fa-calendar"></i></span>
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.ServiceDate)
+                                            </div>
+
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label required">@Resource.ServiceCodeType</label>
+                                                <div>
+                                                    <select class="form-control input-sm validateElement"
+                                                                data-convert-to-number = ""
+                                                                data-ng-init="referralNote.Note.ServiceCodeType=(referralNote.Note.ServiceCodeType==null || referralNote.Note.ServiceCodeType==0 || referralNote.Note.ServiceCodeType=='') ?'':referralNote.Note.ServiceCodeType.toString()"
+                                                                data-ng-model="referralNote.Note.ServiceCodeType"
+                                                                data-val="true"
+                                                                data-val-required="@Resource.ServiceCodeTypeRequired"
+                                                                data-error-Count = "referralNote.ErrorCount"
+                                                                data-ng-attr-id = "{{ 'Note_ServiceCodeType' + referralNote.ReferralID }}"
+                                                                data-ng-attr-name = "{{ 'Note.ServiceCodeType' }}">
+                                                        <option value="">@Resource.Select</option>
+                                                        <option data-ng-repeat="option in GroupNoteModel.ServiceCodeTypes" value="{{option.ServiceCodeTypeID}}">{{option.ServiceCodeTypeName}}</option>
+                                                    </select>
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.ServiceCodeType, "", new { data_ng_attr_valmsg_for = "{{ 'Note.ServiceCodeType'}}" })
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label" data-ng-class="{'required':referralNote.Note.ServiceCodeType != OtherServiceCode && referralNote.Note.ServiceCodeType > 0}">@Resource.BillingProvider</label>
+                                                <div>
+
+                                                    @Html.DropDownListFor(p => p.Note.BillingProviderID, Model.Facilities.ToSelectList(Model.Note.BillingProviderID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                                              new
+                                                                                  {
+                                                                                      convert_to_number = "",
+                                                                                      data_ng_model = "referralNote.Note.BillingProviderID",
+                                                                                      data_ng_init = "referralNote.Note.BillingProviderID=(referralNote.Note.BillingProviderID==null || referralNote.Note.BillingProviderID==0 || referralNote.Note.BillingProviderID=='') ?'':referralNote.Note.BillingProviderID.toString()",
+                                                                                      data_ng_value = "referralNote.Note.BillingProviderID",
+                                                                                      //data_ng_options = "col.Value as col.Name for col in referralNote.Facilities track by col.Value",
+                                                                                      data_ng_options = "col.Value as col.Name for col in GroupNoteModel.Facilities track by col.Value",
+                                                                                      @class = "form-control input-sm validateElement",
+                                                                                      data_error_Count = "referralNote.ErrorCount",
+                                                                                      data_ng_attr_id = "{{ 'Note_BillingProviderID' + referralNote.ReferralID }}",
+                                                                                      data_ng_attr_name = "{{ 'Note.BillingProviderID' + referralNote.ReferralID }}"
+                                                                                  })
+
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.BillingProviderID, "", new { data_ng_attr_valmsg_for = "{{ 'Note.BillingProviderID' + referralNote.ReferralID }}" })
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label" data-ng-class="{'required':referralNote.Note.ServiceCodeType != OtherServiceCode && referralNote.Note.ServiceCodeType > 0}">@Resource.RenderingProvider</label>
+                                                <div>
+                                                    @Html.DropDownListFor(p => p.Note.RenderingProviderID, Model.Facilities.ToSelectList(Model.Note.RenderingProviderID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                                              new
+                                                                                  {
+                                                                                      convert_to_number = "",
+                                                                                      data_ng_model = "referralNote.Note.RenderingProviderID",
+                                                                                      data_ng_init = "referralNote.Note.RenderingProviderID=(referralNote.Note.RenderingProviderID==null || referralNote.Note.RenderingProviderID==0 || referralNote.Note.RenderingProviderID=='') ?'':referralNote.Note.RenderingProviderID.toString()",
+                                                                                      data_ng_value = "referralNote.Note.RenderingProviderID",
+                                                                                      //data_ng_options = "col.Value as col.Name for col in referralNote.Facilities track by col.Value",
+                                                                                      data_ng_options = "col.Value as col.Name for col in GroupNoteModel.Facilities track by col.Value",
+                                                                                      @class = "form-control input-sm validateElement",
+                                                                                      data_error_Count = "referralNote.ErrorCount",
+                                                                                      data_ng_attr_id = "{{ 'Note_RenderingProviderID' + referralNote.ReferralID }}",
+                                                                                      data_ng_attr_name = "{{ 'Note.RenderingProviderID' + referralNote.ReferralID }}"
+                                                                                  })
+
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.RenderingProviderID, "", new { data_ng_attr_valmsg_for = "{{ 'Note.RenderingProviderID' + referralNote.ReferralID }}" })
+                                            </div>
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                            <label class="control-label required">@Resource.ZSPService</label>
+                                            <div>
+
+                                                @Html.DropDownListFor(p => p.Note.ZarephathService, Model.Facilities.ToSelectList(Model.Note.ZarephathService ?? "", "Value", "Value", @Resource.Select, ""),
+                                                                          new
+                                                                              {
+                                                                                  //convert_to_number = "",
+                                                                                  data_ng_model = "referralNote.Note.ZarephathService",
+                                                                                  data_ng_init = "referralNote.Note.ZarephathService=(referralNote.Note.ZarephathService==null || referralNote.Note.ZarephathService==0 || referralNote.Note.ZarephathService=='') ?'':referralNote.Note.ZarephathService.toString()",
+                                                                                  data_ng_value = "referralNote.Note.ZarephathService",
+                                                                                  data_ng_options = "option.Value as option.Value for option in GroupNoteModel.Services track by option.Value",
+                                                                                  @class = "form-control input-sm validateElement",
+                                                                                  data_error_Count = "referralNote.ErrorCount",
+                                                                                  data_ng_attr_id = "{{ 'Note_ZarephathService' + referralNote.ReferralID }}",
+                                                                                  data_ng_attr_name = "{{ 'Note.ZarephathService' + referralNote.ReferralID }}"
+                                                                              })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.Note.ZarephathService, "", new { data_ng_attr_valmsg_for = "{{ 'Note.ZarephathService' + referralNote.ReferralID }}" })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="referralNote.Note.ServiceCodeType > 0 && referralNote.Note.ServiceCodeType!= OtherServiceCode">
+                                            <label class="control-label">@Resource.ServiceCode</label>
+
+                                            @Html.TextBoxFor(x => x.Note.ServiceCodeID,
+                                                                 new
+                                                                     {
+                                                                         ng_model = "referralNote.Note.ServiceCodeID",
+                                                                         @class = "form-control  hideErrorContent replaceErrorSource validateElement",
+                                                                         data_error_Count = "referralNote.ErrorCount",
+                                                                         data_ng_attr_id = "{{ 'Note_ServiceCodeID' + referralNote.ReferralID }}",
+                                                                         data_ng_attr_name = "{{ 'Note.ServiceCodeID' }}",
+                                                                         tabindex = "-1"
+                                                                     })
+                                            <div class="replaceErrorDest">
+                                                <input type="text"
+                                                           token-input
+                                                           ng-val="referralNote.Note.ServiceCodeID"
+                                                           textfield='ServiceCode'
+                                                           valuefield='ServiceCodeID'
+                                                           searchurl="{{GetServiceCodesURL}}"
+                                                           placeholder="@Resource.EnterServiceCode"
+                                                           tokenlimit='1'
+                                                           onresultsformatter='referralNote.ServiceCodeResultsFormatter'
+                                                           onaddedcallback='referralNote.AddedServiceCode'
+                                                           ondeletecallback='referralNote.RemoveServiceCode'
+                                                           ontokenformatter="referralNote.ServiceCodeTokenFormatter"
+                                                           additional-filter-value="referralNote.AdditionFilterForServiceCode"                                           
+                                                           additional-filter-text="searchParam"
+                                                           autoSelectFirstResult="true"
+                                                           minChars="0"
+                                                           tokeninputobj="referralNote.ServiceCodeTokenObj"
+                                                           id="ServiceCodeIDToken"
+                                                           customclass="form-control input-sm"
+                                                        />
+                                            </div>
+                                            @Html.ValidationMessageFor(x => x.Note.ServiceCodeID, "", new { data_ng_attr_valmsg_for = "{{ 'Note.ServiceCodeID' }}" })
+                                        </div>
+                                        <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="referralNote.Note.ServiceCodeType!=OtherServiceCode">@*data-ng-show="referralNote.Note.ServiceCodeID > 0"*@
+                                            <label class="control-label">@Resource.POS{{referralNote.Note.PosID}}</label>
+                                            <div>
+                                                @Html.DropDownListFor(p => p.Note.PosID, Model.PosCodes.ToSelectList(Model.Note.PosID.ToString() ?? "", "PosName", "PosID", @Resource.Select, ""),
+                                                                          new
+                                                                              {
+
+                                                                                  data_ng_model = "referralNote.Note.PosID",
+                                                                                  data_ng_init = "referralNote.Note.PosID=(referralNote.Note.PosID==null || referralNote.Note.PosID==0 || referralNote.Note.PosID=='') ?'':referralNote.Note.PosID.toString()",
+                                                                                  data_ng_value = "referralNote.Note.PosID",
+                                                                                  data_ng_options = "option.PosID as option.PosName for option in referralNote.PosCodes track by option.PosID",
+                                                                                  @class = "form-control input-sm validateElement",
+                                                                                  data_error_Count = "referralNote.ErrorCount",
+                                                                                  data_ng_attr_id = "{{ 'Note_PosID' + referralNote.ReferralID }}",
+                                                                                  data_ng_attr_name = "{{ 'Note.PosID' + referralNote.ReferralID }}",
+                                                                                  //convert_to_number = ""
+                                                                              })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.Note.PosID, "", new { data_ng_attr_valmsg_for = "{{ 'Note.PosID' + referralNote.ReferralID }}" })
+                                        </div>
+
+                                        <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="referralNote.Note.ServiceCodeType!=OtherServiceCode">
+                                            <label class="control-label">@Resource.POSDetails</label>
+                                            <div>
+                                                @Html.TextBoxFor(x => x.Note.POSDetail,
+                                                                     new
+                                                                         {
+                                                                             ng_model = "referralNote.Note.POSDetail",
+                                                                             @class = "form-control input-sm  validateElement",
+                                                                             data_error_Count = "referralNote.ErrorCount",
+                                                                             data_ng_disabled = "referralNote.Note.PosID!=OtherPOS",
+                                                                             data_ng_attr_id = "{{ 'Note_POSDetail' + referralNote.ReferralID }}",
+                                                                             data_ng_attr_name = "{{ 'Note.POSDetail' + referralNote.ReferralID }}"
+                                                                         })
+                                            </div>
+                                            @Html.ValidationMessageFor(m => m.Note.POSDetail, "", new { data_ng_attr_valmsg_for = "{{ 'Note.POSDetail' + referralNote.ReferralID }}" })
+                                        </div>
+                                        <div class="clearfix">
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="referralNote.SelectedServiceCodeForPayor.UnitType>0">
+                                                <label class="control-label">@Resource.StartTime</label>
+                                                @Html.TextBoxFor(x => x.Note.StrStartTime,
+                                                                     new
+                                                                         {
+                                                                             ng_model = "referralNote.Note.StrStartTime",
+                                                                             @class = "form-control input-sm validateElement",
+                                                                             data_error_Count = "referralNote.ErrorCount",
+                                                                             placeholder = @Resource.StartTime,
+                                                                             data_ng_attr_id = "{{ 'Note_strStartTime' + referralNote.ReferralID }}",
+                                                                             data_ng_attr_name = "{{ 'Note_strStartTime' + referralNote.ReferralID }}",
+                                                                             time_input_mask = "",
+                                                                         })
+                                                @Html.ValidationMessageFor(m => m.Note.StrStartTime, "", new { data_ng_attr_valmsg_for = "{{ 'Note_strStartTime' + referralNote.ReferralID }}" })
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="referralNote.SelectedServiceCodeForPayor.UnitType>0">
+                                                <label class="control-label">@Resource.EndTime</label>
+                                                @Html.TextBoxFor(x => x.Note.StrEndTime,
+                                                                     new
+                                                                         {
+                                                                             ng_model = "referralNote.Note.StrEndTime",
+                                                                             @class = "form-control input-sm",
+                                                                             placeholder = @Resource.EndTime,
+                                                                             compare_with = "{{ '#Note_strStartTime' + referralNote.ReferralID }}",
+                                                                             validation_timecompare = "",
+                                                                             data_ng_attr_id = "{{ 'Note_NotestrEndTime' + referralNote.ReferralID }}",
+                                                                             data_ng_attr_name = "{{ 'Note_NotestrEndTime' + referralNote.ReferralID }}",
+                                                                             time_input_mask = ""
+                                                                         })
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="referralNote.SelectedServiceCodeForPayor.UnitType==DistanceInMilesUnit || referralNote.SelectedServiceCodeForPayor.UnitType==StopUnit">
+                                                <label class="control-label">@Resource.StartMile</label>
+                                                <div>
+                                                    @Html.TextBoxFor(x => x.Note.StartMile,
+                                                                         new
+                                                                             {
+                                                                                 ng_model = "referralNote.Note.StartMile",
+                                                                                 @class = "form-control input-sm validateElement",
+                                                                                 data_error_Count = "referralNote.ErrorCount",
+                                                                                 placeholder = @Resource.StartMile,
+                                                                                 dir_valid_decimal = "",
+                                                                                 data_ng_attr_id = "{{ 'Note_StartMile' + referralNote.ReferralID }}",
+                                                                                 data_ng_attr_name = "{{ 'Note.StartMile' + referralNote.ReferralID }}",
+                                                                                 maxlength = "10"
+                                                                             })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.StartMile, "", new { data_ng_attr_valmsg_for = "{{ 'Note.StartMile' + referralNote.ReferralID }}" })
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-if="referralNote.SelectedServiceCodeForPayor.UnitType==DistanceInMilesUnit || referralNote.SelectedServiceCodeForPayor.UnitType==StopUnit">
+                                                <label class="control-label">@Resource.EndMile</label>
+                                                <div>
+                                                    @Html.TextBoxFor(x => x.Note.EndMile,
+                                                                         new
+                                                                             {
+                                                                                 ng_model = "referralNote.Note.EndMile",
+                                                                                 min = "{{referralNote.Note.StartMile}}",
+                                                                                 @class = "form-control input-sm validateElement",
+                                                                                 data_error_Count = "referralNote.ErrorCount",
+                                                                                 placeholder = @Resource.EndMile,
+                                                                                 dir_valid_decimal = "",
+                                                                                 data_ng_attr_id = "{{ 'Note_EndMile' + referralNote.ReferralID }}",
+                                                                                 data_ng_attr_name = "{{ 'Note.EndMile' + referralNote.ReferralID }}",
+                                                                                 maxlength = "10"
+                                                                             })
+                                                </div>
+                                                @Html.ValidationMessageFor(m => m.Note.EndMile, "", new { data_ng_attr_valmsg_for = "{{ 'Note.EndMile' + referralNote.ReferralID }}" })
+                                            </div>
+                                        </div>
+
+                                        <div class="form-group col-lg-12 col-md-12 col-sm-12 pulsateControls" data-ng-show="((referralNote.SelectedServiceCodeForPayor.AvailableDailyUnit*1) < (referralNote.SelectedServiceCodeForPayor.CalculatedUnit*1))">
+                                            <div class="alert alert-danger margin-bottom-0">
+                                                <strong>@Resource.Note**:&nbsp;</strong> @Resource.DailyLimitExceedMsg
+                                            </div>
+                                            @*<i><span class="font-red font-weight-600">@Resource.Note**:&nbsp;</span><span class="">@Resource.DailyLimitExceedMsg</span></i>*@
+                                        </div>
+
+                                        <div class="col-md-12" data-ng-show="referralNote.SelectedServiceCodeForPayor.UnitType>0">
+                                            <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12 no-padding block">
+                                                <div class="mt-element-ribbon bg-grey-steel">
+                                                    <div class="ribbon ribbon-color-info uppercase">@Resource.UnitDetails :</div>
+                                                    <div class="row margin-left-110">
+                                                        <div class="row margin-bottom-10 padding-left-right-10">
+
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><b>@Resource.MaxUnitDetails</b></label><hr />
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><b>@Resource.DailyUnitDetails</b>&nbsp; {{referralNote.Note.ServiceDate | dateformat}}</label><hr />
+                                                            </div>
+
+
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><span class="UnitCalculation">@Resource.MaxUnitLimit:</span> {{referralNote.SelectedServiceCodeForPayor.MaxUnit > 0 ? referralNote.SelectedServiceCodeForPayor.MaxUnit  +' @Resource.UN':'@Resource.Unlimited'}}</label>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><span class="UnitCalculation">@Resource.DailyUnitLimit:</span> {{referralNote.SelectedServiceCodeForPayor.DailyUnitLimit > 0 ? referralNote.SelectedServiceCodeForPayor.DailyUnitLimit  +' @Resource.UN':'@Resource.Unlimited'}}</label>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><span class="UnitCalculation">@Resource.RemainingMaxUnit:</span> {{referralNote.SelectedServiceCodeForPayor.MaxUnit == 0 ? '@Resource.Unlimited' : referralNote.SelectedServiceCodeForPayor.AvailableMaxUnit  +' @Resource.UN'}}</label>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><span class="UnitCalculation">@Resource.RemainingDailyUnit:</span> {{referralNote.SelectedServiceCodeForPayor.DailyUnitLimit == 0 && referralNote.SelectedServiceCodeForPayor.MaxUnit == 0 ? '@Resource.Unlimited' : referralNote.SelectedServiceCodeForPayor.AvailableDailyUnit +' @Resource.UN'}}</label>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><span class="UnitCalculation">@Resource.TotalUsedUnit:</span> {{referralNote.SelectedServiceCodeForPayor.TotalUsedUnit +' @Resource.UN'}}</label>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><span class="UnitCalculation">@Resource.TodayUsedUnit:</span> {{referralNote.SelectedServiceCodeForPayor.TodayUsedUnit +' @Resource.UN'}}</label>
+                                                            </div>
+                                                        </div>
+                                                        <hr class="clearfix" />
+                                                        <div class="row margin-top-10 padding-left-right-10">
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                @*<label class="control-label"><b>@Resource.InputtedUnit:</b> {{referralNote.SelectedServiceCodeForPayor.UsedUnit +' UN'}}</label>*@
+                                                                <label class="control-label"></label>
+                                                            </div>
+                                                            <div class="col-lg-6 col-md-6 col-sm-6">
+                                                                <label class="control-label"><b class="color-red">@Resource.CalculatedUnit:</b> {{referralNote.SelectedServiceCodeForPayor.CalculatedUnit +' @Resource.UN'}}</label>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="label-info-white row clearfix" data-ng-show="(referralNote.SelectedServiceCodeForPayor.AvailableDailyUnit*1) < (referralNote.SelectedServiceCodeForPayor.CalculatedUnit*1)">
+                                                        <i><span class="font-red font-weight-600">@Resource.Note**:&nbsp;</span><span class="">@Resource.DailyLimitExceedMsg</span></i>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr class="clear">
+                                    <div class="row">
+                                        <div class="" data-ng-if="referralNote.Note.ServiceCodeType==OtherServiceCode">
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label">@Resource.SpokeTo</label>
+                                                <div>
+                                                    <input type="text" class="form-control input-sm" name="referralNote.Note.SpokeTo" data-ng-model="referralNote.Note.SpokeTo">
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label">@Resource.Relation</label>
+                                                <div>
+
+                                                    <select class="form-control input-sm"
+                                                        data-ng-init="referralNote.Note.Relation=(referralNote.Note.Relation==null || referralNote.Note.Relation==0 || referralNote.Note.Relation=='') ?'':referralNote.Note.Relation.toString()"
+                                                        data-ng-model="referralNote.Note.Relation"
+                                                        id="Relation"
+                                                        name="referralNote.Note.Relation">
+                                                        <option value="">@Resource.Select</option>
+                                                        <option data-ng-repeat="option in GroupNoteModel.Relations" value="{{option.Value}}">{{option.Value}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                <label class="control-label">@Resource.KindOfNote</label>
+                                                <div>
+                                                    <select class="form-control input-sm"
+                                                        data-ng-init="referralNote.Note.OtherNoteType=(referralNote.Note.OtherNoteType==null || referralNote.Note.OtherNoteType==0 || referralNote.Note.OtherNoteType=='') ?'':referralNote.Note.OtherNoteType.toString()"
+                                                        data-ng-model="referralNote.Note.OtherNoteType"
+                                                        id="OtherNoteType"
+                                                        name="referralNote.Note.OtherNoteType">
+                                                        <option value="">@Resource.Select</option>
+                                                        <option data-ng-repeat="option in GroupNoteModel.KindOfNotes" value="{{option.Value}}">{{option.Value}}</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+
+                                            <div class="clearfix">
+                                                <div class="form-group col-md-6 col-sm-6 col-sm-6 margin-top-20">
+                                                    <div>
+                                                        <div class="pull-left">
+                                                            <label class="" for="IsIssue">
+                                                                <input data-ng-model="referralNote.Note.IsIssue" type="checkbox" id="IsIssue" name="Note.IsIssue" class="unicheckbox " val="referralNote.Note.IsIssue">
+                                                                @Resource.OpenAsAnIssue</label>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                                <div class="form-group col-lg-3 col-md-3 col-sm-3" data-ng-show="referralNote.Note.IsIssue">
+                                                    <label class="control-label" data-ng-class="{'required':referralNote.Note.IsIssue}">@Resource.Assignee</label>
+                                                    <div>
+                                                        @Html.DropDownListFor(p => p.Note.IssueAssignID, Model.Employees.ToSelectList(Model.Note.IssueAssignID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                        new
+                                                        {
+                                                            convert_to_number = "",
+                                                            data_ng_model = "referralNote.Note.IssueAssignID",
+                                                            data_ng_init = "referralNote.Note.IssueAssignID=(referralNote.Note.IssueAssignID==null || referralNote.Note.IssueAssignID==0 || referralNote.Note.IssueAssignID=='') ?'':referralNote.Note.IssueAssignID.toString()",
+                                                            data_ng_value = "referralNote.Note.IssueAssignID",
+                                                            data_ng_options = "col.Value as col.Name for col in GroupNoteModel.Employees track by col.Value",
+                                                            @class = "form-control input-sm validateElement",
+                                                            data_error_Count = "referralNote.ErrorCount",
+                                                            data_ng_attr_id = "{{ 'Note_IssueAssignID' + referralNote.ReferralID }}",
+                                                            data_ng_attr_name = "{{ 'Note.IssueAssignID' + referralNote.ReferralID }}"
+                                                        })
+                                                    </div>
+                                                    @Html.ValidationMessageFor(m => m.Note.IssueAssignID, "", new { data_ng_attr_valmsg_for = "{{ 'Note.IssueAssignID' + referralNote.ReferralID }}" })
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div>
+                                            <br class="clear-both" />
+                                            <hr class="clear">
+                                            <div class="padding-bottom-10 col-lg-12 col-md-12 col-sm-12 ">
+                                                <div class="mt-checkbox-inline">
+                                                    <label class="control-label"><strong>@Resource.DTRDetails</strong></label>
+                                                    <label class="control-label alert-info">
+                                                        @Resource.DTRReportRelatedNote
+                                                    </label>
+                                                    <label class="mt-checkbox mt-checkbox-outline padding-top-10">
+                                                        <input data-ng-model="referralNote.Note.DTRIsOnline"
+                                                            class="uniformControls" data-uniform-value="referralNote.Note.DTRIsOnline"
+                                                            data-ng-true-value="true" data-ng-false-value="false"
+                                                            type="checkbox">@Resource.Online<span></span>
+                                                    </label>
+                                                    <label class="mt-checkbox mt-checkbox-outline padding-top-10">
+                                                        <input data-ng-model="referralNote.Note.DTRIsOnline"
+                                                            class="uniformControls" data-uniform-value="!referralNote.Note.DTRIsOnline"
+                                                            data-ng-true-value="false" data-ng-false-value="true"
+                                                            type="checkbox">Paper Work<span></span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group" data-ng-if="referralNote.Note.DTRIsOnline">
+                                                <div class="">
+                                                    <div class="padding-bottom-10">
+                                                        <span class="font-red padding-left-15">@Resource.DTRDetailsMsg</span>
+                                                    </div>
+                                                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                        <label class="control-label">@Resource.DriverName</label>
+                                                        <div>
+                                                            @Html.DropDownListFor(p => p.Note.DriverID, Model.Employees.ToSelectList(Model.Note.DriverID.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                                  new
+                                                                      {
+                                                                          convert_to_number = "",
+                                                                          data_ng_model = "referralNote.Note.DriverID",
+                                                                          data_ng_init = "referralNote.Note.DriverID=(referralNote.Note.DriverID==null || referralNote.Note.DriverID==0 || referralNote.Note.DriverID=='') ?'':referralNote.Note.DriverID.toString()",
+                                                                          data_ng_value = "referralNote.Note.DriverID",
+                                                                          data_ng_options = "col.Value as col.Name for col in GroupNoteModel.Employees track by col.Value",
+                                                                          @class = "form-control input-sm",
+                                                                          data_ng_attr_id = "{{ 'Note_DriverID' + referralNote.DriverID }}",
+                                                                          data_ng_attr_name = "{{ 'Note.DriverID' + referralNote.DriverID }}",
+                                                                      })
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.Note.DriverID)
+
+                                                    </div>
+
+                                                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                        <label class="control-label">@Resource.VehicleNumber</label>
+                                                        <div>
+                                                            @Html.TextBoxFor(x => x.Note.VehicleNumber,
+                                                        new
+                                                        {
+                                                            ng_model = "referralNote.Note.VehicleNumber",
+                                                            @class = "form-control input-sm auto-complete",
+                                                            data_ng_attr_id = "{{ 'Note_VehicleNumber' + referralNote.VehicleNumber }}",
+                                                            data_ng_attr_name = "{{ 'Note.VehicleNumber' + referralNote.VehicleNumber }}",
+                                                            searchurl = "{{GetDTRDetailsURL}}",
+                                                            dtrtype = (int)DTRDetail.DTRDetailTypes.Vehicle
+                                                        })
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.Note.VehicleNumber)
+                                                    </div>
+                                                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                        <label class="control-label">@Resource.VehicleType</label>
+                                                        <div>
+                                                            @Html.TextBoxFor(x => x.Note.VehicleType,
+                                                        new
+                                                        {
+                                                            ng_model = "referralNote.Note.VehicleType",
+                                                            @class = "form-control input-sm auto-complete",
+                                                            data_ng_attr_id = "{{ 'Note_VehicleType' + referralNote.VehicleType }}",
+                                                            data_ng_attr_name = "{{ 'Note.VehicleType' + referralNote.VehicleType }}",
+                                                            searchurl = "{{GetDTRDetailsURL}}",
+                                                            dtrtype = (int)DTRDetail.DTRDetailTypes.VehicleType
+                                                        })
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.Note.VehicleType)
+                                                    </div>
+                                                    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                                                        <label class="control-label">@Resource.PickUpAddress</label>
+                                                        <div>
+                                                            @Html.TextBoxFor(x => x.Note.PickUpAddress,
+                                                        new
+                                                        {
+                                                            ng_model = "referralNote.Note.PickUpAddress",
+                                                            @class = "form-control input-sm auto-complete",
+                                                            data_ng_attr_id = "{{ 'Note_PickUpAddress' + referralNote.PickUpAddress }}",
+                                                            data_ng_attr_name = "{{ 'Note.PickUpAddress' + referralNote.PickUpAddress }}",
+                                                            searchurl = "{{GetDTRDetailsURL}}",
+                                                            dtrtype = (int)DTRDetail.DTRDetailTypes.LocationAddress
+                                                        })
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.Note.PickUpAddress)
+                                                    </div>
+                                                    <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                                                        <label class="control-label">@Resource.DropOffAddress</label>
+                                                        <div>
+                                                            @Html.TextBoxFor(x => x.Note.DropOffAddress,
+                                                        new
+                                                        {
+                                                            ng_model = "referralNote.Note.DropOffAddress",
+                                                            @class = "form-control input-sm auto-complete",
+                                                            data_ng_attr_id = "{{ 'Note_DropOffAddress' + referralNote.DropOffAddress }}",
+                                                            data_ng_attr_name = "{{ 'Note.DropOffAddress' + referralNote.DropOffAddress }}",
+                                                            searchurl = "{{GetDTRDetailsURL}}",
+                                                            dtrtype = (int)DTRDetail.DTRDetailTypes.LocationAddress
+                                                        })
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.Note.DropOffAddress)
+                                                    </div>
+
+
+
+
+
+                                                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                        <label class="control-label">@Resource.EscortName</label>
+                                                        <div>
+                                                            @Html.TextBoxFor(x => x.Note.EscortName,
+                                                        new
+                                                        {
+                                                            ng_model = "referralNote.Note.EscortName",
+                                                            @class = "form-control input-sm",
+                                                            data_ng_attr_id = "{{ 'Note_EscortName' + referralNote.EscortName }}",
+                                                            data_ng_attr_name = "{{ 'Note.EscortName' + referralNote.EscortName }}",
+                                                        })
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.Note.EscortName)
+                                                    </div>
+                                                    <div class="form-group col-lg-3 col-md-3 col-sm-3">
+                                                        <label class="control-label">@Resource.Relationship</label>
+                                                        <div>
+                                                            @Html.TextBoxFor(x => x.Note.Relationship,
+                                                        new
+                                                        {
+                                                            ng_model = "referralNote.Note.Relationship",
+                                                            @class = "form-control input-sm",
+                                                            data_ng_attr_id = "{{ 'Note_NoteDetails' + referralNote.Relationship }}",
+                                                            data_ng_attr_name = "{{ 'Note.NoteDetails' + referralNote.Relationship }}",
+                                                        })
+                                                        </div>
+                                                        @Html.ValidationMessageFor(m => m.Note.Relationship)
+                                                    </div>
+
+
+
+                                                    <div class="form-group col-md-2 col-sm-2 col-sm-2 margin-top-20 no-padding">
+                                                        <div>
+                                                            <input data-ng-model="referralNote.Note.RoundTrip" type="checkbox" id="RoundTrip" name="Note.RoundTrip" class="unicheckbox" val="referralNote.Note.RoundTrip">
+                                                            <label for="RoundTrip">@Resource.RoundTrip</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-md-2 col-sm-2 col-sm-2 margin-top-20 no-padding">
+                                                        <div>
+                                                            <input data-ng-model="referralNote.Note.OneWay" type="checkbox" id="OneWay" name="Note.OneWay" class="unicheckbox" val="referralNote.Note.OneWay">
+                                                            <label for="OneWay">@Resource.OneWay</label>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-md-2 col-sm-2 col-sm-2 margin-top-20 no-padding">
+                                                        <div>
+                                                            <input data-ng-model="referralNote.Note.MultiStops" type="checkbox" id="MultiStops" name="Note.MultiStops" class="unicheckbox" val="referralNote.Note.MultiStops">
+                                                            <label for="MultiStops">@Resource.MultiStops</label>
+                                                        </div>
+                                                    </div>
+
+
+                                                </div>
+                                            </div>
+                                            <br class="clear-both" />
+                                            <hr class="clear">
+                                        </div>
+
+
+                                        <div class="margin-top-30 inline-block">
+
+                                            <div>
+                                                <a class="btn btn-xs btn-circle btn-default margin-left-10 margin-5"
+                                                    data-ng-repeat="item in GroupNoteModel.NoteSentenceList"
+                                                    data-ng-click="referralNote.NoteSentenceSelectionClick_3rd(item.NoteSentenceDetails)"
+                                                    data-ng-attr-title="{{item.NoteSentenceDetails}}">
+                                                    <span>{{item.NoteSentenceTitle}}</span>
+                                                </a>
+                                            </div>
+
+                                            <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                                <label class="control-label required">@Resource.Intervention</label>
+                                                <div>
+                                                    @Html.TextAreaFor(x => x.Note.NoteDetails,
+                                                    new
+                                                    {
+                                                        ng_model = "referralNote.Note.NoteDetails",
+                                                        @class = "form-control hideErrorContent replaceErrorSource validateElement",
+                                                        data_ng_attr_id = "{{ 'Note_NoteDetails' + referralNote.ReferralID }}",
+                                                        data_ng_attr_name = "{{ 'Note.NoteDetails' + referralNote.ReferralID }}",
+                                                        data_error_Count = "referralNote.ErrorCount",
+                                                        tabindex = "-1"
+                                                    })
+                                                    @Html.ValidationMessageFor(m => m.Note.NoteDetails)
+                                                    <div class="replaceErrorDest summerNoteEditor">
+                                                        <summernote data-ng-model="referralNote.Note.NoteDetails"
+                                                            height="150"></summernote>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+
+
+                                            <div class="form-group col-lg-12 col-md-12 col-sm-12">
+                                                <label class="control-label required">@Resource.Assessment</label>
+                                                <div>
+                                                    @*<summernote data-ng-model="referralNote.Note.Assessment" height="150"></summernote>*@
+                                                    @Html.TextAreaFor(x => x.Note.Assessment,
+                                                    new
+                                                    {
+                                                        ng_model = "referralNote.Note.Assessment",
+                                                        @class = "form-control hideErrorContent replaceErrorSource validateElement",
+                                                        data_ng_attr_id = "{{ 'Note_Assessment' + referralNote.ReferralID }}",
+                                                        data_ng_attr_name = "{{ 'Note.Assessment' + referralNote.ReferralID }}",
+                                                        data_error_Count = "referralNote.ErrorCount",
+                                                        tabindex = "-1"
+                                                    })
+                                                    @Html.ValidationMessageFor(m => m.Note.Assessment)
+                                                    <div class="replaceErrorDest summerNoteEditor">
+                                                        <summernote data-ng-model="referralNote.Note.Assessment"
+                                                            height="150"></summernote>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+
+
+                                            <div class="form-group col-lg-12 col-md-12 col-sm-12" style="display: none;">
+                                                <label class="control-label">@Resource.ActionPlan</label>
+                                                <div>
+                                                    <summernote data-ng-model="referralNote.Note.ActionPlan" height="150"></summernote>
+                                                </div>
+                                            </div>
+
+
+                                            <div class="form-group col-lg-12 col-md-12 col-sm-12 ">
+                                                <label class="control-label"><strong>@Html.Raw(Resource.NoteAssigneeAndComment)</strong></label>
+                                                <hr class="" />
+                                                <div>
+                                                    <div class="col-lg-2 no-padding">
+                                                        <label class="control-label">@Resource.NoteAssignee</label>
+                                                    </div>
+                                                    <div class="col-lg-4 no-left-padding">
+
+                                                        @Html.DropDownListFor(p => p.Note.NoteAssignee, Model.Employees.ToSelectList(Model.Note.NoteAssignee.ToString() ?? "", "Name", "Value", @Resource.Select, ""),
+                                                            new
+                                                            {
+                                                                convert_to_number = "",
+                                                                data_ng_model = "referralNote.Note.NoteAssignee",
+                                                                data_ng_init = "referralNote.Note.NoteAssignee=(referralNote.Note.NoteAssignee==null || referralNote.Note.NoteAssignee==0 || referralNote.Note.NoteAssignee=='') ?'':referralNote.Note.NoteAssignee.toString()",
+                                                                data_ng_value = "referralNote.Note.NoteAssignee",
+                                                                data_ng_options = "col.Value as col.Name for col in GroupNoteModel.Employees track by col.Value",
+                                                                @class = "form-control input-sm"
+                                                            })
+                                                    </div>
+                                                    @Html.ValidationMessageFor(m => m.Note.NoteAssignee)
+                                                </div>
+                                                <br class="clear-both" />
+                                                <br class="clear-both" />
+                                                <label class="control-label">@Resource.NoteComment</label>
+                                                <div>
+                                                    <textarea class="form-control input-sm" rows="8" data-ng-model="referralNote.Note.NoteComments"></textarea>
+                                                </div>
+                                            </div>
+                                            <hr class="clearfix" />
+
+
+
+
+
+
+
+
+                                            <div class="form-group col-lg-12 col-md-12 col-sm-12 compact" data-ng-if="referralNote.Note.ServiceCodeType!=OtherServiceCode">
+                                                @*{{referralNote.GroupNoteDxCodeCount}}*@
+                                                <label class="control-label required"><strong>@Resource.DxCodeDetails</strong></label>
+                                                <div class="padding-10 alert-danger" data-ng-if="referralNote.IsDifferentDxCode && (referralNote.DxCodes | filter:referralNote.DxCodeFilter()).length">
+                                                    <strong>Error!</strong> @Resource.DxCodeErrorMsg
+                                                </div>
+                                                <div class="padding-10 alert-info" data-ng-if="!referralNote.IsDifferentDxCode && (referralNote.DxCodes | filter:referralNote.DxCodeFilter()).length">
+                                                    <strong>Info</strong> @Resource.DxCodeInfoMsg
+                                                </div>
+                                                @*@Html.TextBoxFor(q => q.GroupNoteDxCodeCount,
+                                                                     new
+                                                                         {
+                                                                             data_ng_model = "referralNote.GroupNoteDxCodeCount",
+                                                                             @class = "form-control hideErrorContent  replaceErrorSource validateElement",
+                                                                             data_ng_attr_id = "{{ 'GroupNoteDxCodeCount' + referralNote.ReferralID }}",
+                                                                             data_ng_attr_name = "{{ 'Note.GroupNoteDxCodeCount' + referralNote.ReferralID }}",
+                                                                             data_error_Count = "referralNote.ErrorCount",
+                                                                         })
+
+                                                @Html.ValidationMessageFor(m => m.GroupNoteDxCodeCount, "", new { data_ng_attr_valmsg_for = "{{ 'Note.GroupNoteDxCodeCount' + referralNote.ReferralID }}" })*@
+                                                @Html.TextBoxFor(q => q.GroupNoteDxCodeCount,
+                                                new
+                                                {
+                                                    data_ng_model = "referralNote.GroupNoteDxCodeCount",
+                                                    @class = "form-control hideErrorContent  replaceErrorSource",
+                                                    data_ng_attr_id = "{{ 'GroupNoteDxCodeCount' + referralNote.ReferralID }}",
+                                                    data_ng_attr_name = "{{ 'Note.GroupNoteDxCodeCount' + referralNote.ReferralID }}",
+                                                    tabindex = "-1"
+                                                })
+
+                                                @Html.ValidationMessageFor(m => m.GroupNoteDxCodeCount, "", new { data_ng_attr_valmsg_for = "{{ 'Note.GroupNoteDxCodeCount' + referralNote.ReferralID }}" })
+                                                <hr class="clear">
+                                                <div class="replaceErrorDest">@*replaceErrorDest*@
+                                                    <div class="table-responsive">
+                                                        <table class="table table-advance table-bordered table-striped table-hover table-condensed" data-ng-cloak>
+                                                            <thead>
+                                                                <tr>
+                                                                    <th class="width-20px">
+                                                                        <div data-ng-show="referralNote.IsSameDxCodeType">
+                                                                            <input id="SelectAllDxCode" type="checkbox" class="unicheckbox" data-ng-model="referralNote.SelectAllDxCodeCheckbox" val="referralNote.SelectAllDxCodeCheckbox" data-ng-change="referralNote.SelectAll()">
+                                                                        </div>
+                                                                    </th>
+                                                                    <th><strong>@Resource.DXCodeShortName</strong></th>
+                                                                    <th><strong>@Resource.DXCode</strong></th>
+                                                                    <th><strong>@Resource.DXCodeType</strong></th>
+                                                                    <th><strong>@Resource.Precedence</strong></th>
+                                                                    <th><strong>@Resource.StarDate</strong></th>
+                                                                    <th><strong>@Resource.EndDate</strong></th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr data-ng-repeat="dxCode in referralNote.FilterDxCodes = (referralNote.DxCodes | filter:referralNote.DxCodeFilter())">
+                                                                    <td>
+                                                                        <input type="checkbox" class="unicheckbox text-align-center" data-ng-attr-class="dxCode{{$index}}" data-ng-change="referralNote.SelectDxCode(dxCode)" data-ng-model="dxCode.IsChecked" val="dxCode.IsChecked" />
+                                                                        @*<span data-ng-if="$index==0" style="display: none;" data-ng-value="referralNote.SelectFirstDxCode('#dxCode'+$index,$index)()"></span>*@
+                                                                    </td>
+                                                                    <td>{{dxCode.DxCodeShortName}}</td>
+                                                                    <td>{{(dxCode.DXCodeWithoutDot ? dxCode.DXCodeWithoutDot :'@Resource.NA') +' (' + dxCode.DXCodeName +')'}}</td>
+                                                                    <td>{{dxCode.DxCodeType}}</td>
+                                                                    <td>{{dxCode.Precedence ? dxCode.Precedence :'@Resource.NA'}}</td>
+                                                                    <td data-ng-if="dxCode.StartDate">{{dxCode.StartDate | dateformat}}</td>
+                                                                    <td data-ng-if="!dxCode.StartDate">@Resource.NA</td>
+                                                                    <td data-ng-if="dxCode.EndDate">{{dxCode.EndDate | dateformat}}</td>
+                                                                    <td data-ng-if="!dxCode.EndDate">@Resource.NA</td>
+
+                                                                </tr>
+                                                                <tr data-ng-if="!(referralNote.DxCodes | filter:referralNote.DxCodeFilter()).length">
+                                                                    <td colspan="7" class="pad-10">
+                                                                        @Html.Raw(Resource.NoDxCodeFound)
+                                                                    </td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                        <div>
+                                            <div class="form-group col-lg-6 col-md-6 col-sm-6">
+                                                <div class="no-left-padding">
+                                                    <input type="checkbox" id="MarkAsComplete" data-ng-model="referralNote.Note.MarkAsComplete" class="unicheckbox" val="referralNote.Note.MarkAsComplete">
+                                                    <label for="MarkAsComplete"><strong class="SignAndComplete">@Resource.SignAndComplete</strong></label>
+                                                </div>
+                                            </div>
+                                            <div class="form-group col-lg-6 col-md-6 col-sm-6 pull-left" data-ng-if="referralNote.Note.MarkAsComplete">
+                                                <div class="col-md-12">
+                                                    @*<b>@SessionHelper.FirstName @SessionHelper.LastName</b>
+                                                    <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{'@(ConfigSettings.AmazonS3Url + ConfigSettings.ZarephathBucket)/'+referralNote.Note.Signature}}" />*@
+
+                                                    <b>{{referralNote.Note.EmpSignatureDetails.SignatureName}}</b>
+                                                    <img class="img-responsive signature-image" id="imgDisplay" src="" data-ng-src="{{'@(ConfigSettings.AmazonS3Url + ConfigSettings.ZarephathBucket)/'+referralNote.Note.EmpSignatureDetails.Signature}}" />
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,222 @@
+﻿@model HC_AddReferralModel
+@{bool isEditMode = Model != null && Model.Referral.ReferralID > 0;}
+
+@*@Html.Hidden("hdnAddReferralModel", Common.SerializeObject(Model))*@
+<style>
+    .clear {
+        background-color: antiquewhite;
+    }
+</style>
+
+
+
+<div class="row">
+
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <form id="frmReferralHistory">
+            <div class="fscontainer">
+                @*<div class="legend">
+                        @Resource.ReferralHistory
+                    </div>*@
+
+                <div class="patientContainermain">
+
+                    <div class="row">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="" style="padding-top:15px;">
+                                            <div class="col-sm-8">
+                                                <label class="control-label" style="font-size:16px;">@Resource.Facility</label> : <span class=" labeldiv" value="ContactListPage.EmployeeGroup.Value" style="border-left: 5px solid #e43a45 !important;
+    padding: 5px 15px;
+    border: solid 1px #ddd;">{{ContactListPage.EmployeeGroup.Name}}</span>
+
+                                                @*<select class="form-control input-sm requiredStrip" title="@Resource.Facility"
+                                                            data-val="true"  name="ReferralNote.SelectedRoleID" data-ng-change="EmployeeDetails(option)" data-ng-model="Group.Value">
+                                                        <option data-ng-repeat="option in ContactListPage.EmployeeGroupList" value="{{option.Value}}">{{option.Name}}</option>
+                                                    </select>*@
+                                            </div>
+                                            <div class="col-sm-4">
+                                                <button class="btn btn-sm blue pull-right " data-ng-click="EmployeeDetails(ContactListPage.EmployeeGroup.Value)">Add Resources</button>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="form-group col-sm-12">
+                                        <div class="row">
+                                            <div data-ng-if="ContactListPage.EmployeeListAssignedGroup.length > 0">
+
+                                                <div class="row padding-left-right-10">
+                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                        <div class="portlet-body compact">
+                                                            <div class="dataTables_wrapper" style="padding: 1px 8px 0px 8px">
+                                                                <table class="table table-advance table-bordered table-striped table-hover table-condensed tbl_reflog table-responsive">
+                                                                    <thead>
+                                                                        <tr>
+
+                                                                            <th class="width-100px"><strong>@Resource.EmployeeID</strong></th>
+                                                                            <th class="width-200px"><strong>@Resource.Name</strong></th>
+                                                                            <th class="width-150px"><strong>@Resource.Email</strong></th>
+                                                                            <th><strong>@Resource.Phone</strong></th>
+                                                                            <th class="width-200px"><strong>Action</strong></th>
+                                                                        </tr>
+                                                                    </thead>
+                                                                    <tbody>
+
+                                                                        <tr data-ng-repeat="item in ContactListPage.EmployeeListAssignedGroup">
+                                                                            @*<td>{{item.EmployeeID}}</td>*@
+                                                                            <td>{{item.EmployeeUniqueID}}</td>
+                                                                            <td>{{item.EmployeeName.replace(',','')}}</td>
+                                                                            <td>{{item.Email}}</td>
+                                                                            <td>{{item.MobileNumber}}</td>
+                                                                            <td>
+                                                                                <a href="javascript:void(0);" data-ng-click="RemoveAllAssignedGroup(item)" class="btn btn-xs red"><i class="fa fa-trash"></i></a>
+                                                                            </td>
+                                                                        </tr>
+                                                                    </tbody>
+                                                                </table>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-sm-12">
+                                                        <div data-ng-if="ReferralModel.ContactInformationList.length == 0">
+                                                            <div class="row">
+                                                                <div class="col-lg-12">
+                                                                    <div class="alert alert-danger">
+                                                                        @Html.Raw(Resource.NoRecordsFound)
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </div>
+
+
+                </div>
+
+            </div>
+        </form>
+    </div>
+</div>
+
+
+
+<div class="modal fade modal-scroll outComeForm" id="modal_AddEmployee" tabindex="-1" role="dialog" aria-hidden="true">
+    <form id="formAddEmployee">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <a class="close" data-dismiss="modal">&times;</a>
+                    <h4 class="modal-title text-center"><strong>Employee Details</strong></h4>
+                </div>
+                <div class="modal-body" style="height:500px;overflow:auto">
+                    <div class="row">
+                        <div class="col-sm-12 form-group margin-top-8 margin-bottom-3">
+                            <div style="padding: 0px 0px 7px 9px;"><input type="text" name="search" data-ng-model="SearchText" placeholder="Search Here" /></div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="portlet-body compact" style="display: block;">
+
+                                <div class="table-responsive" style="overflow-x: inherit;">
+                                    <form id="gmfrmemployeelist">
+                                        <table class="table table-bordered table-striped table-condensed flip-content">
+                                            <thead class="flip-content">
+                                                <tr>
+                                                    <th class="text-align-center">
+                                                        <div class="btn-group" data-ng-show="EmployeeList.length > 0">
+                                                            <input id="SelectAllEmployee" class="unicheckbox" type="checkbox" data-ng-model="SelectAllCheckbox" data-ng-change="SelectAll()" val="SelectAllCheckbox">
+                                                            <label for="SelectAllEmployee"></label>
+                                                        </div>
+                                                    </th>
+                                                    <th class="">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('Name')">@Resource.Name</a>
+                                                        <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'Name'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                                    </th>
+                                                    <th class="">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('Name')">@Resource.Designation</a>
+                                                        <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'Name'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                                    </th>
+                                                    <th class="">
+                                                        <a class="anchor_color" href="javascript:void(0);" data-ng-click="EmployeeListPager.sortColumn('Name')">@Resource.Group</a>
+                                                        <span class="sortorder" data-ng-show="EmployeeListPager.sortIndex === 'Name'" data-ng-class="{reverse:EmployeeListPager.reverse}"></span>
+                                                    </th>
+                                                    @*<th width="125" class="actionTh text-align-center">@Resource.Action</th>*@
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr data-ng-repeat="employee in ContactListPage.EmployeeList | filter : SearchText">
+                                                    <td>
+                                                        <input id="cbEmployee{{employee.EmployeeID}}" type="checkbox" data-ng-if="employee.EmployeeID.toString() != LoggedInUserId" class="unicheckbox text-align-center" data-ng-model="employee.IsChecked" data-ng-change="SelectEmployee(employee)" val="employee.IsChecked">
+                                                    </td>
+
+                                                    @*<td data-ng-bind="employee.EmployeeUniqueID"></td>*@
+                                                    <td>
+                                                        <a><span>{{employee.EmployeeName.replace(',','')}}</span></a>
+
+                                                    </td>
+                                                    <td data-ng-bind="employee.Designation"></td>
+                                                    <td data-ng-bind="employee.GroupNames"></td>
+                                                    @*<td class="text-align-center actions">
+                                                        <button class="btn btn-xs blue" data-ng-click="EmployeeEditModel(employee.EncryptedEmployeeID)" name="Edit"><i class="fa fa-edit"></i></button>
+                                                    </td>*@
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </form>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12" data-ng-if="EmployeeList.length > 0">
+                            <div class="col-sm-3 pull-left no-padding">
+                                @Resource.Showing <span data-ng-bind="(EmployeeListPager.pageSize * EmployeeListPager.currentPage) - EmployeeListPager.pageSize  + 1"></span>
+                                &nbsp;@Resource.To <span data-ng-bind="(EmployeeListPager.pageSize == EmployeeListPager.currentPageSize) ? (EmployeeListPager.pageSize * EmployeeListPager.currentPage) :(EmployeeListPager.pageSize * EmployeeListPager.currentPage) - EmployeeListPager.pageSize  + EmployeeListPager.currentPageSize"></span>&nbsp;@Resource.Of &nbsp;<span data-ng-bind="EmployeeListPager.totalRecords"></span>&nbsp;@Resource.Records
+
+                            </div>
+                            <div class="pull-right top pagination-sm">
+                                <dir-pagination-controls boundary-links="true" max-size="EmployeeListPager.maxSize" on-page-change="EmployeeListPager.pageChanged(newPageNumber)" pagination-id="EmployeeListPager"></dir-pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                @*<div class="modal-footer">
+                        <button class="btn btn-sm red" data-dismiss="modal" ng-click="RefreshEmp()">@Resource.Cancel </button>
+                        <input type="button" class="btn btn-sm green-jungle" ng-click="AssignEmployee(true)" value="Assign" />
+                    </div>*@
+            </div>
+        </div>
+    </form>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
