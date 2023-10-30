@@ -37,7 +37,7 @@ INNER JOIN ReferralTimeSlotDetails rtd on rtd.ReferralTimeSlotMasterID=rtm.Refer
 INNER JOIN Referrals r on r.ReferralID=rtm.ReferralID    
 LEFT JOIN ScheduleMasters sm on sm.ReferralTSDateID= rtds.ReferralTSDateID     
 LEFT JOIN Employees e on e.EmployeeID=sm.EmployeeID    
-where rtm.ReferralID = @ReferralID AND rtm.ReferralTimeSlotMasterID=@ReferralTimeSlotMasterID      
+WHERE rtm.ReferralID = @ReferralID AND rtm.ReferralTimeSlotMasterID=@ReferralTimeSlotMasterID
 AND ReferralTSDate >= CONVERT(DATE,GETDATE())      
 AND ((@StartDate is null OR rtds.ReferralTSDate >= @StartDate) AND (@EndDate is null OR rtds.ReferralTSDate <= @EndDate))              
 AND (((@ClientName IS NULL) or (@ClientName='') or LEN(LTRIM(rtrim(@ClientName)))=0  )             
