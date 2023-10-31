@@ -1,13 +1,14 @@
 ﻿var ReferralDocumentVM;
 
 controllers.ReferralDocumentController = function ($scope, $http, $window, $timeout, $filter) {
-    
+
     $scope.ItemID = '';
     ReferralDocumentVM = $scope;
     $scope.newInstance = function () {
         return $.parseJSON($("#hdnAddReferralModel").val());
     };
-
+    $scope.EmployeeID = '0';
+    $scope.ReferralID = '0';
     var modalJson = null;
     //$scope.CurrentDate = new Date();
     $scope.CurrentDate = $filter('date')(new Date(), 'MMddy');
@@ -20,7 +21,7 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
         $scope.EncryptedReferralID = $scope.Model.Referral.EncryptedReferralID;
         $scope.ReferralID = $scope.Model.Referral.ReferralID;
         $scope.UploadFile = HomeCareSiteUrl.UploadFile;
-        $scope.EmployeeID = '0';
+        
         $scope.UserType = "Referral";
         $scope.UploadFileGoogleDrive = HomeCareSiteUrl.UploadFileGoogleDrive;
     } else {
@@ -139,7 +140,6 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     };
 
     $scope.SaveDetails = function () {
-        debugger
         if (CheckErrors("#frmAdd")) {
             $scope.AddModal.UserType = $scope.UserType;
             if ($scope.Modal == "Sub Section") {
@@ -209,7 +209,6 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     };
 
     $scope.SaveSubSection = function (data) {
-        debugger
         //modalJson = $.parseJSON($("#hdnEmployeeModel").val());
         //$scope.Model = modalJson;
         //data.EmployeeID = $scope.Model.Employee.EmployeeID;
@@ -311,7 +310,7 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     };
 
     $scope.SetPreview = function (Section, SubSection) {
-        
+
         $scope.Form = {};
         $scope.Document = {};
         var item = (SubSection == null || SubSection == undefined) ? Section : SubSection;
@@ -1214,9 +1213,10 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
 
         $scope.MailModel.To = $("#tagsinputTo").val();
         $scope.MailModel.CC = $("#tagsinputCC").val();
-        $scope.MailModel.From = $scope.OrganizationSettings;
+        $scope.MailModel.From = $scope.OrganizationSettings[0];
         $scope.MailModel.Subject = $("#txtSubject").val();
-        $scope.MailModel.Body = $('.note-editable').html();
+        //$scope.MailModel.Body = $('.note-editable').html();
+        $scope.MailModel.Body = $scope.MailModel.Body1 + $scope.MailModel.Body2;
         //$scope.MailModel.ResourceFile = $('#EmailAttachment')[0].files[0];
         // $scope.MailModel.Attachment = $('#EmailAttachment')[0].files[0];
         var jsonData = angular.toJson($scope.MailModel);
@@ -1241,7 +1241,30 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     $scope.relative = [];
     $scope.assignee = {};
     $scope.casemanager = {};
+    $scope.MailModel.ReferralDocumentID = {};
+    $scope.MailModel.Body1 = {};
     $scope.GetReferralAttachment = function (item) {
+        $scope.MailModel.ReferralDocumentID = item.ReferralDocumentID;
+        $scope.GoogleFileId = item.GoogleFileId;
+        $scope.EmployeeID = $scope.EmployeeID;
+        $scope.ReferralID = $scope.ReferralID;
+        $scope.ReferralDocumentID = item.ReferralDocumentID;
+        $scope.OrganizationID = window.OrgID;
+        $scope.FilePath = item.FilePath;
+        var FormUrl = HomeCareSiteUrl.OrbeonLoadHtmlFormURL + '?FormURL=' + $scope.FilePath + '/' + 'edit' + '/' + $scope.GoogleFileId + "?form-version=" + '1'
+            + "&orbeon-embeddable=true"
+            + "&OrgPageID=" + window.ReferralDocumentPageId
+            + "&IsEditMode=" + "true"
+            + "&ReferralID=" + $scope.ReferralID
+            + "&EmployeeID=" + $scope.EmployeeID
+            + "&FormName=" + Name
+            + "&OrganizationId=" + window.OrgID
+            + "&UserId=" + window.LUserId
+        $scope.BaseUrl = window.LiveSiteURL;// 'http://localhost:50036/';
+        $scope.ResetPasswordLink = $scope.BaseUrl + FormUrl;
+        //$scope.ResetPasswordLink = 'http://localhost:50036/hc/form/OrbeonLoadHtmlForm?FormURL=/ezcare/Client-FaceSheet/new?form-version=1&orbeon-embeddable=true&OrgPageID=undefined&IsEditMode=false&ReferralID=203&FormName=Client-FaceSheet&OrganizationId=74&UserId=1';
+        $scope.MailModel.Body1 = '<table border="0" cellpadding="0" cellspacing="0" style="margin: 0; margin: 0px; width: 100%;">    <tbody>        <tr>            <td style="background-color: #ececec; padding: 20px 10px 0 10px;" align="center">                <table border="0" cellpadding="0" cellspacing="0" align="center" style="margin: auto; background-color: #fff" width="640">                    <tbody>                        <tr>                            <td>                                <table border="0" cellpadding="1" cellspacing="0" style="width: 100%;">                                    <tbody>                                        <tr>                                            <td style="text-align: center; padding-top: 15px; border-bottom: solid 2px #ececec">                                                <div style="padding-bottom: 10px; padding-top: 0px; text-align: center">                                                    <img src="##HomeCareLogoImage##" width="600px" height="200px">                                                </div>                                            </td>                                        </tr>                                        <tr>                                            <td style="padding: 5px 15px; text-align: left; width: 80%; text-align: left; font-style: normal; font-size: 13px">                                                <table style="width: 100%; display: table; text-align: left;" cellpadding="0" cellspacing="0">                                                    <tbody>                                                        <tr>                                                            <td>                                                                <div style="text-align: left; width: 100%;">                                                                    <p style="color: #222; margin-bottom: 0px; margin-top: 3px;">Hello ,</p>                                                                </div>                                                            </td>                                                        </tr>                                                        <tr>                                                            <td style="height: 10px;"></td>                                                        </tr>                                                        <tr>                                                            <td colspan="2">                                                                <div>                                                                                                                                                                                                   <p>                                                                        <strong style="color:red">Note:</strong> To Open digital form please click on the below link.</p>                                                                    <div style="text-align:center">                                                                        <a href="' + $scope.ResetPasswordLink + '"></a>                                                                        <div style="margin: 10px 0px;">OR</div>                                                                        <a href="' + $scope.ResetPasswordLink +'" style="background: #ff5200; color: #fff; border: none; padding: 5px 8px; text-decoration: none;cursor: pointer">Open Form</a>                                                                    </div>                                                                </div>                                                            </td>                                                        </tr>                                                        <tr style="text-align: left;">                                                            <td style="font-style: normal;">                                                                <p style="display: block">Thank You.<br></p>                                                            </td>                                                        </tr>                                                    </tbody>                                                </table>                                            </td>                                        </tr>                                    </tbody>                                </table>                            </td>                        </tr>                    </tbody>                </table>            </td>        </tr>        <tr>            <td style="background-color: #ececec; padding: 0px 10px 20px 10px;" align="center">                <table border="0" cellpadding="0" cellspacing="0" style="background-color: #d8d7d7; width: 640px;">                    <tbody>                        <tr>                            <td valign="top" style="padding: 3px;">                                <span></span>                                <p style="color: #000000; text-align: center; padding: 3px; font-size: 13px;">##SiteName##<br></p>                            </td>                        </tr>                    </tbody>                </table>            </td>        </tr>    </tbody></table>';
+        $scope.GetOrganizationSettings();
         $('#sendemail').modal({
             backdrop: 'static',
             keyboard: false
@@ -1356,7 +1379,7 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
         AngularAjaxCall($http, "/hc/referral/GetOrganizationSettings", "", "Get", "json", "application/json").success(function (response) {
             if (response.IsSuccess) {
                 $scope.OrganizationSettingList = response.Data;
-                $scope.OrganizationSettings = "0";
+                $scope.OrganizationSettings = $scope.OrganizationSettingList[0].FromEmail;
             }
             //ShowMessages(response);
         });

@@ -1931,7 +1931,8 @@ namespace Zarephath.Core.Areas.HomeCare.Controllers
         {
             _referralDataProvider = new ReferralDataProvider();
 
-            RefDocument refDoc = (RefDocument)_referralDataProvider.GetReferralDocumentDetails(SessionHelper.ReferralDocumentID.ToString()).Data;
+            //RefDocument refDoc = (RefDocument)_referralDataProvider.GetReferralDocumentDetails(SessionHelper.ReferralDocumentID.ToString()).Data;
+            RefDocument refDoc = (RefDocument)_referralDataProvider.GetReferralDocumentDetails(model.ReferralDocumentID.ToString()).Data;
             var orbeonFormDownloadPath = "";
 
             if (refDoc.StoreType.ToLower() == "orbeon") //checking if document type is orbeon
@@ -1945,8 +1946,8 @@ namespace Zarephath.Core.Areas.HomeCare.Controllers
                     var orbeonFormURL = ConfigSettings.OrbeonBaseUrl + "/fr" + refDoc.FilePath + "/pdf/" + refDoc.GoogleFileId; //building orbeon form url
                     orbeonFormDownloadPath = orbeonFormDownloadPath + @"\" + refDoc.GoogleFileId + ".pdf"; //temporary download location for orbeon form
                     client.Credentials = new NetworkCredential(ConfigSettings.OrbeonUserName, ConfigSettings.OrbeonPassword); //orbeon server credentials
-                    client.DownloadFile(new Uri(orbeonFormURL), orbeonFormDownloadPath); //downloading orbeon form
-                    model.Attachment = new List<string>() { orbeonFormDownloadPath }; //setting the form as attachment to the email
+                    //client.DownloadFile(new Uri(orbeonFormURL), orbeonFormDownloadPath); //downloading orbeon form
+                    //model.Attachment = new List<string>() { orbeonFormDownloadPath }; //setting the form as attachment to the email
                 }
             }
             else
@@ -1961,7 +1962,7 @@ namespace Zarephath.Core.Areas.HomeCare.Controllers
 
             var fileAdditionalAttachments = TempData["Attachments"] as List<string>;
 
-            if (model.Attachment.Count > 0 && fileAdditionalAttachments != null)
+            if ( fileAdditionalAttachments != null)
             {
                 model.Attachment.AddRange(fileAdditionalAttachments);
             }
