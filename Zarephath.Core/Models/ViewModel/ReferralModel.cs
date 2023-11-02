@@ -595,8 +595,8 @@ namespace Zarephath.Core.Models.ViewModel
         public List<NameValueData> BeneficiaryTypes { get; set; }
         public List<ReferralBeneficiaryDetail> ReferralBeneficiaryTypes { get; set; }
         public List<ReferralPhysicianDetail> ReferralPhysicians { get; set; }
-        
- 
+
+
         public List<ServiceType> ServiceType { get; set; }
 
         [Ignore]
@@ -753,7 +753,7 @@ namespace Zarephath.Core.Models.ViewModel
         public string EmpFirstName { get; set; }
         public string EmpLastName { get; set; }
         public string EmpFullName { get; set; }
-       // public string EmpFullName { get { return Common.GetGeneralNameFormat(EmpFirstName, EmpLastName); } }
+        // public string EmpFullName { get { return Common.GetGeneralNameFormat(EmpFirstName, EmpLastName); } }
         public string Relation { get; set; }
 
         public string EncryptedContactMappingID { get { return Crypto.Encrypt(Convert.ToString(ContactMappingID)); } }
@@ -1637,7 +1637,8 @@ namespace Zarephath.Core.Models.ViewModel
         public string CaseManagerPhone { get; set; }
         public long LanguageID { get; set; }
         public long RegionID { get; set; }
-        public string ServiceTypeID { get; set; }
+        public string[] ServiceTypeID { get; set; }
+        public string CommaSeparatedServiceTypeIDs { get; set; }
         public string[] GroupIds { get; set; }
         public string CommaSeparatedIds { get; set; }
         public string PayorName { get; set; }

@@ -6,7 +6,6 @@ controllers.ReferralListController = function ($scope, $http, $window, $timeout)
     $scope.newInstance = function () {
         return $.parseJSON($("#hdnSetReferralListModel").val());
     };
-
     ReferralBulkUpdateModel = null;
     $scope.SelectedReferralIds = [];
     $scope.ReferralList = [];
@@ -20,6 +19,7 @@ controllers.ReferralListController = function ($scope, $http, $window, $timeout)
     $scope.ReferralListPager = new PagerModule("ClientName");
 
     $scope.SetPostData = function (fromIndex, model) {
+        debugger
         var pagermodel = {
             SearchReferralModel: $scope.SearchReferralModel,
             pageSize: $scope.ReferralListPager.pageSize,
@@ -66,7 +66,7 @@ controllers.ReferralListController = function ($scope, $http, $window, $timeout)
     $scope.ReferralIds = [];
     $scope.GetReferralList = function (isSearchDataMappingRequire) {
         //Reset Selcted Checkbox items and Control
-
+        debugger
         $scope.SelectedReferralIds = [];
         $scope.SelectAllCheckbox = false;
         //Reset Selcted Checkbox items and Control
@@ -214,6 +214,7 @@ controllers.ReferralListController = function ($scope, $http, $window, $timeout)
     };
 
     $scope.SearchReferral = function () {
+        debugger
         $scope.ReferralListPager.currentPage = 1;
         $scope.ReferralListPager.getDataCallback(true);
     };
@@ -537,7 +538,7 @@ controllers.ReferralListController = function ($scope, $http, $window, $timeout)
         $('#Referral_fixedAside').modal('hide');
     }
 
-    $scope.ShowReferralChartForm = function (referral,FormName, mode) {
+    $scope.ShowReferralChartForm = function (referral, FormName, mode) {
         $scope.ReferralID = referral.ReferralID;
         $scope.OrganizationID = window.OrgID;
         var ReferralChartURL = HomeCareSiteUrl.OrbeonLoadHtmlFormURL + '?FormURL=' + '/ezcare/' + FormName + '/' + 'pdf' + "?form-version=" + '1'
