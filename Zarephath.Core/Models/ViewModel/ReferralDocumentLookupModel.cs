@@ -20,10 +20,11 @@ namespace Zarephath.Core.Models.ViewModel
         public List<NameValueDataBoolean> SetYesNoList { get; set; }
 
         public List<Role> UserRoleList { get; set; }
-        public List<string> SelectedRoles {
+        public List<string> SelectedRoles
+        {
             get
             {
-                List<string> data=new List<string>();
+                List<string> data = new List<string>();
                 foreach (var role in UserRoleList)
                     data.Add(Convert.ToString(role.RoleID));
                 return data;
@@ -157,6 +158,7 @@ namespace Zarephath.Core.Models.ViewModel
         public long ReferralID { get; set; }
         public string StoreType { get; set; }
         public string GoogleFileId { get; set; }
+        public bool IsDeleted { get; set; }
     }
 
     public class FormModal
@@ -193,6 +195,7 @@ namespace Zarephath.Core.Models.ViewModel
         public DateTime? EndDate { get; set; }
         public int KindOfDocument { get; set; }
         public string SearchType { get; set; }
+        public string IsDeleted { get; set; }
     }
 
     public class DocumentList
@@ -217,11 +220,12 @@ namespace Zarephath.Core.Models.ViewModel
         public DateTime CreatedDate { get; set; }
         public string UpdatedBy { get; set; }
         public DateTime UpdatedDate { get; set; }
+        public bool IsDeleted { get; set; }
         public int Row { get; set; }
         public int Count { get; set; }
         public string StoreType { get; set; }
         public string GoogleFileId { get; set; }
-		public bool IsOrbeonForm { get; set; }
+        public bool IsOrbeonForm { get; set; }
         public string AccessFilePath { get => Common.GetAccessPath(FilePath); }
     }
 

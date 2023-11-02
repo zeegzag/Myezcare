@@ -333,6 +333,7 @@ namespace Zarephath.Core.Areas.HomeCare.Controllers
         {
             _referralDataProvider = new ReferralDataProvider();
             string ids = "";
+            string ServiceTypeIDs = "";
             if (searchReferralModel.GroupIds != null)
             {
                 foreach (var item in searchReferralModel.GroupIds)
@@ -340,7 +341,15 @@ namespace Zarephath.Core.Areas.HomeCare.Controllers
                     ids += item + ",";
                 }
             }
+            if (searchReferralModel.ServiceTypeID != null)
+            {
+                foreach (var item in searchReferralModel.ServiceTypeID)
+                {
+                    ServiceTypeIDs += item + ",";
+                }
+            }
             searchReferralModel.CommaSeparatedIds = ids.ToString();
+            searchReferralModel.CommaSeparatedServiceTypeIDs = ServiceTypeIDs.ToString();
             var response = _referralDataProvider.GetReferralList(searchReferralModel, pageIndex, pageSize, sortIndex, sortDirection, SessionHelper.LoggedInID);
             return JsonSerializer(response);
         }
@@ -1962,7 +1971,7 @@ namespace Zarephath.Core.Areas.HomeCare.Controllers
 
             var fileAdditionalAttachments = TempData["Attachments"] as List<string>;
 
-            if ( fileAdditionalAttachments != null)
+            if (fileAdditionalAttachments != null)
             {
                 model.Attachment.AddRange(fileAdditionalAttachments);
             }

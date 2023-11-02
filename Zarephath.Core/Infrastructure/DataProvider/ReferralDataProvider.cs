@@ -22,6 +22,7 @@ using Twilio;
 using Twilio.Rest.Fax.V1;
 using System.Text;
 using Org.BouncyCastle.Asn1.Ocsp;
+//using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Zarephath.Core.Infrastructure.DataProvider
 {
@@ -3111,7 +3112,8 @@ namespace Zarephath.Core.Infrastructure.DataProvider
             if (searchReferralModel.RegionID > 0)
                 searchList.Add(new SearchValueData { Name = "RegionID", Value = Convert.ToString(searchReferralModel.RegionID) });
 
-            searchList.Add(new SearchValueData { Name = "ServicetypeId", Value = Convert.ToString(searchReferralModel.ServiceTypeID) });
+            //searchList.Add(new SearchValueData { Name = "ServicetypeId", Value = Convert.ToString(searchReferralModel.ServiceTypeID) });
+            searchList.Add(new SearchValueData { Name = "ServicetypeId", Value = Convert.ToString(searchReferralModel.CommaSeparatedServiceTypeIDs) });
             searchList.Add(new SearchValueData { Name = "DDType_PatientSystemStatus", Value = Convert.ToString((int)Common.DDType.PatientSystemStatus) });
 
             if (isList)
@@ -6243,6 +6245,7 @@ namespace Zarephath.Core.Infrastructure.DataProvider
                 searchList.Add(new SearchValueData { Name = "EmployeeID", Value = Crypto.Decrypt(searchReferralDocument.EncryptedEmployeeID) });
 
             searchList.Add(new SearchValueData { Name = "ComplianceID", Value = Convert.ToString(searchReferralDocument.ComplianceID) });
+            searchList.Add(new SearchValueData { Name = "IsDeleted", Value = Convert.ToString(searchReferralDocument.IsDeleted) });
             searchList.Add(new SearchValueData { Name = "Name", Value = searchReferralDocument.Name });
             searchList.Add(new SearchValueData { Name = "SearchInDate", Value = searchReferralDocument.SearchInDate });
             if (searchReferralDocument.StartDate.HasValue)
@@ -9476,6 +9479,7 @@ namespace Zarephath.Core.Infrastructure.DataProvider
                 searchParam.Add(new SearchValueData("EbriggsFormMppingID", Convert.ToString(model.EbriggsFormMppingID)));
                 searchParam.Add(new SearchValueData("CurrentDateTime", Common.GetOrgCurrentDateTime().ToString(Constants.DbDateTimeFormat)));
                 searchParam.Add(new SearchValueData("LoggedInID", Convert.ToString(loggedInId)));
+                searchParam.Add(new SearchValueData("IsDeleted", Convert.ToString(model.IsDeleted)));
                 GetScalar(StoredProcedure.HC_DeleteReferralDocument, searchParam);
 
                 //FormModal data = new FormModal

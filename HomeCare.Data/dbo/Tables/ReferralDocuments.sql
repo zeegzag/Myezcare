@@ -17,6 +17,7 @@
     [StoreType]          NVARCHAR (MAX) NULL,
     [GoogleDetails]      VARCHAR (MAX)  NULL,
     [GoogleFileId]       VARCHAR (MAX)  NULL,
+    [IsDeleted ] BIT NULL DEFAULT ((0)), 
     CONSTRAINT [PK_Documents] PRIMARY KEY CLUSTERED ([ReferralDocumentID] ASC)
 );
 

@@ -152,9 +152,9 @@
                                                                                                             <span class="pull-left" ng-header="Details" common-detail-popover="item" popover-width="400"
                                                                                                                   popover-trigger="hover" ng-template-selector="#formdetailpopover">{{item.FileName}}</span>
                                                                                                         </a>*@
-                                                                                                <a href="javascript:void(0)" taraget="myIframe" data-ng-if="item.FormName" title="{{item.FormName}}_{{item.UpdatedDate|orgdatetime}}">
-                                                                                                    <span class="pull-left" data-ng-click="OpenSavedForm(item)"> {{item.FormName}}_{{item.UpdatedDate|orgdatetime}}</span>
-                                                                                                </a>
+                                                                                                    <a href="javascript:void(0)" taraget="myIframe" data-ng-if="item.FormName" title="{{item.FormName}}_{{item.UpdatedDate|orgdatetime}}">
+                                                                                                        <span class="pull-left" data-ng-click="OpenSavedForm(item)"> {{item.FormName}}_{{item.UpdatedDate|orgdatetime}}</span>
+                                                                                                    </a>
                                                                                                 </content>
                                                                                                 <content class="navItem__content___1BanG_Hover padding-left-10 pull-right form-content con_rgt">
                                                                                                     <a href="javascript:void(0);" class="btn btn-xs btn-success ng-scope" ng-header="Details" common-detail-popover="item" popover-width="400"
@@ -279,6 +279,16 @@
                                                     <option value="@Resource.Global">@Resource.Global</option>
                                                 </select>
                                             </div>
+                                            <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6">
+                                                <label class="control-label">
+                                                    @Resource.Status
+                                                </label>
+                                                <select class="form-control input-xs" data-ng-model="SearchReferralDocumentListPage.IsDeleted"
+                                                        data-ng-init="SearchReferralDocumentListPage.IsDeleted=SearchReferralDocumentListPage.IsDeleted==null?'0':SearchReferralDocumentListPage.IsDeleted">
+                                                    <option value="0">Active</option>
+                                                    <option value="1">Archive</option>
+                                                </select>
+                                            </div>
                                             <div class="form-group col-lg-3 col-md-4 col-sm-4 col-xs-6 margin-top-20">
                                                 <button type="submit" class="btn btn-xs btn-primary" data-ng-click="SearchReferralDocument()">
                                                     @Resource.Search
@@ -380,7 +390,7 @@
                                                 <td data-ng-bind="referralDocument.UpdatedDate | orgdate"></td>
                                                 <td data-ng-if="IsEditableCompliance()" class="text-align-right">
                                                     @{bool isDelete = (documentFrom != null && documentFrom == "PATIENT" && Common.HasPermission(Constants.HC_Permission_PatientIntake_Documents_Delete))
-                                                                                                       || (documentFrom != null && documentFrom == "EMPLOYEE" && Common.HasPermission(Constants.HC_Permission_Employee_EmployeeDocuments_Delete));
+                                                                                                         || (documentFrom != null && documentFrom == "EMPLOYEE" && Common.HasPermission(Constants.HC_Permission_Employee_EmployeeDocuments_Delete));
                                                         bool isEdit = (documentFrom != null && documentFrom == "PATIENT" && Common.HasPermission(Constants.HC_Permission_PatientIntake_Documents_Add))
                                                                 || (documentFrom != null && documentFrom == "EMPLOYEE" && Common.HasPermission(Constants.HC_Permission_Employee_EmployeeDocuments_Add));
 
@@ -394,9 +404,14 @@
 
                                                                 @if (isDelete)
                                                                 {
-                                                                    <li>
+                                                                    <li data-ng-show="!referralDocument.IsDeleted">
                                                                         <a href="javascript:void(0);" data-ng-click="DeleteDocument(referralDocument)" tooltip title="@Resource.DeleteDocument">
-                                                                            <i class="fa fa-trash text-danger"></i>@Resource.Delete
+                                                                            <i class="fa fa-trash text-danger"></i>@Resource.Archive
+                                                                        </a>
+                                                                    </li>
+                                                                    <li data-ng-show="referralDocument.IsDeleted">
+                                                                        <a href="javascript:void(0);" data-ng-click="DeleteDocument(referralDocument)" tooltip title="@Resource.DeleteDocument">
+                                                                            <i class="fa fa-trash text-danger"></i>@Resource.Active
                                                                         </a>
                                                                     </li>
                                                                 }
@@ -435,19 +450,19 @@
                                                                     </li>
 
                                                                     @*<li>
-                                <a href="#sendFax" data-ng-click="GetItem(referralDocument)" tooltip title="Fax"
-                                   data-toggle="modal">
-                                    <i class="fa fa-copy"></i>Fax <span beta-tag></span>
-                                </a>
-                            </li>*@
+                                                                            <a href="#sendFax" data-ng-click="GetItem(referralDocument)" tooltip title="Fax"
+                                                                               data-toggle="modal">
+                                                                                <i class="fa fa-copy"></i>Fax <span beta-tag></span>
+                                                                            </a>
+                                                                        </li>*@
 
                                                                 }
                                                                 @*<li>
-                            <a href="#" data-ng-click="" tooltip title="@Resource.CloneDocument"
-                               data-toggle="modal" data-ng-if="referralDocument.ReferralDocumentID > 0 && referralDocument.StoreType == 'Orbeon'">
-                                <i class="fa fa-copy"></i>Fax
-                            </a>
-                        </li>*@
+                                                                        <a href="#" data-ng-click="" tooltip title="@Resource.CloneDocument"
+                                                                           data-toggle="modal" data-ng-if="referralDocument.ReferralDocumentID > 0 && referralDocument.StoreType == 'Orbeon'">
+                                                                            <i class="fa fa-copy"></i>Fax
+                                                                        </a>
+                                                                    </li>*@
 
                                                             </ul>
                                                         </div>
@@ -549,7 +564,7 @@
                             <a href="javascript:void(0);" data-ng-click="RemoveMappedForm()" title="Remove Mapping"><i class="fa fa-remove"></i></a>
                         </div>
                     </div>
-                   
+
                     <div class="row" data-ng-if="AddModal.EBFormID==null">
                         <div class="col-md-3">
                             <button type="button" class="btn btn-sm button" data-ng-click="OpenMapFormModel(false)">@Resource.MapForm</button>
@@ -1030,7 +1045,7 @@
                 </div>
             </div>
             <div class="modal-body">
-                <form name="frmCertificate" id="frmCertificate" >
+                <form name="frmCertificate" id="frmCertificate">
                     <div class="row">
                         <div class="col-sm-12">
 
@@ -1049,7 +1064,7 @@
                                         <div class="col-sm-4">
                                             <div data-ng-if="!IsFileUploading" class="fileUpload ">
                                                 <span><i class="fa fa-paperclip" style="padding-right: 8px;font-size: 16px;"></i> Attach</span>
-                                               
+
                                                 <div>
                                                     <div class="">
                                                         <input id="EmailAttachment" type="file" name="ResourceFile" multiple class="upload" value="Browse" />
@@ -1060,10 +1075,10 @@
                                         <div class="col-sm-3">
                                             <input type="checkbox" ng-model="EmployeeEmail" ng-change="GetEmployeeEmail()"> CC to myself
                                         </div>
-                                        
-                                            <div class="col-sm-12"  style="margin-top: 7px;" id="AttachedList">
-                                            </div>
-                                       
+
+                                        <div class="col-sm-12" style="margin-top: 7px;" id="AttachedList">
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -1189,12 +1204,12 @@
                     </tr>
                 </table>
                 <br />
-                
+
             </div>
             <div class="modal-footer">
                 <div class="row">
                     <div class="col-sm-12 text-center">
-                        <button data-ng-click="AddEmail(referral)" >Add</button>
+                        <button data-ng-click="AddEmail(referral)">Add</button>
                         @*<button class="btn" data-dismiss="modal">Close</button>*@
                     </div>
                 </div>
@@ -1221,7 +1236,7 @@
                         <div class="all-mail">
 
                         </div>
-                        <input type="text" id="txtFaxTo" name="email" data-ng-model="FaxModel.To"  class="enter-mail-id" placeholder="Enter Fax No" />
+                        <input type="text" id="txtFaxTo" name="email" data-ng-model="FaxModel.To" class="enter-mail-id" placeholder="Enter Fax No" />
                     </div>
 
 
@@ -1317,10 +1332,10 @@
         document.getElementById(cityName).style.display = "block";
         evt.currentTarget.className += " active";
     };
-    
+
     // Get the element with id="defaultOpen" and click on it
    // document.getElementById("defaultOpen").click();
- 
+
 </script>
 
 @*<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -1328,9 +1343,10 @@
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://cdn.jsdelivr.net/bootstrap.tagsinput/0.4.2/bootstrap-tagsinput.min.js"></script>*@
 <style>
-    .custom_switch{
-        width:100px !important;
+    .custom_switch {
+        width: 100px !important;
     }
+
     span.email-ids {
         float: left;
         /* padding: 4px; */
