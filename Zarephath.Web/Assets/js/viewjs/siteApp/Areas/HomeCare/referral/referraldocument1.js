@@ -267,6 +267,7 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     };
 
     $scope.OpenAddFormModal = function () {
+        debugger
         if ($scope.SelectedSection == undefined && ($scope.SelectedSubSection == undefined || $scope.SelectedSubSection == null)) {
             ShowMessage("Select the Folder or Subfolder to add document.", "error");
         } else {
