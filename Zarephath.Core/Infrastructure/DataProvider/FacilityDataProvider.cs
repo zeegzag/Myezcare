@@ -374,7 +374,7 @@ namespace Zarephath.Core.Infrastructure.DataProvider
                 {
                     addReferralModel.Referral.AgencyID = null;
                 }
-                if (addReferralModel.Referral.RegionID == 0)
+                if (addReferralModel.Referral.RegionID == null)
                 {
                     addReferralModel.Referral.RegionID = null;
                 }
@@ -1753,17 +1753,17 @@ namespace Zarephath.Core.Infrastructure.DataProvider
 
                 #endregion
 
-                #region Add Region(Location)
-                if (addReferralModel.Referral.RegionID == 0)
-                {
-                    List<SearchValueData> param = new List<SearchValueData>
-                    {
-                        new SearchValueData {Name = "RegionName", Value = addReferralModel.Referral.RegionName}
-                    };
-                    long RegionID = (long)GetScalar(StoredProcedure.AddRegion, param);
-                    addReferralModel.Referral.RegionID = RegionID;
-                }
-                #endregion
+                //#region Add Region(Location)
+                //if (addReferralModel.Referral.RegionID == null)
+                //{
+                //    List<SearchValueData> param = new List<SearchValueData>
+                //    {
+                //        new SearchValueData {Name = "RegionName", Value = addReferralModel.Referral.RegionName}
+                //    };
+                //    long RegionID = (long)GetScalar(StoredProcedure.AddRegion, param);
+                //    addReferralModel.Referral.RegionID = RegionID;
+                //}
+                //#endregion
 
                 #region Add/Update Referral Related details
 
@@ -1785,7 +1785,7 @@ namespace Zarephath.Core.Infrastructure.DataProvider
                 {
                     addReferralModel.Referral.AgencyID = null;
                 }
-                if (addReferralModel.Referral.RegionID == 0)
+                if (addReferralModel.Referral.RegionID == null)
                 {
                     addReferralModel.Referral.RegionID = null;
                 }

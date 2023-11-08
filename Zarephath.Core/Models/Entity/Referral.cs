@@ -123,8 +123,8 @@ namespace Zarephath.Core.Models.Entity
         //[Required(ErrorMessageResourceName = "InstitutionalAuthrizationCodeRequired", ErrorMessageResourceType = typeof(Resource))]
         //public string InstitutionalAuthrizationCode { get; set; }
 
-        [GetTableNameAttribute("Regions")]
-        public long? RegionID { get; set; }
+        //[GetTableNameAttribute("Regions")]
+        public string RegionID { get; set; }
 
         [GetTableNameAttribute("Languages")]
         [Display(ResourceType = typeof(Resource), Name = "Language")]

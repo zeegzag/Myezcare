@@ -19,7 +19,6 @@ controllers.ReferralListController = function ($scope, $http, $window, $timeout)
     $scope.ReferralListPager = new PagerModule("ClientName");
 
     $scope.SetPostData = function (fromIndex, model) {
-        debugger
         var pagermodel = {
             SearchReferralModel: $scope.SearchReferralModel,
             pageSize: $scope.ReferralListPager.pageSize,
@@ -66,7 +65,6 @@ controllers.ReferralListController = function ($scope, $http, $window, $timeout)
     $scope.ReferralIds = [];
     $scope.GetReferralList = function (isSearchDataMappingRequire) {
         //Reset Selcted Checkbox items and Control
-        debugger
         $scope.SelectedReferralIds = [];
         $scope.SelectAllCheckbox = false;
         //Reset Selcted Checkbox items and Control
@@ -214,7 +212,6 @@ controllers.ReferralListController = function ($scope, $http, $window, $timeout)
     };
 
     $scope.SearchReferral = function () {
-        debugger
         $scope.ReferralListPager.currentPage = 1;
         $scope.ReferralListPager.getDataCallback(true);
     };
