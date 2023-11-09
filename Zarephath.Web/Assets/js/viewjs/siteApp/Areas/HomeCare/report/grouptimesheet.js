@@ -71,7 +71,6 @@ controllers.GroupTimesheetListController = function ($scope, $http, $timeout, St
     }
 
     $scope.GetGroupTimesheetList = function () {
-        debugger
         var isValid = CheckErrors($("#frmFilters"), true);
         if (isValid) {
             //Reset Selcted Checkbox items and Control
@@ -107,7 +106,7 @@ controllers.GroupTimesheetListController = function ($scope, $http, $timeout, St
     $scope.GroupTimesheetListPager.getDataCallback = $scope.GetGroupTimesheetList;
 
     $scope.SearchGroupTimesheet = function () {
-       /* alert("qwqwqw");*/
+        /* alert("qwqwqw");*/
         $scope.GroupTimesheetListPager.currentPage = 1;
         $scope.GroupTimesheetListPager.getDataCallback();
     };

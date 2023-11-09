@@ -480,11 +480,13 @@ controllers.AddReferralTimeSlotsController = function ($scope, $http) {
         return today;
     }
     $scope.OnReferralBillingAuthorizationChange_Old = function (item) {
+        debugger
         $scope.RTSDetail.SelectedRBA = $scope.ReferralBillingAuthorizations.find(rba => rba.ReferralBillingAuthorizationID == item.ReferralBillingAuthorizationID);
         $scope.RTSDetail.ReferralBillingAuthorizationID = item.ReferralBillingAuthorizationID;
         $scope.RTSDetail.AuthorizationCode = item.AuthorizationCode;
     };
     $scope.OnReferralBillingAuthorizationChange = function (item, option) {
+        debugger
         if (option == true) {/*Invoice base*/
             // $scope.RTSMaster = $scope.newInstance().RTSMaster;
             $scope.RTSMaster.SelectedRBA = $scope.newInstance().SelectedRBA;
@@ -492,8 +494,10 @@ controllers.AddReferralTimeSlotsController = function ($scope, $http) {
             $scope.RTSMaster.ReferralBillingAuthorizationID = item.ReferralBillingAuthorizationID;
             $scope.RTSMaster.ReferralID = $scope.RTSMaster.ReferralID; //$scope.RTSMaster.SelectedRBA.ReferralID;
             $scope.RTSMaster.AuthorizationCode = item.AuthorizationCode;
-            $scope.RTSMaster.StartDate = $scope.MakeDateFormat(item.StartDate);
-            $scope.RTSMaster.EndDate = $scope.MakeDateFormat(item.EndDate);
+            //$scope.RTSMaster.StartDate = $scope.MakeDateFormat(item.StartDate);
+            //$scope.RTSMaster.EndDate = $scope.MakeDateFormat(item.EndDate);
+            $scope.RTSMaster.StartDate = moment(item.StartDate);
+            $scope.RTSMaster.EndDate = moment(item.EndDate);
             $scope.RTSMaster.CareTypeID = item.CareTypeID;
             $scope.RTSDetail.CareTypeId = item.CareTypeID;
             $scope.RTSMaster.CareType = item.CareType;
@@ -529,8 +533,10 @@ controllers.AddReferralTimeSlotsController = function ($scope, $http) {
 
             $scope.RTSMaster.ServiceCode = item.ServiceCode;
             if (item.ReferralBillingAuthorizationID > 0) {
-                $scope.RTSMaster.StartDate = $scope.MakeDateFormat(item.StartDate);
-                $scope.RTSMaster.EndDate = $scope.MakeDateFormat(item.EndDate);
+                //$scope.RTSMaster.StartDate = $scope.MakeDateFormat(item.StartDate);
+                //$scope.RTSMaster.EndDate = $scope.MakeDateFormat(item.EndDate);
+                $scope.RTSMaster.StartDate = moment(item.StartDate);
+                $scope.RTSMaster.EndDate = moment(item.EndDate);
                 $scope.RTSMaster.IsEndDateAvailable = true;
             }
             else {
@@ -635,6 +641,7 @@ controllers.AddReferralTimeSlotsController = function ($scope, $http) {
     }
 
     $scope.SaveRTSMasterOld = function () {
+        debugger
         RadioSelectChange
         var isValid = CheckErrors($("#frmRTSMaster"));
         $scope.RTSMaster.IsVisible = false;
@@ -1095,6 +1102,7 @@ controllers.AddReferralTimeSlotsController = function ($scope, $http) {
 
     
     $scope.SaveRTSDetail = function () {
+        debugger
         $scope.RTSDetail.StartDate = $scope.RTSMaster.StartDate;
         $scope.RTSDetail.EndDate = $scope.RTSMaster.EndDate;
         $scope.RTSDetail.ReferralID = $scope.TempSearchRTSMaster.ReferralID;
