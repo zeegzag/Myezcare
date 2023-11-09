@@ -41,6 +41,7 @@ controllers.BillingSettingController = function ($scope, $http, $window, $timeou
     };
 
     $scope.SaveReferralBillingAuthorization = function (isProfessionalAuthCode) {
+        debugger
         $scope.AuthFormID = '#' + isProfessionalAuthCode;
         if (CheckErrors($scope.AuthFormID)) {
             //$scope.ReferralModel.ReferralBillingAuthorization;
