@@ -267,7 +267,6 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     };
 
     $scope.OpenAddFormModal = function () {
-        debugger
         if ($scope.SelectedSection == undefined && ($scope.SelectedSubSection == undefined || $scope.SelectedSubSection == null)) {
             ShowMessage("Select the Folder or Subfolder to add document.", "error");
         } else {
@@ -754,7 +753,7 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
         }
     });
 
-    $scope.DeleteDocument = function (data) {
+    $scope.DeleteDocument = function (data,msg) {
         var deleteDocumentUrl = HomeCareSiteUrl.DeleteReferralDocumentURL;
 
         if (data.StoreType == 'Google Drive') { deleteDocumentUrl = HomeCareSiteUrl.DeleteReferralDocumentGoogleURL; }
@@ -772,7 +771,7 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
                     ShowMessages(response);
                 });
             }
-        }, bootboxDialogType.Confirm, bootboxDialogTitle.Delete, window.DeleteDocumentMessage, bootboxDialogButtonText.YesContinue, btnClass.BtnDanger);
+        }, bootboxDialogType.Confirm, msg, window.DeleteDocumentMessage, bootboxDialogButtonText.YesContinue, btnClass.BtnDanger);
     };
 
 
@@ -862,7 +861,6 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     $scope.ReferralDocumentPager = new PagerModule("CreatedDate", null, "Desc");
 
     $scope.SetPostData = function (fromIndex, complianceID) {
-        debugger
         $scope.SearchReferralDocumentListPage.ComplianceID = complianceID;
         $scope.SearchReferralDocumentListPage.EncryptedReferralID = $scope.EncryptedReferralID;
         $scope.SearchReferralDocumentListPage.EncryptedEmployeeID = $scope.EncryptedEmployeeID;
@@ -884,7 +882,6 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     };
 
     $scope.GetReferralDocumentList = function (isSearchDataMappingRequire) {
-        debugger
         //$scope.ReferralDocumentPager.pageSize = 50;
         $scope.SetFullScreen = false;
         if (isSearchDataMappingRequire)
@@ -1249,7 +1246,6 @@ controllers.ReferralDocumentController = function ($scope, $http, $window, $time
     $scope.MailModel.ReferralDocumentID = {};
     $scope.MailModel.Body1 = {};
     $scope.GetReferralAttachment = function (item) {
-        debugger
         $scope.MailModel.ReferralDocumentID = item.ReferralDocumentID;
         $scope.GoogleFileId = item.GoogleFileId;
         $scope.EmployeeID = $scope.EmployeeID;

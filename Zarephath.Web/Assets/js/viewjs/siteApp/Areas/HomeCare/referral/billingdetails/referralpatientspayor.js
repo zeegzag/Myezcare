@@ -335,6 +335,9 @@ controllers.ReferralPatientsPayorController = function ($scope, $http, $window, 
         $scope.ResetSearchFilter();
         $scope.ReferralPayorMappingListPager.getDataCallback();
         $scope.ClearReferralPayorMappingDetails();
+
+        var dateformat = GetOrgDateFormat();
+        $(".dateInputMask").attr("placeholder", dateformat);
     });
 
     
@@ -344,6 +347,7 @@ controllers.ReferralPatientsPayorController.$inject = ['$scope', '$http', '$wind
 
 
 $(document).ready(function () {
+    debugger
     var dateformat = GetOrgDateFormat();
     $(".dateInputMask").attr("placeholder", dateformat);
     $('.time').inputmask({
