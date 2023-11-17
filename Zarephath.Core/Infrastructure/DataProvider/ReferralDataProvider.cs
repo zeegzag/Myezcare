@@ -22,6 +22,7 @@ using Twilio;
 using Twilio.Rest.Fax.V1;
 using System.Text;
 using Org.BouncyCastle.Asn1.Ocsp;
+using DocumentFormat.OpenXml.Office2010.Excel;
 //using DocumentFormat.OpenXml.Wordprocessing;
 
 namespace Zarephath.Core.Infrastructure.DataProvider
@@ -10764,6 +10765,77 @@ namespace Zarephath.Core.Infrastructure.DataProvider
                 return true;
             }
             return false;
+        }
+        public ServiceResponse GetReferralSourcesDD(string ItemType, int Isdeleted)
+        {
+            ServiceResponse response = new ServiceResponse();
+
+            List<SearchValueData> searchList = new List<SearchValueData>();
+            searchList.Add(new SearchValueData { Name = "ItemType", Value = Convert.ToString(ItemType) });
+            searchList.Add(new SearchValueData { Name = "Isdeleted", Value = Convert.ToString(Isdeleted) });
+            List<ReferralSourcesDDModel> totalData = GetEntityList<ReferralSourcesDDModel>(StoredProcedure.GetReferralSourcesDD, searchList);
+            response.IsSuccess = true;
+            response.Data = totalData;
+            return response;
+        }
+        public ServiceResponse SaveReferralSourcesDD(ReferralSources model, long LoggedInID)
+        {
+            var response = new ServiceResponse();
+            try
+            {
+                ReferralSourcesDDModel data = GetEntity<ReferralSourcesDDModel>(StoredProcedure.SaveReferralSourcesDD, new List<SearchValueData>
+                {
+                    new SearchValueData {Name = "Value",Value = Convert.ToString(model.Value)},
+                    new SearchValueData {Name = "Name",Value = Convert.ToString(model.Name)},
+                    new SearchValueData {Name = "ItemType",Value = Convert.ToString(model.ItemType)},
+                     new SearchValueData {Name = "UpdatedBy",Value = Convert.ToString(LoggedInID)}
+                   
+                });
+                if (data.Result == -1)
+                {
+                    response.IsSuccess = false;
+                    response.Message = "Record already Exist";
+                }
+                else
+                {
+                    response.IsSuccess = true;
+                    response.Data = data;
+                    response.Message = string.Format(Resource.RecordUpdatedSuccessfully, Resource.EmployeeVisit);
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = Common.MessageWithTitle(Resource.Error, ex.Message);
+            }
+            return response;
+        }
+        public ServiceResponse DeleteReferralSourcesDD(long id,long IsDeleted,string ItemType)
+        {
+            var response = new ServiceResponse();
+            try
+            {
+                List<SearchValueData> searchList = new List<SearchValueData>();
+                searchList.Add(new SearchValueData { Name = "id", Value = Convert.ToString(id) });
+                searchList.Add(new SearchValueData { Name = "IsDeleted", Value = Convert.ToString(IsDeleted) });
+                searchList.Add(new SearchValueData { Name = "ItemType", Value = Convert.ToString(ItemType) });
+                GetScalar(StoredProcedure.DeleteReferralSourcesDD, searchList);
+                if (IsDeleted == 0)
+                {
+                    response.Message = string.Format(Resource.DeletedSuccessfully, Resource.ReferralSource);
+                }
+                else
+                {
+                    response.Message = string.Format("Active Successfully", Resource.ReferralSource);
+                }
+                response.IsSuccess = true;
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = Common.MessageWithTitle(Resource.Error, ex.Message);
+            }
+            return response;
         }
     }
 }

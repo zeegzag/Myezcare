@@ -1322,6 +1322,9 @@ namespace Zarephath.Core.Infrastructure
         public const string WeeklyReportDMAS90GetDays = "WeeklyReportDMAS90GetDays";
         public const string GetPatientScheduledEmployees = "GetPatientScheduledEmployees";
         public const string GetCaretype = "GetCaretype";
+        public const string GetReferralSourcesDD = "GetReferralSourcesDD";
+        public const string SaveReferralSourcesDD = "SaveReferralSourcesDD";
+        public const string DeleteReferralSourcesDD = "DeleteReferralSourcesDD";
         public const string GetRegion = "rpt.locationList";
         public const string NotificationForEmployeeLateClockIn = "NotificationForEmployeeLateClockIn";
 
