@@ -347,7 +347,7 @@ controllers.ReferralPatientsPayorController.$inject = ['$scope', '$http', '$wind
 
 
 $(document).ready(function () {
-    debugger
+    //debugger
     var dateformat = GetOrgDateFormat();
     $(".dateInputMask").attr("placeholder", dateformat);
     $('.time').inputmask({
