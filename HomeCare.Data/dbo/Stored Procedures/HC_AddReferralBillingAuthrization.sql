@@ -32,7 +32,7 @@
  @FacilityCode NVARCHAR(MAX)=NULL    
 AS        
 BEGIN                                                  
-                  
+      set @DxCode= replace(@DxCode,',',' | ')            
 -- New change request for Billing Module        
 -- Added new fields to creating mapping of payor to service code with referrals.        
 -- 18-05-2020: Kundan Kumar Rai        
@@ -77,7 +77,8 @@ BEGIN TRANSACTION trans
   VALUES(@ReferralID,@Type,@AuthorizationCode,@PayorID,@AllowedTime,@StartDate,@EndDate,@PriorAuthorizationFrequencyType,        
   @ServiceCodeID,@Rate,@RevenueCode,@UnitType,@PerUnitQuantity,@RoundUpUnit,@MaxUnit,@DailyUnitLimit,@CareType,@ModifierID,@TaxonomyID,@AllowedTimeType,
   GETUTCDATE(),@loggedInID,GETUTCDATE(),@loggedInID,@SystemID, @AttachmentFileName, @AttachmentFilePath, 
-  @UnitLimitFrequency,replace(@DxCode,',','  |  '),@DxCodeID,@PayRate, @FacilityCode)       
+  @UnitLimitFrequency,@DxCode
+  ,@DxCodeID,@PayRate, @FacilityCode)       
        
                     
                     
@@ -109,7 +110,7 @@ BEGIN TRANSACTION trans
   AttachmentFileName = @AttachmentFileName,        
   AttachmentFilePath = @AttachmentFilePath ,      
   UnitLimitFrequency = @UnitLimitFrequency ,    
-  DxCode=replace(@DxCode,',','  |  '),    
+  DxCode=@DxCode,    
   DxCodeID=@DxCodeID,
   PayRate = @PayRate,
   FacilityCode = @FacilityCode

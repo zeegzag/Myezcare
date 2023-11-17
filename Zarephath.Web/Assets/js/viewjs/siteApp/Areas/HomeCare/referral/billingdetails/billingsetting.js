@@ -1058,6 +1058,18 @@ controllers.BillingSettingController = function ($scope, $http, $window, $timeou
         AngularAjaxCall($http, HomeCareSiteUrl.GetDXcodeListDDURL, jsonData, "Post", "json", "application/json").success(function (response) {
             if (response.IsSuccess) {
                 $scope.DXcodeListDD = response.Data;
+                $scope.DXcodeListDD.forEach(function (item, index) {
+                    //= (5)['1714', '1715', '1716', '1717', '1718']
+                    if ($scope.DXCodeIDs && $scope.DXCodeIDs.indexOf('' + item.DXCodeID) > -1) {
+                        item.IsChecked = true;
+                        $scope.DXCodeIDs.push('' + item.DXCodeID);
+                        $scope.DXCodes.push('' + item.DXCodeWithoutDot);
+                    }
+                    else {
+                        item.IsChecked = false;
+                    }
+
+                });
             }
             ShowMessages(response);
         });
@@ -1098,27 +1110,44 @@ controllers.BillingSettingController = function ($scope, $http, $window, $timeou
     $scope.DXCodeIDs = [];
     $scope.DXCodes = [];
     $scope.SelectDxCode = function (item) {
+        $scope.DXCodes = [...new Set($scope.DXCodes)];
+        $scope.DXCodeIDs = [...new Set($scope.DXCodeIDs)];
         if (item.IsChecked) {
             $scope.DXCodeIDs.push(item.DXCodeID);
             $scope.DXCodes.push(item.DXCodeWithoutDot);
         }
         else {
-            $scope.DXCodeIDs.remove(item.DXCodeID);
-            $scope.DXCodes.remove(item.DXCodeWithoutDot);
+            $scope.DXCodeIDs.forEach(function (items) {
+               
+                if (items.indexOf('' + item.DXCodeID) > -1) {
+                    $scope.DXCodeIDs.remove(item.DXCodeID);
+                   
+                }
+            });
+            $scope.DXCodes.forEach(function (items) {
+
+                if (items.indexOf('' + item.DXCodeWithoutDot) > -1) {
+                    
+                    $scope.DXCodes.remove(item.DXCodeWithoutDot);
+                }
+            });
+            //$scope.DXCodeIDs.remove(item.DXCodeID);
+            //$scope.DXCodes.remove(item.DXCodeWithoutDot);
         }
     };
     $scope.SaveDxCode = function () {
         $scope.DXCodeID = null;
         
-        
-        $scope.ReferralModel.ReferralBillingAuthorization.DxCode = $scope.DXCodes.toString();
+        $scope.DXCodes = [...new Set($scope.DXCodes)];
+        $scope.DXCodeIDs = [...new Set($scope.DXCodeIDs)];
+        $scope.ReferralModel.ReferralBillingAuthorization.DxCode = $scope.DXCodes.toString().replaceAll(',',' | ' );
         $scope.ReferralModel.ReferralBillingAuthorization.DxCodeID = $scope.DXCodeIDs.toString();
         /**/
         $scope.DXCode = $scope.DXCodes.toString();
         $scope.DXCodeID = $scope.DXCodeIDs.toString();
         $scope.ReferralBillingAuthorizationID = $scope.ReferralModel.ReferralBillingAuthorization.ReferralBillingAuthorizationID;
-        $scope.DXCodeIDs = [];
-        $scope.DXCodes = [];
+        //$scope.DXCodeIDs = [];
+        //$scope.DXCodes = [];
         //var jsonData = angular.toJson({ DXCodeID: $scope.DXCodeID, ReferralBillingAuthorizationID: $scope.ReferralBillingAuthorizationID });
         //AngularAjaxCall($http, HomeCareSiteUrl.SaveDXcodeListDDURL, jsonData, "post", "json", "application/json", true).
         //    success(function (response, status, headers, config) {
