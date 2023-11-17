@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Web;
+using Zarephath.Core.Helpers;
 using Zarephath.Core.Models;
 using Zarephath.Core.Models.Entity;
 using Zarephath.Core.Models.ViewModel;
@@ -488,6 +489,9 @@ namespace Zarephath.Core.Infrastructure.DataProvider
 
         ServiceResponse GetMasterJurisdictionList(string claimProcessor);
         ServiceResponse GetMasterTimezoneList(string claimProcessor);
+        ServiceResponse GetReferralSourcesDD(string ItemType, int Isdeleted);
+        ServiceResponse SaveReferralSourcesDD(ReferralSources model, long LoggedInID);
+        ServiceResponse DeleteReferralSourcesDD(long id, long IsDeleted, string ItemType);
 
         bool IsDXCodeExist(string referralID, string PayorID);
     }

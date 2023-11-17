@@ -2765,5 +2765,19 @@ namespace Zarephath.Core.Models.ViewModel
         public string ReferralBillingAuthorizationID { get; set; }
         public string DXCodeID { get; set; }
     }
+    public class ReferralSourcesDDModel
+    {
+        public long Value { get; set; }
+        public string Name { get; set; }
+        public string ItemType { get; set; }
+        public int IsDeleted { get; set; }
+        public int Result { get; set; }
+    }
+    public class ReferralSources
+    {
+        public long Value { get; set; }
+        public string Name { get; set; }
+        public string ItemType { get; set; }
+    }
 
 }

@@ -2304,5 +2304,24 @@ namespace Zarephath.Core.Areas.HomeCare.Controllers
             _referralDataProvider = new ReferralDataProvider();
             return Json(_referralDataProvider.GetMasterTimezoneList(claimProcessor));
         }
+        [HttpPost]
+        public JsonResult GetReferralSourcesDD(string ItemType,int Isdeleted)
+        {
+            _referralDataProvider = new ReferralDataProvider();
+            ServiceResponse response = _referralDataProvider.GetReferralSourcesDD(ItemType,Isdeleted);
+            return Json(response, JsonRequestBehavior.AllowGet);
+            }
+        [HttpPost]
+        public JsonResult SaveReferralSourcesDD(ReferralSources model)
+        {
+            _referralDataProvider = new ReferralDataProvider();
+            return Json(_referralDataProvider.SaveReferralSourcesDD(model, SessionHelper.LoggedInID));
+        }
+        [HttpPost]
+        public JsonResult DeleteReferralSourcesDD(long id,long IsDeleted, string ItemType)
+        {
+            _referralDataProvider = new ReferralDataProvider();
+            return Json(_referralDataProvider.DeleteReferralSourcesDD(id, IsDeleted,ItemType));
+        }
     }
 }
