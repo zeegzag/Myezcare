@@ -1486,7 +1486,10 @@ var HomeCareSiteUrl =
     BatchMasterURL: "/hc/batch/batchmaster",
 
     GetRegionURL: "/hc/home/GetRegion",
-    SaveMannualPaymentPostingDetailsUrl: "/hc/batch//SaveMannualPaymentPostingDetails"
+    SaveMannualPaymentPostingDetailsUrl: "/hc/batch//SaveMannualPaymentPostingDetails",
+    GetReferralSourcesDDUrl: "/hc/referral/GetReferralSourcesDD",
+    SaveReferralSourcesDDUrl: "/hc/referral/SaveReferralSourcesDD",
+    DeleteReferralSourcesDDUrl: "/hc/referral/DeleteReferralSourcesDD"
 };
 
 

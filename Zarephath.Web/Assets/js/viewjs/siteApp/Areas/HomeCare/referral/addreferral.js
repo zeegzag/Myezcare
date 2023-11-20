@@ -3,13 +3,14 @@
 controllers.AddReferralController = function ($scope, $http, $window, $timeout, $filter) {
     //#region REFERRAL RELATED GLOBAL FUNCATION
     model = $scope;
+    $scope.IsReferralSources = false;
+    $scope.IsReferralSources = false;
     $scope.CurrentDate = SetExpiryDate();
     $scope.newInstance = function () {        
         return $.parseJSON($("#hdnAddReferralModel").val());
     };
     
     var modalJson = $.parseJSON($("#hdnAddReferralModel").val());
-
     $scope.ShowSubmitActions = true;
     $scope.DxCodeTokenInputObj = {};
     $scope.ReferralSiblingTokenInputObj = {};
@@ -3077,6 +3078,81 @@ controllers.AddReferralController = function ($scope, $http, $window, $timeout, 
         pdfWindow.document.close();
 
     };
+    $scope.OpenReferralSourceModel = function (ReferralSourceID, ItemType)
+    {
+        if (ReferralSourceID == 99999999 && ItemType =='ReferralSources') {
+            $('#ReferralSourceModal').modal({ backdrop: 'static', keyboard: false })
+            $scope.IsReferralSources = true;
+            $scope.IsReferralStatuses = false;
+        }
+        if (ReferralSourceID == 99999999 && ItemType == 'ReferralStatuses') {
+            $('#ReferralStatusesModal').modal({ backdrop: 'static', keyboard: false })
+            $scope.IsReferralStatuses = true;
+            $scope.IsReferralSources = false;
+        }
+        $scope.GetReferralSource(ItemType,0);
+    };
+    $scope.ReferralSourceModelClosed = function ()
+    {
+        $('#ReferralSourceModal').modal('hide');
+        $('#ReferralStatusesModal').modal('hide');
+        location.reload();
+    }
+    $scope.ReferralSourcesDDList = [];
+    $scope.GetReferralSource = function (ItemType, Isdeleted) {
+        //$scope.Isdeleted = Isdeleted ? Isdeleted : 0;
+        var jsonData = angular.toJson({ ItemType:ItemType,Isdeleted:Isdeleted});
+        AngularAjaxCall($http, HomeCareSiteUrl.GetReferralSourcesDDUrl, jsonData, "Post", "json", "application/json").success(function (response) {
+            ShowMessages(response);
+            if (response.IsSuccess) {
+                $scope.ReferralSourcesDDList = response.Data;
+                if ($scope.ReferralSourcesDDList.length > 0) {
+                $scope.ReferralModel.ReferralSources = $scope.ReferralSourcesDDList;}
+            }
+        });
+    };
+    $scope.SaveReferralSource = function (item, ItemType) {
+        if (item != undefined) {
+            item.ItemType = ItemType;
+            var jsonData = angular.toJson({ Name: item.Name, Value: item.Value, ItemType: ItemType });
+            AngularAjaxCall($http, HomeCareSiteUrl.SaveReferralSourcesDDUrl, jsonData, "Post", "json", "application/json").success(function (response) {
+                ShowMessages(response);
+                if (response.IsSuccess) {
+                    $scope.ReferralSourcesDDList = response.Data;
+                    $scope.GetReferralSource(ItemType,0);
+                    /*location.reload();*/
+                }
+            });
+        }
+        else {
+            toastr.error("Name is required field");
+        }
+    };
+    $scope.DeleteReferralSourcesDD = function (item, msg, ItemType) {
+        bootboxDialog(function (result) {
+            if (result) {
+               // if (item.Value > 0) {
+                var jsonData = angular.toJson({ id: item.Value, IsDeleted: item.IsDeleted, ItemType: ItemType });
+                AngularAjaxCall($http, HomeCareSiteUrl.DeleteReferralSourcesDDUrl, jsonData, "Post", "json", "application/json").success(function (response) {
+                    if (response.IsSuccess) {
+                        $scope.GetReferralSource(ItemType,0);
+                        }
+                        ShowMessages(response);
+                    });
+                //} 
+            }
+        }, bootboxDialogType.Confirm, msg, 'Are you sure you want to '+msg+ ' record(s)?', bootboxDialogButtonText.YesContinue, btnClass.BtnDanger);
+
+    };
+    
+    $scope.EditReferralSources = function (item, ItemType) {
+        $scope.ReferralSources = [];
+        $scope.ReferralSources.ItemType = ItemType;
+        $scope.ReferralSources.Name = item.Name;
+        $scope.ReferralSources.Value = item.Value;
+       
+    };
+
 };
 
 controllers.AddReferralController.$inject = ['$scope', '$http', '$window', '$timeout'];

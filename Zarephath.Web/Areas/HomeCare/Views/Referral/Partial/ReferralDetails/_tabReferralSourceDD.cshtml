@@ -1,0 +1,143 @@
+﻿@model HC_AddReferralModel
+@{bool isEditMode = Model != null && Model.Referral.ReferralID > 0;}
+
+
+<div class="row">
+    <div class="col-sm-12">
+
+
+        <div class="col-sm-12">
+            <div class="form-group row">
+                <div class="fscontainer">
+                    <div class="row">
+                        <div class="col-sm-12">
+
+
+                            <div class="col-sm-12">
+                                <div class="form-group row">
+                                    <div class="fscontainer">
+                                            <form id="frmReferralSources">
+                                                <div class="col-sm-12">
+                                                    <div class="row">
+                                                        <div class="form-group col-lg-3 col-md-3 col-sm-12">
+                                                            <label class="control-label required">@Resource.Name</label>
+                                                            <input type="text" class="form-control input-sm requiredStrip" data-ng-model="ReferralSources.Name" />
+                                                        </div>
+
+                                                        <div data-ng-class="form-group col-lg-3 col-md-3 col-sm-12">
+                                                            <label class="control-label"></label>
+                                                            <div>
+                                                                <a href="javascript:void(0);" data-ng-if="IsReferralSources==true" data-ng-click="SaveReferralSource(ReferralSources,'ReferralSources')" class="btn btn-sm green-jungle">@Resource.Save</a>
+                                                                <a href="javascript:void(0);" data-ng-if="IsReferralStatuses==true" data-ng-click="SaveReferralSource(ReferralSources,'ReferralStatuses')" class="btn btn-sm green-jungle">@Resource.Save</a>
+                                                                <a href="javascript:void(0);" data-ng-click="ReferralSourceModelClosed()" class="btn btn-sm red-mint">@Resource.Cancel</a>
+                                                              
+                                                            </div>
+                                                        </div>
+
+                                                        <hr />
+                                                    </div>
+                                                </div>
+                                            </form>
+                                       
+                                            <div>
+                                                <div class="row">
+                                                    <div class="col-md-12 col-sm-12 col-xs-12">
+                                                        <div class="btn-group">
+                                                            <select class="btn blue btn-sm grey border-grey-cascade" data-ng-if="IsReferralSources==true" data-ng-model="Isdeleted" data-ng-change="GetReferralSource('ReferralSources',Isdeleted)">
+                                                                <option value="" selected>All</option>
+                                                                <option value="0">Active</option>
+                                                                <option value="1">Delete</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="btn-group">
+                                                            <select class="btn blue btn-sm grey border-grey-cascade" data-ng-if="IsReferralStatuses==true" data-ng-model="Isdeleted" data-ng-change="GetReferralSource('ReferralStatuses',Isdeleted)">
+                                                                <option value="" selected>All</option>
+                                                                <option value="0">Active</option>
+                                                                <option value="1">Delete</option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="space20"></div>
+                                                </div>
+
+                                                <div>
+                                                    <div class="row">
+                                                        <div class="col-sm-15">
+                                                            <div class="portlet-body" style="display: block;">
+                                                                <form id="FrmDDMasterList">
+                                                                    <div class="col-lg-12 col-md-12 col-sm-12">
+                                                                        <div class="portlet-body compact">
+                                                                            <div class="dataTables_wrapper" style="max-height: 350px; overflow-y: scroll ">
+                                                                                <table class="table table-bordered table-striped table-hover table-condensed tbl_reflog">
+                                                                                    <thead class="flip-content">
+                                                                                        <tr>
+                                                                                            <th>
+                                                                                                <a class="anchor_color" href="javascript:void(0);">ID</a>
+                                                                                            </th>
+                                                                                            <th>
+                                                                                                <a class="anchor_color" href="javascript:void(0);">@Resource.Name</a>
+                                                                                            </th>
+                                                                                            <th class="width-120px" style="text-align:center">@Resource.Action</th>
+                                                                                        </tr>
+                                                                                    </thead>
+
+                                                                                    <tbody>
+                                                                                        <tr  data-ng-repeat="item in ReferralSourcesDDList | filter:search" >
+                                                                                           
+                                                                                                @*<td>
+                                                                                                    <input type="checkbox" class="unicheckbox" data-ng-model="ddMaster.IsChecked" data-ng-change="SelectDDMaster(ddMaster)" val="ddMaster.IsChecked">
+                                                                                                </td>*@
+                                                                                           
+                                                                                                <td>
+                                                                                                    {{item.Value}}
+                                                                                                </td>
+                                                                                                <td>
+                                                                                                    {{item.Name}}
+                                                                                                </td>
+                     
+                                                                                                <td class="text-align-center">
+                                                                                                    @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_AddUpdate))
+                                                                                                    {
+                                                                                                        <a href="javascript:void(0);" data-ng-if="IsReferralSources==true" data-ng-click="EditReferralSources(item,'ReferralSources')" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                                                        <a href="javascript:void(0);" data-ng-if="IsReferralStatuses==true" data-ng-click="EditReferralSources(item,'ReferralStatuses')" class="btn btn-xs blue margin-right-05"><i class="fa fa-edit"></i> </a>
+                                                                                                    }
+                                                                                                    @if (Common.HasPermission(Constants.HC_Permission_GeneralMaster_Delete))
+                                                                                                    {
+                                                                                                        
+                                                                                                            <a href="javascript:void(0);" data-ng-if="IsReferralSources==true" data-ng-show="item.IsDeleted" data-ng-click="DeleteReferralSourcesDD(item,'Active','ReferralSources')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                                                            <a href="javascript:void(0);" data-ng-if="IsReferralSources==true" data-ng-show="!item.IsDeleted" data-ng-click="DeleteReferralSourcesDD(item,'Delete','ReferralSources')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                                                                      
+                                                                                                            <a href="javascript:void(0);" data-ng-if="IsReferralStatuses==true" data-ng-show="item.IsDeleted" data-ng-click="DeleteReferralSourcesDD(item,'Active','ReferralStatuses')" class="btn btn-xs green">@Resource.Enable</a>
+                                                                                                            <a href="javascript:void(0);" data-ng-if="IsReferralStatuses==true" data-ng-show="!item.IsDeleted" data-ng-click="DeleteReferralSourcesDD(item,'Delete','ReferralStatuses')" class="btn btn-xs red "><i class="fa fa-trash"></i></a>
+                                                                                                       
+                                                                                                    }
+
+                                                                                                </td>
+                                                                                        </tr>
+                                                                                    </tbody>
+
+                                                                                </table>
+                                                                            </div>
+                                                                        </div>
+
+                                                                    </div>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                            </div>
+                                        
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
