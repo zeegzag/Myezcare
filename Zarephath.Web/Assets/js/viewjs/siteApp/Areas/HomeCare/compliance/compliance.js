@@ -85,7 +85,6 @@ controllers.ComplianceController = function ($scope, $http, $timeout, $window, $
     //    })
     //}
     $scope.GetAssigneeList = function () {
-        debugger
         let jsonData = angular.toJson({ UserType: $scope.Compliance.UserType });
         AngularAjaxCall($http, HomeCareSiteUrl.GetAssigneeList, jsonData, "post", "json", "application/json", true).
             success(function (response) {
@@ -94,7 +93,6 @@ controllers.ComplianceController = function ($scope, $http, $timeout, $window, $
     };
 
     $scope.GetDirectoryList = function (item) {
-        debugger;
         if (item != undefined || item != null) {
             $scope.Compliance.UserType = item;
         }
@@ -113,7 +111,6 @@ controllers.ComplianceController = function ($scope, $http, $timeout, $window, $
     };
 
     $scope.EditCompliance = function (data) {
-        debugger
         $scope.GetAssigneeList(data.UserType);
         $scope.GetDirectoryList(data.UserType);
         //console.log(data)

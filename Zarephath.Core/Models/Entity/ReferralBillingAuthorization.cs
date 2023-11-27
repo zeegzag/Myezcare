@@ -45,8 +45,8 @@ namespace Zarephath.Core.Models.Entity
         [Range(1, long.MaxValue, ErrorMessageResourceName = "ServiceCodeRequired", ErrorMessageResourceType = typeof(Resource))]
         public long ServiceCodeID { get; set; }
 
-        [Required(ErrorMessageResourceName = "RateRequired", ErrorMessageResourceType = typeof(Resource))]
-        [RegularExpression(@"[0-9]*\.?[0-9]+", ErrorMessageResourceName = "Ratemustbenumber", ErrorMessageResourceType = typeof(Resource))]
+        //[Required(ErrorMessageResourceName = "RateRequired", ErrorMessageResourceType = typeof(Resource))]
+        //[RegularExpression(@"[0-9]*\.?[0-9]+", ErrorMessageResourceName = "Ratemustbenumber", ErrorMessageResourceType = typeof(Resource))]
         public float Rate { get; set; }
 
         public long? RevenueCode { get; set; }
@@ -109,7 +109,7 @@ namespace Zarephath.Core.Models.Entity
         public string DxCode { get; set; }
         public string DxCodeID { get; set; }
 
-        [RegularExpression(@"[0-9]*\.?[0-9]+", ErrorMessageResourceName = "Ratemustbenumber", ErrorMessageResourceType = typeof(Resource))]
+        //[RegularExpression(@"[0-9]*\.?[0-9]+", ErrorMessageResourceName = "Ratemustbenumber", ErrorMessageResourceType = typeof(Resource))]
         public float PayRate { get; set; }
 
         public string FacilityCode { get; set; }

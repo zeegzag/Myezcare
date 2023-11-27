@@ -50,5 +50,6 @@ namespace Zarephath.Core.Models.Entity
 
         public string SelectedRoles { get; set; }
         public string Assignee { get; set; }
+        public bool ShowToAll { get; set; }
     }
 }
