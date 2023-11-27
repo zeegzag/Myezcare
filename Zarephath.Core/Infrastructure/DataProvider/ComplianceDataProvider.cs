@@ -97,6 +97,7 @@ namespace Zarephath.Core.Infrastructure.DataProvider
                 searchList.Add(new SearchValueData("SystemID", Common.GetHostAddress()));
                 searchList.Add(new SearchValueData("SelectedRoles", Convert.ToString(compliance.SelectedRoles)));
                 searchList.Add(new SearchValueData("Assignee", Convert.ToString(compliance.Assignee)));
+                searchList.Add(new SearchValueData("ShowToAll", Convert.ToString(compliance.ShowToAll)));
 
                 int data = (int)GetScalar(StoredProcedure.SaveCompliance, searchList);
                 if (data == -1)
