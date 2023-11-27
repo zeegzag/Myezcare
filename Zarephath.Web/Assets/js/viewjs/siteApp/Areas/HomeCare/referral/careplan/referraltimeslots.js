@@ -198,6 +198,7 @@ controllers.AddReferralTimeSlotsController = function ($scope, $http) {
     $scope.OrgRTSMaster = {};
     
     $scope.OpenRTSMasterModal = function ($event, item) {
+        debugger
         $('#lblDayAdded').addClass('hide');
         $('#btnDropdown').text('');
         $event.stopPropagation();
@@ -552,6 +553,7 @@ controllers.AddReferralTimeSlotsController = function ($scope, $http) {
                 $scope.GetRTSDetailList();
         } 
         //$scope.ExistanceOfReferralTimeslot();de
+        $scope.RTSDetail.UsedInScheduling = true;
     };
 
 
